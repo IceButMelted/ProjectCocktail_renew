@@ -8,6 +8,7 @@ public class N_PlacementSystem : MonoBehaviour
     [SerializeField]
     private N_InputManager inputManager;
 
+    [SerializeField]
     private float floatingDistance = 3f;
 
     private GameObject selectedObject;
