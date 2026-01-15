@@ -2,24 +2,31 @@ using System;
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using UnityEngine.Rendering;
 
 public class CameraController_001 : MonoBehaviour
 {
     Camera mainCamera;
     Vector3 mousePos;
 
+    [Header("Camera Control")]
+    [SerializeField]
+    bool CanTurnSide = false;
+    [SerializeField]
+    bool CanMoveCamera = false;
+
     [Header("Transition Threshold")]
     [SerializeField]
-    [Range(10, 50)]
+    [Range(10, 70)]
     float TolookingSide = 30; //percentage of screen width
     [SerializeField]
-    [Range(10, 50)]
+    [Range(10, 70)]
     float BackFormSide = 40; // percentage of screen width
     [SerializeField]
     [Range(10, 50)]
     float TolookingDown = 20; // percentage of screen height
     [SerializeField]
-    [Range(10, 50)]
+    [Range(10, 80)]
     float BackFromDown = 30; // percentage of screen height
     [Space(5)]
 
@@ -39,6 +46,21 @@ public class CameraController_001 : MonoBehaviour
     Quaternion _targetRotation;
     float rotateProgress = 0f;
     Quaternion startRotation;
+    [Space(5)]
+
+    [Header("Camera Position")]
+    [SerializeField]
+    float moveDownDistance = 1f;
+
+    Vector3 InitPosition;
+    Vector3 DownPosition;
+    float moveDuration = 0.6f;
+    Vector3 _targetPosition;
+    float moveProgress = 0f;
+    Vector3 startPosition;
+    bool IsMoveCamera = false;
+
+
 
     // Hover delay system
     bool isHovering = false;
@@ -58,7 +80,6 @@ public class CameraController_001 : MonoBehaviour
             _lookDirection = value;
         }
     }
-
     public enum LookingDirection
     {
         Forward,
@@ -70,6 +91,8 @@ public class CameraController_001 : MonoBehaviour
     private void Awake()
     {
         mainCamera = Camera.main;
+        InitPosition = transform.position;
+        DownPosition = transform.position - new Vector3(0, moveDownDistance, 0);
     }
 
     void Start()
@@ -95,6 +118,10 @@ public class CameraController_001 : MonoBehaviour
             UpdateHoverDelay();
             CheckTransitions();
         }
+        if (IsMoveCamera)
+        {
+            MoveCamera();
+        }
     }
 
     void UpdateHoverDelay()
@@ -107,6 +134,7 @@ public class CameraController_001 : MonoBehaviour
             {
                 // Hover delay complete, start rotation
                 StartRotation(pendingDirection);
+                StartTranslation(pendingDirection);
                 isHovering = false;
                 hoverTime = 0f;
             }
@@ -138,10 +166,14 @@ public class CameraController_001 : MonoBehaviour
                 break;
 
             case LookingDirection.Left:
+                if (!CanTurnSide)
+                    break;
                 CheckBackFromLeft();
                 break;
 
             case LookingDirection.Right:
+                if (!CanTurnSide)
+                    break;
                 CheckBackFromRight();
                 break;
 
@@ -260,6 +292,35 @@ public class CameraController_001 : MonoBehaviour
         _targetRotation = Quaternion.Euler(targetEuler);
     }
 
+    void StartTranslation(LookingDirection newDirection)
+    {
+        if (!CanMoveCamera) return; // Check if camera movement is enabled
+
+        IsMoveCamera = true;
+        moveProgress = 0f;
+        startPosition = transform.position; 
+        
+
+        Vector3 targetPosition = Vector3.zero;
+        switch (newDirection)
+        {
+            case LookingDirection.Forward:
+                targetPosition = InitPosition;
+                Debug.Log("Starting translation to Forward");
+                break;
+            case LookingDirection.Down:
+                targetPosition = DownPosition;
+                Debug.Log("Starting translation to Down");
+                break;
+            default:
+                // For Left/Right, don't move camera
+                IsMoveCamera = false;
+                return;
+        }
+
+        _targetPosition = targetPosition;
+    }
+
     void RotateCamera()
     {
         rotateProgress += Time.deltaTime / rotateDuration;
@@ -276,6 +337,25 @@ public class CameraController_001 : MonoBehaviour
             // Smooth rotation using Slerp (Spherical Linear Interpolation)
             float smoothProgress = Mathf.SmoothStep(0f, 1f, rotateProgress);
             mainCamera.transform.localRotation = Quaternion.Slerp(startRotation, _targetRotation, smoothProgress);
+        }
+    }
+
+    void MoveCamera()
+    {
+        moveProgress += Time.deltaTime / moveDuration;
+        Debug.Log($"{moveProgress} MoveCamera");
+
+        if (moveProgress >= 1f) 
+        {
+            mainCamera.transform.position = _targetPosition; 
+            moveProgress = 0f;
+            IsMoveCamera = false;
+        }
+        else
+        {
+            float smoothProgress = Mathf.SmoothStep(0f, 1f, moveProgress);
+            mainCamera.transform.position = Vector3.Lerp(startPosition, _targetPosition, smoothProgress);
+            float smoothStopZ = Mathf.SmoothStep(-1f, 1f, moveDuration);
         }
     }
 }
