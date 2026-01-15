@@ -10,16 +10,16 @@ public class CameraController_001 : MonoBehaviour
 
     [Header("Transition Threshold")]
     [SerializeField]
-    [Range(10, 40)]
+    [Range(10, 50)]
     float TolookingSide = 30; //percentage of screen width
     [SerializeField]
-    [Range(10, 40)]
+    [Range(10, 50)]
     float BackFormSide = 40; // percentage of screen width
     [SerializeField]
-    [Range(10, 40)]
+    [Range(10, 50)]
     float TolookingDown = 20; // percentage of screen height
     [SerializeField]
-    [Range(10, 40)]
+    [Range(10, 50)]
     float BackFromDown = 30; // percentage of screen height
     [Space(5)]
 
