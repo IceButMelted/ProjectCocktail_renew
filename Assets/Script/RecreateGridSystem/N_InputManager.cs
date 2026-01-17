@@ -67,6 +67,22 @@ public class N_InputManager : MonoBehaviour
             return null;
     }
 
+    public GameObject GetObjectMouseHover() {
+        if (Mouse.current == null)
+            return null;
+
+        Vector3 mousePos = Mouse.current.position.ReadValue();
+        mousePos.z = sceneCamera.nearClipPlane;
+        Ray ray = sceneCamera.ScreenPointToRay(mousePos);
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit, range, draggableLayer))
+        {
+            return hit.collider.gameObject;
+        }
+        else
+            return null;
+    }
+
     public Vector3 GetFloatingPosition(float distance)
     {
         if (Mouse.current == null)
