@@ -1,4 +1,5 @@
 using System.Drawing;
+using Unity.VisualScripting;
 using UnityEditor.UIElements;
 using UnityEngine;
 using UnityEngine.InputSystem;
@@ -62,6 +63,22 @@ public class N_InputManager : MonoBehaviour
         if (Physics.Raycast(ray, out hit, range, draggableLayer))
         { 
             return hit.collider.gameObject;
+        }
+        else
+            return null;
+    }
+
+    public DragableObject GetDragableObject() {
+        if (Mouse.current == null)
+            return null;
+
+        Vector3 mousePos = Mouse.current.position.ReadValue();
+        mousePos.z = sceneCamera.nearClipPlane;
+        Ray ray = sceneCamera.ScreenPointToRay(mousePos);
+        RaycastHit hit;
+        if (Physics.Raycast(ray, out hit, range, draggableLayer))
+        {
+            return hit.collider.gameObject.GetComponent<DragableObject>();
         }
         else
             return null;

@@ -35,7 +35,7 @@ public class DragableObject : MonoBehaviour
 
     void FixedUpdate()
     {
-        BeingDrags = true; //for check code before attach to other code
+        //BeingDrags = true; //for check code before attach to other code
 
         if (!BeingDrags)
         {
