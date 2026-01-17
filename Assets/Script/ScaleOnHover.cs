@@ -10,7 +10,7 @@ public class ScaleOnHover : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     private float newScale = 1.1f;
 
     [SerializeField]
-    private float scaleDuration = 0.2f; // Optional: smooth scaling
+    private float scaleDuration = 0.2f; 
 
     private Vector3 targetScale;
     private bool isScaling = false;
@@ -31,7 +31,7 @@ public class ScaleOnHover : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
 
     private void Update()
     {
-        // Optional: Smooth scaling
+
         if (isScaling)
         {
             transform.localScale = Vector3.Lerp(transform.localScale, targetScale, Time.deltaTime / scaleDuration);
@@ -44,23 +44,6 @@ public class ScaleOnHover : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
         }
     }
 
-    //private void OnMouseEnter()
-    //{
-    //    ChangeScale(true);
-    //    Debug.Log("Mouse entered: " + gameObject.name);
-    //}
-
-    //private void OnMouseExit()
-    //{
-    //    ChangeScale(false);
-    //    Debug.Log("Mouse exited: " + gameObject.name);
-    //}
-
-    //private void OnMouseDown()
-    //{
-    //    Debug.Log("Mouse down on: " + gameObject.name);
-    //}
-
     private void ChangeScale(bool status)
     {
         if (status)
@@ -72,9 +55,6 @@ public class ScaleOnHover : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
             targetScale = initScale;
         }
 
-        // For instant scaling, uncomment this line and comment out the smooth scaling in Update()
-        // transform.localScale = targetScale;
-
         // For smooth scaling
         isScaling = true;
     }
@@ -82,12 +62,12 @@ public class ScaleOnHover : MonoBehaviour, IPointerEnterHandler, IPointerExitHan
     public void OnPointerEnter(PointerEventData eventData)
     {
         ChangeScale(true);
-        Debug.Log("Mouse entered: " + gameObject.name);
+        //Debug.Log("Mouse entered: " + gameObject.name);
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
         ChangeScale(false);
-        Debug.Log("Mouse entered: " + gameObject.name);
+        //Debug.Log("Mouse entered: " + gameObject.name);
     }
 }
