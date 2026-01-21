@@ -51,7 +51,7 @@ public class N_PlacementSystem : MonoBehaviour
             }
         }
         //on release
-        if (Mouse.current.leftButton.wasReleasedThisFrame && selectedObject != null)
+        if (Mouse.current.leftButton.wasReleasedThisFrame && selectedObject != null && selectedDragsObject != null)
         {
             //if can placed that place
             if (selectedDragsObject.CanPlaced && !selectedObjectIsFloating)
