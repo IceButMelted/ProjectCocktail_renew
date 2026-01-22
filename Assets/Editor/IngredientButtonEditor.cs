@@ -4,14 +4,14 @@ using UnityEditor;
 [CustomEditor(typeof(IngredientButton))]
 public class IngredientButtonEditor : Editor
 {
-    SerializedProperty m_MixerOrAlcohol;
+    SerializedProperty TypeIngredient;
     SerializedProperty mixer;
     SerializedProperty alcohol;
 
     private void OnEnable()
     {
         // Link serialized properties
-        m_MixerOrAlcohol = serializedObject.FindProperty("m_MixerOrAlcohol");
+        TypeIngredient = serializedObject.FindProperty("TypeIngredient");
         mixer = serializedObject.FindProperty("mixer");
         alcohol = serializedObject.FindProperty("alcohol");
     }
@@ -27,10 +27,10 @@ public class IngredientButtonEditor : Editor
         GUI.enabled = true;
 
         // Draw the MixerOrAlcohol enum field
-        EditorGUILayout.PropertyField(m_MixerOrAlcohol);
+        EditorGUILayout.PropertyField(TypeIngredient);
 
         // Get the current enum value
-        int enumValue = m_MixerOrAlcohol.enumValueIndex;
+        int enumValue = TypeIngredient.enumValueIndex;
 
         // Show fields based on the enum value
         // 0 = None, 1 = Mixer, 2 = Alcohol

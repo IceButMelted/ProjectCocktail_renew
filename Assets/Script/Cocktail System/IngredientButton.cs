@@ -18,7 +18,7 @@ public class IngredientButton : MonoBehaviour, IPointerEnterHandler, IPointerExi
 
     private bool CanClick = false;
     [SerializeField]
-    private MixerOrAlcohol m_MixerOrAlcohol;
+    private MixerOrAlcohol TypeIngredient;
     [SerializeField]
     private E_Cocktail.Mixer mixer;
     [SerializeField]
@@ -49,9 +49,9 @@ public class IngredientButton : MonoBehaviour, IPointerEnterHandler, IPointerExi
             {
                 if (Mouse.current.leftButton.wasPressedThisFrame)
                 {
-                    if (m_MixerOrAlcohol == MixerOrAlcohol.Mixer)
+                    if (TypeIngredient == MixerOrAlcohol.Mixer)
                         cocktailMaker.OnAddMixer?.Invoke(mixer, 1);
-                    else if (m_MixerOrAlcohol == MixerOrAlcohol.Alcohol)
+                    else if (TypeIngredient == MixerOrAlcohol.Alcohol)
                         cocktailMaker.OnAddAlcohol?.Invoke(alcohol, 1);
                 }
             }
