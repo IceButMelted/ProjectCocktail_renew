@@ -71,4 +71,26 @@ public class CocktailMaker : MonoBehaviour
 
         return total;
     }
+
+    public void  GetCocktailInfo() {
+        string _info = "";
+
+        _info += "Name : " + makingCocktail.cocktailName;
+        _info += "\n Method : " + makingCocktail.method.ToString();
+        _info += "\n Add Ice ? : " + makingCocktail.AddIce.ToString();
+        _info += "\n Type Of Alcohol : " + makingCocktail.typeOfCocktail.ToString();
+        _info += "\n Alcohols";
+        foreach (KeyValuePair<E_Cocktail.Alcohol, int> kvp in makingCocktail.Alcohols) {
+            _info += $"\n\t {kvp.Key} {kvp.Value} shot";
+        }
+
+        _info += "\n Mixers";
+
+        foreach (KeyValuePair<E_Cocktail.Mixer, int> kvp in makingCocktail.Mixers)
+        {
+            _info += $"\n\t {kvp.Key} {kvp.Value} shot";
+        }
+        
+        Debug.Log( _info);
+    }
 }

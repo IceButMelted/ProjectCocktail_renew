@@ -53,6 +53,7 @@ public class IngredientButton : MonoBehaviour, IPointerEnterHandler, IPointerExi
                         cocktailMaker.OnAddMixer?.Invoke(mixer, 1);
                     else if (TypeIngredient == MixerOrAlcohol.Alcohol)
                         cocktailMaker.OnAddAlcohol?.Invoke(alcohol, 1);
+                    cocktailMaker.OnAddIngredient?.Invoke();
                 }
             }
         }
