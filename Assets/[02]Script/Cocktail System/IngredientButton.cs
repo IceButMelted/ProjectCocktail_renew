@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
 
-public class IngredientButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler
+public class IngredientButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler
 {
     enum MixerOrAlcohol
     {
@@ -13,6 +13,15 @@ public class IngredientButton : MonoBehaviour, IPointerEnterHandler, IPointerExi
         Mixer,
         Alcohol,
     }
+
+    [SerializeField]
+    private Material m_Material;
+    [SerializeField]
+    private Texture2D T_Default;
+    [SerializeField]
+    private Texture2D T_Hover;
+    [SerializeField]
+    private Texture2D T_Clicked;
 
     private CocktailMaker cocktailMaker;
 
@@ -26,18 +35,27 @@ public class IngredientButton : MonoBehaviour, IPointerEnterHandler, IPointerExi
 
     private void Awake()
     {
+        m_Material = GetComponent<MeshRenderer>().material;
+        ;  
+
         cocktailMaker = FindFirstObjectByType<CocktailMaker>();
+        m_Material.SetFloat("_EmssionStrength", 0);
+        m_Material.SetTexture("_CurrentTexture", T_Default);
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
         CanClick = true;
+        m_Material.SetFloat("_EmssionStrength", 0.25f);
+        m_Material.SetTexture("_CurrentTexture", T_Hover);
         Debug.Log("You can Click");
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
         CanClick &= !CanClick;
+        m_Material.SetFloat("_EmssionStrength", 0);
+        m_Material.SetTexture("_CurrentTexture", T_Default);
     }
 
     public void OnPointerDown(PointerEventData eventData)
@@ -57,5 +75,13 @@ public class IngredientButton : MonoBehaviour, IPointerEnterHandler, IPointerExi
                 }
             }
         }
+        m_Material.SetFloat("_EmssionStrength", 0.125f);
+        m_Material.SetTexture("_CurrentTexture", T_Clicked);
+    }
+
+    public void OnPointerUp(PointerEventData eventData)
+    {
+        m_Material.SetFloat("_EmssionStrength", 0);
+        m_Material.SetTexture("_CurrentTexture", T_Default);
     }
 }
