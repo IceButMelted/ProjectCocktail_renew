@@ -38,7 +38,7 @@ public struct S_Recipe
         return total;
     }
 
-    public void GetCocktailInfo()
+    public string GetCocktailInfo()
     {
         string _info = "";
 
@@ -59,7 +59,7 @@ public struct S_Recipe
             _info += $"\n\t {kvp.Key} {kvp.Value} shot";
         }
 
-        Debug.Log(_info);
+        return _info;
     }
 
     public bool IsSameRecipe(S_Recipe _Recipe)

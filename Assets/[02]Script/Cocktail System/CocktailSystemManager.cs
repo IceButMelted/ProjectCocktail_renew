@@ -6,20 +6,15 @@ public class CocktailSystemManager : MonoBehaviour
 {
     [SerializeField] private SO_CocktailList normalCocktailList;
     [SerializeField] private SO_CocktailList specialCocktailList;
-    private S_Recipe targetcocktail;
+    private S_Recipe targetcocktail = default(S_Recipe);
 
-    private void Awake()
+    private void Start()
     {
-        Debug.Log("none");
-        targetcocktail.GetCocktailInfo();
-
         RandomCocktail();
-        Debug.Log("All randome\n");
-        targetcocktail.GetCocktailInfo();
+        Debug.Log("All randome\n" + targetcocktail.GetCocktailInfo());
 
         RandomCocktail(E_Cocktail.TypeOfCocktail.LowAlcohol);
-        Debug.Log("Specific type");
-        targetcocktail.GetCocktailInfo();
+        Debug.Log("Specific type\n" + targetcocktail.GetCocktailInfo());
     }
 
     public S_Recipe RandomCocktail()
