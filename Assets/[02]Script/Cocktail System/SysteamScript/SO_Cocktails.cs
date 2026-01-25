@@ -7,4 +7,5 @@ public class SO_Cocktails : ScriptableObject
     public GameObject CocktailGameObject;
     public S_Recipe CocktailInfos;
 
+
 }

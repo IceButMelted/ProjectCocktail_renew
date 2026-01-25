@@ -31,7 +31,7 @@ public class CocktailMaker : MonoBehaviour
 
         if (makingCocktail.Alcohols.ContainsKey(alcohol))
         {
-            makingCocktail.Alcohols[alcohol] += amount;  // Fixed: was += 1
+            makingCocktail.Alcohols[alcohol] += amount;
         }
         else
         {
@@ -46,7 +46,7 @@ public class CocktailMaker : MonoBehaviour
 
         if (makingCocktail.Mixers.ContainsKey(mixer))
         {
-            makingCocktail.Mixers[mixer] += amount;  // Fixed: was += 1
+            makingCocktail.Mixers[mixer] += amount;  
         }
         else
         {
@@ -55,42 +55,9 @@ public class CocktailMaker : MonoBehaviour
 
     }
 
-    public int GetTotalIngredient()  // Fixed typo: Ingradient -> Ingredient
+    public int GetTotalIngredient()  
     {
-        int total = 0;
-
-        if (makingCocktail.Alcohols != null)
-        {
-            total += makingCocktail.Alcohols.Values.Sum();
-        }
-
-        if (makingCocktail.Mixers != null)
-        {
-            total += makingCocktail.Mixers.Values.Sum();
-        }
-
-        return total;
+        return makingCocktail.GetTotalIngredient();
     }
 
-    public void  GetCocktailInfo() {
-        string _info = "";
-
-        _info += "Name : " + makingCocktail.cocktailName;
-        _info += "\n Method : " + makingCocktail.method.ToString();
-        _info += "\n Add Ice ? : " + makingCocktail.AddIce.ToString();
-        _info += "\n Type Of Alcohol : " + makingCocktail.typeOfCocktail.ToString();
-        _info += "\n Alcohols";
-        foreach (KeyValuePair<E_Cocktail.Alcohol, int> kvp in makingCocktail.Alcohols) {
-            _info += $"\n\t {kvp.Key} {kvp.Value} shot";
-        }
-
-        _info += "\n Mixers";
-
-        foreach (KeyValuePair<E_Cocktail.Mixer, int> kvp in makingCocktail.Mixers)
-        {
-            _info += $"\n\t {kvp.Key} {kvp.Value} shot";
-        }
-        
-        Debug.Log( _info);
-    }
 }

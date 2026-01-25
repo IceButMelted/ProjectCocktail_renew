@@ -61,7 +61,7 @@ public class E_Cocktail
         NotMatch
     }
 
-    public enum CocktaillResualt : byte
+    public enum CocktailResult : byte
     {
         Success = 0,
         Aceptable,
