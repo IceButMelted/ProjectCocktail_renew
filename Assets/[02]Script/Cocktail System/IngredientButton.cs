@@ -7,11 +7,14 @@ using UnityEngine.InputSystem;
 
 public class IngredientButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler
 {
-    enum MixerOrAlcohol
+    enum Behaviability
     {
         None,
         Mixer,
         Alcohol,
+        Shaking,
+        Mixing,
+        Reset,
     }
 
     [SerializeField]
@@ -25,9 +28,12 @@ public class IngredientButton : MonoBehaviour, IPointerEnterHandler, IPointerExi
 
     private CocktailMaker cocktailMaker;
 
+    [SerializeField]
+    private bool ShouldCanClick = true;
+
     private bool CanClick = false;
     [SerializeField]
-    private MixerOrAlcohol TypeIngredient;
+    private Behaviability TypeIngredient;
     [SerializeField]
     private E_Cocktail.Mixer mixer;
     [SerializeField]
@@ -60,6 +66,7 @@ public class IngredientButton : MonoBehaviour, IPointerEnterHandler, IPointerExi
 
     public void OnPointerDown(PointerEventData eventData)
     {
+        if (!ShouldCanClick) return;
         //was press mouse down
         if (CanClick)
         {
@@ -67,11 +74,25 @@ public class IngredientButton : MonoBehaviour, IPointerEnterHandler, IPointerExi
             {
                 if (Mouse.current.leftButton.wasPressedThisFrame)
                 {
-                    if (TypeIngredient == MixerOrAlcohol.Mixer)
+                    if (TypeIngredient == Behaviability.Mixer)
+                    {
                         cocktailMaker.OnAddMixer?.Invoke(mixer, 1);
-                    else if (TypeIngredient == MixerOrAlcohol.Alcohol)
+                        cocktailMaker.OnAddIngredient?.Invoke();
+                    }
+                    else if (TypeIngredient == Behaviability.Alcohol)
+                    {
                         cocktailMaker.OnAddAlcohol?.Invoke(alcohol, 1);
-                    cocktailMaker.OnAddIngredient?.Invoke();
+                        cocktailMaker.OnAddIngredient?.Invoke();
+                    }
+                    else if (TypeIngredient == Behaviability.Shaking) 
+                    {
+                        cocktailMaker.SetMethod(E_Cocktail.Method.Shaking);
+                    }
+                    else if (TypeIngredient == Behaviability.Mixing) 
+                    {
+                        cocktailMaker.SetMethod(E_Cocktail.Method.Mixing);
+                    }
+                    
                 }
             }
         }

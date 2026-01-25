@@ -60,4 +60,8 @@ public class CocktailMaker : MonoBehaviour
         return makingCocktail.GetTotalIngredient();
     }
 
+
+    public void SetMethod(Method method) { 
+        makingCocktail.method = method;
+    }
 }

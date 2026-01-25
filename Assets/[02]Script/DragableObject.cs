@@ -27,6 +27,9 @@ public class DragableObject : MonoBehaviour
     public LayerMask detectLayerMask;
     private Collider colliderOfObject;
 
+    [Header("Debugging Zone")]
+    public bool DebugDraw = false;   
+
     private void Awake()
     {
         _pastLocation = gameObject.transform.localPosition;
@@ -77,6 +80,7 @@ public class DragableObject : MonoBehaviour
     // Optional: Draw the box in the scene view for debugging purposes
     void OnDrawGizmos()
     {
+        if(!DebugDraw) { return; }
         Gizmos.color = CanPlaced ? Color.green :Color.red;
         // The Gizmos matrix is used to apply the object's rotation to the drawn cube
         Gizmos.matrix = Matrix4x4.TRS(transform.position, transform.rotation, Vector3.one);

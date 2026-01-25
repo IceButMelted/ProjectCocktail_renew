@@ -8,6 +8,9 @@ public class IngredientButtonEditor : Editor
     SerializedProperty T_Default;
     SerializedProperty T_Hover;
     SerializedProperty T_Clicked;
+
+    SerializedProperty ShouldCanClick;
+
     SerializedProperty TypeIngredient;
     SerializedProperty mixer;
     SerializedProperty alcohol;
@@ -24,6 +27,7 @@ public class IngredientButtonEditor : Editor
         TypeIngredient = serializedObject.FindProperty("TypeIngredient");
         mixer = serializedObject.FindProperty("mixer");
         alcohol = serializedObject.FindProperty("alcohol");
+        ShouldCanClick = serializedObject.FindProperty("ShouldCanClick");
     }
 
     public override void OnInspectorGUI()
@@ -35,6 +39,8 @@ public class IngredientButtonEditor : Editor
         GUI.enabled = false;
         EditorGUILayout.ObjectField("Script", MonoScript.FromMonoBehaviour((IngredientButton)target), typeof(IngredientButton), false);
         GUI.enabled = true;
+
+        EditorGUILayout.PropertyField(ShouldCanClick);
 
         EditorGUILayout.Space(5);
 

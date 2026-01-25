@@ -320,6 +320,7 @@ MonoBehaviour:
   T_Default: {fileID: 2800000, guid: 61dead64264f27b40b2ff9f4c2ca1946, type: 3}
   T_Hover: {fileID: 2800000, guid: 44baf45470b59df4a9c6118f8e446c83, type: 3}
   T_Clicked: {fileID: 2800000, guid: 7dce1c903ab6fcf45817c2924de91ad2, type: 3}
+  ShouldCanClick: 1
   TypeIngredient: 1
   mixer: 3
   alcohol: 2
@@ -490,6 +491,7 @@ MonoBehaviour:
   T_Default: {fileID: 2800000, guid: cdb32641de392d749bbaca65b9d46d93, type: 3}
   T_Hover: {fileID: 2800000, guid: fd5574b4f10eca948bf8bbfb70acbea9, type: 3}
   T_Clicked: {fileID: 2800000, guid: d1a44c36942f0014b9236958a0c1273e, type: 3}
+  ShouldCanClick: 1
   TypeIngredient: 1
   mixer: 2
   alcohol: 3
@@ -585,6 +587,140 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 89068464}
+  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!1 &98172225
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 98172226}
+  - component: {fileID: 98172230}
+  - component: {fileID: 98172229}
+  - component: {fileID: 98172228}
+  - component: {fileID: 98172227}
+  m_Layer: 9
+  m_Name: Plane
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &98172226
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 98172225}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -19.866661, y: 0, z: 2.86}
+  m_LocalScale: {x: 2.9333334, y: 1, z: 0.6095238}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 1773464893}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &98172227
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 98172225}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e35202e08e403cd4fba7fceeb6e444a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::IngredientButton
+  m_Material: {fileID: 0}
+  T_Default: {fileID: 2800000, guid: 8982f15d432462f4ab4a30d8aa35d9af, type: 3}
+  T_Hover: {fileID: 2800000, guid: 15994e8f484ec1542a14ee544955b333, type: 3}
+  T_Clicked: {fileID: 2800000, guid: 8982f15d432462f4ab4a30d8aa35d9af, type: 3}
+  ShouldCanClick: 1
+  TypeIngredient: 4
+  mixer: 0
+  alcohol: 0
+--- !u!64 &98172228
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 98172225}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!23 &98172229
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 98172225}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: dec764644521013409427f27bd4e2401, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &98172230
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 98172225}
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1001 &112259631
 PrefabInstance:
@@ -856,6 +992,7 @@ MonoBehaviour:
   T_Default: {fileID: 2800000, guid: 6dd47ba122bdcca4e8e55dd0a1b81167, type: 3}
   T_Hover: {fileID: 2800000, guid: 9326326a802937a4aa2d44de9a04c848, type: 3}
   T_Clicked: {fileID: 2800000, guid: 23f48003aa23e2c46b210f3b316b9e04, type: 3}
+  ShouldCanClick: 1
   TypeIngredient: 1
   mixer: 5
   alcohol: 4
@@ -1026,6 +1163,7 @@ MonoBehaviour:
   T_Default: {fileID: 2800000, guid: bab165074020fb24a8277c796f5ece3f, type: 3}
   T_Hover: {fileID: 2800000, guid: 6d5280c153fa82a42a46a544030d3bc3, type: 3}
   T_Clicked: {fileID: 2800000, guid: 07d93d97d2100f441b9b127740d17d2c, type: 3}
+  ShouldCanClick: 1
   TypeIngredient: 1
   mixer: 4
   alcohol: 4
@@ -1140,7 +1278,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2383033270529986323, guid: 29604c82d8d0f2c4494cb4fa8d02c324, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.11542034
+      value: 0.15600014
       objectReference: {fileID: 0}
     - target: {fileID: 2383033270529986323, guid: 29604c82d8d0f2c4494cb4fa8d02c324, type: 3}
       propertyPath: m_LocalRotation.w
@@ -1441,6 +1579,7 @@ MonoBehaviour:
   T_Default: {fileID: 2800000, guid: f678bb946d213874b908194a9af7726c, type: 3}
   T_Hover: {fileID: 2800000, guid: acd7cf59d96e8ea4eb34ae115982c089, type: 3}
   T_Clicked: {fileID: 2800000, guid: 601d055b82252cb44bef4cb56621a920, type: 3}
+  ShouldCanClick: 1
   TypeIngredient: 2
   mixer: 0
   alcohol: 2
@@ -2335,6 +2474,7 @@ MonoBehaviour:
   T_Default: {fileID: 2800000, guid: 14ae198fdb6730a4fa7289680a4c5e42, type: 3}
   T_Hover: {fileID: 2800000, guid: 68c1075e38dfc1f4d81a75c050834d31, type: 3}
   T_Clicked: {fileID: 2800000, guid: e0b8ab599a506ca46b1cfdda1dc9cf29, type: 3}
+  ShouldCanClick: 1
   TypeIngredient: 1
   mixer: 1
   alcohol: 1
@@ -2627,6 +2767,7 @@ MonoBehaviour:
   T_Default: {fileID: 2800000, guid: 8036660d851b6dd449af7a7edc73945f, type: 3}
   T_Hover: {fileID: 2800000, guid: febfe039047ed1c4bb761f4dcbfa6c25, type: 3}
   T_Clicked: {fileID: 2800000, guid: 8c967cec7f9b1ed44b7ad9b9838b3f12, type: 3}
+  ShouldCanClick: 1
   TypeIngredient: 2
   mixer: 0
   alcohol: 3
@@ -3303,7 +3444,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 887533205}
+  - {fileID: 1773464893}
   m_Father: {fileID: 2011351561}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &758655791
@@ -3828,7 +3969,7 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 3027d5aa0c1884a45ac3022b8b18e3df, type: 3}
---- !u!1 &887533204
+--- !u!1 &950782935
 GameObject:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -3836,96 +3977,132 @@ GameObject:
   m_PrefabAsset: {fileID: 0}
   serializedVersion: 6
   m_Component:
-  - component: {fileID: 887533205}
-  - component: {fileID: 887533206}
-  m_Layer: 5
-  m_Name: CocktialMaker
+  - component: {fileID: 950782936}
+  - component: {fileID: 950782940}
+  - component: {fileID: 950782939}
+  - component: {fileID: 950782938}
+  - component: {fileID: 950782937}
+  m_Layer: 9
+  m_Name: Plane (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &887533205
+--- !u!4 &950782936
 Transform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 887533204}
+  m_GameObject: {fileID: 950782935}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: -19.866661, y: 0, z: -2.27}
+  m_LocalScale: {x: 2.9333334, y: 1, z: 0.6095238}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 758655790}
+  m_Father: {fileID: 1773464893}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &887533206
+--- !u!114 &950782937
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 887533204}
+  m_GameObject: {fileID: 950782935}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fd643a7da97d09d4e9d7a901d200e0f6, type: 3}
+  m_Script: {fileID: 11500000, guid: e35202e08e403cd4fba7fceeb6e444a4, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CocktailMaker
-  OnAddIngredient:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 887533206}
-        m_TargetAssemblyTypeName: CocktailMaker, Assembly-CSharp
-        m_MethodName: GetCocktailInfo
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  OnAddAlcohol:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 887533206}
-        m_TargetAssemblyTypeName: CocktailMaker, Assembly-CSharp
-        m_MethodName: AddAlcohol
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  OnAddMixer:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 887533206}
-        m_TargetAssemblyTypeName: CocktailMaker, Assembly-CSharp
-        m_MethodName: AddMixer
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  makingCocktail:
-    cocktailName: 
-    typeOfCocktail: 0
-    method: 0
-    AddIce: 0
-    Alcohols:
-      _serializedList: []
-    Mixers:
-      _serializedList: []
+  m_EditorClassIdentifier: Assembly-CSharp::IngredientButton
+  m_Material: {fileID: 0}
+  T_Default: {fileID: 2800000, guid: 4f2b10965c701964e98fcfba45df8bb7, type: 3}
+  T_Hover: {fileID: 2800000, guid: e021277a712ab2340bbb931c7960f210, type: 3}
+  T_Clicked: {fileID: 2800000, guid: 4f2b10965c701964e98fcfba45df8bb7, type: 3}
+  ShouldCanClick: 1
+  TypeIngredient: 3
+  mixer: 0
+  alcohol: 0
+--- !u!64 &950782938
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 950782935}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 0
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!23 &950782939
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 950782935}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: dec764644521013409427f27bd4e2401, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &950782940
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 950782935}
+  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
 --- !u!1001 &963315491
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4137,7 +4314,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2383033270529986323, guid: 29604c82d8d0f2c4494cb4fa8d02c324, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.11542034
+      value: 0.15600014
       objectReference: {fileID: 0}
     - target: {fileID: 2383033270529986323, guid: 29604c82d8d0f2c4494cb4fa8d02c324, type: 3}
       propertyPath: m_LocalRotation.w
@@ -4847,7 +5024,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2383033270529986323, guid: 29604c82d8d0f2c4494cb4fa8d02c324, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.11542034
+      value: 0.15600014
       objectReference: {fileID: 0}
     - target: {fileID: 2383033270529986323, guid: 29604c82d8d0f2c4494cb4fa8d02c324, type: 3}
       propertyPath: m_LocalRotation.w
@@ -5395,6 +5572,7 @@ MonoBehaviour:
   T_Default: {fileID: 2800000, guid: 7256f19f1d1974548ab979702d95ce8f, type: 3}
   T_Hover: {fileID: 2800000, guid: d555d94255b50594e8416ded815ec2d2, type: 3}
   T_Clicked: {fileID: 2800000, guid: d919386702d39ce46a7aa40acb065c95, type: 3}
+  ShouldCanClick: 1
   TypeIngredient: 2
   mixer: 0
   alcohol: 4
@@ -5955,6 +6133,7 @@ MonoBehaviour:
   T_Default: {fileID: 2800000, guid: 066984d47636db145bec21d55a673a3f, type: 3}
   T_Hover: {fileID: 2800000, guid: 9e52ce2ad57e2cb4199dbb137524c4cd, type: 3}
   T_Clicked: {fileID: 2800000, guid: 2335bea3343aca84ba06ba669f2c3df7, type: 3}
+  ShouldCanClick: 1
   TypeIngredient: 1
   mixer: 6
   alcohol: 3
@@ -6369,6 +6548,232 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 2383033270529986323, guid: 29604c82d8d0f2c4494cb4fa8d02c324, type: 3}
   m_PrefabInstance: {fileID: 1302556473}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1773464892
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1773464893}
+  - component: {fileID: 1773464897}
+  - component: {fileID: 1773464896}
+  - component: {fileID: 1773464895}
+  - component: {fileID: 1773464894}
+  - component: {fileID: 1773464898}
+  - component: {fileID: 1773464899}
+  - component: {fileID: 1773464900}
+  m_Layer: 7
+  m_Name: CocktailShaker
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1773464893
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1773464892}
+  serializedVersion: 2
+  m_LocalRotation: {x: -0, y: -0.7071068, z: 0.7071068, w: 0}
+  m_LocalPosition: {x: 7.05, y: 1.176, z: 4.785}
+  m_LocalScale: {x: 0.015000001, y: 0.015, z: 0.026250001}
+  m_ConstrainProportionsScale: 1
+  m_Children:
+  - {fileID: 98172226}
+  - {fileID: 950782936}
+  m_Father: {fileID: 758655790}
+  m_LocalEulerAnglesHint: {x: 90, y: 0, z: 180}
+--- !u!114 &1773464894
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1773464892}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: eb29c6328ada81c48a4f1ddd54af8b12, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ScaleOnHover
+  newScale: 1.1
+  scaleDuration: 0.2
+--- !u!64 &1773464895
+MeshCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1773464892}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 5
+  m_Convex: 1
+  m_CookingOptions: 30
+  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!23 &1773464896
+MeshRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1773464892}
+  m_Enabled: 1
+  m_CastShadows: 1
+  m_ReceiveShadows: 1
+  m_DynamicOccludee: 1
+  m_StaticShadowCaster: 0
+  m_MotionVectors: 1
+  m_LightProbeUsage: 1
+  m_ReflectionProbeUsage: 1
+  m_RayTracingMode: 2
+  m_RayTraceProcedural: 0
+  m_RayTracingAccelStructBuildFlagsOverride: 0
+  m_RayTracingAccelStructBuildFlags: 1
+  m_SmallMeshCulling: 1
+  m_ForceMeshLod: -1
+  m_MeshLodSelectionBias: 0
+  m_RenderingLayerMask: 1
+  m_RendererPriority: 0
+  m_Materials:
+  - {fileID: 2100000, guid: 653b5c43ccaa5c945a7b1b653084bd32, type: 2}
+  m_StaticBatchInfo:
+    firstSubMesh: 0
+    subMeshCount: 0
+  m_StaticBatchRoot: {fileID: 0}
+  m_ProbeAnchor: {fileID: 0}
+  m_LightProbeVolumeOverride: {fileID: 0}
+  m_ScaleInLightmap: 1
+  m_ReceiveGI: 1
+  m_PreserveUVs: 0
+  m_IgnoreNormalsForChartDetection: 0
+  m_ImportantGI: 0
+  m_StitchLightmapSeams: 1
+  m_SelectedEditorRenderState: 3
+  m_MinimumChartSize: 4
+  m_AutoUVMaxDistance: 0.5
+  m_AutoUVMaxAngle: 89
+  m_LightmapParameters: {fileID: 0}
+  m_GlobalIlluminationMeshLod: 0
+  m_SortingLayerID: 0
+  m_SortingLayer: 0
+  m_SortingOrder: 0
+  m_MaskInteraction: 0
+  m_AdditionalVertexStreams: {fileID: 0}
+--- !u!33 &1773464897
+MeshFilter:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1773464892}
+  m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1773464898
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1773464892}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 6102873c730fa6445b33680b1e865215, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DragableObject
+  CanPlaced: 1
+  numbersObjectOverlaying: 0
+  boxHalfExtents: {x: 0.06, y: 0.02, z: 0.13}
+  detectLayerMask:
+    serializedVersion: 2
+    m_Bits: 128
+  DebugDraw: 0
+--- !u!114 &1773464899
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1773464892}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e35202e08e403cd4fba7fceeb6e444a4, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::IngredientButton
+  m_Material: {fileID: 0}
+  T_Default: {fileID: 2800000, guid: a38d06b768b5fff4284ccec1b5925d53, type: 3}
+  T_Hover: {fileID: 2800000, guid: a38d06b768b5fff4284ccec1b5925d53, type: 3}
+  T_Clicked: {fileID: 2800000, guid: a38d06b768b5fff4284ccec1b5925d53, type: 3}
+  ShouldCanClick: 0
+  TypeIngredient: 0
+  mixer: 0
+  alcohol: 0
+--- !u!114 &1773464900
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1773464892}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fd643a7da97d09d4e9d7a901d200e0f6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CocktailMaker
+  OnAddIngredient:
+    m_PersistentCalls:
+      m_Calls: []
+  OnAddAlcohol:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1773464900}
+        m_TargetAssemblyTypeName: CocktailMaker, Assembly-CSharp
+        m_MethodName: AddAlcohol
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  OnAddMixer:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 1773464900}
+        m_TargetAssemblyTypeName: CocktailMaker, Assembly-CSharp
+        m_MethodName: AddMixer
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  makingCocktail:
+    cocktailName: 
+    typeOfCocktail: 0
+    method: 0
+    AddIce: 0
+    Alcohols:
+      _serializedList: []
+    Mixers:
+      _serializedList: []
 --- !u!1001 &1806843547
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6514,6 +6919,7 @@ MonoBehaviour:
   T_Default: {fileID: 2800000, guid: bb099c1bab71061418bf27e4a35b281b, type: 3}
   T_Hover: {fileID: 2800000, guid: 463ea70b261edaa4b99833eac53f2bf5, type: 3}
   T_Clicked: {fileID: 2800000, guid: 9bf365fc4dfa9854cb9a7cf6c5eaa633, type: 3}
+  ShouldCanClick: 1
   TypeIngredient: 2
   mixer: 0
   alcohol: 1
@@ -7425,7 +7831,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2383033270529986323, guid: 29604c82d8d0f2c4494cb4fa8d02c324, type: 3}
       propertyPath: m_LocalPosition.z
-      value: -0.11542034
+      value: 0.156
       objectReference: {fileID: 0}
     - target: {fileID: 2383033270529986323, guid: 29604c82d8d0f2c4494cb4fa8d02c324, type: 3}
       propertyPath: m_LocalRotation.w
