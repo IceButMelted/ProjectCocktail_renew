@@ -52,7 +52,8 @@ public class N_InputManager : MonoBehaviour
         return lastPosition;
     }
 
-    public GameObject GetObjectSelected() {
+    public GameObject GetObjectSelected()
+    {
         if (Mouse.current == null)
             return null;
 
@@ -60,15 +61,22 @@ public class N_InputManager : MonoBehaviour
         mousePos.z = sceneCamera.nearClipPlane;
         Ray ray = sceneCamera.ScreenPointToRay(mousePos);
         RaycastHit hit;
-        if (Physics.Raycast(ray, out hit, range, draggableLayer))
-        { 
-            return hit.collider.gameObject;
+
+        // Cast ray without layer mask to get first hit
+        if (Physics.Raycast(ray, out hit, range))
+        {
+            // Check if the hit object is on the draggable layer
+            if (((1 << hit.collider.gameObject.layer) & draggableLayer) != 0)
+            {
+                return hit.collider.gameObject;
+            }
         }
-        else
-            return null;
+
+        return null;
     }
 
-    public DragableObject GetDragableObject() {
+    public DragableObject GetDragableObject()
+    {
         if (Mouse.current == null)
             return null;
 
@@ -76,12 +84,18 @@ public class N_InputManager : MonoBehaviour
         mousePos.z = sceneCamera.nearClipPlane;
         Ray ray = sceneCamera.ScreenPointToRay(mousePos);
         RaycastHit hit;
-        if (Physics.Raycast(ray, out hit, range, draggableLayer))
+
+        // Cast ray without layer mask to get first hit
+        if (Physics.Raycast(ray, out hit, range))
         {
-            return hit.collider.gameObject.GetComponent<DragableObject>();
+            // Check if the hit object is on the draggable layer
+            if (((1 << hit.collider.gameObject.layer) & draggableLayer) != 0)
+            {
+                return hit.collider.gameObject.GetComponent<DragableObject>();
+            }
         }
-        else
-            return null;
+
+        return null;
     }
 
     public GameObject GetObjectMouseHover() {

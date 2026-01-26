@@ -27,7 +27,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3229928991928026398}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0.33154964, y: 0.052000046, z: -0.11542034}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
@@ -84,10 +84,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::DragableObject
   CanPlaced: 1
   numbersObjectOverlaying: 0
-  boxHalfExtents: {x: 0.085, y: 0.085, z: 0.085}
+  boxHalfExtents: {x: 0.085, y: 0.075, z: 0.085}
   detectLayerMask:
     serializedVersion: 2
     m_Bits: 128
+  DebugDraw: 0
 --- !u!1 &3979269304280579733
 GameObject:
   m_ObjectHideFlags: 0

@@ -32,7 +32,7 @@ public class DragableObject : MonoBehaviour
 
     private void Awake()
     {
-        _pastLocation = gameObject.transform.localPosition;
+        _pastLocation = gameObject.transform.position;
         colliderOfObject = GetComponent<Collider>();
     }
 
