@@ -192,17 +192,17 @@ public class CameraController_001 : MonoBehaviour
         if (mousePos.x > rightEnter)
         {
             StartHoverDelay(LookingDirection.Right);
-            Debug.Log("Hovering Right");
+            //Debug.Log("Hovering Right");
         }
         else if (mousePos.x < leftEnter)
         {
             StartHoverDelay(LookingDirection.Left);
-            Debug.Log("Hovering Left");
+            //Debug.Log("Hovering Left");
         }
         else if (mousePos.y < downEnter)
         {
             StartHoverDelay(LookingDirection.Down);
-            Debug.Log("Hovering Down");
+            //Debug.Log("Hovering Down");
         }
         else
         {
@@ -218,7 +218,7 @@ public class CameraController_001 : MonoBehaviour
         if (mousePos.x > leftExit)
         {
             StartHoverDelay(LookingDirection.Forward);
-            Debug.Log("Hovering to Forward from Left");
+            //Debug.Log("Hovering to Forward from Left");
         }
         else
         {
@@ -233,7 +233,7 @@ public class CameraController_001 : MonoBehaviour
         if (mousePos.x < rightExit)
         {
             StartHoverDelay(LookingDirection.Forward);
-            Debug.Log("Hovering to Forward from Right");
+            //Debug.Log("Hovering to Forward from Right");
         }
         else
         {
@@ -248,7 +248,7 @@ public class CameraController_001 : MonoBehaviour
         if (mousePos.y > downExit)
         {
             StartHoverDelay(LookingDirection.Forward);
-            Debug.Log("Hovering to Forward from Down");
+            //Debug.Log("Hovering to Forward from Down");
         }
         else
         {

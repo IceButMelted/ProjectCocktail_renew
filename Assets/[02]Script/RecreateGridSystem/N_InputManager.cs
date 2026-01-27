@@ -6,6 +6,8 @@ using UnityEngine.InputSystem;
 
 public class N_InputManager : MonoBehaviour
 {
+    
+
     [SerializeField]
     private Camera sceneCamera;
     [SerializeField]
@@ -22,9 +24,9 @@ public class N_InputManager : MonoBehaviour
     private Vector3 placementPosition;
     [SerializeField]
     private LayerMask boxplacementLayerMark;
-
-    [SerializeField] 
+    [SerializeField]
     private LayerMask draggableLayer;
+
 
 
     public Vector3 GetSelectedMapPosition()
@@ -62,8 +64,11 @@ public class N_InputManager : MonoBehaviour
         Ray ray = sceneCamera.ScreenPointToRay(mousePos);
         RaycastHit hit;
 
-        // Cast ray without layer mask to get first hit
-        if (Physics.Raycast(ray, out hit, range))
+        // Create a layer mask that excludes boxplacementLayerMark
+        int layerMask = ~boxplacementLayerMark;
+
+        // Cast ray excluding boxplacement layer to get first hit
+        if (Physics.Raycast(ray, out hit, range, layerMask))
         {
             // Check if the hit object is on the draggable layer
             if (((1 << hit.collider.gameObject.layer) & draggableLayer) != 0)
@@ -85,8 +90,11 @@ public class N_InputManager : MonoBehaviour
         Ray ray = sceneCamera.ScreenPointToRay(mousePos);
         RaycastHit hit;
 
-        // Cast ray without layer mask to get first hit
-        if (Physics.Raycast(ray, out hit, range))
+        // Create a layer mask that excludes boxplacementLayerMark
+        int layerMask = ~boxplacementLayerMark;
+
+        // Cast ray excluding boxplacement layer to get first hit
+        if (Physics.Raycast(ray, out hit, range, layerMask))
         {
             // Check if the hit object is on the draggable layer
             if (((1 << hit.collider.gameObject.layer) & draggableLayer) != 0)

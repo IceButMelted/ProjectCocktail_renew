@@ -119,6 +119,20 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
+--- !u!114 &10031458
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc1515ab76e54f068e2f2207940fab32, type: 3}
+  m_Name: Cocktail/Interact_Tap
+  m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.InputActionReference
+  m_Asset: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  m_ActionId: a58907e6-a0e8-40ef-a3a9-a576f1931344
 --- !u!1 &42139701
 GameObject:
   m_ObjectHideFlags: 0
@@ -601,6 +615,7 @@ GameObject:
   - component: {fileID: 98172229}
   - component: {fileID: 98172228}
   - component: {fileID: 98172227}
+  - component: {fileID: 98172231}
   m_Layer: 9
   m_Name: MixingButton
   m_TagString: Untagged
@@ -617,11 +632,11 @@ Transform:
   m_GameObject: {fileID: 98172225}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -19.866661, y: 0, z: 2.860001}
-  m_LocalScale: {x: 2.9333339, y: 1, z: 0.6095237}
+  m_LocalPosition: {x: -19.866661, y: -0, z: 2.11}
+  m_LocalScale: {x: 2.9333339, y: 1, z: 0.60952365}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 2115414361}
+  m_Father: {fileID: 1773464893}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &98172227
 MonoBehaviour:
@@ -722,6 +737,19 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 98172225}
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &98172231
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 98172225}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5f961b0d76afe243a14c46ab8a87c04, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  initState: 0
 --- !u!1001 &112259631
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3440,11 +3468,11 @@ Transform:
   m_GameObject: {fileID: 758655789}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: -0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 2115414361}
+  - {fileID: 1773464893}
   m_Father: {fileID: 2011351561}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &758655791
@@ -3461,6 +3489,62 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   normalCocktailList: {fileID: 11400000, guid: e64c41a62842fd54491c7e08deb2cd77, type: 2}
   specialCocktailList: {fileID: 0}
+--- !u!1 &766915415
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 766915416}
+  - component: {fileID: 766915417}
+  m_Layer: 0
+  m_Name: InputSystem
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &766915416
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 766915415}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2011351561}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &766915417
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 766915415}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 62cb23e7ecd1bf640b34528a5a12a848, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  holdActionRef: {fileID: 2046789631}
+  TapActionRef: {fileID: 1578842380}
+  PointActionRef: {fileID: 814633148}
+  input:
+    m_Name: Input
+    m_Type: 0
+    m_ExpectedControlType: 
+    m_Id: 3baf7bd2-b002-4e7c-b34b-0cad72bfcb23
+    m_Processors: 
+    m_Interactions: 
+    m_SingletonActionBindings: []
+    m_Flags: 0
 --- !u!1001 &776758629
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -3648,6 +3732,8 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 785520493}
+  - component: {fileID: 785520495}
+  - component: {fileID: 785520494}
   m_Layer: 0
   m_Name: PlacmentSystem
   m_TagString: Untagged
@@ -3668,11 +3754,61 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 1731829883}
-  - {fileID: 2020323302}
   - {fileID: 1210304370}
   m_Father: {fileID: 2011351561}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &785520494
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 785520492}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 22effe1264a37d740b5115b3812424af, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::N_PlacementSystem
+  mouseIndicator: {fileID: 1210304366}
+  inputManager: {fileID: 785520495}
+  floatingDistance: 1
+--- !u!114 &785520495
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 785520492}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 44ca199b41c9e354c9b5f6f587849f31, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::N_InputManager
+  sceneCamera: {fileID: 696697199}
+  range: 100
+  placementLayerMark:
+    serializedVersion: 2
+    m_Bits: 64
+  boxplacementLayerMark:
+    serializedVersion: 2
+    m_Bits: 256
+  draggableLayer:
+    serializedVersion: 2
+    m_Bits: 128
+--- !u!114 &814633148
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc1515ab76e54f068e2f2207940fab32, type: 3}
+  m_Name: Cocktail/Pointer
+  m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.InputActionReference
+  m_Asset: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  m_ActionId: 3355aa1d-2ab6-4cce-884f-dad1d9c3f3f2
 --- !u!1 &852539602
 GameObject:
   m_ObjectHideFlags: 0
@@ -3982,6 +4118,7 @@ GameObject:
   - component: {fileID: 950782939}
   - component: {fileID: 950782938}
   - component: {fileID: 950782937}
+  - component: {fileID: 950782941}
   m_Layer: 9
   m_Name: ShakingButton
   m_TagString: Untagged
@@ -3998,11 +4135,11 @@ Transform:
   m_GameObject: {fileID: 950782935}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: -19.866661, y: -0, z: -2.2699993}
-  m_LocalScale: {x: 2.9333339, y: 1, z: 0.6095237}
+  m_LocalPosition: {x: -19.866661, y: -0, z: -3.64}
+  m_LocalScale: {x: 2.9333339, y: 1, z: 0.60952365}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 2115414361}
+  m_Father: {fileID: 1773464893}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &950782937
 MonoBehaviour:
@@ -4103,6 +4240,19 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 950782935}
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &950782941
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 950782935}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5f961b0d76afe243a14c46ab8a87c04, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ActiveGameObject
+  initState: 0
 --- !u!1001 &963315491
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -5014,13 +5164,21 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 1400907134}
     m_Modifications:
+    - target: {fileID: 980995348620338506, guid: 29604c82d8d0f2c4494cb4fa8d02c324, type: 3}
+      propertyPath: m_IsTrigger
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1827497582659521546, guid: 29604c82d8d0f2c4494cb4fa8d02c324, type: 3}
+      propertyPath: DebugDraw
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 2383033270529986323, guid: 29604c82d8d0f2c4494cb4fa8d02c324, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.178
       objectReference: {fileID: 0}
     - target: {fileID: 2383033270529986323, guid: 29604c82d8d0f2c4494cb4fa8d02c324, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.052000046
+      value: 0.0666
       objectReference: {fileID: 0}
     - target: {fileID: 2383033270529986323, guid: 29604c82d8d0f2c4494cb4fa8d02c324, type: 3}
       propertyPath: m_LocalPosition.z
@@ -5189,6 +5347,20 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 46d05e7b41223614683e962276a5b320, type: 3}
+--- !u!114 &1342922949
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc1515ab76e54f068e2f2207940fab32, type: 3}
+  m_Name: Cocktail/Pointer
+  m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.InputActionReference
+  m_Asset: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  m_ActionId: 3355aa1d-2ab6-4cce-884f-dad1d9c3f3f2
 --- !u!4 &1358375986 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 2383033270529986323, guid: 29604c82d8d0f2c4494cb4fa8d02c324, type: 3}
@@ -5923,6 +6095,20 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 46d05e7b41223614683e962276a5b320, type: 3}
   m_PrefabInstance: {fileID: 575090519}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1578842380
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fc1515ab76e54f068e2f2207940fab32, type: 3}
+  m_Name: Cocktail/Interact_Tap
+  m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.InputActionReference
+  m_Asset: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  m_ActionId: a58907e6-a0e8-40ef-a3a9-a576f1931344
 --- !u!4 &1602828466 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 3027d5aa0c1884a45ac3022b8b18e3df, type: 3}
@@ -6483,61 +6669,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: dbcf16c5418bbfb4e953afb5b6ff8304, type: 3}
   m_PrefabInstance: {fileID: 112259631}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &1731829882
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1731829883}
-  - component: {fileID: 1731829884}
-  m_Layer: 0
-  m_Name: InputSystem
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1731829883
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1731829882}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 785520493}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1731829884
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1731829882}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 44ca199b41c9e354c9b5f6f587849f31, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::N_InputManager
-  sceneCamera: {fileID: 696697199}
-  range: 100
-  placementLayerMark:
-    serializedVersion: 2
-    m_Bits: 64
-  boxplacementLayerMark:
-    serializedVersion: 2
-    m_Bits: 256
-  draggableLayer:
-    serializedVersion: 2
-    m_Bits: 128
 --- !u!4 &1748267733 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 33424babb632ff14a9d231848b65cdd2, type: 3}
@@ -6562,10 +6693,9 @@ GameObject:
   - component: {fileID: 1773464895}
   - component: {fileID: 1773464894}
   - component: {fileID: 1773464898}
-  - component: {fileID: 1773464899}
   - component: {fileID: 1773464900}
   - component: {fileID: 1773464901}
-  m_Layer: 9
+  m_Layer: 7
   m_Name: CocktailShaker
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -6580,12 +6710,14 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1773464892}
   serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_LocalRotation: {x: -0, y: -0.7071068, z: 0.7071068, w: 0}
+  m_LocalPosition: {x: 7.05, y: 1.176, z: 4.785}
+  m_LocalScale: {x: 0.015000002, y: 0.015, z: 0.026250005}
   m_ConstrainProportionsScale: 1
-  m_Children: []
-  m_Father: {fileID: 2115414361}
+  m_Children:
+  - {fileID: 98172226}
+  - {fileID: 950782936}
+  m_Father: {fileID: 758655790}
   m_LocalEulerAnglesHint: {x: 90, y: 0, z: 180}
 --- !u!114 &1773464894
 MonoBehaviour:
@@ -6687,38 +6819,18 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1773464892}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 6102873c730fa6445b33680b1e865215, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DragableObject
   CanPlaced: 1
   numbersObjectOverlaying: 0
-  boxHalfExtents: {x: 0.06, y: 0.02, z: 0.13}
+  boxHalfExtents: {x: 0.06, y: 0.06, z: 0.13}
   detectLayerMask:
     serializedVersion: 2
     m_Bits: 128
-  DebugDraw: 0
---- !u!114 &1773464899
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1773464892}
-  m_Enabled: 0
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e35202e08e403cd4fba7fceeb6e444a4, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::IngredientButton
-  m_Material: {fileID: 0}
-  T_Default: {fileID: 2800000, guid: a38d06b768b5fff4284ccec1b5925d53, type: 3}
-  T_Hover: {fileID: 2800000, guid: a38d06b768b5fff4284ccec1b5925d53, type: 3}
-  T_Clicked: {fileID: 2800000, guid: a38d06b768b5fff4284ccec1b5925d53, type: 3}
-  ShouldCanClick: 0
-  TypeIngredient: 0
-  mixer: 0
-  alcohol: 0
+  DebugDraw: 1
 --- !u!114 &1773464900
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6785,16 +6897,32 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 8d14d52801e24cc4db361833ceb66675, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  m_Material: {fileID: 0}
   T_Default: {fileID: 2800000, guid: a38d06b768b5fff4284ccec1b5925d53, type: 3}
   T_Hover: {fileID: 2800000, guid: a38d06b768b5fff4284ccec1b5925d53, type: 3}
   T_Clicked: {fileID: 2800000, guid: a38d06b768b5fff4284ccec1b5925d53, type: 3}
+  pointAction: {fileID: 1342922949}
+  clickAction: {fileID: 10031458}
+  boxplacementLayerMark:
+    serializedVersion: 2
+    m_Bits: 256
   OnClicked:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1773464901}
-        m_TargetAssemblyTypeName: BTN_2_5D, Assembly-CSharp
-        m_MethodName: TestFire
+      - m_Target: {fileID: 98172231}
+        m_TargetAssemblyTypeName: ActiveGameObject, Assembly-CSharp
+        m_MethodName: SetActiveState
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 950782941}
+        m_TargetAssemblyTypeName: ActiveGameObject, Assembly-CSharp
+        m_MethodName: SetActiveState
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -7534,6 +7662,7 @@ Transform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 766915416}
   - {fileID: 758655790}
   - {fileID: 785520493}
   m_Father: {fileID: 0}
@@ -7543,53 +7672,20 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: 46d05e7b41223614683e962276a5b320, type: 3}
   m_PrefabInstance: {fileID: 215656561}
   m_PrefabAsset: {fileID: 0}
---- !u!1 &2020323301
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2020323302}
-  - component: {fileID: 2020323303}
-  m_Layer: 0
-  m_Name: PlacementSystem
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2020323302
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2020323301}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 785520493}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2020323303
+--- !u!114 &2046789631
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2020323301}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 22effe1264a37d740b5115b3812424af, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::N_PlacementSystem
-  mouseIndicator: {fileID: 1210304366}
-  inputManager: {fileID: 1731829884}
-  floatingDistance: 1
+  m_Script: {fileID: 11500000, guid: fc1515ab76e54f068e2f2207940fab32, type: 3}
+  m_Name: Cocktail/Interact_Hold
+  m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.InputActionReference
+  m_Asset: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  m_ActionId: 9458f363-10a5-42cd-817d-dce45ea1623f
 --- !u!1 &2056593688
 GameObject:
   m_ObjectHideFlags: 0
@@ -7778,82 +7874,6 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: 46d05e7b41223614683e962276a5b320, type: 3}
---- !u!1 &2115414360
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 2115414361}
-  - component: {fileID: 2115414362}
-  - component: {fileID: 2115414363}
-  m_Layer: 7
-  m_Name: MakingCocktail
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &2115414361
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2115414360}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0.7071068, z: 0.7071068, w: 0}
-  m_LocalPosition: {x: 7.05, y: 1.176, z: 4.785}
-  m_LocalScale: {x: 0.0150000015, y: 0.015, z: 0.026250003}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 98172226}
-  - {fileID: 950782936}
-  - {fileID: 1773464893}
-  m_Father: {fileID: 758655790}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &2115414362
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2115414360}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6102873c730fa6445b33680b1e865215, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DragableObject
-  CanPlaced: 1
-  numbersObjectOverlaying: 0
-  boxHalfExtents: {x: 0.07, y: 0.04, z: 0.13}
-  detectLayerMask:
-    serializedVersion: 2
-    m_Bits: 128
-  DebugDraw: 1
---- !u!65 &2115414363
-BoxCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2115414360}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 3
-  m_Size: {x: 1, y: 1, z: 1}
-  m_Center: {x: 0, y: 0, z: 0}
 --- !u!1001 &2140223747
 PrefabInstance:
   m_ObjectHideFlags: 0

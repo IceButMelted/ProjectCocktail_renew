@@ -1,55 +1,77 @@
-using UnityEngine;
 using UnityEditor;
+using UnityEngine;
 
 [CustomEditor(typeof(IngredientButton))]
 public class IngredientButtonEditor : Editor
 {
-    SerializedProperty m_Material;
     SerializedProperty T_Default;
     SerializedProperty T_Hover;
     SerializedProperty T_Clicked;
 
-    SerializedProperty ShouldCanClick;
+    SerializedProperty pointAction;
+    SerializedProperty clickAction;
 
+    SerializedProperty ShouldCanClick;
     SerializedProperty TypeIngredient;
     SerializedProperty mixer;
     SerializedProperty alcohol;
 
-    private bool showMaterialSettings = true;
+    private bool showVisualSettings = true;
+    private bool showInputSettings = true;
 
     private void OnEnable()
     {
-        // Link serialized properties
-        m_Material = serializedObject.FindProperty("m_Material");
         T_Default = serializedObject.FindProperty("T_Default");
         T_Hover = serializedObject.FindProperty("T_Hover");
         T_Clicked = serializedObject.FindProperty("T_Clicked");
+
+        pointAction = serializedObject.FindProperty("pointAction");
+        clickAction = serializedObject.FindProperty("clickAction");
+
+        ShouldCanClick = serializedObject.FindProperty("ShouldCanClick");
         TypeIngredient = serializedObject.FindProperty("TypeIngredient");
         mixer = serializedObject.FindProperty("mixer");
         alcohol = serializedObject.FindProperty("alcohol");
-        ShouldCanClick = serializedObject.FindProperty("ShouldCanClick");
     }
 
     public override void OnInspectorGUI()
     {
-        // Update the serialized object
         serializedObject.Update();
 
-        // Draw the default script field (read-only)
+        // Script field (read-only)
         GUI.enabled = false;
-        EditorGUILayout.ObjectField("Script", MonoScript.FromMonoBehaviour((IngredientButton)target), typeof(IngredientButton), false);
+        EditorGUILayout.ObjectField(
+            "Script",
+            MonoScript.FromMonoBehaviour((IngredientButton)target),
+            typeof(IngredientButton),
+            false
+        );
         GUI.enabled = true;
 
+        EditorGUILayout.Space(5);
         EditorGUILayout.PropertyField(ShouldCanClick);
+
+        // =========================
+        // Input Settings
+        // =========================
+        showInputSettings = EditorGUILayout.Foldout(showInputSettings, "Input Settings", true);
+        if (showInputSettings)
+        {
+            EditorGUI.indentLevel++;
+            EditorGUILayout.PropertyField(pointAction, new GUIContent("Point Action"));
+            EditorGUILayout.PropertyField(clickAction, new GUIContent("Click Action"));
+            EditorGUI.indentLevel--;
+        }
 
         EditorGUILayout.Space(5);
 
-        // Material foldout section
-        showMaterialSettings = EditorGUILayout.Foldout(showMaterialSettings, "Material Settings", true);
-        if (showMaterialSettings)
+        // =========================
+        // Visual Settings
+        // =========================
+        showVisualSettings = EditorGUILayout.Foldout(showVisualSettings, "Visual Settings", true);
+        if (showVisualSettings)
         {
             EditorGUI.indentLevel++;
-            EditorGUILayout.PropertyField(m_Material);
             EditorGUILayout.PropertyField(T_Default);
             EditorGUILayout.PropertyField(T_Hover);
             EditorGUILayout.PropertyField(T_Clicked);
@@ -58,14 +80,13 @@ public class IngredientButtonEditor : Editor
 
         EditorGUILayout.Space(10);
 
-        // Draw the TypeIngredient enum field
+        // =========================
+        // Ingredient Logic
+        // =========================
         EditorGUILayout.PropertyField(TypeIngredient, new GUIContent("Type Ingredient"));
 
-        // Get the current enum value
         int enumValue = TypeIngredient.enumValueIndex;
 
-        // Show fields based on the enum value
-        // 0 = None, 1 = Mixer, 2 = Alcohol
         if (enumValue == 1) // Mixer
         {
             EditorGUILayout.PropertyField(mixer);
@@ -75,7 +96,6 @@ public class IngredientButtonEditor : Editor
             EditorGUILayout.PropertyField(alcohol);
         }
 
-        // Apply changes to the serialized object
         serializedObject.ApplyModifiedProperties();
     }
 }

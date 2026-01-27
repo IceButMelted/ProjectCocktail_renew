@@ -1,8 +1,11 @@
+using System.Data.SqlTypes;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
 public class N_PlacementSystem : MonoBehaviour
 {
+    private InputSystemManager inputSystemManager;
+
     [SerializeField]
     private GameObject mouseIndicator;
     [SerializeField]
@@ -15,26 +18,46 @@ public class N_PlacementSystem : MonoBehaviour
     private DragableObject selectedDragsObject;
     private bool selectedObjectIsFloating = false;
 
+    private bool IsHolding;
+
     private float bottomOffset;
+
+    private void Awake()
+    {
+        if (inputSystemManager = FindFirstObjectByType<InputSystemManager>())
+        {
+            Debug.Log("Found InputSystemManager");
+        }
+        else { 
+            Debug.LogError("Cannot find InputSystemManager");
+        }
+    }
+
+    private void Start()
+    {
+
+        inputSystemManager.holdActionRef.action.started += context =>
+        {
+        };
+
+        inputSystemManager.holdActionRef.action.performed += context => 
+        {
+            DragObject();
+        };
+
+        inputSystemManager.holdActionRef.action.canceled += context =>
+        {
+            ReleaseObject();
+
+        };
+    }
 
     private void Update()
     {
         Vector3 mousePos = inputManager.GetSelectedMapPosition();
         mouseIndicator.transform.position = mousePos;
 
-        //on click
-        if (Mouse.current.leftButton.wasPressedThisFrame)
-        {
-            selectedObject = inputManager.GetObjectSelected();
-            selectedDragsObject = inputManager.GetDragableObject();
-
-            if (selectedObject != null && selectedDragsObject != null)
-            {
-                bottomOffset = GetBottomOffset(selectedObject);
-                selectedDragsObject.BeingDrags = true;
-            }
-        }
-        if (selectedObject != null && Mouse.current.leftButton.isPressed)
+        if (selectedObject != null && IsHolding)
         {
 
             if (inputManager.TryGetPlacementPoint(out Vector3 placementPoint))
@@ -50,8 +73,20 @@ public class N_PlacementSystem : MonoBehaviour
                 selectedObjectIsFloating = true;
             }
         }
-        //on release
-        if (Mouse.current.leftButton.wasReleasedThisFrame && selectedObject != null && selectedDragsObject != null)
+
+    }
+
+    private float GetBottomOffset(GameObject obj)
+    {
+        Renderer r = obj.GetComponentInChildren<Renderer>();
+        return obj.transform.position.y - r.bounds.min.y;
+    }
+
+    private void ReleaseObject() {
+        Vector3 mousePos = inputManager.GetSelectedMapPosition();
+        mouseIndicator.transform.position = mousePos;
+
+        if (selectedObject != null && selectedDragsObject != null)
         {
             //if can placed that place
             if (selectedDragsObject.CanPlaced && !selectedObjectIsFloating)
@@ -60,22 +95,32 @@ public class N_PlacementSystem : MonoBehaviour
                 //to where mouse are
                 selectedObject.transform.position = mousePos + Vector3.up * bottomOffset;
             }
-            else {
+            else
+            {
                 selectedObject.transform.position = selectedDragsObject.PastLocation;
             }
 
-            //free gameobject
-            selectedObject = null;
             selectedDragsObject.BeingDrags = false;
             selectedDragsObject.CanPlaced = true;
-            selectedDragsObject = null;
         }
+
+
+        selectedObject = null;
+        selectedDragsObject = null;
+
+        IsHolding = false;
     }
 
-    private float GetBottomOffset(GameObject obj)
-    {
-        Renderer r = obj.GetComponentInChildren<Renderer>();
-        return obj.transform.position.y - r.bounds.min.y;
+    private void DragObject() {
+        selectedObject = inputManager.GetObjectSelected();
+        selectedDragsObject = inputManager.GetDragableObject();
+
+        if (selectedObject != null && selectedDragsObject != null)
+        {
+            bottomOffset = GetBottomOffset(selectedObject);
+            selectedDragsObject.BeingDrags = true;
+        }
+        IsHolding = true;
     }
 
 }
