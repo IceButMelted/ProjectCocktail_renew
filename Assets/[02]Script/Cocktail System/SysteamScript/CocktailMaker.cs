@@ -22,11 +22,15 @@ public class CocktailMaker : MonoBehaviour
 
     private void Awake()
     {
-        
+
     }
 
     public void AddAlcohol(Alcohol alcohol, int amount)
     {
+
+        if (GetTotalIngredient() >= 10)
+            return;
+
         Debug.Log($"Add {alcohol} for {amount} shot");
 
         if (makingCocktail.Alcohols.ContainsKey(alcohol))
@@ -42,11 +46,14 @@ public class CocktailMaker : MonoBehaviour
 
     public void AddMixer(Mixer mixer, int amount)
     {
+        if (GetTotalIngredient() >= 10)
+            return;
+
         Debug.Log($"Add {mixer} for {amount} shot");
 
         if (makingCocktail.Mixers.ContainsKey(mixer))
         {
-            makingCocktail.Mixers[mixer] += amount;  
+            makingCocktail.Mixers[mixer] += amount;
         }
         else
         {
@@ -55,13 +62,34 @@ public class CocktailMaker : MonoBehaviour
 
     }
 
-    public int GetTotalIngredient()  
+    public int GetTotalIngredient()
     {
         return makingCocktail.GetTotalIngredient();
     }
 
+    public int GetTotalAlcohol()
+    {
+        int total = 0;
+        foreach (var amount in makingCocktail.Alcohols.Values)
+        {
+            total += amount;
+        }
+        return total;
+    }
 
-    public void SetMethod(Method method) { 
+    public int GetTotalMixer()
+    {
+        int total = 0;
+        foreach (var amount in makingCocktail.Mixers.Values)
+        {
+            total += amount;
+        }
+        return total;
+    }
+
+    public void SetMethod(Method method)
+    {
         makingCocktail.method = method;
     }
+
 }
