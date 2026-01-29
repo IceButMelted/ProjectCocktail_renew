@@ -41,16 +41,19 @@ public class IngredientButton : MonoBehaviour, IPointerEnterHandler, IPointerExi
 
     private void Awake()
     {
-        m_Material = GetComponent<MeshRenderer>().material;
-        ;  
-
         cocktailMaker = FindFirstObjectByType<CocktailMaker>();
+
+        if (!ShouldCanClick) return;
+        m_Material = GetComponent<MeshRenderer>().material;
+        
         m_Material.SetFloat("_EmssionStrength", 0);
         m_Material.SetTexture("_CurrentTexture", T_Default);
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
+        if (!ShouldCanClick) return;
+
         CanClick = true;
         m_Material.SetFloat("_EmssionStrength", 0.25f);
         m_Material.SetTexture("_CurrentTexture", T_Hover);
@@ -59,6 +62,8 @@ public class IngredientButton : MonoBehaviour, IPointerEnterHandler, IPointerExi
 
     public void OnPointerExit(PointerEventData eventData)
     {
+        if (!ShouldCanClick) return;
+
         CanClick &= !CanClick;
         m_Material.SetFloat("_EmssionStrength", 0);
         m_Material.SetTexture("_CurrentTexture", T_Default);
@@ -102,7 +107,30 @@ public class IngredientButton : MonoBehaviour, IPointerEnterHandler, IPointerExi
 
     public void OnPointerUp(PointerEventData eventData)
     {
+        if (!ShouldCanClick) return;
+
         m_Material.SetFloat("_EmssionStrength", 0);
         m_Material.SetTexture("_CurrentTexture", T_Default);
+    }
+
+    public void SetCockailIngredient() {
+        if (TypeIngredient == Behaviability.Mixer)
+        {
+            cocktailMaker.OnAddMixer?.Invoke(mixer, 1);
+            cocktailMaker.OnAddIngredient?.Invoke();
+        }
+        else if (TypeIngredient == Behaviability.Alcohol)
+        {
+            cocktailMaker.OnAddAlcohol?.Invoke(alcohol, 1);
+            cocktailMaker.OnAddIngredient?.Invoke();
+        }
+        else if (TypeIngredient == Behaviability.Shaking)
+        {
+            cocktailMaker.SetMethod(E_Cocktail.Method.Shaking);
+        }
+        else if (TypeIngredient == Behaviability.Mixing)
+        {
+            cocktailMaker.SetMethod(E_Cocktail.Method.Mixing);
+        }
     }
 }

@@ -11,6 +11,7 @@ public class ActiveGameObject : MonoBehaviour
 
     public void SetActiveState(bool state)
     {
+        initState = state;
         gameObject.SetActive(state);
     }
 

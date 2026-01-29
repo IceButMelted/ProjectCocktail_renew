@@ -54,14 +54,14 @@ public class IngredientButtonEditor : Editor
         // =========================
         // Input Settings
         // =========================
-        showInputSettings = EditorGUILayout.Foldout(showInputSettings, "Input Settings", true);
-        if (showInputSettings)
-        {
-            EditorGUI.indentLevel++;
-            EditorGUILayout.PropertyField(pointAction, new GUIContent("Point Action"));
-            EditorGUILayout.PropertyField(clickAction, new GUIContent("Click Action"));
-            EditorGUI.indentLevel--;
-        }
+        //showInputSettings = EditorGUILayout.Foldout(showInputSettings, "Input Settings", true);
+        //if (showInputSettings)
+        //{
+        //    EditorGUI.indentLevel++;
+        //    EditorGUILayout.PropertyField(pointAction, new GUIContent("Point Action"));
+        //    EditorGUILayout.PropertyField(clickAction, new GUIContent("Click Action"));
+        //    EditorGUI.indentLevel--;
+        //}
 
         EditorGUILayout.Space(5);
 

@@ -92,4 +92,12 @@ public class CocktailMaker : MonoBehaviour
         makingCocktail.method = method;
     }
 
+    public void SetMethodToShake() { 
+        makingCocktail.method = Method.Shaking;
+    }
+
+    public void SetMethodToMixing() { 
+        makingCocktail.method = Method.Mixing;
+    }
+
 }
