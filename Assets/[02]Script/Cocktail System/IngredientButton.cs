@@ -5,7 +5,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
 
-public class IngredientButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler, IPointerUpHandler
+public class IngredientButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler ,IPointerUpHandler
 {
     enum Behaviability
     {
@@ -89,15 +89,15 @@ public class IngredientButton : MonoBehaviour, IPointerEnterHandler, IPointerExi
                         cocktailMaker.OnAddAlcohol?.Invoke(alcohol, 1);
                         cocktailMaker.OnAddIngredient?.Invoke();
                     }
-                    else if (TypeIngredient == Behaviability.Shaking) 
+                    else if (TypeIngredient == Behaviability.Shaking)
                     {
                         cocktailMaker.SetMethod(E_Cocktail.Method.Shaking);
                     }
-                    else if (TypeIngredient == Behaviability.Mixing) 
+                    else if (TypeIngredient == Behaviability.Mixing)
                     {
                         cocktailMaker.SetMethod(E_Cocktail.Method.Mixing);
                     }
-                    
+
                 }
             }
         }
@@ -113,7 +113,8 @@ public class IngredientButton : MonoBehaviour, IPointerEnterHandler, IPointerExi
         m_Material.SetTexture("_CurrentTexture", T_Default);
     }
 
-    public void SetCockailIngredient() {
+    public void SetCockailIngredient()
+    {
         if (TypeIngredient == Behaviability.Mixer)
         {
             cocktailMaker.OnAddMixer?.Invoke(mixer, 1);

@@ -1,4 +1,4 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 public class E_Cocktail
 {
@@ -31,7 +31,7 @@ public class E_Cocktail
     /// <summary>
     /// List of glass types used for serving cocktails.
     /// </summary>
-    public enum Glass : byte
+    public enum GlassType : byte
     {
         None,
         Hi_ball,
@@ -47,9 +47,11 @@ public class E_Cocktail
     /// </summary>
     public enum Method : byte
     {
-        None,
+        None = 0,
+        Shaking,
         Mixing,
-        Shaking
+        SmashNShaking,
+        SmashNMixing
     }
 
     public enum TypeOfCocktail : byte
@@ -57,16 +59,14 @@ public class E_Cocktail
         None,
         HighAlcohol,
         LowAlcohol,
-        NonAlcoholic,
         NotMatch
     }
 
-    public enum CocktailResult : byte
+    public enum Satisfaction : byte
     {
-        Success = 0,
-        Aceptable,
-        Fail,
-        None
+        Fail,        
+        Acceptable,  
+        Perfect      
     }
 
     public enum TextType

@@ -18,86 +18,34 @@ public class CocktailMaker : MonoBehaviour
     public AlcoholEvent OnAddAlcohol;  // New typed event
     public MixerEvent OnAddMixer;      // New typed event
 
-    public S_Recipe makingCocktail;
+    public S_Drink currentCocktail;
 
     private void Awake()
     {
 
     }
 
-    public void AddAlcohol(Alcohol alcohol, int amount)
-    {
-
-        if (GetTotalIngredient() >= 10)
-            return;
-
-        Debug.Log($"Add {alcohol} for {amount} shot");
-
-        if (makingCocktail.Alcohols.ContainsKey(alcohol))
-        {
-            makingCocktail.Alcohols[alcohol] += amount;
-        }
-        else
-        {
-            makingCocktail.Alcohols.Add(alcohol, amount);
-        }
-
-    }
-
-    public void AddMixer(Mixer mixer, int amount)
-    {
-        if (GetTotalIngredient() >= 10)
-            return;
-
-        Debug.Log($"Add {mixer} for {amount} shot");
-
-        if (makingCocktail.Mixers.ContainsKey(mixer))
-        {
-            makingCocktail.Mixers[mixer] += amount;
-        }
-        else
-        {
-            makingCocktail.Mixers.Add(mixer, amount);
-        }
-
-    }
-
-    public int GetTotalIngredient()
-    {
-        return makingCocktail.GetTotalIngredient();
-    }
-
-    public int GetTotalAlcohol()
-    {
-        int total = 0;
-        foreach (var amount in makingCocktail.Alcohols.Values)
-        {
-            total += amount;
-        }
-        return total;
-    }
-
-    public int GetTotalMixer()
-    {
-        int total = 0;
-        foreach (var amount in makingCocktail.Mixers.Values)
-        {
-            total += amount;
-        }
-        return total;
-    }
-
     public void SetMethod(Method method)
     {
-        makingCocktail.method = method;
+        currentCocktail.PreparationMethod = method;
     }
 
-    public void SetMethodToShake() { 
-        makingCocktail.method = Method.Shaking;
+    public void SetMethodToShake()
+    {
+        currentCocktail.PreparationMethod = Method.Shaking;
     }
 
-    public void SetMethodToMixing() { 
-        makingCocktail.method = Method.Mixing;
+    public void SetMethodToMixing()
+    {
+        currentCocktail.PreparationMethod = Method.Mixing;
     }
 
+
+    public void TryToAddAlcohol(Alcohol alcohol, int amount = 1) {
+        currentCocktail.TryToAddAlcohol(alcohol,amount);
+    }
+
+    public void TryToAddMixer(Mixer mixer, int amount = 1) { 
+        currentCocktail.TryToAddMixer(mixer, amount);
+    }
 }

@@ -35,9 +35,9 @@ public class VisualizeCocktail : MonoBehaviour
 
     public void UpdateCocktailBars()
     {
-        alcohol_fill.fillAmount = (float)cocktailMaker.GetTotalAlcohol() / 10;
+        //alcohol_fill.fillAmount = (float)cocktailMaker.GetTotalAlcohol() / 10;
 
-        mixer_fill.fillAmount = ((float)cocktailMaker.GetTotalMixer() / 10) + (float)alcohol_fill.fillAmount;
+        //mixer_fill.fillAmount = ((float)cocktailMaker.GetTotalMixer() / 10) + (float)alcohol_fill.fillAmount;
 
 
         Debug.Log($"Alcohol Fill Amount: {alcohol_fill.fillAmount}");

@@ -6,49 +6,36 @@ using UnityEngine.InputSystem;
 /// Mouse-driven camera controller that smoothly transitions between different view angles
 /// when the mouse hovers near screen edges. Supports left/right/down camera angles with
 /// configurable transitions and optional camera translation.
+///
+/// Assign a CameraControllerSettings asset to the 'settings' field to configure all
+/// parameters. If no asset is assigned, built-in defaults are used as a fallback.
 /// </summary>
 public class CameraController : MonoBehaviour
 {
     #region Serialized Fields
 
-    [Header("Feature Toggles")]
-    [Tooltip("Enable left/right camera rotation when hovering at screen edges")]
-    [SerializeField] private bool canRotateSideways = false;
+    [Tooltip("ScriptableObject asset containing all camera controller settings. " +
+             "Create one via: Assets > Create > Camera > Camera Controller Settings")]
+    [SerializeField] private CameraControllerSettings settings;
 
-    [Tooltip("Enable camera position movement (vertical) when looking down")]
-    [SerializeField] private bool canMoveCamera = false;
+    #endregion
 
-    [Header("Edge Detection Thresholds (%)")]
-    [Tooltip("Distance from screen edge (%) to trigger side view")]
-    [SerializeField][Range(5, 70)] private float sideViewTriggerThreshold = 30f;
+    #region Settings Accessors (read from SO, fall back to defaults)
 
-    [Tooltip("Distance from screen edge (%) to return from side view")]
-    [SerializeField][Range(5, 70)] private float sideViewReturnThreshold = 40f;
-
-    [Tooltip("Distance from bottom (%) to trigger down view")]
-    [SerializeField][Range(5, 50)] private float downViewTriggerThreshold = 20f;
-
-    [Tooltip("Distance from bottom (%) to return from down view")]
-    [SerializeField][Range(5, 80)] private float downViewReturnThreshold = 30f;
-
-    [Header("Camera Rotation Angles")]
-    [SerializeField] private Vector3 forwardAngle = new Vector3(0, 0, 0);
-    [SerializeField] private Vector3 sideAngle = new Vector3(0, 90, 0);
-    [SerializeField] private Vector3 downAngle = new Vector3(45, 0, 0);
-
-    [Header("Transition Settings")]
-    [Tooltip("Time to complete rotation transition")]
-    [SerializeField][Range(0.1f, 2f)] private float rotationDuration = 0.5f;
-
-    [Tooltip("Time mouse must hover before triggering transition")]
-    [SerializeField][Range(0.1f, 2f)] private float hoverDelayDuration = 0.6f;
-
-    [Tooltip("Time to complete camera position movement")]
-    [SerializeField][Range(0.1f, 2f)] private float movementDuration = 0.6f;
-
-    [Header("Camera Translation")]
-    [Tooltip("Distance to move camera down when looking down")]
-    [SerializeField] private float moveDownDistance = 1f;
+    private bool CanRotateSideways => settings != null ? settings.canRotateSideways : false;
+    private bool CanMoveCamera => settings != null ? settings.canMoveCamera : false;
+    private float SideTrigger => settings != null ? settings.sideViewTriggerThreshold : 30f;
+    private float SideReturn => settings != null ? settings.sideViewReturnThreshold : 40f;
+    private float DownTrigger => settings != null ? settings.downViewTriggerThreshold : 20f;
+    private float DownReturn => settings != null ? settings.downViewReturnThreshold : 30f;
+    private Vector3 ForwardAngle => settings != null ? settings.forwardAngle : Vector3.zero;
+    private Vector3 LeftSideAngle => settings != null ? settings.leftSideAngle : new Vector3(0, -90, 0);
+    private Vector3 RightSideAngle => settings != null ? settings.rightSideAngle : new Vector3(0, 90, 0);
+    private Vector3 DownAngle => settings != null ? settings.downAngle : new Vector3(45, 0, 0);
+    private float RotationDuration => settings != null ? settings.rotationDuration : 0.5f;
+    private float HoverDelayDuration => settings != null ? settings.hoverDelayDuration : 0.6f;
+    private float MovementDuration => settings != null ? settings.movementDuration : 0.6f;
+    private float MoveDownDistance => settings != null ? settings.moveDownDistance : 1f;
 
     #endregion
 
@@ -98,7 +85,7 @@ public class CameraController : MonoBehaviour
     #region Properties
 
     /// <summary>
-    /// Gets the current viewing direction of the camera
+    /// Gets the current viewing direction of the camera.
     /// </summary>
     public ViewDirection CurrentDirection => currentDirection;
 
@@ -117,20 +104,20 @@ public class CameraController : MonoBehaviour
             return;
         }
 
-        // Store initial positions
+        if (settings == null)
+            Debug.LogWarning("CameraController: No CameraControllerSettings asset assigned — using built-in defaults.");
+
         initialPosition = transform.position;
-        downPosition = initialPosition - new Vector3(0, moveDownDistance, 0);
+        downPosition = initialPosition - new Vector3(0, MoveDownDistance, 0);
     }
 
     private void Start()
     {
-        // Set initial camera angle
-        mainCamera.transform.localRotation = Quaternion.Euler(forwardAngle);
+        mainCamera.transform.localRotation = Quaternion.Euler(ForwardAngle);
     }
 
     private void Update()
     {
-        // Update transitions
         if (isRotating)
         {
             UpdateRotation();
@@ -157,9 +144,8 @@ public class CameraController : MonoBehaviour
 
         hoverTimer += Time.deltaTime;
 
-        if (hoverTimer >= hoverDelayDuration)
+        if (hoverTimer >= HoverDelayDuration)
         {
-            // Hover duration met - trigger transition
             StartTransition(pendingDirection);
             ResetHoverDelay();
         }
@@ -167,11 +153,8 @@ public class CameraController : MonoBehaviour
 
     private void StartHoverDelay(ViewDirection direction)
     {
-        // If already hovering toward a different direction, reset
         if (isHovering && pendingDirection != direction)
-        {
             ResetHoverDelay();
-        }
 
         if (!isHovering)
         {
@@ -202,13 +185,11 @@ public class CameraController : MonoBehaviour
                 break;
 
             case ViewDirection.Left:
-                if (canRotateSideways)
-                    CheckFromLeft(mousePosition);
+                if (CanRotateSideways) CheckFromLeft(mousePosition);
                 break;
 
             case ViewDirection.Right:
-                if (canRotateSideways)
-                    CheckFromRight(mousePosition);
+                if (CanRotateSideways) CheckFromRight(mousePosition);
                 break;
 
             case ViewDirection.Down:
@@ -222,71 +203,42 @@ public class CameraController : MonoBehaviour
         float screenWidth = Screen.width;
         float screenHeight = Screen.height;
 
-        // Calculate edge trigger positions
-        float rightTrigger = screenWidth * (100f - sideViewTriggerThreshold) / 100f;
-        float leftTrigger = screenWidth * sideViewTriggerThreshold / 100f;
-        float downTrigger = screenHeight * downViewTriggerThreshold / 100f;
+        float rightTrigger = screenWidth * (100f - SideTrigger) / 100f;
+        float leftTrigger = screenWidth * SideTrigger / 100f;
+        float downTrigger = screenHeight * DownTrigger / 100f;
 
-        // Check which edge the mouse is near
-        if (canRotateSideways && mousePos.x > rightTrigger)
-        {
+        if (CanRotateSideways && mousePos.x > rightTrigger)
             StartHoverDelay(ViewDirection.Right);
-        }
-        else if (canRotateSideways && mousePos.x < leftTrigger)
-        {
+        else if (CanRotateSideways && mousePos.x < leftTrigger)
             StartHoverDelay(ViewDirection.Left);
-        }
         else if (mousePos.y < downTrigger)
-        {
             StartHoverDelay(ViewDirection.Down);
-        }
         else
-        {
-            // Mouse not in any trigger zone
             ResetHoverDelay();
-        }
     }
 
     private void CheckFromLeft(Vector2 mousePos)
     {
-        float returnThreshold = Screen.width * sideViewReturnThreshold / 100f;
+        float returnThreshold = Screen.width * SideReturn / 100f;
 
-        if (mousePos.x > returnThreshold)
-        {
-            StartHoverDelay(ViewDirection.Forward);
-        }
-        else
-        {
-            ResetHoverDelay();
-        }
+        if (mousePos.x > returnThreshold) StartHoverDelay(ViewDirection.Forward);
+        else ResetHoverDelay();
     }
 
     private void CheckFromRight(Vector2 mousePos)
     {
-        float returnThreshold = Screen.width * (100f - sideViewReturnThreshold) / 100f;
+        float returnThreshold = Screen.width * (100f - SideReturn) / 100f;
 
-        if (mousePos.x < returnThreshold)
-        {
-            StartHoverDelay(ViewDirection.Forward);
-        }
-        else
-        {
-            ResetHoverDelay();
-        }
+        if (mousePos.x < returnThreshold) StartHoverDelay(ViewDirection.Forward);
+        else ResetHoverDelay();
     }
 
     private void CheckFromDown(Vector2 mousePos)
     {
-        float returnThreshold = Screen.height * downViewReturnThreshold / 100f;
+        float returnThreshold = Screen.height * DownReturn / 100f;
 
-        if (mousePos.y > returnThreshold)
-        {
-            StartHoverDelay(ViewDirection.Forward);
-        }
-        else
-        {
-            ResetHoverDelay();
-        }
+        if (mousePos.y > returnThreshold) StartHoverDelay(ViewDirection.Forward);
+        else ResetHoverDelay();
     }
 
     #endregion
@@ -306,14 +258,13 @@ public class CameraController : MonoBehaviour
         rotationProgress = 0f;
         startRotation = mainCamera.transform.localRotation;
 
-        // Determine target rotation based on direction
         Vector3 targetEuler = direction switch
         {
-            ViewDirection.Forward => forwardAngle,
-            ViewDirection.Left => new Vector3(sideAngle.x, -sideAngle.y, sideAngle.z),
-            ViewDirection.Right => sideAngle,
-            ViewDirection.Down => downAngle,
-            _ => forwardAngle
+            ViewDirection.Forward => ForwardAngle,
+            ViewDirection.Left => LeftSideAngle,
+            ViewDirection.Right => RightSideAngle,
+            ViewDirection.Down => DownAngle,
+            _ => ForwardAngle
         };
 
         targetRotation = Quaternion.Euler(targetEuler);
@@ -321,17 +272,12 @@ public class CameraController : MonoBehaviour
 
     private void StartMovement(ViewDirection direction)
     {
-        // Only move camera if feature is enabled
-        if (!canMoveCamera) return;
-
-        // Only move for specific directions
-        if (direction != ViewDirection.Forward && direction != ViewDirection.Down)
-            return;
+        if (!CanMoveCamera) return;
+        if (direction != ViewDirection.Forward && direction != ViewDirection.Down) return;
 
         isMoving = true;
         movementProgress = 0f;
         startPosition = transform.position;
-
         targetPosition = direction == ViewDirection.Down ? downPosition : initialPosition;
     }
 
@@ -341,18 +287,16 @@ public class CameraController : MonoBehaviour
 
     private void UpdateRotation()
     {
-        rotationProgress += Time.deltaTime / rotationDuration;
+        rotationProgress += Time.deltaTime / RotationDuration;
 
         if (rotationProgress >= 1f)
         {
-            // Rotation complete
             mainCamera.transform.localRotation = targetRotation;
             isRotating = false;
             rotationProgress = 0f;
         }
         else
         {
-            // Smooth rotation using spherical interpolation
             float smoothed = Mathf.SmoothStep(0f, 1f, rotationProgress);
             mainCamera.transform.localRotation = Quaternion.Slerp(startRotation, targetRotation, smoothed);
         }
@@ -360,18 +304,16 @@ public class CameraController : MonoBehaviour
 
     private void UpdateMovement()
     {
-        movementProgress += Time.deltaTime / movementDuration;
+        movementProgress += Time.deltaTime / MovementDuration;
 
         if (movementProgress >= 1f)
         {
-            // Movement complete
             transform.position = targetPosition;
             isMoving = false;
             movementProgress = 0f;
         }
         else
         {
-            // Smooth movement using linear interpolation
             float smoothed = Mathf.SmoothStep(0f, 1f, movementProgress);
             transform.position = Vector3.Lerp(startPosition, targetPosition, smoothed);
         }
@@ -379,20 +321,12 @@ public class CameraController : MonoBehaviour
 
     #endregion
 
-    #region Debug Visualization
+    #region Debug
 
     private void OnValidate()
     {
-        // Ensure return thresholds are greater than trigger thresholds
-        if (sideViewReturnThreshold <= sideViewTriggerThreshold)
-        {
-            Debug.LogWarning("CameraController: Return threshold should be greater than trigger threshold to prevent flickering!");
-        }
-
-        if (downViewReturnThreshold <= downViewTriggerThreshold)
-        {
-            Debug.LogWarning("CameraController: Return threshold should be greater than trigger threshold to prevent flickering!");
-        }
+        if (settings == null)
+            Debug.LogWarning("CameraController: No CameraControllerSettings asset assigned.");
     }
 
     #endregion

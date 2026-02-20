@@ -5,7 +5,5 @@ using UnityEngine;
 public class SO_Cocktails : ScriptableObject
 {
     public GameObject CocktailGameObject;
-    public S_Recipe CocktailInfos;
-
-
+    public S_Drink CocktailInfos;
 }
