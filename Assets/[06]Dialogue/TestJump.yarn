@@ -1,0 +1,20 @@
+﻿title : TestIf
+---
+<<set $gold_amount to 5>>
+<<set $reputation to 10>>
+<<if $gold_amount >= 5 and $reputation >= 8>>
+    // The player is both rich and popular
+    Merchant: You're rich enough and popular enough for me to serve you!
+    <<set $reputation = $reputation + $reputation>>
+<<elseif $gold_amount >= 10 or $reputation >= 10>>
+    // The player is either rich enough or popular enough to serve
+    Merchant: I wouldn't normally, but I'll serve you!
+<<else>>
+    // The player is dirt
+    Merchant: You're neither rich enough nor important enough for me to serve!
+<<endif>>
+Guard: You're not allowed in!
+-> Sure I am! The boss knows me! <<if $reputation > 10>>
+-> Please?
+-> I'll come back later.
+===
