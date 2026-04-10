@@ -17,7 +17,9 @@ public class CocktailMaker : MonoBehaviour
     public UnityEvent OnAddIngredient;
     public AlcoholEvent OnAddAlcohol;  // New typed event
     public MixerEvent OnAddMixer;      // New typed event
+    public UnityEvent OnResetCocktail;
 
+    [HideInInspector]
     public S_Drink currentCocktail;
 
     private void Awake()

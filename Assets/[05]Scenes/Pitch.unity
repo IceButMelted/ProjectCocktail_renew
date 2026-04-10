@@ -850,6 +850,33 @@ Transform:
   m_Children: []
   m_Father: {fileID: 421432757}
   m_LocalEulerAnglesHint: {x: 0, y: -89.998, z: 0}
+--- !u!1 &552650704 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 453190883101344344, guid: ace3877f62487a6408fb78aebccf2c37, type: 3}
+  m_PrefabInstance: {fileID: 2375174171745272147}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &552650706 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3046182707712437384, guid: ace3877f62487a6408fb78aebccf2c37, type: 3}
+  m_PrefabInstance: {fileID: 2375174171745272147}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 552650704}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a5f961b0d76afe243a14c46ab8a87c04, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ActiveGameObject
+--- !u!114 &552650711 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 2100976203913784326, guid: ace3877f62487a6408fb78aebccf2c37, type: 3}
+  m_PrefabInstance: {fileID: 2375174171745272147}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 552650704}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3486176e33c32744a9acffddd5caeb5d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VisualizeCocktail
 --- !u!1 &696697197
 GameObject:
   m_ObjectHideFlags: 0
@@ -3519,6 +3546,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1198727810573366094, guid: ace3877f62487a6408fb78aebccf2c37, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1579336082123580115, guid: ace3877f62487a6408fb78aebccf2c37, type: 3}
       propertyPath: TapActionRef
       value: 
@@ -3531,9 +3562,17 @@ PrefabInstance:
       propertyPath: PointActionRef
       value: 
       objectReference: {fileID: 814633148}
+    - target: {fileID: 2784762120815422683, guid: ace3877f62487a6408fb78aebccf2c37, type: 3}
+      propertyPath: m_Enabled
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3036482577174968938, guid: ace3877f62487a6408fb78aebccf2c37, type: 3}
       propertyPath: m_Name
       value: System
+      objectReference: {fileID: 0}
+    - target: {fileID: 4019487158080486272, guid: ace3877f62487a6408fb78aebccf2c37, type: 3}
+      propertyPath: m_Convex
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4492720801769829549, guid: ace3877f62487a6408fb78aebccf2c37, type: 3}
       propertyPath: clickAction
@@ -3551,6 +3590,150 @@ PrefabInstance:
       propertyPath: m_Camera
       value: 
       objectReference: {fileID: 696697199}
+    - target: {fileID: 7604337194525146766, guid: ace3877f62487a6408fb78aebccf2c37, type: 3}
+      propertyPath: OnAddMixer.m_PersistentCalls.m_Calls.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7604337194525146766, guid: ace3877f62487a6408fb78aebccf2c37, type: 3}
+      propertyPath: OnAddAlcohol.m_PersistentCalls.m_Calls.Array.size
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7604337194525146766, guid: ace3877f62487a6408fb78aebccf2c37, type: 3}
+      propertyPath: OnResetCocktail.m_PersistentCalls.m_Calls.Array.size
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7604337194525146766, guid: ace3877f62487a6408fb78aebccf2c37, type: 3}
+      propertyPath: OnAddMixer.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7604337194525146766, guid: ace3877f62487a6408fb78aebccf2c37, type: 3}
+      propertyPath: OnAddMixer.m_PersistentCalls.m_Calls.Array.data[2].m_Mode
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 7604337194525146766, guid: ace3877f62487a6408fb78aebccf2c37, type: 3}
+      propertyPath: OnAddAlcohol.m_PersistentCalls.m_Calls.Array.data[1].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7604337194525146766, guid: ace3877f62487a6408fb78aebccf2c37, type: 3}
+      propertyPath: OnAddAlcohol.m_PersistentCalls.m_Calls.Array.data[2].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7604337194525146766, guid: ace3877f62487a6408fb78aebccf2c37, type: 3}
+      propertyPath: OnAddAlcohol.m_PersistentCalls.m_Calls.Array.data[3].m_Mode
+      value: 6
+      objectReference: {fileID: 0}
+    - target: {fileID: 7604337194525146766, guid: ace3877f62487a6408fb78aebccf2c37, type: 3}
+      propertyPath: OnAddMixer.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 552650711}
+    - target: {fileID: 7604337194525146766, guid: ace3877f62487a6408fb78aebccf2c37, type: 3}
+      propertyPath: OnAddMixer.m_PersistentCalls.m_Calls.Array.data[2].m_Target
+      value: 
+      objectReference: {fileID: 552650704}
+    - target: {fileID: 7604337194525146766, guid: ace3877f62487a6408fb78aebccf2c37, type: 3}
+      propertyPath: OnAddAlcohol.m_PersistentCalls.m_Calls.Array.data[1].m_Target
+      value: 
+      objectReference: {fileID: 552650711}
+    - target: {fileID: 7604337194525146766, guid: ace3877f62487a6408fb78aebccf2c37, type: 3}
+      propertyPath: OnAddAlcohol.m_PersistentCalls.m_Calls.Array.data[2].m_Target
+      value: 
+      objectReference: {fileID: 552650711}
+    - target: {fileID: 7604337194525146766, guid: ace3877f62487a6408fb78aebccf2c37, type: 3}
+      propertyPath: OnAddAlcohol.m_PersistentCalls.m_Calls.Array.data[3].m_Target
+      value: 
+      objectReference: {fileID: 552650706}
+    - target: {fileID: 7604337194525146766, guid: ace3877f62487a6408fb78aebccf2c37, type: 3}
+      propertyPath: OnResetCocktail.m_PersistentCalls.m_Calls.Array.data[0].m_Mode
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7604337194525146766, guid: ace3877f62487a6408fb78aebccf2c37, type: 3}
+      propertyPath: OnAddMixer.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: UpdateCocktailBars
+      objectReference: {fileID: 0}
+    - target: {fileID: 7604337194525146766, guid: ace3877f62487a6408fb78aebccf2c37, type: 3}
+      propertyPath: OnAddMixer.m_PersistentCalls.m_Calls.Array.data[2].m_MethodName
+      value: SetActive
+      objectReference: {fileID: 0}
+    - target: {fileID: 7604337194525146766, guid: ace3877f62487a6408fb78aebccf2c37, type: 3}
+      propertyPath: OnAddAlcohol.m_PersistentCalls.m_Calls.Array.data[3].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7604337194525146766, guid: ace3877f62487a6408fb78aebccf2c37, type: 3}
+      propertyPath: OnResetCocktail.m_PersistentCalls.m_Calls.Array.data[0].m_Target
+      value: 
+      objectReference: {fileID: 552650711}
+    - target: {fileID: 7604337194525146766, guid: ace3877f62487a6408fb78aebccf2c37, type: 3}
+      propertyPath: OnAddAlcohol.m_PersistentCalls.m_Calls.Array.data[1].m_MethodName
+      value: UpdateCocktailBars
+      objectReference: {fileID: 0}
+    - target: {fileID: 7604337194525146766, guid: ace3877f62487a6408fb78aebccf2c37, type: 3}
+      propertyPath: OnAddAlcohol.m_PersistentCalls.m_Calls.Array.data[2].m_MethodName
+      value: UpdateCocktailBars
+      objectReference: {fileID: 0}
+    - target: {fileID: 7604337194525146766, guid: ace3877f62487a6408fb78aebccf2c37, type: 3}
+      propertyPath: OnAddAlcohol.m_PersistentCalls.m_Calls.Array.data[3].m_MethodName
+      value: SetActiveState
+      objectReference: {fileID: 0}
+    - target: {fileID: 7604337194525146766, guid: ace3877f62487a6408fb78aebccf2c37, type: 3}
+      propertyPath: OnResetCocktail.m_PersistentCalls.m_Calls.Array.data[0].m_CallState
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 7604337194525146766, guid: ace3877f62487a6408fb78aebccf2c37, type: 3}
+      propertyPath: OnResetCocktail.m_PersistentCalls.m_Calls.Array.data[0].m_MethodName
+      value: ResetVisualBars
+      objectReference: {fileID: 0}
+    - target: {fileID: 7604337194525146766, guid: ace3877f62487a6408fb78aebccf2c37, type: 3}
+      propertyPath: OnAddMixer.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: VisualizeCocktail, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 7604337194525146766, guid: ace3877f62487a6408fb78aebccf2c37, type: 3}
+      propertyPath: OnAddMixer.m_PersistentCalls.m_Calls.Array.data[2].m_TargetAssemblyTypeName
+      value: UnityEngine.GameObject, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 7604337194525146766, guid: ace3877f62487a6408fb78aebccf2c37, type: 3}
+      propertyPath: OnAddAlcohol.m_PersistentCalls.m_Calls.Array.data[1].m_TargetAssemblyTypeName
+      value: VisualizeCocktail, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 7604337194525146766, guid: ace3877f62487a6408fb78aebccf2c37, type: 3}
+      propertyPath: OnAddAlcohol.m_PersistentCalls.m_Calls.Array.data[2].m_TargetAssemblyTypeName
+      value: VisualizeCocktail, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 7604337194525146766, guid: ace3877f62487a6408fb78aebccf2c37, type: 3}
+      propertyPath: OnAddAlcohol.m_PersistentCalls.m_Calls.Array.data[3].m_TargetAssemblyTypeName
+      value: ActiveGameObject, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 7604337194525146766, guid: ace3877f62487a6408fb78aebccf2c37, type: 3}
+      propertyPath: OnAddMixer.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_BoolArgument
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7604337194525146766, guid: ace3877f62487a6408fb78aebccf2c37, type: 3}
+      propertyPath: OnAddMixer.m_PersistentCalls.m_Calls.Array.data[2].m_Arguments.m_BoolArgument
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7604337194525146766, guid: ace3877f62487a6408fb78aebccf2c37, type: 3}
+      propertyPath: OnAddAlcohol.m_PersistentCalls.m_Calls.Array.data[1].m_Arguments.m_BoolArgument
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7604337194525146766, guid: ace3877f62487a6408fb78aebccf2c37, type: 3}
+      propertyPath: OnAddAlcohol.m_PersistentCalls.m_Calls.Array.data[2].m_Arguments.m_BoolArgument
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7604337194525146766, guid: ace3877f62487a6408fb78aebccf2c37, type: 3}
+      propertyPath: OnAddAlcohol.m_PersistentCalls.m_Calls.Array.data[3].m_Arguments.m_BoolArgument
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7604337194525146766, guid: ace3877f62487a6408fb78aebccf2c37, type: 3}
+      propertyPath: OnResetCocktail.m_PersistentCalls.m_Calls.Array.data[0].m_TargetAssemblyTypeName
+      value: VisualizeCocktail, Assembly-CSharp
+      objectReference: {fileID: 0}
+    - target: {fileID: 7604337194525146766, guid: ace3877f62487a6408fb78aebccf2c37, type: 3}
+      propertyPath: OnAddAlcohol.m_PersistentCalls.m_Calls.Array.data[3].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
+    - target: {fileID: 7604337194525146766, guid: ace3877f62487a6408fb78aebccf2c37, type: 3}
+      propertyPath: OnResetCocktail.m_PersistentCalls.m_Calls.Array.data[0].m_Arguments.m_ObjectArgumentAssemblyTypeName
+      value: UnityEngine.Object, UnityEngine
+      objectReference: {fileID: 0}
     - target: {fileID: 8199817507960703015, guid: ace3877f62487a6408fb78aebccf2c37, type: 3}
       propertyPath: m_LocalPosition.x
       value: -5.9370003

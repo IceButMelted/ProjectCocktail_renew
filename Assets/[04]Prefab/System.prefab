@@ -185,6 +185,7 @@ GameObject:
   - component: {fileID: 7945054547447197471}
   - component: {fileID: 1173257506088474275}
   - component: {fileID: 3046182707712437384}
+  - component: {fileID: 2100976203913784326}
   m_Layer: 5
   m_Name: Canvas_Progress_Bar
   m_TagString: Untagged
@@ -302,6 +303,20 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ActiveGameObject
   initState: 0
+--- !u!114 &2100976203913784326
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 453190883101344344}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 3486176e33c32744a9acffddd5caeb5d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::VisualizeCocktail
+  alcohol_fill: {fileID: 6668158887378924361}
+  mixer_fill: {fileID: 6911359516063657010}
 --- !u!1 &943410214745620277
 GameObject:
   m_ObjectHideFlags: 0
@@ -2656,7 +2671,6 @@ GameObject:
   - component: {fileID: 1592513148943127433}
   - component: {fileID: 2781617898979759246}
   - component: {fileID: 774323832522412329}
-  - component: {fileID: 2784762120815422683}
   - component: {fileID: 9147402661166271471}
   - component: {fileID: 5898598805456431816}
   - component: {fileID: 7604337194525146766}
@@ -2766,20 +2780,6 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 10209, guid: 0000000000000000e000000000000000, type: 0}
---- !u!114 &2784762120815422683
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6200082535624626933}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3486176e33c32744a9acffddd5caeb5d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::VisualizeCocktail
-  alcohol_fill: {fileID: 6668158887378924361}
-  mixer_fill: {fileID: 6911359516063657010}
 --- !u!114 &9147402661166271471
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2843,7 +2843,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 2784762120815422683}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: VisualizeCocktail, Assembly-CSharp
         m_MethodName: UpdateCocktailBars
         m_Mode: 1
@@ -2882,7 +2882,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 2784762120815422683}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: VisualizeCocktail, Assembly-CSharp
         m_MethodName: UpdateCocktailBars
         m_Mode: 1
@@ -2906,6 +2906,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
+  OnResetCocktail:
+    m_PersistentCalls:
+      m_Calls: []
   currentCocktail:
     Name: 
     AlcoholStrength: 0

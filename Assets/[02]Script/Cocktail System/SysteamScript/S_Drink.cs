@@ -34,7 +34,7 @@ public class S_Drink
     /// <summary>
     /// Compare this Drink to Other Drink
     /// </summary>
-    /// <param name="other">Other Drink than get to Compare</param>
+    /// <param name="other">Other Drink that get to Compare</param>
     /// <param name="technicalOnly">true = Not count Price and GlassType</param>
     public bool Check(S_Drink other, bool technicalOnly = true)
     {
@@ -59,7 +59,7 @@ public class S_Drink
     /// <summary>
     /// Calculate Satisfaction with recipe BP
     /// </summary>
-    /// <param name="recipe">Recipe than customer want</param>
+    /// <param name="recipe">Recipe that customer want</param>
     public Satisfaction CalculateSatisfaction(S_Drink recipe)
     {
         int ingredientErrors = CountIngredientErrors(recipe);
@@ -118,6 +118,7 @@ public class S_Drink
     public int GetTotalAlcohol() { 
         return AlcoholList.Values.Sum();
     }
+
     /// <summary>
     /// Get Total Mixer
     /// </summary>
@@ -125,6 +126,7 @@ public class S_Drink
     public int GetTotalMixer() { 
         return MixerList.Values.Sum();
     }
+
     /// <summary>
     /// Get Total of Ingredient
     /// </summary>
@@ -201,8 +203,7 @@ public class S_Drink
         return errors;
     }
 
-    private static bool DictEquals<TKey, TValue>(
-        Dictionary<TKey, TValue> a, Dictionary<TKey, TValue> b)
+    private static bool DictEquals<TKey, TValue>(Dictionary<TKey, TValue> a, Dictionary<TKey, TValue> b)
     {
         if (a.Count != b.Count) return false;
         foreach (var kv in a)
