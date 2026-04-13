@@ -62,19 +62,19 @@ public class BTN_2_5D : MonoBehaviour
 
     private void Start()
     {
-        clickAction.action.started += Context =>
-        {
-            Debug.Log($"{name} clicked (New Input System - started)");
-        };
+        //clickAction.action.started += Context =>
+        //{
+        //    Debug.Log($"{name} clicked (New Input System - started)");
+        //};
 
-        clickAction.action.performed += Context =>
-        {
-            Debug.Log($"{name} clicked (New Input System - performed)");
-        };
+        //clickAction.action.performed += Context =>
+        //{
+        //    Debug.Log($"{name} clicked (New Input System - performed)");
+        //};
 
-        clickAction.action.canceled += Context => {
-            Debug.Log($"{name} clicked (New Input System - cancled)");
-        };
+        //clickAction.action.canceled += Context => {
+        //    Debug.Log($"{name} clicked (New Input System - cancled)");
+        //};
     }
 
     private void Update()
