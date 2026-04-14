@@ -1,96 +1,81 @@
 ﻿// ============================================================
-//  Bar410 — BaseMiniGame (FSM Core)
-//
-//  Update loop is intentionally NOT here.
-//  MinigameSystemManager owns Update and calls ProcessedGame()
-//  each frame, keeping tick control in one place.
+//  BaseMiniGame — fixed
 // ============================================================
-
 using System;
 using UnityEngine;
+using Yarn.Unity.Editor;
 
 public abstract class BaseMiniGame : MonoBehaviour, IMinigame
 {
-    // ── IMinigame ──────────────────────────────────────────
     [field: SerializeField]
     public SO_MinigameSetting Setting { get; set; }
 
+    [SerializeField] private CameraController _camera;
+
     public bool IsRunning { get; protected set; }
+    public MiniGameState CurrentState { get; protected set; } = MiniGameState.Standby;
 
-    // ── FSM ────────────────────────────────────────────────
-    public MiniGameState CurrentState { get; protected set; } = MiniGameState.Initialize;
-
-    // ── Events ─────────────────────────────────────────────
-    /// <summary>Fired when the game ends. Bool = success.</summary>
     public event Action<bool> OnGameEnd;
 
-
-    // ── Input (read-only for subclasses) ───────────────────
-
-    /// <summary>
-    /// True on the exact frame the player pressed the left mouse button.
-    /// Polled inside ProcessedGame() so subclasses never call Input directly.
-    /// </summary>
     protected bool IsClickedThisFrame { get; private set; }
 
-    // ── FSM Transitions ────────────────────────────────────
-    /// <summary>Transition to a new state and invoke the matching handler.</summary>
-    protected void SetState(MiniGameState newState)
+    public void Initialize(CameraController cam)
+    {
+        _camera = cam;
+        IsRunning = false;
+    }
+
+    public void SetState(MiniGameState newState)
     {
         if (CurrentState == newState) return;
-
         CurrentState = newState;
-
         switch (newState)
         {
-            case MiniGameState.Initialize: OnInitialize(); break;
             case MiniGameState.Processing: OnProcessing(); break;
             case MiniGameState.Success: OnSuccess(); break;
-            case MiniGameState.Fail: OnFail(); break;
+            case MiniGameState.Standby: OnStandby(); break;
         }
     }
 
-    // ── FSM Handlers (override in subclasses) ──────────────
-
-    protected virtual void OnInitialize() { }
     protected virtual void OnProcessing() { }
     protected virtual void OnSuccess() => FireEndEvent(true);
-    protected virtual void OnFail() => FireEndEvent(false);
+    protected virtual void OnStandby() => ResetGame();
 
-    // ── IMinigame ──────────────────────────────────────────
 
     public virtual void StartGame()
     {
         IsRunning = true;
+        _camera.ResetRotaionAndMovement();
+        SetState(MiniGameState.Standby); // Init first, then Processing
         SetState(MiniGameState.Processing);
     }
-
+    public virtual void ProcessedGame()
+    {
+        IsClickedThisFrame = Input.GetMouseButtonDown(0);
+        if (!IsRunning) return;
+    }
+    public virtual void UpdateUI() { }
     public virtual void EndGame()
     {
         IsRunning = false;
+        _camera.SetCanRotateCamera(true);
     }
 
-    /// <summary>
-    /// Called every frame by MinigameSystemManager.Update().
-    /// Refreshes IsClickedThisFrame then runs subclass logic.
-    /// Base guard: exits early when not running.
-    /// </summary>
-    public virtual void ProcessedGame()
-    {
-        // Always poll input so subclasses can read IsClickedThisFrame
-        IsClickedThisFrame = Input.GetMouseButtonDown(0);
-
-        if (!IsRunning) return;
-    }
+    
 
     public virtual string GetGameState()
         => $"{GetType().Name} | State: {CurrentState} | Running: {IsRunning}";
 
-    // ── Helper ─────────────────────────────────────────────
-
     protected void FireEndEvent(bool success)
     {
         EndGame();
-        OnGameEnd?.Invoke(success);
+        OnGameEnd?.Invoke(success); 
+    }
+
+    protected virtual void ResetGame()
+    {
+        IsRunning = false;
+        CurrentState = MiniGameState.Standby;
+        IsClickedThisFrame = false;
     }
 }

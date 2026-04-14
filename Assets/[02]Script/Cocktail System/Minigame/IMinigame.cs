@@ -95,10 +95,9 @@ public class SO_GrindSetting : SO_MinigameSetting
 /// </summary>
 public enum MiniGameState
 {
-    Initialize,
     Processing,
     Success,
-    Fail
+    Standby
 }
 
 public interface IMinigame

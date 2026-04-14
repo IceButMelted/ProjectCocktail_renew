@@ -326,6 +326,16 @@ public class CameraController : MonoBehaviour
 
     #endregion
 
+    #region Helper
+
+    public void SetCanRotateCamera(bool _bool)
+    { 
+        settings.canRotateSideways = _bool;
+        settings.canMoveCamera = _bool;    
+    }
+
+    #endregion
+
     #region Debug
 
     private void OnValidate()

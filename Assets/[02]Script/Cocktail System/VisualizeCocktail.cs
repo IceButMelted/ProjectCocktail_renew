@@ -29,7 +29,8 @@ public class VisualizeCocktail : MonoBehaviour
 
     private void Awake()
     {
-        cocktailMaker = GetComponent<CocktailMaker>();
+        cocktailMaker = FindFirstObjectByType<CocktailMaker>();
+        
     }
 
     public void UpdateCocktailBars()
