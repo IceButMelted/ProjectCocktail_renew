@@ -14,7 +14,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SO_ShakingSetting
   DifficultyMultiplier: 1
   Duration: 5
-  TargetZoneMin: 0.4
-  TargetZoneMax: 0.7
+  TargetZoneMinSize: 0.1
+  TargetZoneMaxSize: 0.3
+  InitTargetZone_MinValue: 0.7
+  TargetZone_DecreasePerProgress: 0.05
+  ProgressBar_IncreaseRate: 1
+  ProgressBar_StartColor: {r: 0.1829047, g: 0.13203098, b: 0.6509434, a: 1}
+  ProgressBar_EndColor: {r: 0, g: 0.7075472, b: 0.0053276434, a: 1}
   GaugeDecayRate: 0.15
   GaugeIncreasePerClick: 0.08

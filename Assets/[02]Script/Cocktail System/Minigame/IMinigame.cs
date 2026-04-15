@@ -33,8 +33,16 @@ public class SO_MinigameSetting : ScriptableObject
 public class SO_ShakingSetting : SO_MinigameSetting
 {
     [Header("Shaking Zone")]
-    [Range(0f, 1f)] public float TargetZoneMin = 0.4f;
-    [Range(0f, 1f)] public float TargetZoneMax = 0.7f;
+    [Range(0f, .4f)] public float TargetZoneMinSize = 0.4f;
+    [Range(0f, .95f)] public float TargetZoneMaxSize = 0.7f;
+    [Tooltip("Initial minimum value for the target zone. Target zone must not go below this value.")]
+    [Range(.5f, .95f)] public float InitTargetZone_MinValue = 0.7f; // must not go below this
+    [Range(0f, 0.05f)] public float TargetZone_DecreasePerProgress = 0.01f; // zone shrinks as progress grows
+
+    [Header("Progress Bar")]
+    [Range(0f,1f)]public float ProgressBar_IncreaseRate = 0.2f; // per second, while inside zone
+    public Color ProgressBar_StartColor = Color.green;
+    public Color ProgressBar_EndColor = Color.red;
 
     [Tooltip("Gauge decay per second when the player is not clicking.")]
     public float GaugeDecayRate = 0.15f;

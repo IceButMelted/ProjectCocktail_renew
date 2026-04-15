@@ -1,74 +1,172 @@
 ﻿// ============================================================
-//  ShakingMinigame — fixed
+//  ShakingMinigame — with target zone handle visual
 // ============================================================
 using UnityEngine;
+using UnityEngine.UI;
 
 public class ShakingMinigame : BaseMiniGame
 {
-    // No constructor — MonoBehaviour lifecycle only
-
     private SO_ShakingSetting _cfg => Setting as SO_ShakingSetting;
+
+    [Header("UI")]
+    [SerializeField] private Slider _gaugeSlider;
+    [SerializeField] private Slider _ProgressSlider;
+    [SerializeField] private Slider _targetZoneSlider;   // handle visually shows the zone
+
+    // Internal state
+    private float _targetZoneCurrentSize;
+    private float _targetZoneCenter;
+    private float _targetZoneBorderMin;
+    private float _targetZoneBorderMax;
+
+    // Cache the handle's original height so we only change width
+    private float _handleOriginalHeight;
+    private float _handleOriginalWidth;
 
     public float GaugeValue { get; private set; }
     public float TimeInZone { get; private set; }
 
-    protected override void OnProcessing()
+    // ─────────────────────────────────────────────
+    //  Lifecycle
+    // ─────────────────────────────────────────────
+
+    public override void StartGame()
     {
-        // Don't reset here — OnInitialize already ran.
-        // Only reset if you explicitly want a mid-game restart.
+        // Cache handle width once before anything resizes it
+        _handleOriginalWidth = _targetZoneSlider.handleRect.sizeDelta.x;
+
+        InitTargetZone();
+        base.StartGame();
+        Debug.Log("Shaking Minigame Started");
     }
+
+    protected override void OnProcessing() { }
 
     public override void ProcessedGame()
     {
-        if (!IsRunning) return; // explicit guard after base
-        // 1. Run base FIRST: sets IsClickedThisFrame, guards !IsRunning
+        if (!IsRunning) return;
         base.ProcessedGame();
-        
-        Debug.Log($"Shaking Minigame: Gauge={GaugeValue:F2}, TimeInZone={TimeInZone:F2}s");
-        Debug.Log($"Max: {_cfg.TargetZoneMax} | Min: {_cfg.TargetZoneMin}");
 
-        // 2. Click input
+        // 1. Click → increase gauge
         if (IsClickedThisFrame)
         {
             GaugeValue += _cfg.GaugeIncreasePerClick * _cfg.DifficultyMultiplier;
             GaugeValue = Mathf.Clamp01(GaugeValue);
         }
 
-        // 3. Decay
+        // 2. Decay every frame
         GaugeValue -= _cfg.GaugeDecayRate * Time.deltaTime;
         GaugeValue = Mathf.Clamp01(GaugeValue);
 
-        // 4. Zone accumulation
-        bool inZone = GaugeValue >= _cfg.TargetZoneMin && GaugeValue <= _cfg.TargetZoneMax;
-        if (inZone)
-            TimeInZone += Time.deltaTime;
+        // 3. Zone bounds (clamp for safety)
+        float zoneStart = Mathf.Max(_targetZoneBorderMin, 0f);
+        float zoneEnd = Mathf.Min(_targetZoneBorderMax, 1f);
 
-        Debug.Log($"In Target Zone: {inZone}");
+        // 4. Zone accumulation — progress increases by rate * dt
+        bool inZone = GaugeValue >= zoneStart && GaugeValue <= zoneEnd;
+        if (inZone)
+        {
+            float oldProgress = TimeInZone;
+            TimeInZone += _cfg.ProgressBar_IncreaseRate * Time.deltaTime;
+
+            float progressDelta = TimeInZone - oldProgress;
+            DecreaseTargetZone(progressDelta);
+        }
+
+        Debug.Log($"In Zone: {inZone} | Gauge={GaugeValue:F2} | Zone=[{zoneStart:F2},{zoneEnd:F2}] | Progress={TimeInZone:F2}");
 
         // 5. Win condition
         if (TimeInZone >= _cfg.Duration)
             SetState(MiniGameState.Success);
+
+        UpdateUI();
     }
 
     public override void EndGame()
     {
         base.EndGame();
-        Debug.Log($"Shaking Minigame Ended: Final Gauge={GaugeValue:F2}, Total TimeInZone={TimeInZone:F2}s, Result={CurrentState}");
-        ResetGame(); // Ensure we reset after ending, so next start is fresh
+        Debug.Log($"Shaking Ended | Gauge={GaugeValue:F2} | Progress={TimeInZone:F2} | {CurrentState}");
     }
 
     public override void UpdateUI()
     {
         base.UpdateUI();
+
+        _gaugeSlider.value = GaugeValue;
+        _ProgressSlider.value = TimeInZone / _cfg.Duration;
+
+        UpdateTargetZoneVisual();
+        UpdateProgressBarVisaul();
     }
 
     public override string GetGameState()
-        => $"Shaking | Gauge: {GaugeValue:P0} | InZone: {TimeInZone:F1}s | {CurrentState}";
+        => $"Shaking | Gauge: {GaugeValue:P0} | Progress: {TimeInZone:F1}s | {CurrentState}";
 
-    protected override void ResetGame() { 
+    protected override void ResetGame()
+    {
         base.ResetGame();
         GaugeValue = 0f;
         TimeInZone = 0f;
         Debug.Log("Shaking Minigame Reset");
     }
+
+    private void InitTargetZone()
+    {
+        _targetZoneCurrentSize = _cfg.TargetZoneMaxSize;
+
+        float halfSize = _targetZoneCurrentSize / 2f;
+        float minCenter = Mathf.Max(_cfg.InitTargetZone_MinValue, halfSize);
+        float maxCenter = 1f - halfSize;
+
+        _targetZoneCenter = Random.Range(minCenter, maxCenter);
+        _targetZoneBorderMin = _targetZoneCenter - halfSize;
+        _targetZoneBorderMax = _targetZoneCenter + halfSize;
+
+        ResetGame();
+
+        //update Visuals
+        UpdateTargetZoneVisual();
+        UpdateProgressBarVisaul();
+    }
+
+    private void DecreaseTargetZone(float progressDelta)
+    {
+        if (_targetZoneCurrentSize <= _cfg.TargetZoneMinSize) return;
+
+        float shrink = _cfg.TargetZone_DecreasePerProgress * progressDelta;
+        _targetZoneCurrentSize -= shrink;
+        _targetZoneCurrentSize = Mathf.Max(_targetZoneCurrentSize, _cfg.TargetZoneMinSize);
+
+        float halfSize = _targetZoneCurrentSize / 2f;
+        _targetZoneBorderMin = _targetZoneCenter - halfSize;
+        _targetZoneBorderMax = _targetZoneCenter + halfSize;
+    }
+
+    private void UpdateTargetZoneVisual()
+    {
+        // Move slider thumb to zone center
+        _targetZoneSlider.value = _targetZoneCenter;
+
+        // Get the pixel width of the full slider track
+        float trackHeight = (_targetZoneSlider.transform as RectTransform).rect.height;
+
+        // Scale handle width to match zone size in pixels
+        float handleHeight = _targetZoneCurrentSize * trackHeight;
+
+        RectTransform handle = _targetZoneSlider.handleRect;
+        handle.sizeDelta = new Vector2(_handleOriginalWidth, handleHeight);
+
+    }
+
+    private void UpdateProgressBarVisaul() { 
+        Image fillImage = _ProgressSlider.fillRect.GetComponent<Image>();
+
+        // Change color based on progress (green to red)
+        float t = TimeInZone / _cfg.Duration;
+        float smoothT = Mathf.SmoothStep(0f, 1f, t); // for smoother color transition
+
+        fillImage.color = Oklab.OklabLerp(_cfg.ProgressBar_StartColor, _cfg.ProgressBar_EndColor, smoothT);
+
+    }
+
 }
