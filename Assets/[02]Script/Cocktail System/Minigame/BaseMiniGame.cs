@@ -146,13 +146,6 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
         return (fullyIn, fullyOut);
     }
 
-    // ─────────────────────────────────────────────
-    //  SlideMinigame — direction only
-    //  Slides panel continuously in dir until:
-    //   (1) fully inside  the parent rect, or
-    //   (2) fully outside the parent rect
-    // ─────────────────────────────────────────────
-
     protected enum FinishCondition
     {
         FullyIn,
@@ -187,15 +180,6 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
         }
 
     }
-
-    // ─────────────────────────────────────────────
-    //  SlideMinigame — direction + target position
-    //  Slides panel in dir until:
-    //   (1) anchoredPosition has passed target pos
-    //       along the slide axis, or
-    //   (2) fully inside  the parent rect, or
-    //   (3) fully outside the parent rect
-    // ─────────────────────────────────────────────
 
     /// <summary>
     /// Call every frame. <paramref name="pos"/> is in the panel's
