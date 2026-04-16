@@ -4,6 +4,8 @@
 using UnityEngine;
 using UnityEngine.UI;
 
+using static E_Cocktail;
+
 public class ShakingMinigame : BaseMiniGame
 {
     private SO_ShakingSetting _cfg => Setting as SO_ShakingSetting;
@@ -18,6 +20,10 @@ public class ShakingMinigame : BaseMiniGame
     private float _targetZoneCenter;
     private float _targetZoneBorderMin;
     private float _targetZoneBorderMax;
+
+    //slide panel
+    private bool _isPanelSlidingIn = false;
+    private bool _isPanelSlidingOut = false;
 
     // Cache the handle's original height so we only change width
     private float _handleOriginalHeight;
@@ -36,15 +42,34 @@ public class ShakingMinigame : BaseMiniGame
         _handleOriginalWidth = _targetZoneSlider.handleRect.sizeDelta.x;
 
         InitTargetZone();
+        OnProcessing();
         base.StartGame();
         Debug.Log("Shaking Minigame Started");
     }
 
-    protected override void OnProcessing() { }
+    protected override void OnProcessing() {
+        //_minigamePanel.anchoredPosition = new Vector2(-Screen.width, 0f);
+    }
 
     public override void ProcessedGame()
     {
+        
+        if (_isPanelSlidingIn)
+            if (!SlideMinigame(Direction.Right, Vector2.zero)) return;
+            else _isPanelSlidingIn = false;
+        if (_isPanelSlidingOut)
+        {
+            Vector2 _OutPoint = new Vector2(-(_minigamePanel.transform as RectTransform).rect.width, 0);
+            if (!SlideMinigame(Direction.Left, _OutPoint)) return;
+            else
+            {
+                _isPanelSlidingOut = false;
+                SetState(MiniGameState.Success);
+            }
+        }
+
         if (!IsRunning) return;
+
         base.ProcessedGame();
 
         // 1. Click → increase gauge
@@ -77,7 +102,9 @@ public class ShakingMinigame : BaseMiniGame
 
         // 5. Win condition
         if (TimeInZone >= _cfg.Duration)
-            SetState(MiniGameState.Success);
+        {
+            _isPanelSlidingOut = true;
+        }
 
         UpdateUI();
     }
@@ -107,6 +134,8 @@ public class ShakingMinigame : BaseMiniGame
         base.ResetGame();
         GaugeValue = 0f;
         TimeInZone = 0f;
+        _isPanelSlidingIn = false;
+        _isPanelSlidingOut = false;
         Debug.Log("Shaking Minigame Reset");
     }
 
@@ -123,6 +152,9 @@ public class ShakingMinigame : BaseMiniGame
         _targetZoneBorderMax = _targetZoneCenter + halfSize;
 
         ResetGame();
+
+        _isPanelSlidingIn = true;
+        _isPanelSlidingOut = false;
 
         //update Visuals
         UpdateTargetZoneVisual();

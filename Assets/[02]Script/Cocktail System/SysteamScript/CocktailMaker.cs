@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.InputSystem;
+
 using static E_Cocktail;
 
 // Define custom UnityEvent types at the top of your file
@@ -12,8 +14,9 @@ public class AlcoholEvent : UnityEvent<Alcohol, int> { }
 [System.Serializable]
 public class MixerEvent : UnityEvent<Mixer, int> { }
 
-public class CocktailMaker : MonoBehaviour
+public class CocktailMaker : BTN_2_5D
 {
+    [Header("Add Ingredient")]
     public UnityEvent OnAddIngredient;
     public AlcoholEvent OnAddAlcohol;  // New typed event
     public MixerEvent OnAddMixer;      // New typed event
@@ -22,9 +25,14 @@ public class CocktailMaker : MonoBehaviour
     [HideInInspector]
     public S_Drink currentCocktail;
 
-    private void Awake()
+    protected override void Awake()
     {
+        base.Awake();
+    }
 
+    protected override void Update()
+    {
+        base.Update();
     }
 
     public void SetMethod(Method method)
@@ -49,5 +57,12 @@ public class CocktailMaker : MonoBehaviour
 
     public void TryToAddMixer(Mixer mixer, int amount = 1) { 
         currentCocktail.TryToAddMixer(mixer, amount);
+    }
+
+    protected override void OnClick(InputAction.CallbackContext context)
+    {
+        if (!(currentCocktail.GetTotalIngredient() > 0))
+            return;
+        base.OnClick(context);
     }
 }

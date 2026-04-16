@@ -2,6 +2,7 @@
 //  MinigameSystemManager — fixed
 // ============================================================
 using UnityEngine;
+using static E_Cocktail;
 
 public class MinigameSystemManager : MonoBehaviour
 {
@@ -79,5 +80,15 @@ public class MinigameSystemManager : MonoBehaviour
 
         if (_currentMinigame != null && _currentMinigame.IsRunning)
             _currentMinigame.ProcessedGame();
+    }
+
+    public void StartShakingMinigame() { 
+        _currentMinigame = _shakingMinigame;
+        _currentMinigame.StartGame();
+    }
+
+    public void StartStirringMinigame() { 
+        _currentMinigame = _mixingMinigame;
+        _currentMinigame.StartGame();
     }
 }
