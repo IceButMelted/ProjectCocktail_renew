@@ -1,6 +1,7 @@
 ﻿// ============================================================
 //  BaseMiniGame — fixed
 // ============================================================
+using NUnit.Framework.Constraints;
 using System;
 using UnityEngine;
 using Yarn.Unity.Editor;
@@ -152,6 +153,12 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
     //   (2) fully outside the parent rect
     // ─────────────────────────────────────────────
 
+    protected enum FinishCondition
+    {
+        FullyIn,
+        FullyOut
+    }
+
     /// <summary>
     /// Call every frame (e.g. from Update / ProcessedGame).
     /// Returns true the frame one of the finish conditions is met.
@@ -163,6 +170,22 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
         var (fullyIn, fullyOut) = CheckBoundaryConditions();
 
         return fullyIn || fullyOut;
+    }
+
+    protected virtual bool SlideMinigame(Direction dir, FinishCondition finishCondition)
+    {
+        _minigamePanel.anchoredPosition += DirectionToVector(dir) * _slidePanelSpeed * Time.deltaTime;
+        Vector2 pos = _minigamePanel.anchoredPosition;
+        
+        var (fullyIn, fullyOut) = CheckBoundaryConditions();
+
+        switch (finishCondition)
+        {
+            case FinishCondition.FullyIn: return fullyIn;
+            case FinishCondition.FullyOut: return fullyOut;
+            default: return false;
+        }
+
     }
 
     // ─────────────────────────────────────────────
@@ -210,8 +233,8 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
             _minigamePanel.anchoredPosition = snapped;
         }
 
-        var (fullyIn, fullyOut) = CheckBoundaryConditions();
+        //var (fullyIn, fullyOut) = CheckBoundaryConditions();
 
-        return reachedTarget || fullyIn || fullyOut;
+        return reachedTarget;
     }
 }

@@ -42,33 +42,29 @@ public class ShakingMinigame : BaseMiniGame
         _handleOriginalWidth = _targetZoneSlider.handleRect.sizeDelta.x;
 
         InitTargetZone();
-        OnProcessing();
         base.StartGame();
         Debug.Log("Shaking Minigame Started");
     }
 
-    protected override void OnProcessing() {
-        //_minigamePanel.anchoredPosition = new Vector2(-Screen.width, 0f);
-    }
-
     public override void ProcessedGame()
     {
-        
+
+        if (!IsRunning) return;
+
         if (_isPanelSlidingIn)
-            if (!SlideMinigame(Direction.Right, Vector2.zero)) return;
+            if (!SlideMinigame(Direction.Right, FinishCondition.FullyIn)) return;
             else _isPanelSlidingIn = false;
         if (_isPanelSlidingOut)
         {
             Vector2 _OutPoint = new Vector2(-(_minigamePanel.transform as RectTransform).rect.width, 0);
-            if (!SlideMinigame(Direction.Left, _OutPoint)) return;
+            //if (!SlideMinigame(Direction.Left, _OutPoint)) return;
+            if (!SlideMinigame(Direction.Left, FinishCondition.FullyOut)) return;
             else
             {
                 _isPanelSlidingOut = false;
                 SetState(MiniGameState.Success);
             }
-        }
-
-        if (!IsRunning) return;
+        } 
 
         base.ProcessedGame();
 
@@ -131,12 +127,15 @@ public class ShakingMinigame : BaseMiniGame
 
     protected override void ResetGame()
     {
-        base.ResetGame();
+        
         GaugeValue = 0f;
         TimeInZone = 0f;
-        _isPanelSlidingIn = false;
+        if (!IsRunning) // Only trigger slide-in if we're starting fresh, not just resetting mid-game
+            _isPanelSlidingIn = true;
         _isPanelSlidingOut = false;
         Debug.Log("Shaking Minigame Reset");
+
+        base.ResetGame();
     }
 
     private void InitTargetZone()
@@ -151,10 +150,9 @@ public class ShakingMinigame : BaseMiniGame
         _targetZoneBorderMin = _targetZoneCenter - halfSize;
         _targetZoneBorderMax = _targetZoneCenter + halfSize;
 
-        ResetGame();
 
-        _isPanelSlidingIn = true;
-        _isPanelSlidingOut = false;
+        ResetGame(); // prevent any unintended carryover from previous game
+        
 
         //update Visuals
         UpdateTargetZoneVisual();
