@@ -27,6 +27,14 @@ public class E_Cocktail
         PepperMint
     }
 
+    public enum Direction : byte
+    {
+        None,
+        Left,
+        Right,
+        Up,
+        Down
+    }   
 
     /// <summary>
     /// List of glass types used for serving cocktails.
