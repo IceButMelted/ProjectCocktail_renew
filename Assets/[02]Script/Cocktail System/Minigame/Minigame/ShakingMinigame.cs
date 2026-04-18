@@ -42,6 +42,7 @@ public class ShakingMinigame : BaseMiniGame
         _handleOriginalWidth = _targetZoneSlider.handleRect.sizeDelta.x;
 
         InitTargetZone();
+        ResetGame(); // prevent any unintended carryover from previous game
         base.StartGame();
         Debug.Log("Shaking Minigame Started");
     }
@@ -132,6 +133,7 @@ public class ShakingMinigame : BaseMiniGame
         TimeInZone = 0f;
         if (!IsRunning) // Only trigger slide-in if we're starting fresh, not just resetting mid-game
             _isPanelSlidingIn = true;
+
         _isPanelSlidingOut = false;
         Debug.Log("Shaking Minigame Reset");
 
@@ -149,9 +151,6 @@ public class ShakingMinigame : BaseMiniGame
         _targetZoneCenter = Random.Range(minCenter, maxCenter);
         _targetZoneBorderMin = _targetZoneCenter - halfSize;
         _targetZoneBorderMax = _targetZoneCenter + halfSize;
-
-
-        ResetGame(); // prevent any unintended carryover from previous game
         
 
         //update Visuals
