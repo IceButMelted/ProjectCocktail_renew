@@ -1,75 +1,79 @@
-﻿// ============================================================
-//  MinigameSystemManager — fixed
-// ============================================================
-using UnityEngine;
+﻿using UnityEngine;
 using static E_Cocktail;
 
+/// <summary>
+/// Owns all minigame instances, drives the active one each frame,
+/// and exposes public entry points for external systems (e.g. BeverageManager).
+/// </summary>
 public class MinigameSystemManager : MonoBehaviour
 {
-    private BaseMiniGame _currentMinigame;
-    private ShakingMinigame _shakingMinigame;
-    private MixingMinigame _mixingMinigame;
-
-    [Header("Visual")]
-    public Sprite MiniGamePanelSprite;
+    // ── Inspector ──────────────────────────────────────────
 
     [Header("Camera")]
-    public CameraController cocktailCamera;
+    [SerializeField] private CameraController _cocktailCamera;
+
+    // ── Private ────────────────────────────────────────────
+
+    private ShakingMinigame _shakingMinigame;
+    private MixingMinigame _mixingMinigame;
+    private BaseMiniGame _activeMinigame;
+
+    // ── Unity Lifecycle ────────────────────────────────────
 
     private void Awake()
     {
-        ShakingMinigame shaking = GetComponent<ShakingMinigame>();
-        shaking.Initialize(cocktailCamera);
-        _shakingMinigame = shaking;
+        _shakingMinigame = GetComponent<ShakingMinigame>();
+        _shakingMinigame.Initialize(_cocktailCamera);
 
-        MixingMinigame mixing = GetComponent<MixingMinigame>();
-        mixing.Initialize(cocktailCamera);
-        _mixingMinigame = mixing;
+        _mixingMinigame = GetComponent<MixingMinigame>();
+        _mixingMinigame.Initialize(_cocktailCamera);
 
-        _currentMinigame = _shakingMinigame;
+        _activeMinigame = _shakingMinigame;
     }
 
     private void Update()
     {
 #if UNITY_EDITOR
-        if (Input.GetKeyDown(KeyCode.Alpha1))
-        {
-            _currentMinigame?.EndGame();
-            _currentMinigame = _shakingMinigame;
-        }
-        else if (Input.GetKeyDown(KeyCode.Alpha2))
-        {
-            _currentMinigame?.EndGame();
-            _currentMinigame = _mixingMinigame;
-        }
-        else if (Input.GetKeyDown(KeyCode.R) || Input.GetKeyDown(KeyCode.B))
-        {
-            _currentMinigame?.EndGame();
-        }
-        else if (Input.GetKeyDown(KeyCode.V))
-        {
-            _currentMinigame?.StartGame();
-        }
+        HandleEditorHotkeys();
 #endif
-
-        if (_currentMinigame == null)
+        if (_activeMinigame == null)
         {
-            Debug.LogWarning("No minigame assigned.");
+            Debug.LogWarning("MinigameSystemManager: No active minigame assigned.");
             return;
         }
 
-        _currentMinigame.ProcessedGame();
+        _activeMinigame.ProcessedGame();
     }
+
+    // ── Public API ─────────────────────────────────────────
 
     public void StartShakingMinigame()
     {
-        _currentMinigame = _shakingMinigame;
-        _currentMinigame.StartGame();
+        SwitchTo(_shakingMinigame);
+        _activeMinigame.StartGame();
     }
 
     public void StartMixingMinigame()
     {
-        _currentMinigame = _mixingMinigame;
-        _currentMinigame.StartGame();
+        SwitchTo(_mixingMinigame);
+        _activeMinigame.StartGame();
     }
+
+    // ── Private Helpers ────────────────────────────────────
+
+    private void SwitchTo(BaseMiniGame next)
+    {
+        _activeMinigame?.EndGame();
+        _activeMinigame = next;
+    }
+
+#if UNITY_EDITOR
+    private void HandleEditorHotkeys()
+    {
+        if (Input.GetKeyDown(KeyCode.Alpha1)) SwitchTo(_shakingMinigame);
+        else if (Input.GetKeyDown(KeyCode.Alpha2)) SwitchTo(_mixingMinigame);
+        else if (Input.GetKeyDown(KeyCode.R) || Input.GetKeyDown(KeyCode.B)) _activeMinigame?.EndGame();
+        else if (Input.GetKeyDown(KeyCode.V)) _activeMinigame?.StartGame();
+    }
+#endif
 }

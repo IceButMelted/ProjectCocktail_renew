@@ -1,110 +1,98 @@
-﻿// ============================================================
-//  ShakingMinigame — with target zone handle visual
-// ============================================================
+﻿// GDD 3.2.1 — Spam-click to keep the gauge inside the target zone for the full duration.
 using UnityEngine;
 using UnityEngine.UI;
-
 using static E_Cocktail;
 
 public class ShakingMinigame : BaseMiniGame
 {
+    // ── Config ─────────────────────────────────────────────
+
     private SO_ShakingSetting _cfg => Setting as SO_ShakingSetting;
+
+    // ── Inspector ──────────────────────────────────────────
 
     [Header("UI")]
     [SerializeField] private Slider _gaugeSlider;
-    [SerializeField] private Slider _ProgressSlider;
-    [SerializeField] private Slider _targetZoneSlider;   // handle visually shows the zone
+    [SerializeField] private Slider _progressSlider;
+    [SerializeField] private Slider _targetZoneSlider; // handle visually marks the zone
 
-    // Internal state
-    private float _targetZoneCurrentSize;
-    private float _targetZoneCenter;
-    private float _targetZoneBorderMin;
-    private float _targetZoneBorderMax;
-
-    //slide panel
-    private bool _isPanelSlidingIn = false;
-    private bool _isPanelSlidingOut = false;
-
-    // Cache the handle's original height so we only change width
-    private float _handleOriginalHeight;
-    private float _handleOriginalWidth;
+    // ── Runtime State ──────────────────────────────────────
 
     public float GaugeValue { get; private set; }
     public float TimeInZone { get; private set; }
 
-    // ─────────────────────────────────────────────
-    //  Lifecycle
-    // ─────────────────────────────────────────────
+    private float _zoneSize;
+    private float _zoneCenter;
+    private float _zoneBorderMin;
+    private float _zoneBorderMax;
+
+    private bool _isPanelSlidingIn = false;
+    private bool _isPanelSlidingOut = false;
+
+    // Cached so only width changes each frame
+    private float _handleOriginalWidth;
+
+    // ── Lifecycle ──────────────────────────────────────────
 
     public override void StartGame()
     {
-        // Cache handle width once before anything resizes it
         _handleOriginalWidth = _targetZoneSlider.handleRect.sizeDelta.x;
 
         InitTargetZone();
-        ResetGame(); // prevent any unintended carryover from previous game
+        ResetGame();
         base.StartGame();
         Debug.Log("Shaking Minigame Started");
     }
 
+    // ── Game Loop ──────────────────────────────────────────
+
     public override void ProcessedGame()
     {
-
         if (!IsRunning) return;
 
         if (_isPanelSlidingIn)
+        {
             if (!SlideMinigame(Direction.Right, FinishCondition.FullyIn)) return;
-            else _isPanelSlidingIn = false;
+            _isPanelSlidingIn = false;
+        }
+
         if (_isPanelSlidingOut)
         {
-            Vector2 _OutPoint = new Vector2(-(_minigamePanel.transform as RectTransform).rect.width, 0);
-            //if (!SlideMinigame(Direction.Left, _OutPoint)) return;
             if (!SlideMinigame(Direction.Left, FinishCondition.FullyOut)) return;
-            else
-            {
-                _isPanelSlidingOut = false;
-                SetState(MiniGameState.Success);
-            }
-        } 
-
-        base.ProcessedGame();
-
-        // 1. Click → increase gauge
-        if (IsClickedThisFrame)
-        {
-            GaugeValue += _cfg.GaugeIncreasePerClick * _cfg.DifficultyMultiplier;
-            GaugeValue = Mathf.Clamp01(GaugeValue);
+            _isPanelSlidingOut = false;
+            SetState(MiniGameState.Success);
         }
 
-        // 2. Decay every frame
-        GaugeValue -= _cfg.GaugeDecayRate * Time.deltaTime;
-        GaugeValue = Mathf.Clamp01(GaugeValue);
+        base.ProcessedGame(); // polls IsClickedThisFrame
 
-        // 3. Zone bounds (clamp for safety)
-        float zoneStart = Mathf.Max(_targetZoneBorderMin, 0f);
-        float zoneEnd = Mathf.Min(_targetZoneBorderMax, 1f);
+        float dt = Time.deltaTime;
 
-        // 4. Zone accumulation — progress increases by rate * dt
-        bool inZone = GaugeValue >= zoneStart && GaugeValue <= zoneEnd;
+        // 1. Click → boost gauge
+        if (IsClickedThisFrame)
+            GaugeValue = Mathf.Clamp01(GaugeValue + _cfg.GaugeIncreasePerClick * _cfg.DifficultyMultiplier);
+
+        // 2. Constant gauge decay
+        GaugeValue = Mathf.Clamp01(GaugeValue - _cfg.GaugeDecayRate * dt);
+
+        // 3. Accumulate progress while inside the zone
+        bool inZone = GaugeValue >= _zoneBorderMin && GaugeValue <= _zoneBorderMax;
         if (inZone)
         {
-            float oldProgress = TimeInZone;
-            TimeInZone += _cfg.ProgressBar_IncreaseRate * Time.deltaTime;
-
-            float progressDelta = TimeInZone - oldProgress;
-            DecreaseTargetZone(progressDelta);
+            float gained = _cfg.ProgressIncreaseRate * dt;
+            TimeInZone += gained;
+            ShrinkTargetZone(gained);
         }
 
-        Debug.Log($"In Zone: {inZone} | Gauge={GaugeValue:F2} | Zone=[{zoneStart:F2},{zoneEnd:F2}] | Progress={TimeInZone:F2}");
+        Debug.Log($"Shaking | In Zone: {inZone} | Gauge={GaugeValue:F2} | Zone=[{_zoneBorderMin:F2},{_zoneBorderMax:F2}] | Progress={TimeInZone:F2}");
 
-        // 5. Win condition
+        // 4. Win condition
         if (TimeInZone >= _cfg.Duration)
-        {
             _isPanelSlidingOut = true;
-        }
 
         UpdateUI();
     }
+
+    // ── EndGame / Reset ────────────────────────────────────
 
     public override void EndGame()
     {
@@ -112,90 +100,83 @@ public class ShakingMinigame : BaseMiniGame
         Debug.Log($"Shaking Ended | Gauge={GaugeValue:F2} | Progress={TimeInZone:F2} | {CurrentState}");
     }
 
+    protected override void ResetGame()
+    {
+        GaugeValue = 0f;
+        TimeInZone = 0f;
+
+        if (!IsRunning)
+            _isPanelSlidingIn = true;
+
+        _isPanelSlidingOut = false;
+
+        Debug.Log("Shaking Minigame Reset");
+        base.ResetGame();
+    }
+
+    // ── UI ─────────────────────────────────────────────────
+
     public override void UpdateUI()
     {
         base.UpdateUI();
 
         _gaugeSlider.value = GaugeValue;
-        _ProgressSlider.value = TimeInZone / _cfg.Duration;
+        _progressSlider.value = TimeInZone / _cfg.Duration;
 
         UpdateTargetZoneVisual();
-        UpdateProgressBarVisaul();
+        UpdateProgressBarColor();
     }
 
     public override string GetGameState()
         => $"Shaking | Gauge: {GaugeValue:P0} | Progress: {TimeInZone:F1}s | {CurrentState}";
 
-    protected override void ResetGame()
-    {
-        
-        GaugeValue = 0f;
-        TimeInZone = 0f;
-        if (!IsRunning) // Only trigger slide-in if we're starting fresh, not just resetting mid-game
-            _isPanelSlidingIn = true;
-
-        _isPanelSlidingOut = false;
-        Debug.Log("Shaking Minigame Reset");
-
-        base.ResetGame();
-    }
+    // ── Private Helpers ────────────────────────────────────
 
     private void InitTargetZone()
     {
-        _targetZoneCurrentSize = _cfg.TargetZoneMaxSize;
+        _zoneSize = _cfg.TargetZoneMaxSize;
 
-        float halfSize = _targetZoneCurrentSize / 2f;
-        float minCenter = Mathf.Max(_cfg.InitTargetZone_MinValue, halfSize);
+        float halfSize = _zoneSize / 2f;
+        float minCenter = Mathf.Max(_cfg.InitTargetZoneMinValue, halfSize);
         float maxCenter = 1f - halfSize;
 
-        _targetZoneCenter = Random.Range(minCenter, maxCenter);
-        _targetZoneBorderMin = _targetZoneCenter - halfSize;
-        _targetZoneBorderMax = _targetZoneCenter + halfSize;
-        
+        _zoneCenter = Random.Range(minCenter, maxCenter);
+        _zoneBorderMin = _zoneCenter - halfSize;
+        _zoneBorderMax = _zoneCenter + halfSize;
 
-        //update Visuals
         UpdateTargetZoneVisual();
-        UpdateProgressBarVisaul();
+        UpdateProgressBarColor();
     }
 
-    private void DecreaseTargetZone(float progressDelta)
+    /// <summary>Shrinks the zone proportionally to progress gained this frame.</summary>
+    private void ShrinkTargetZone(float progressDelta)
     {
-        if (_targetZoneCurrentSize <= _cfg.TargetZoneMinSize) return;
+        if (_zoneSize <= _cfg.TargetZoneMinSize) return;
 
-        float shrink = _cfg.TargetZone_DecreasePerProgress * progressDelta;
-        _targetZoneCurrentSize -= shrink;
-        _targetZoneCurrentSize = Mathf.Max(_targetZoneCurrentSize, _cfg.TargetZoneMinSize);
+        _zoneSize = Mathf.Max(_zoneSize - _cfg.TargetZoneShrinkPerProgress * progressDelta, _cfg.TargetZoneMinSize);
 
-        float halfSize = _targetZoneCurrentSize / 2f;
-        _targetZoneBorderMin = _targetZoneCenter - halfSize;
-        _targetZoneBorderMax = _targetZoneCenter + halfSize;
+        float halfSize = _zoneSize / 2f;
+        _zoneBorderMin = _zoneCenter - halfSize;
+        _zoneBorderMax = _zoneCenter + halfSize;
     }
 
+    /// <summary>Positions the handle at the zone center and scales its height to cover the zone.</summary>
     private void UpdateTargetZoneVisual()
     {
-        // Move slider thumb to zone center
-        _targetZoneSlider.value = _targetZoneCenter;
+        _targetZoneSlider.value = _zoneCenter;
 
-        // Get the pixel width of the full slider track
         float trackHeight = (_targetZoneSlider.transform as RectTransform).rect.height;
+        float handleHeight = _zoneSize * trackHeight;
 
-        // Scale handle width to match zone size in pixels
-        float handleHeight = _targetZoneCurrentSize * trackHeight;
-
-        RectTransform handle = _targetZoneSlider.handleRect;
-        handle.sizeDelta = new Vector2(_handleOriginalWidth, handleHeight);
-
+        _targetZoneSlider.handleRect.sizeDelta = new Vector2(_handleOriginalWidth, handleHeight);
     }
 
-    private void UpdateProgressBarVisaul() { 
-        Image fillImage = _ProgressSlider.fillRect.GetComponent<Image>();
+    /// <summary>Smoothly transitions the progress bar from start to end color.</summary>
+    private void UpdateProgressBarColor()
+    {
+        float t = Mathf.SmoothStep(0f, 1f, TimeInZone / _cfg.Duration);
 
-        // Change color based on progress (green to red)
-        float t = TimeInZone / _cfg.Duration;
-        float smoothT = Mathf.SmoothStep(0f, 1f, t); // for smoother color transition
-
-        fillImage.color = Oklab.OklabLerp(_cfg.ProgressBar_StartColor, _cfg.ProgressBar_EndColor, smoothT);
-
+        _progressSlider.fillRect
+            .GetComponent<Image>().color = Oklab.OklabLerp(_cfg.ProgressBarStartColor, _cfg.ProgressBarEndColor, t);
     }
-
 }
