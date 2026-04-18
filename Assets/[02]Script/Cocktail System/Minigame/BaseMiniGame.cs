@@ -1,30 +1,42 @@
-﻿// ============================================================
-//  BaseMiniGame — fixed
-// ============================================================
-using NUnit.Framework.Constraints;
-using System;
+﻿using System;
 using UnityEngine;
-using Yarn.Unity.Editor;
-
 using static E_Cocktail;
 
+/// <summary>
+/// Abstract base for all minigames. Handles state transitions, input polling,
+/// panel slide animations, and camera management.
+/// Derived classes override ProcessedGame() for their specific gameplay loop.
+/// </summary>
 public abstract class BaseMiniGame : MonoBehaviour, IMinigame
 {
+    // ── Inspector ──────────────────────────────────────────
+
     [field: SerializeField]
     public SO_MinigameSetting Setting { get; set; }
 
-    private CameraController _camera;
     [SerializeField] protected RectTransform _minigamePanel;
 
     [Header("Slide Settings")]
     [SerializeField] private float _slidePanelSpeed = 800f;
 
+    // ── Public State ───────────────────────────────────────
+
     public bool IsRunning { get; protected set; }
     public MiniGameState CurrentState { get; protected set; } = MiniGameState.Standby;
 
+    /// <summary>Fired when the game ends. True = success, false = failure.</summary>
     public event Action<bool> OnGameEnd;
 
+    // ── Protected State ────────────────────────────────────
+
+    /// <summary>True only on the frame the player left-clicked.</summary>
     protected bool IsClickedThisFrame { get; private set; }
+
+    // ── Private ────────────────────────────────────────────
+
+    private CameraController _camera;
+
+    // ── Initialization ─────────────────────────────────────
 
     public void Initialize(CameraController cam)
     {
@@ -32,10 +44,13 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
         IsRunning = false;
     }
 
+    // ── State Machine ──────────────────────────────────────
+
     public void SetState(MiniGameState newState)
     {
         if (CurrentState == newState) return;
         CurrentState = newState;
+
         switch (newState)
         {
             case MiniGameState.Processing: OnProcessing(); break;
@@ -48,47 +63,55 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
     protected virtual void OnSuccess() => FireEndEvent(true);
     protected virtual void OnStandby() => ResetGame();
 
+    // ── IMinigame ──────────────────────────────────────────
 
     public virtual void StartGame()
     {
         IsRunning = true;
         _camera.ResetRotaionAndMovement();
-        SetState(MiniGameState.Standby); // Init first, then Processing
+
+        // Standby → triggers ResetGame, then Processing → begins gameplay
+        SetState(MiniGameState.Standby);
         SetState(MiniGameState.Processing);
     }
+
+    /// <summary>
+    /// Called every frame by MinigameSystemManager.
+    /// Base implementation polls mouse input; call base.ProcessedGame() first in overrides.
+    /// </summary>
     public virtual void ProcessedGame()
     {
         IsClickedThisFrame = Input.GetMouseButtonDown(0);
-        if (!IsRunning) return;
     }
+
     public virtual void UpdateUI() { }
+
     public virtual void EndGame()
     {
         IsRunning = false;
         _camera.SetCanRotateCamera(true);
     }
 
-    
-
     public virtual string GetGameState()
         => $"{GetType().Name} | State: {CurrentState} | Running: {IsRunning}";
+
+    // ── Helpers ────────────────────────────────────────────
 
     protected void FireEndEvent(bool success)
     {
         EndGame();
-        OnGameEnd?.Invoke(success); 
+        OnGameEnd?.Invoke(success);
     }
 
     protected virtual void ResetGame()
     {
-        //IsRunning = false;
-        //CurrentState = MiniGameState.Standby;
         IsClickedThisFrame = false;
     }
 
-    /// <summary>
-    /// Maps a Direction enum to a normalized 2D movement vector.
-    /// </summary>
+    // ── Panel Slide ────────────────────────────────────────
+
+    protected enum FinishCondition { FullyIn, FullyOut }
+
     private static Vector2 DirectionToVector(Direction dir) => dir switch
     {
         Direction.Left => Vector2.left,
@@ -99,126 +122,80 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
     };
 
     /// <summary>
-    /// Returns the panel's rect in its parent's local space.
-    /// Uses GetWorldCorners → InverseTransformPoint so it works
-    /// at any canvas scale mode / resolution.
+    /// Returns the panel's rect mapped into its parent's local space.
+    /// Using GetWorldCorners → InverseTransformPoint keeps this correct
+    /// across all Canvas scale modes and resolutions.
     /// </summary>
     private Rect GetPanelRectInParent()
     {
         Vector3[] corners = new Vector3[4];
         _minigamePanel.GetWorldCorners(corners);
 
-        RectTransform parent = _minigamePanel.parent as RectTransform;
+        var parent = _minigamePanel.parent as RectTransform;
         for (int i = 0; i < 4; i++)
             corners[i] = parent.InverseTransformPoint(corners[i]);
 
-        // corners: [0]=BL [1]=TL [2]=TR [3]=BR
-        float xMin = corners[0].x;
-        float yMin = corners[0].y;
-        float xMax = corners[2].x;
-        float yMax = corners[2].y;
-        return new Rect(xMin, yMin, xMax - xMin, yMax - yMin);
+        // Layout: [0]=BL [1]=TL [2]=TR [3]=BR
+        return new Rect(
+            corners[0].x,
+            corners[0].y,
+            corners[2].x - corners[0].x,
+            corners[2].y - corners[0].y);
     }
 
-    /// <summary>
-    /// Returns the parent container's rect (the "screen" boundary).
-    /// </summary>
-    private Rect GetParentRect()
-    {
-        return (_minigamePanel.parent as RectTransform).rect;
-    }
+    private Rect GetParentRect() => (_minigamePanel.parent as RectTransform).rect;
 
-    /// <summary>
-    /// Checks the three completion conditions shared by both overloads.
-    /// </summary>
     private (bool fullyIn, bool fullyOut) CheckBoundaryConditions()
     {
         Rect panel = GetPanelRectInParent();
         Rect screen = GetParentRect();
 
-        bool fullyIn = panel.xMin >= screen.xMin &&
-                       panel.xMax <= screen.xMax &&
-                       panel.yMin >= screen.yMin &&
-                       panel.yMax <= screen.yMax;
-
+        bool fullyIn = panel.xMin >= screen.xMin && panel.xMax <= screen.xMax &&
+                        panel.yMin >= screen.yMin && panel.yMax <= screen.yMax;
         bool fullyOut = !panel.Overlaps(screen);
 
         return (fullyIn, fullyOut);
     }
 
-    protected enum FinishCondition
-    {
-        FullyIn,
-        FullyOut
-    }
-
     /// <summary>
-    /// Call every frame (e.g. from Update / ProcessedGame).
-    /// Returns true the frame one of the finish conditions is met.
+    /// Moves the panel each frame and returns true once the given finish condition is met.
     /// </summary>
-    protected virtual bool SlideMinigame(Direction dir)
+    protected bool SlideMinigame(Direction dir, FinishCondition finishCondition)
     {
         _minigamePanel.anchoredPosition += DirectionToVector(dir) * _slidePanelSpeed * Time.deltaTime;
 
         var (fullyIn, fullyOut) = CheckBoundaryConditions();
 
-        return fullyIn || fullyOut;
-    }
-
-    protected virtual bool SlideMinigame(Direction dir, FinishCondition finishCondition)
-    {
-        _minigamePanel.anchoredPosition += DirectionToVector(dir) * _slidePanelSpeed * Time.deltaTime;
-        Vector2 pos = _minigamePanel.anchoredPosition;
-        
-        var (fullyIn, fullyOut) = CheckBoundaryConditions();
-
-        switch (finishCondition)
-        {
-            case FinishCondition.FullyIn: return fullyIn;
-            case FinishCondition.FullyOut: return fullyOut;
-            default: return false;
-        }
-
+        return finishCondition == FinishCondition.FullyIn ? fullyIn : fullyOut;
     }
 
     /// <summary>
-    /// Call every frame. <paramref name="pos"/> is in the panel's
-    /// parent local space (anchoredPosition coordinates).
-    /// Returns true the frame one of the finish conditions is met.
+    /// Moves the panel each frame toward an explicit target position and returns true
+    /// the frame it crosses that point. Snaps to the target to avoid overshooting.
     /// </summary>
-    protected virtual bool SlideMinigame(Direction dir, Vector2 pos)
+    protected bool SlideMinigame(Direction dir, Vector2 targetPosition)
     {
         Vector2 before = _minigamePanel.anchoredPosition;
         _minigamePanel.anchoredPosition += DirectionToVector(dir) * _slidePanelSpeed * Time.deltaTime;
         Vector2 after = _minigamePanel.anchoredPosition;
 
-        // Has the panel's anchoredPosition crossed or reached the target
-        // along the relevant axis in the direction of travel?
-        bool reachedTarget = dir switch
+        bool crossed = dir switch
         {
-            Direction.Left => before.x >= pos.x && after.x <= pos.x, // crossed leftward
-            Direction.Right => before.x <= pos.x && after.x >= pos.x, // crossed rightward
-            Direction.Up => before.y <= pos.y && after.y >= pos.y, // crossed upward
-            Direction.Down => before.y >= pos.y && after.y <= pos.y, // crossed downward
+            Direction.Left => before.x >= targetPosition.x && after.x <= targetPosition.x,
+            Direction.Right => before.x <= targetPosition.x && after.x >= targetPosition.x,
+            Direction.Up => before.y <= targetPosition.y && after.y >= targetPosition.y,
+            Direction.Down => before.y >= targetPosition.y && after.y <= targetPosition.y,
             _ => false
         };
 
-        // Snap to target if we've reached it so callers get a clean final position
-        if (reachedTarget)
+        if (crossed)
         {
             Vector2 snapped = after;
-            switch (dir)
-            {
-                case Direction.Left:
-                case Direction.Right: snapped.x = pos.x; break;
-                case Direction.Up:
-                case Direction.Down: snapped.y = pos.y; break;
-            }
+            if (dir == Direction.Left || dir == Direction.Right) snapped.x = targetPosition.x;
+            if (dir == Direction.Up || dir == Direction.Down) snapped.y = targetPosition.y;
             _minigamePanel.anchoredPosition = snapped;
         }
 
-        //var (fullyIn, fullyOut) = CheckBoundaryConditions();
-
-        return reachedTarget;
+        return crossed;
     }
 }
