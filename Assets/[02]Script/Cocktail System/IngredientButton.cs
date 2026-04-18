@@ -1,13 +1,16 @@
-using System;
-using UnityEngine;
-using UnityEngine.Events;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
-
-public class IngredientButton : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerDownHandler ,IPointerUpHandler
+public class IngredientButton : MonoBehaviour,
+    IPointerEnterHandler,
+    IPointerExitHandler,
+    IPointerDownHandler,
+    IPointerUpHandler
 {
-    enum Behaviability
+    // ── Types ──────────────────────────────────────────────
+
+    private enum Behaviability
     {
         None,
         Mixer,
@@ -17,90 +20,74 @@ public class IngredientButton : MonoBehaviour, IPointerEnterHandler, IPointerExi
         Reset,
     }
 
-    [SerializeField]
-    private Material m_Material;
-    [SerializeField]
-    private Texture2D T_Default;
-    [SerializeField]
-    private Texture2D T_Hover;
-    [SerializeField]
-    private Texture2D T_Clicked;
+    // ── Inspector ──────────────────────────────────────────
 
-    private CocktailMaker cocktailMaker;
+    [SerializeField] private Material m_Material;
+    [SerializeField] private Texture2D T_Default;
+    [SerializeField] private Texture2D T_Hover;
+    [SerializeField] private Texture2D T_Clicked;
 
-    [SerializeField]
-    private bool ShouldCanClick = true;
+    [SerializeField] private bool ShouldCanClick = true;
+    [SerializeField] private Behaviability TypeIngredient;
+    [SerializeField] private E_Cocktail.Mixer mixer;
+    [SerializeField] private E_Cocktail.Alcohol alcohol;
 
-    private bool CanClick = false;
-    [SerializeField]
-    private Behaviability TypeIngredient;
-    [SerializeField]
-    private E_Cocktail.Mixer mixer;
-    [SerializeField]
-    private E_Cocktail.Alcohol alcohol;
+    private CocktailMaker _cocktailMaker;
+    private bool _canClick;
 
     private void Awake()
     {
-        cocktailMaker = FindFirstObjectByType<CocktailMaker>();
+        _cocktailMaker = FindFirstObjectByType<CocktailMaker>();
 
         if (!ShouldCanClick) return;
+
         m_Material = GetComponent<MeshRenderer>().material;
-        
         m_Material.SetFloat("_EmssionStrength", 0);
         m_Material.SetTexture("_CurrentTexture", T_Default);
     }
+
+    // ── Pointer Events ─────────────────────────────────────
 
     public void OnPointerEnter(PointerEventData eventData)
     {
         if (!ShouldCanClick) return;
 
-        CanClick = true;
+        _canClick = true;
         m_Material.SetFloat("_EmssionStrength", 0.25f);
         m_Material.SetTexture("_CurrentTexture", T_Hover);
-        Debug.Log("You can Click");
     }
 
     public void OnPointerExit(PointerEventData eventData)
     {
         if (!ShouldCanClick) return;
 
-        CanClick &= !CanClick;
+        _canClick = false;
         m_Material.SetFloat("_EmssionStrength", 0);
         m_Material.SetTexture("_CurrentTexture", T_Default);
     }
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        if (!ShouldCanClick) return;
-        //was press mouse down
-        if (CanClick)
-        {
-            if (Mouse.current != null)
-            {
-                if (Mouse.current.leftButton.wasPressedThisFrame)
-                {
-                    if (TypeIngredient == Behaviability.Mixer)
-                    {
-                        cocktailMaker.OnAddMixer?.Invoke(mixer, 1);
-                        cocktailMaker.OnAddIngredient?.Invoke();
-                    }
-                    else if (TypeIngredient == Behaviability.Alcohol)
-                    {
-                        cocktailMaker.OnAddAlcohol?.Invoke(alcohol, 1);
-                        cocktailMaker.OnAddIngredient?.Invoke();
-                    }
-                    else if (TypeIngredient == Behaviability.Shaking)
-                    {
-                        cocktailMaker.SetMethod(E_Cocktail.Method.Shaking);
-                    }
-                    else if (TypeIngredient == Behaviability.Mixing)
-                    {
-                        cocktailMaker.SetMethod(E_Cocktail.Method.Mixing);
-                    }
+        if (!ShouldCanClick || !_canClick) return;
 
-                }
-            }
-        }
+        // ── FIX ───────────────────────────────────────────
+        // Removed: if (Mouse.current.leftButton.wasPressedThisFrame)
+        //
+        // Reason: OnPointerDown only fires when the EventSystem's raycaster
+        // determines this object is the top-most hit. If a Canvas with a
+        // GraphicRaycaster (Blocking Mask = 2.5D UI) sits in front, the
+        // EventSystem stops here and OnPointerDown never reaches this object.
+        // Adding a raw Mouse.current check on top of that does nothing useful
+        // and can cause the opposite problem — it evaluates the raw input state
+        // independently of the raycaster, so it never correctly blocks.
+        //
+        // OnPointerDown receiving the call IS the left-click confirmation.
+        // ─────────────────────────────────────────────────
+
+        if (eventData.button != PointerEventData.InputButton.Left) return;
+
+        ApplyIngredient();
+
         m_Material.SetFloat("_EmssionStrength", 0.125f);
         m_Material.SetTexture("_CurrentTexture", T_Clicked);
     }
@@ -113,25 +100,34 @@ public class IngredientButton : MonoBehaviour, IPointerEnterHandler, IPointerExi
         m_Material.SetTexture("_CurrentTexture", T_Default);
     }
 
-    public void SetCockailIngredient()
+    // ── Public ─────────────────────────────────────────────
+
+    /// <summary>Can also be called directly (e.g. from keyboard shortcut).</summary>
+    public void SetCocktailIngredient() => ApplyIngredient();
+
+    // ── Private ────────────────────────────────────────────
+
+    private void ApplyIngredient()
     {
-        if (TypeIngredient == Behaviability.Mixer)
+        switch (TypeIngredient)
         {
-            cocktailMaker.OnAddMixer?.Invoke(mixer, 1);
-            cocktailMaker.OnAddIngredient?.Invoke();
-        }
-        else if (TypeIngredient == Behaviability.Alcohol)
-        {
-            cocktailMaker.OnAddAlcohol?.Invoke(alcohol, 1);
-            cocktailMaker.OnAddIngredient?.Invoke();
-        }
-        else if (TypeIngredient == Behaviability.Shaking)
-        {
-            cocktailMaker.SetMethod(E_Cocktail.Method.Shaking);
-        }
-        else if (TypeIngredient == Behaviability.Mixing)
-        {
-            cocktailMaker.SetMethod(E_Cocktail.Method.Mixing);
+            case Behaviability.Mixer:
+                _cocktailMaker.OnAddMixer?.Invoke(mixer, 1);
+                _cocktailMaker.OnAddIngredient?.Invoke();
+                break;
+
+            case Behaviability.Alcohol:
+                _cocktailMaker.OnAddAlcohol?.Invoke(alcohol, 1);
+                _cocktailMaker.OnAddIngredient?.Invoke();
+                break;
+
+            case Behaviability.Shaking:
+                _cocktailMaker.SetMethod(E_Cocktail.Method.Shaking);
+                break;
+
+            case Behaviability.Mixing:
+                _cocktailMaker.SetMethod(E_Cocktail.Method.Mixing);
+                break;
         }
     }
 }

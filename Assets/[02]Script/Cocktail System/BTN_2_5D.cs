@@ -14,8 +14,6 @@ public class BTN_2_5D : MonoBehaviour
     [SerializeField] private Texture2D T_Hover;
     [SerializeField] private Texture2D T_Clicked;
 
-    
-
     [Header("Input Actions")]
     [SerializeField] private InputActionReference pointAction;
     [SerializeField] private InputActionReference clickAction;
@@ -23,7 +21,7 @@ public class BTN_2_5D : MonoBehaviour
     [Header("ByPass Layer")]
     [SerializeField] private LayerMask boxplacementLayerMark;
 
-
+    [Space()]
     public UnityEvent OnClicked;
 
     private bool isHovering;
@@ -32,7 +30,7 @@ public class BTN_2_5D : MonoBehaviour
     private static readonly int EmissionStrengthID = Shader.PropertyToID("_EmssionStrength");
     private static readonly int CurrentTextureID = Shader.PropertyToID("_CurrentTexture");
 
-    private void Awake()
+    protected virtual void Awake()
     {
         pointAction = FindFirstObjectByType<InputSystemManager>().PointActionRef;
         clickAction = FindFirstObjectByType<InputSystemManager>().TapActionRef;
@@ -62,22 +60,22 @@ public class BTN_2_5D : MonoBehaviour
 
     private void Start()
     {
-        clickAction.action.started += Context =>
-        {
-            Debug.Log($"{name} clicked (New Input System - started)");
-        };
+        //clickAction.action.started += Context =>
+        //{
+        //    Debug.Log($"{name} clicked (New Input System - started)");
+        //};
 
-        clickAction.action.performed += Context =>
-        {
-            Debug.Log($"{name} clicked (New Input System - performed)");
-        };
+        //clickAction.action.performed += Context =>
+        //{
+        //    Debug.Log($"{name} clicked (New Input System - performed)");
+        //};
 
-        clickAction.action.canceled += Context => {
-            Debug.Log($"{name} clicked (New Input System - cancled)");
-        };
+        //clickAction.action.canceled += Context => {
+        //    Debug.Log($"{name} clicked (New Input System - cancled)");
+        //};
     }
 
-    private void Update()
+    protected virtual void Update()
     {
         CheckHover();
     }
@@ -111,7 +109,7 @@ public class BTN_2_5D : MonoBehaviour
 
 
 
-    private void OnClick(InputAction.CallbackContext context)
+    protected virtual void OnClick(InputAction.CallbackContext context)
     {
         if (!isHovering) return;
 
