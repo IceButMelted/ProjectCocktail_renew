@@ -93,7 +93,7 @@ public class BTN_2_5D : MonoBehaviour
                 {
                     isHovering = true;
                     SetMaterial(0.25f, T_Hover);
-                    Debug.Log($"{name} - Hover Enter");
+                    //Debug.Log($"{name} - Hover Enter");
                 }
                 return;
             }
@@ -103,7 +103,7 @@ public class BTN_2_5D : MonoBehaviour
         {
             isHovering = false;
             SetMaterial(0f, T_Default);
-            Debug.Log($"{name} - Hover Exit");
+            //Debug.Log($"{name} - Hover Exit");
         }
     }
 
@@ -113,7 +113,7 @@ public class BTN_2_5D : MonoBehaviour
     {
         if (!isHovering) return;
 
-        Debug.Log($"{name} clicked (New Input System)");
+        //Debug.Log($"{name} clicked (New Input System)");
         OnClicked?.Invoke();
 
         SetMaterial(0.125f, T_Clicked);

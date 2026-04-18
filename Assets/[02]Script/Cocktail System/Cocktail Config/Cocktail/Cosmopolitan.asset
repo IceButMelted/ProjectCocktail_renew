@@ -14,19 +14,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SO_Cocktails
   CocktailGameObject: {fileID: 0}
   CocktailInfos:
-    cocktailName: Cosmopolitan
-    typeOfCocktail: 1
-    method: 2
+    Name: Cosmopolitan
+    AlcoholStrength: 1
+    PreparationMethod: 1
     AddIce: 0
-    Alcohols:
+    Price: 120
+    AlcoholList:
       _serializedList:
       - Key: 1
         Value: 4
       - Key: 3
         Value: 2
-    Mixers:
+    MixerList:
       _serializedList:
       - Key: 1
         Value: 2
       - Key: 3
         Value: 1
+    CompatibleGlasses: 

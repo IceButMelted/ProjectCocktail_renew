@@ -67,6 +67,7 @@ public class E_Cocktail
         None,
         HighAlcohol,
         LowAlcohol,
+        NoneAlcohol,
         NotMatch
     }
 

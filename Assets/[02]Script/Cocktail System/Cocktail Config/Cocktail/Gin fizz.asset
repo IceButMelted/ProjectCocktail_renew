@@ -10,23 +10,25 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e334e4af58a99445a8dadc5aaedcf4f, type: 3}
-  m_Name: Gin Fizz
+  m_Name: Gin fizz
   m_EditorClassIdentifier: Assembly-CSharp::SO_Cocktails
   CocktailGameObject: {fileID: 0}
   CocktailInfos:
-    cocktailName: Gin Fizz
-    typeOfCocktail: 2
-    method: 2
+    Name: Gin Fizz
+    AlcoholStrength: 2
+    PreparationMethod: 1
     AddIce: 1
-    Alcohols:
+    Price: 90
+    AlcoholList:
       _serializedList:
-      - Key: 1
+      - Key: 2
         Value: 4
-    Mixers:
+    MixerList:
       _serializedList:
+      - Key: 4
+        Value: 1
       - Key: 3
         Value: 3
       - Key: 5
         Value: 2
-      - Key: 4
-        Value: 1
+    CompatibleGlasses: 

@@ -14,19 +14,21 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SO_Cocktails
   CocktailGameObject: {fileID: 0}
   CocktailInfos:
-    cocktailName: Cranberry Fizz
-    typeOfCocktail: 3
-    method: 2
+    Name: Cranberry Fizz
+    AlcoholStrength: 3
+    PreparationMethod: 1
     AddIce: 1
-    Alcohols:
+    Price: 80
+    AlcoholList:
       _serializedList: []
-    Mixers:
+    MixerList:
       _serializedList:
+      - Key: 4
+        Value: 2
       - Key: 1
         Value: 5
       - Key: 3
         Value: 2
-      - Key: 4
-        Value: 1
       - Key: 5
-        Value: 2
+        Value: 1
+    CompatibleGlasses: 

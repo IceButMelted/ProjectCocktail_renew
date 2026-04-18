@@ -14,15 +14,17 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SO_Cocktails
   CocktailGameObject: {fileID: 0}
   CocktailInfos:
-    cocktailName: Greyhound
-    typeOfCocktail: 2
-    method: 1
+    Name: Greyhound
+    AlcoholStrength: 2
+    PreparationMethod: 2
     AddIce: 1
-    Alcohols:
+    Price: 100
+    AlcoholList:
       _serializedList:
       - Key: 1
         Value: 4
-    Mixers:
+    MixerList:
       _serializedList:
-      - Key: 2
+      - Key: 1
         Value: 6
+    CompatibleGlasses: 

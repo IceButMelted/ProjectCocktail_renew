@@ -27,7 +27,7 @@ public class S_Drink
     public bool IsValidRatio()
     {
         int total = AlcoholList.Values.Sum() + MixerList.Values.Sum();
-        Debug.Log(total <= MAX_TOTAL_PARTS);
+        //Debug.Log(total <= MAX_TOTAL_PARTS);
         return total < MAX_TOTAL_PARTS; 
     }
 

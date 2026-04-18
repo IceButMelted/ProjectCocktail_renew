@@ -14,17 +14,19 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SO_Cocktails
   CocktailGameObject: {fileID: 0}
   CocktailInfos:
-    cocktailName: White Lady
-    typeOfCocktail: 1
-    method: 2
+    Name: White Lady
+    AlcoholStrength: 1
+    PreparationMethod: 1
     AddIce: 0
-    Alcohols:
+    Price: 130
+    AlcoholList:
       _serializedList:
       - Key: 2
         Value: 5
       - Key: 3
         Value: 3
-    Mixers:
+    MixerList:
       _serializedList:
       - Key: 3
         Value: 2
+    CompatibleGlasses: 

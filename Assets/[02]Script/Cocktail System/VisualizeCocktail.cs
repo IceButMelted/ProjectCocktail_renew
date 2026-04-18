@@ -42,8 +42,8 @@ public class VisualizeCocktail : MonoBehaviour
         mixer_fill.fillAmount = ((float)currentCocktail.GetTotalMixer() / 10) + (float)alcohol_fill.fillAmount;
 
 
-        Debug.Log($"Alcohol Fill Amount: {alcohol_fill.fillAmount}");
-        Debug.Log($"Mixer Fill Amount: {mixer_fill.fillAmount}");
+        //Debug.Log($"Alcohol Fill Amount: {alcohol_fill.fillAmount}");
+        //Debug.Log($"Mixer Fill Amount: {mixer_fill.fillAmount}");
     }
 
     public void ResetVisualBars() {
