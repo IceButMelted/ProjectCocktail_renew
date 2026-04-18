@@ -32,6 +32,33 @@ public class S_Drink
     }
 
     /// <summary>
+    /// Give info of Cocktail
+    /// </summary>
+    /// <returns></returns>
+    public string GetOfCocktailInfo() {
+        string info = "";
+        info += Name + "\n";
+        info += $"Type : {AlcoholStrength.ToString()} \nMethod : {PreparationMethod.ToString()}";
+        info += $"\nIce : {AddIce}";
+        info += $"\nPrice :{Price}";
+
+        info += "\nAlcohol";
+        foreach (var item in AlcoholList)
+        {
+            info += $"\n{item.Key.ToString()} : {item.Value.ToString()}";
+        }
+
+        info += "\nMixer";
+        foreach (var item in MixerList)
+        {
+            info += $"\n{item.Key.ToString()} : {item.Value.ToString()}";
+        }
+
+
+        return info;
+    }
+
+    /// <summary>
     /// Compare this Drink to Other Drink
     /// </summary>
     /// <param name="other">Other Drink that get to Compare</param>
@@ -103,7 +130,7 @@ public class S_Drink
 
         if (totalAlcohol >= 5) return TypeOfCocktail.HighAlcohol;
         if (totalAlcohol > 0) return TypeOfCocktail.LowAlcohol;
-        return TypeOfCocktail.None;
+        return TypeOfCocktail.NoneAlcohol;
     }
 
     /// <summary>

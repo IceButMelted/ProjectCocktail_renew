@@ -1,5 +1,7 @@
 ﻿using System;
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.EventSystems;
 using static E_Cocktail;
 
 /// <summary>
@@ -25,7 +27,8 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
     public MiniGameState CurrentState { get; protected set; } = MiniGameState.Standby;
 
     /// <summary>Fired when the game ends. True = success, false = failure.</summary>
-    public event Action<bool> OnGameEnd;
+    //public event Action<bool> OnGameEnd;
+    public UnityAction<bool> OnGameEnd;
 
     // ── Protected State ────────────────────────────────────
 
