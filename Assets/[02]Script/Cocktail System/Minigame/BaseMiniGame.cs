@@ -81,8 +81,8 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
 
     protected virtual void ResetGame()
     {
-        IsRunning = false;
-        CurrentState = MiniGameState.Standby;
+        //IsRunning = false;
+        //CurrentState = MiniGameState.Standby;
         IsClickedThisFrame = false;
     }
 

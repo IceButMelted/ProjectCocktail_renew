@@ -10,7 +10,6 @@ public class MinigameSystemManager : MonoBehaviour
     private ShakingMinigame _shakingMinigame;
     private MixingMinigame _mixingMinigame;
 
-
     [Header("Visual")]
     public Sprite MiniGamePanelSprite;
 
@@ -19,75 +18,57 @@ public class MinigameSystemManager : MonoBehaviour
 
     private void Awake()
     {
-        //set minigame ShakingMinigame
         ShakingMinigame shaking = GetComponent<ShakingMinigame>();
-        shaking.SetState(MiniGameState.Standby);
         shaking.Initialize(cocktailCamera);
         _shakingMinigame = shaking;
-        
-        //set minigame MixingMinigame
+
         MixingMinigame mixing = GetComponent<MixingMinigame>();
-        mixing.SetState(MiniGameState.Standby);
         mixing.Initialize(cocktailCamera);
         _mixingMinigame = mixing;
 
-        _currentMinigame = _shakingMinigame; // Start with no active minigame
+        _currentMinigame = _shakingMinigame;
     }
 
-    
     private void Update()
     {
 #if UNITY_EDITOR
-        KeyCode? pressedKey = null;
-
         if (Input.GetKeyDown(KeyCode.Alpha1))
-            pressedKey = KeyCode.Alpha1;
-        else if (Input.GetKeyDown(KeyCode.Alpha2))
-            pressedKey = KeyCode.Alpha2;
-        else if (Input.GetKeyDown(KeyCode.R))
-            pressedKey = KeyCode.R;
-        else if (Input.GetKeyDown(KeyCode.V))
-            pressedKey = KeyCode.V;
-        else if (Input.GetKeyDown(KeyCode.B))
-            pressedKey = KeyCode.B;
-
-        if (pressedKey.HasValue)
         {
-            switch (pressedKey.Value)
-            {
-                case KeyCode.Alpha1:
-                    _currentMinigame?.EndGame();
-                    _currentMinigame = _shakingMinigame;
-                    break;
-
-                case KeyCode.Alpha2:
-                    _currentMinigame?.EndGame();
-                    _currentMinigame = _mixingMinigame;
-                    break;
-
-                case KeyCode.R:
-                case KeyCode.B:
-                    _currentMinigame?.EndGame();
-                    break;
-
-                case KeyCode.V:
-                    _currentMinigame?.StartGame();
-                    break;
-            }
+            _currentMinigame?.EndGame();
+            _currentMinigame = _shakingMinigame;
+        }
+        else if (Input.GetKeyDown(KeyCode.Alpha2))
+        {
+            _currentMinigame?.EndGame();
+            _currentMinigame = _mixingMinigame;
+        }
+        else if (Input.GetKeyDown(KeyCode.R) || Input.GetKeyDown(KeyCode.B))
+        {
+            _currentMinigame?.EndGame();
+        }
+        else if (Input.GetKeyDown(KeyCode.V))
+        {
+            _currentMinigame?.StartGame();
         }
 #endif
 
+        if (_currentMinigame == null)
+        {
+            Debug.LogWarning("No minigame assigned.");
+            return;
+        }
 
-        if (_currentMinigame != null && _currentMinigame.IsRunning)
-            _currentMinigame.ProcessedGame();
+        _currentMinigame.ProcessedGame();
     }
 
-    public void StartShakingMinigame() { 
+    public void StartShakingMinigame()
+    {
         _currentMinigame = _shakingMinigame;
         _currentMinigame.StartGame();
     }
 
-    public void StartStirringMinigame() { 
+    public void StartMixingMinigame()
+    {
         _currentMinigame = _mixingMinigame;
         _currentMinigame.StartGame();
     }

@@ -14,7 +14,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::SO_MixingSetting
   DifficultyMultiplier: 1
   Duration: 5
-  TargetZoneMin: 0.45
-  TargetZoneMax: 0.55
-  NeedleSpeed: 0.6
-  RequiredHits: 3
+  TargetZoneMin: 0.15
+  TargetZoneMax: 0.4
+  TargetZoneDecreasePerHit: 0.1
+  GaugeInitSpeed: 0.6
+  GaugeMaxSpeed: 7
+  GaugeSpeedIncreasePerHit: 0.5
+  GaugeSpeedDecreasePerHit: 1
+  RequiredHits: 6

@@ -49,6 +49,7 @@ public class SO_ShakingSetting : SO_MinigameSetting
 
     [Tooltip("Gauge increase per click.")]
     public float GaugeIncreasePerClick = 0.08f;
+
 }
 #endregion
 
@@ -66,12 +67,19 @@ public class SO_MixingSetting : SO_MinigameSetting
     [Header("Timing Bar")]
     [Range(0f, 1f)] public float TargetZoneMin = 0.45f;
     [Range(0f, 1f)] public float TargetZoneMax = 0.55f;
+    [Range(.01f, 0.3f)] public float TargetZoneDecreasePerHit;
 
+    [Header("Gauge Setting")]
     [Tooltip("Needle speed in normalized units (0–1) per second.")]
-    public float NeedleSpeed = 0.6f;
+    public float GaugeInitSpeed = 0.6f;
+    [Range(5f, 7f)] public float GaugeMaxSpeed;
+    [Range(0f, 3f)] public float GaugeSpeedIncreasePerHit = 0.5f;
+    [Range(0f, 3f)] public float GaugeSpeedDecreasePerHit = 1f;
+
 
     [Tooltip("Number of successful hits required to complete the minigame.")]
     public int RequiredHits = 3;
+
 }
 #endregion
 
