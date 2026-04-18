@@ -280,7 +280,6 @@ public class CameraController : MonoBehaviour
         startPosition = transform.position;
         targetPosition = direction == ViewDirection.Down ? downPosition : initialPosition;
     }
-
     #endregion
 
     #region Transition Updates
@@ -317,6 +316,22 @@ public class CameraController : MonoBehaviour
             float smoothed = Mathf.SmoothStep(0f, 1f, movementProgress);
             transform.position = Vector3.Lerp(startPosition, targetPosition, smoothed);
         }
+    }
+
+    public void ResetRotaionAndMovement() { 
+        currentDirection = ViewDirection.Forward;
+        StartRotation(ViewDirection.Forward);
+        StartMovement(ViewDirection.Forward);
+    }
+
+    #endregion
+
+    #region Helper
+
+    public void SetCanRotateCamera(bool _bool)
+    { 
+        settings.canRotateSideways = _bool;
+        settings.canMoveCamera = _bool;    
     }
 
     #endregion
