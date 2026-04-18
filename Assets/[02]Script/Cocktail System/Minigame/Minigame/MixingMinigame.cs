@@ -1,27 +1,11 @@
-// ============================================================
-//  Bar410 — MixingMinigame
-//  GDD 3.2.2: Click to stop the needle in the target zone
-//             the required number of times.
+// GDD 3.2.2 — Click to stop the needle inside the target zone the required number of times.
 //
-//  Logic ported from StiringMinigame.cs (MonoGame):
-//    - Arrow accelerates based on its own position (not constant speed)
-//    - Hit  → zone shrinks + speed increases + NEW random zone position
-//    - Miss → zone grows back + speed resets to init
-//    - Progress counts successful hits toward RequiredHits
-//
-//  SO_MixingSetting fields:
-//    NeedleSpeed                — PointingArrow_InitSpeed  (base / reset speed)
-//    NeedleSpeedIncreasePerHit  — PointingArrow_SpeedIncreaseRate (acceleration scalar + per-hit bonus)
-//    NeedleSpeedDecreasePerHit  — unused (miss resets to base instead, matching MonoGame)
-//    TargetZoneMin              — TargetZone_MinSize  (normalized 0–1)
-//    TargetZoneMax              — TargetZone_MaxSize  (normalized 0–1)
-//    TargetZoneDecreasePerHit   — TargetZone_DecreasePerSuccess (normalized)
-//    RequiredHits               — ProgressBar_SuccessTimeToWin equivalent
-// ============================================================
-
+// Needle behaviour:
+//   - Accelerates based on its own position (not constant speed)
+//   - Hit  → zone shrinks + speed increases + new random zone position
+//   - Miss → zone grows back + speed resets to base + new random zone position
 using UnityEngine;
 using UnityEngine.UI;
-
 using static E_Cocktail;
 
 public class MixingMinigame : BaseMiniGame
@@ -30,7 +14,7 @@ public class MixingMinigame : BaseMiniGame
 
     private SO_MixingSetting _cfg => Setting as SO_MixingSetting;
 
-    // ── UI ─────────────────────────────────────────────────
+    // ── Inspector ──────────────────────────────────────────
 
     [Header("UI")]
     [Tooltip("Slider showing the moving needle (0–1). Non-interactable.")]
@@ -44,35 +28,25 @@ public class MixingMinigame : BaseMiniGame
 
     // ── Runtime State ──────────────────────────────────────
 
-    /// <summary>Current needle position (0–1). Mirrors PointingArrow_CurrentValue / MaxSize.</summary>
+    /// <summary>Current needle position, normalized 0–1.</summary>
     public float NeedlePosition { get; private set; }
 
-    /// <summary>Successful hit count.</summary>
+    /// <summary>Number of successful hits so far.</summary>
     public int Hits { get; private set; }
 
-    /// <summary>Current needle speed (normalized units / sec). Modified on hit / miss.</summary>
-    private float _currentSpeed;
+    private float _needleSpeed;
+    private float _needleDirection = 1f; // +1 = moving right, -1 = moving left
 
-    /// <summary>+1 moving right, -1 moving left.</summary>
-    private float _needleDirection = 1f;
-
-    /// <summary>Center of the current target zone (normalized 0–1).</summary>
     private float _zoneCenter;
-
-    /// <summary>Current half-size of the target zone (normalized).</summary>
     private float _zoneHalfSize;
 
-    // Derived bounds — read by UI
     private float ZoneMin => Mathf.Max(0f, _zoneCenter - _zoneHalfSize);
     private float ZoneMax => Mathf.Min(1f, _zoneCenter + _zoneHalfSize);
-
-    // ── Slide Panel Flags (mirrors ShakingMinigame) ────────
 
     private bool _isPanelSlidingIn = false;
     private bool _isPanelSlidingOut = false;
 
-    // ── Cached handle size ─────────────────────────────────
-
+    // Cached so only width changes each frame
     private float _handleOriginalHeight;
 
     // ── Lifecycle ──────────────────────────────────────────
@@ -81,18 +55,15 @@ public class MixingMinigame : BaseMiniGame
     {
         _handleOriginalHeight = _targetZoneSlider.handleRect.sizeDelta.y;
 
-        UpdateUI();
         ResetGame();
+        UpdateUI();
         base.StartGame();
         Debug.Log("Mixing Minigame Started");
     }
 
-    // ── FSM Handlers ───────────────────────────────────────
+    // ── FSM Callbacks ──────────────────────────────────────
 
-    protected override void OnProcessing()
-    {
-        UpdateUI();
-    }
+    protected override void OnProcessing() => UpdateUI();
 
     // ── Game Loop ──────────────────────────────────────────
 
@@ -100,66 +71,71 @@ public class MixingMinigame : BaseMiniGame
     {
         if (!IsRunning) return;
 
-        // ── Panel slide-in ─────────────────────────────────
         if (_isPanelSlidingIn)
         {
             if (!SlideMinigame(Direction.Right, FinishCondition.FullyIn)) return;
-            else _isPanelSlidingIn = false;
+            _isPanelSlidingIn = false;
         }
 
-        // ── Panel slide-out (win) ──────────────────────────
         if (_isPanelSlidingOut)
         {
             if (!SlideMinigame(Direction.Left, FinishCondition.FullyOut)) return;
-            else
-            {
-                _isPanelSlidingOut = false;
-                SetState(MiniGameState.Success);
-            }
+            _isPanelSlidingOut = false;
+            SetState(MiniGameState.Success);
+            return;
         }
-
-        base.ProcessedGame(); // polls IsClickedThisFrame
 
         float dt = Time.deltaTime;
 
-        float accel = _cfg.GaugeSpeedIncreasePerHit; // reuse as acceleration scalar
+        // ── 1. Move needle ────────────────────────────────────────────────────
+        // Acceleration grows as the needle approaches the wall it's heading toward,
+        // giving a natural "sling" feel. Clamped so it never contributes negatively.
+        //float wallProximity = _needleDirection > 0f
+        //    ? NeedlePosition          // approaching right wall → 0..1
+        //    : 1f - NeedlePosition;    // approaching left wall  → 0..1
 
-        if (_needleDirection > 0f)
+        //float currentSpeed = _needleSpeed + _cfg.NeedleAcceleration;
+        float currentSpeed = _needleSpeed;
+
+        //NeedlePosition += currentSpeed * _needleDirection * _cfg.DifficultyMultiplier * dt;
+        NeedlePosition += currentSpeed * _needleDirection * dt;
+
+        // ── 2. Bounce — both walls in one pass ────────────────────────────────
+        if (NeedlePosition >= 1f)
         {
-            NeedlePosition += (_currentSpeed + accel * NeedlePosition) * _cfg.DifficultyMultiplier * dt;
-            if (NeedlePosition >= 1f) { NeedlePosition = 1f; _needleDirection = -1f; }
+            NeedlePosition = 1f;
+            _needleDirection = -1f;
         }
-        else
+        else if (NeedlePosition <= 0f)
         {
-            NeedlePosition -= (_currentSpeed + accel * (1f - NeedlePosition)) * _cfg.DifficultyMultiplier * dt;
-            if (NeedlePosition <= 0f) { NeedlePosition = 0f; _needleDirection = 1f; }
+            NeedlePosition = 0f;
+            _needleDirection = 1f;
         }
 
-        // ── 2. Register click ──────────────────────────────
+        Debug.Log($"current Speed : {currentSpeed} ; ");
+
+        // ── 3. Poll click ─────────────────────────────────────────────────────
+        base.ProcessedGame();
+
+        // ── 4. Register click ─────────────────────────────────────────────────
         if (IsClickedThisFrame)
         {
             bool inZone = NeedlePosition >= ZoneMin && NeedlePosition <= ZoneMax;
 
-            if (inZone)
-            {
-                OnHit();
-                Debug.Log($"HIT  | Needle: {NeedlePosition:P0} | Zone: [{ZoneMin:F2}–{ZoneMax:F2}] | Hits: {Hits}/{_cfg.RequiredHits} | Speed: {_currentSpeed:F2}");
-            }
-            else
-            {
-                OnMiss();
-                Debug.Log($"MISS | Needle: {NeedlePosition:P0} | Zone: [{ZoneMin:F2}–{ZoneMax:F2}] | Hits: {Hits}/{_cfg.RequiredHits} | Speed: {_currentSpeed:F2}");
-            }
+            if (inZone) OnHit();
+            else OnMiss();
+
+            Debug.Log($"{(inZone ? "HIT" : "MISS")} | Needle: {NeedlePosition:P0} | Zone: [{ZoneMin:F2}–{ZoneMax:F2}] | Hits: {Hits}/{_cfg.RequiredHits} | Speed: {_needleSpeed:F2}");
         }
 
-        // ── 3. Win condition ───────────────────────────────
+        // ── 5. Win condition ──────────────────────────────────────────────────
         if (Hits >= _cfg.RequiredHits)
             _isPanelSlidingOut = true;
 
         UpdateUI();
     }
 
-    // ── EndGame ────────────────────────────────────────────
+    // ── EndGame / Reset ────────────────────────────────────
 
     public override void EndGame()
     {
@@ -167,34 +143,14 @@ public class MixingMinigame : BaseMiniGame
         Debug.Log($"Mixing Ended | Hits: {Hits}/{_cfg?.RequiredHits} | {CurrentState}");
     }
 
-    // ── UI ─────────────────────────────────────────────────
-
-    public override void UpdateUI()
-    {
-        base.UpdateUI();
-        UpdateNeedleVisual();
-        UpdateTargetZoneVisual();
-        UpdateHitsProgressVisual();
-    }
-
-    // ── ResetGame ──────────────────────────────────────────
-
     protected override void ResetGame()
     {
         NeedlePosition = 0f;
         _needleDirection = 1f;
         Hits = 0;
 
-        if (_cfg != null)
-        {
-            _currentSpeed = _cfg.GaugeInitSpeed;
-            _zoneHalfSize = _cfg.TargetZoneMax / 2f; // start at max size
-        }
-        else
-        {
-            _currentSpeed = 0.3f;
-            _zoneHalfSize = 0.2f;
-        }
+        _needleSpeed = _cfg != null ? _cfg.NeedleInitSpeed : 0.3f;
+        _zoneHalfSize = _cfg != null ? _cfg.TargetZoneMaxSize / 2f : 0.2f;
 
         RandomizeZonePosition();
 
@@ -207,61 +163,57 @@ public class MixingMinigame : BaseMiniGame
         base.ResetGame();
     }
 
-    // ── Debug ──────────────────────────────────────────────
+    // ── UI ─────────────────────────────────────────────────
+
+    public override void UpdateUI()
+    {
+        base.UpdateUI();
+        UpdateNeedleVisual();
+        UpdateTargetZoneVisual();
+        UpdateHitsProgressVisual();
+    }
 
     public override string GetGameState()
-        => $"Mixing | Needle: {NeedlePosition:P0} | Zone: [{ZoneMin:F2}–{ZoneMax:F2}] | Hits: {Hits}/{_cfg?.RequiredHits} | Speed: {_currentSpeed:F2} | {CurrentState}";
+        => $"Mixing | Needle: {NeedlePosition:P0} | Zone: [{ZoneMin:F2}–{ZoneMax:F2}] | Hits: {Hits}/{_cfg?.RequiredHits} | Speed: {_needleSpeed:F2} | {CurrentState}";
 
     // ── Private Hit / Miss ─────────────────────────────────
 
-    /// <summary>
-    /// Successful hit — mirrors StiringMinigame hit branch:
-    ///   zone shrinks, speed increases, NEW random zone position.
-    /// </summary>
+    /// <summary>Zone shrinks, speed increases, zone moves to a new random position.</summary>
     private void OnHit()
     {
         Hits++;
 
-        // Shrink zone (clamp to min size)
-        float minHalf = _cfg.TargetZoneMin / 2f;
-        _zoneHalfSize -= _cfg.TargetZoneDecreasePerHit / 2f;
-        _zoneHalfSize = Mathf.Max(_zoneHalfSize, minHalf);
+        _zoneHalfSize = Mathf.Max(
+            _zoneHalfSize - _cfg.TargetZoneShrinkPerHit / 2f,
+            _cfg.TargetZoneMinSize / 2f);
 
-        // Speed up (capped — reuse NeedleSpeedDecreasePerHit field as cap)
-        _currentSpeed += _cfg.GaugeSpeedIncreasePerHit;
-        _currentSpeed = Mathf.Min(_currentSpeed, _cfg.GaugeMaxSpeed); // cap
+        _needleSpeed = Mathf.Min(
+            _needleSpeed + _cfg.NeedleSpeedIncreasePerHit,
+            _cfg.NeedleMaxSpeed);
 
-        // Move zone to a new random position
         RandomizeZonePosition();
     }
 
-    /// <summary>
-    /// Missed click — mirrors StiringMinigame miss branch:
-    ///   zone grows back toward max, speed resets to base, new random zone.
-    /// </summary>
+    /// <summary>Zone grows back toward max, speed resets to base, zone moves to a new random position.</summary>
     private void OnMiss()
     {
-        // Grow zone back (clamp to max size)
-        float maxHalf = _cfg.TargetZoneMax / 2f;
-        _zoneHalfSize = Mathf.Min(_zoneHalfSize + (_cfg.TargetZoneDecreasePerHit), maxHalf);
+        _zoneHalfSize = Mathf.Min(
+            _zoneHalfSize + _cfg.TargetZoneExtendPerMiss,
+            _cfg.TargetZoneMaxSize / 2f);
 
-        // Reset speed to base
-        _currentSpeed = _cfg.GaugeInitSpeed;
+        _needleSpeed = _needleSpeed - _cfg.NeedleSpeedDecreasePerMiss;
+        _needleSpeed = Mathf.Max(_cfg.NeedleInitSpeed, _needleSpeed); //cap value and get more than one
 
-        // Randomize zone so the player can't just retry the same spot
         RandomizeZonePosition();
     }
 
-    /// <summary>
-    /// Picks a new random center for the zone, keeping it fully within [0, 1].
-    /// Mirrors InitNewTargetZone() in StiringMinigame.
-    /// </summary>
+    /// <summary>Picks a new random zone center that keeps the zone fully within [0, 1].</summary>
     private void RandomizeZonePosition()
     {
         float minCenter = _zoneHalfSize;
         float maxCenter = 1f - _zoneHalfSize;
 
-        if (minCenter > maxCenter) minCenter = maxCenter; // safety clamp
+        if (minCenter > maxCenter) minCenter = maxCenter; // safety for very large zones
 
         _zoneCenter = Random.Range(minCenter, maxCenter);
     }
@@ -269,23 +221,17 @@ public class MixingMinigame : BaseMiniGame
     // ── Private UI Helpers ─────────────────────────────────
 
     private void UpdateNeedleVisual()
-    {
-        _needleSlider.value = NeedlePosition;
-    }
+        => _needleSlider.value = NeedlePosition;
 
-    /// <summary>
-    /// Positions the target zone handle at the zone center and resizes its
-    /// width to cover the current zone — same technique as ShakingMinigame.
-    /// </summary>
+    /// <summary>Positions the zone handle at the zone center and scales its width to cover the zone.</summary>
     private void UpdateTargetZoneVisual()
     {
         _targetZoneSlider.value = _zoneCenter;
 
         float trackWidth = (_targetZoneSlider.transform as RectTransform).rect.width;
-        float handleWidth = (_zoneHalfSize * 2f) * trackWidth;
+        float handleWidth = _zoneHalfSize * 2f * trackWidth;
 
-        RectTransform handle = _targetZoneSlider.handleRect;
-        handle.sizeDelta = new Vector2(handleWidth, _handleOriginalHeight);
+        _targetZoneSlider.handleRect.sizeDelta = new Vector2(handleWidth, _handleOriginalHeight);
     }
 
     private void UpdateHitsProgressVisual()
