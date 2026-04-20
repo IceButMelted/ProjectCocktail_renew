@@ -7,16 +7,41 @@ public class ShakingMinigame : BaseMiniGame
 {
     // ── Config ─────────────────────────────────────────────
 
-    private SO_ShakingSetting _cfg;
+    private SO_ShakingSetting _cfg => Setting as SO_ShakingSetting;
+
+    // ── Fallback Settings (used if SO is null) ─────────────
+    [Header("Fallback Settings (used if SO is missing)")]
+    [SerializeField] private float _fallbackDuration = 5f;
+    [SerializeField] private float _fallbackDifficultyMultiplier = 1f;
+    [SerializeField] private float _fallbackTargetZoneMinSize = 0.4f;
+    [SerializeField] private float _fallbackTargetZoneMaxSize = 0.7f;
+    [SerializeField] private float _fallbackInitTargetZoneMinValue = 0.7f;
+    [SerializeField] private float _fallbackTargetZoneShrinkPerProgress = 0.01f;
+    [SerializeField] private float _fallbackGaugeDecayRate = 0.15f;
+    [SerializeField] private float _fallbackGaugeIncreasePerClick = 0.08f;
+    [SerializeField] private float _fallbackProgressIncreaseRate = 0.2f;
+    [SerializeField] private Color _fallbackProgressBarStartColor = Color.green;
+    [SerializeField] private Color _fallbackProgressBarEndColor = Color.red;
+
+    // ── Resolved values (SO or fallback) ───────────────────
+    private float Duration => _cfg != null ? _cfg.Duration : _fallbackDuration;
+    private float DifficultyMultiplier => _cfg != null ? _cfg.DifficultyMultiplier : _fallbackDifficultyMultiplier;
+    private float TargetZoneMinSize => _cfg != null ? _cfg.TargetZoneMinSize : _fallbackTargetZoneMinSize;
+    private float TargetZoneMaxSize => _cfg != null ? _cfg.TargetZoneMaxSize : _fallbackTargetZoneMaxSize;
+    private float InitTargetZoneMinValue => _cfg != null ? _cfg.InitTargetZoneMinValue : _fallbackInitTargetZoneMinValue;
+    private float TargetZoneShrinkPerProgress => _cfg != null ? _cfg.TargetZoneShrinkPerProgress : _fallbackTargetZoneShrinkPerProgress;
+    private float GaugeDecayRate => _cfg != null ? _cfg.GaugeDecayRate : _fallbackGaugeDecayRate;
+    private float GaugeIncreasePerClick => _cfg != null ? _cfg.GaugeIncreasePerClick : _fallbackGaugeIncreasePerClick;
+    private float ProgressIncreaseRate => _cfg != null ? _cfg.ProgressIncreaseRate : _fallbackProgressIncreaseRate;
+    private Color ProgressBarStartColor => _cfg != null ? _cfg.ProgressBarStartColor : _fallbackProgressBarStartColor;
+    private Color ProgressBarEndColor => _cfg != null ? _cfg.ProgressBarEndColor : _fallbackProgressBarEndColor;
 
     // ── Inspector ──────────────────────────────────────────
 
     [Header("UI")]
     [SerializeField] private Slider _gaugeSlider;
     [SerializeField] private Slider _progressSlider;
-    [SerializeField] private Slider _targetZoneSlider; // handle visually marks the zone
-
-    
+    [SerializeField] private Slider _targetZoneSlider;
 
     // ── Runtime State ──────────────────────────────────────
 
@@ -31,15 +56,16 @@ public class ShakingMinigame : BaseMiniGame
     private bool _isPanelSlidingIn = false;
     private bool _isPanelSlidingOut = false;
 
-    // Cached so only width changes each frame
     private float _handleOriginalWidth;
 
     // ── Lifecycle ──────────────────────────────────────────
 
     public override void StartGame()
     {
-        _handleOriginalWidth = _targetZoneSlider.handleRect.sizeDelta.x;
+        if (_cfg == null)
+            Debug.LogWarning("ShakingMinigame: SO_ShakingSetting not found — using fallback values.");
 
+        _handleOriginalWidth = _targetZoneSlider.handleRect.sizeDelta.x;
         InitTargetZone();
         ResetGame();
         base.StartGame();
@@ -65,30 +91,24 @@ public class ShakingMinigame : BaseMiniGame
             SetState(MiniGameState.Success);
         }
 
-        base.ProcessedGame(); // polls IsClickedThisFrame
+        base.ProcessedGame();
 
         float dt = Time.deltaTime;
 
-        // 1. Click → boost gauge
         if (IsClickedThisFrame)
-            GaugeValue = Mathf.Clamp01(GaugeValue + _cfg.GaugeIncreasePerClick * _cfg.DifficultyMultiplier);
+            GaugeValue = Mathf.Clamp01(GaugeValue + GaugeIncreasePerClick * DifficultyMultiplier);
 
-        // 2. Constant gauge decay
-        GaugeValue = Mathf.Clamp01(GaugeValue - _cfg.GaugeDecayRate * dt);
+        GaugeValue = Mathf.Clamp01(GaugeValue - GaugeDecayRate * dt);
 
-        // 3. Accumulate progress while inside the zone
         bool inZone = GaugeValue >= _zoneBorderMin && GaugeValue <= _zoneBorderMax;
         if (inZone)
         {
-            float gained = _cfg.ProgressIncreaseRate * dt;
+            float gained = ProgressIncreaseRate * dt;
             TimeInZone += gained;
             ShrinkTargetZone(gained);
         }
 
-        Debug.Log($"Shaking | In Zone: {inZone} | Gauge={GaugeValue:F2} | Zone=[{_zoneBorderMin:F2},{_zoneBorderMax:F2}] | Progress={TimeInZone:F2}");
-
-        // 4. Win condition
-        if (TimeInZone >= _cfg.Duration)
+        if (TimeInZone >= Duration)
             _isPanelSlidingOut = true;
 
         UpdateUI();
@@ -100,8 +120,6 @@ public class ShakingMinigame : BaseMiniGame
     {
         base.EndGame();
         Debug.Log($"Shaking Ended | Gauge={GaugeValue:F2} | Progress={TimeInZone:F2} | {CurrentState}");
-    
-        
     }
 
     protected override void ResetGame()
@@ -125,7 +143,7 @@ public class ShakingMinigame : BaseMiniGame
         base.UpdateUI();
 
         _gaugeSlider.value = GaugeValue;
-        _progressSlider.value = TimeInZone / _cfg.Duration;
+        _progressSlider.value = TimeInZone / Duration;
 
         UpdateTargetZoneVisual();
         UpdateProgressBarColor();
@@ -138,24 +156,10 @@ public class ShakingMinigame : BaseMiniGame
 
     private void InitTargetZone()
     {
-        //if (Setting == null)
-        //{ Debug.LogError("SHAKING: Setting field is completely empty — assign it in Inspector!"); return; }
-
-        if (_cfg == null)
-        { Debug.LogError($"SHAKING: Setting is assigned but wrong type! It's 'asdf', expected 'SO_ShakingSetting'"); return; }
-
-        // ── Null diagnostic — remove after fixing ──
-        if (_cfg == null) { Debug.LogError("SHAKING: _cfg (SO_ShakingSetting) is NULL — assign Setting in Inspector!"); return; }
-        if (_targetZoneSlider == null) { Debug.LogError("SHAKING: _targetZoneSlider is NULL — assign in Inspector!"); return; }
-        if (_targetZoneSlider.handleRect == null) { Debug.LogError("SHAKING: _targetZoneSlider has no Handle Rect assigned on its Slider component!"); return; }
-        if (_progressSlider == null) { Debug.LogError("SHAKING: _progressSlider is NULL — assign in Inspector!"); return; }
-        if (_progressSlider.fillRect == null) { Debug.LogError("SHAKING: _progressSlider has no Fill Rect assigned on its Slider component!"); return; }
-        // ──────────────────────────────────────────
-
-        _zoneSize = _cfg.TargetZoneMaxSize;
+        _zoneSize = TargetZoneMaxSize;
 
         float halfSize = _zoneSize / 2f;
-        float minCenter = Mathf.Max(_cfg.InitTargetZoneMinValue, halfSize);
+        float minCenter = Mathf.Max(InitTargetZoneMinValue, halfSize);
         float maxCenter = 1f - halfSize;
 
         _zoneCenter = Random.Range(minCenter, maxCenter);
@@ -166,19 +170,17 @@ public class ShakingMinigame : BaseMiniGame
         UpdateProgressBarColor();
     }
 
-    /// <summary>Shrinks the zone proportionally to progress gained this frame.</summary>
     private void ShrinkTargetZone(float progressDelta)
     {
-        if (_zoneSize <= _cfg.TargetZoneMinSize) return;
+        if (_zoneSize <= TargetZoneMinSize) return;
 
-        _zoneSize = Mathf.Max(_zoneSize - _cfg.TargetZoneShrinkPerProgress * progressDelta, _cfg.TargetZoneMinSize);
+        _zoneSize = Mathf.Max(_zoneSize - TargetZoneShrinkPerProgress * progressDelta, TargetZoneMinSize);
 
         float halfSize = _zoneSize / 2f;
         _zoneBorderMin = _zoneCenter - halfSize;
         _zoneBorderMax = _zoneCenter + halfSize;
     }
 
-    /// <summary>Positions the handle at the zone center and scales its height to cover the zone.</summary>
     private void UpdateTargetZoneVisual()
     {
         _targetZoneSlider.value = _zoneCenter;
@@ -189,12 +191,10 @@ public class ShakingMinigame : BaseMiniGame
         _targetZoneSlider.handleRect.sizeDelta = new Vector2(_handleOriginalWidth, handleHeight);
     }
 
-    /// <summary>Smoothly transitions the progress bar from start to end color.</summary>
     private void UpdateProgressBarColor()
     {
-        float t = Mathf.SmoothStep(0f, 1f, TimeInZone / _cfg.Duration);
-
-        //_progressSlider.fillRect
-        //    .GetComponent<Image>().color = Oklab.OklabLerp(_cfg.ProgressBarStartColor, _cfg.ProgressBarEndColor, t);
+        float t = Mathf.SmoothStep(0f, 1f, TimeInZone / Duration);
+        _progressSlider.fillRect
+            .GetComponent<Image>().color = Oklab.OklabLerp(ProgressBarStartColor, ProgressBarEndColor, t);
     }
 }

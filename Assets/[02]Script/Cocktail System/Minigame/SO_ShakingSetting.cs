@@ -14,7 +14,7 @@ public class SO_ShakingSetting : SO_MinigameSetting
     [Range(0.5f, 0.95f)] public float InitTargetZoneMinValue = 0.7f;
 
     [Tooltip("How much the zone shrinks per unit of progress gained.")]
-    [Range(0f, 0.05f)] public float TargetZoneShrinkPerProgress = 0.01f;
+    [Range(0f, 0.5f)] public float TargetZoneShrinkPerProgress = 0.01f;
 
     [Header("Gauge")]
     [Tooltip("Gauge decay per second while the player is not clicking.")]

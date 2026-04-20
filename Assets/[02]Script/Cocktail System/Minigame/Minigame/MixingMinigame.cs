@@ -14,6 +14,35 @@ public class MixingMinigame : BaseMiniGame
 
     private SO_MixingSetting _cfg => Setting as SO_MixingSetting;
 
+    // ── Fallback Settings (used if SO is null) ─────────────
+
+    [Header("Fallback Settings (used if SO is missing)")]
+    [SerializeField] private float _fallbackDuration = 5f;
+    [SerializeField] private float _fallbackDifficultyMultiplier = 1f;
+    [SerializeField] private float _fallbackTargetZoneMinSize = 0.45f;
+    [SerializeField] private float _fallbackTargetZoneMaxSize = 0.55f;
+    [SerializeField] private float _fallbackTargetZoneShrinkPerHit = 0.05f;
+    [SerializeField] private float _fallbackTargetZoneExtendPerMiss = 0.1f;
+    [SerializeField] private float _fallbackNeedleInitSpeed = 0.6f;
+    [SerializeField] private float _fallbackNeedleMaxSpeed = 3f;
+    [SerializeField] private float _fallbackNeedleSpeedIncreasePerHit = 0.5f;
+    [SerializeField] private float _fallbackNeedleSpeedDecreasePerMiss = 0.1f;
+    [SerializeField] private int _fallbackRequiredHits = 3;
+
+    // ── Resolved values (SO or fallback) ───────────────────
+
+    private float Duration => _cfg != null ? _cfg.Duration : _fallbackDuration;
+    private float DifficultyMultiplier => _cfg != null ? _cfg.DifficultyMultiplier : _fallbackDifficultyMultiplier;
+    private float TargetZoneMinSize => _cfg != null ? _cfg.TargetZoneMinSize : _fallbackTargetZoneMinSize;
+    private float TargetZoneMaxSize => _cfg != null ? _cfg.TargetZoneMaxSize : _fallbackTargetZoneMaxSize;
+    private float TargetZoneShrinkPerHit => _cfg != null ? _cfg.TargetZoneShrinkPerHit : _fallbackTargetZoneShrinkPerHit;
+    private float TargetZoneExtendPerMiss => _cfg != null ? _cfg.TargetZoneExtendPerMiss : _fallbackTargetZoneExtendPerMiss;
+    private float NeedleInitSpeed => _cfg != null ? _cfg.NeedleInitSpeed : _fallbackNeedleInitSpeed;
+    private float NeedleMaxSpeed => _cfg != null ? _cfg.NeedleMaxSpeed : _fallbackNeedleMaxSpeed;
+    private float NeedleSpeedIncreasePerHit => _cfg != null ? _cfg.NeedleSpeedIncreasePerHit : _fallbackNeedleSpeedIncreasePerHit;
+    private float NeedleSpeedDecreasePerMiss => _cfg != null ? _cfg.NeedleSpeedDecreasePerMiss : _fallbackNeedleSpeedDecreasePerMiss;
+    private int RequiredHits => _cfg != null ? _cfg.RequiredHits : _fallbackRequiredHits;
+
     // ── Inspector ──────────────────────────────────────────
 
     [Header("UI")]
@@ -53,6 +82,9 @@ public class MixingMinigame : BaseMiniGame
 
     public override void StartGame()
     {
+        if (_cfg == null)
+            Debug.LogWarning("MixingMinigame: SO_MixingSetting not found — using fallback values.");
+
         _handleOriginalHeight = _targetZoneSlider.handleRect.sizeDelta.y;
 
         ResetGame();
@@ -88,16 +120,7 @@ public class MixingMinigame : BaseMiniGame
         float dt = Time.deltaTime;
 
         // ── 1. Move needle ────────────────────────────────────────────────────
-        // Acceleration grows as the needle approaches the wall it's heading toward,
-        // giving a natural "sling" feel. Clamped so it never contributes negatively.
-        //float wallProximity = _needleDirection > 0f
-        //    ? NeedlePosition          // approaching right wall → 0..1
-        //    : 1f - NeedlePosition;    // approaching left wall  → 0..1
-
-        //float currentSpeed = _needleSpeed + _cfg.NeedleAcceleration;
         float currentSpeed = _needleSpeed;
-
-        //NeedlePosition += currentSpeed * _needleDirection * _cfg.DifficultyMultiplier * dt;
         NeedlePosition += currentSpeed * _needleDirection * dt;
 
         // ── 2. Bounce — both walls in one pass ────────────────────────────────
@@ -125,11 +148,11 @@ public class MixingMinigame : BaseMiniGame
             if (inZone) OnHit();
             else OnMiss();
 
-            Debug.Log($"{(inZone ? "HIT" : "MISS")} | Needle: {NeedlePosition:P0} | Zone: [{ZoneMin:F2}–{ZoneMax:F2}] | Hits: {Hits}/{_cfg.RequiredHits} | Speed: {_needleSpeed:F2}");
+            Debug.Log($"{(inZone ? "HIT" : "MISS")} | Needle: {NeedlePosition:P0} | Zone: [{ZoneMin:F2}–{ZoneMax:F2}] | Hits: {Hits}/{RequiredHits} | Speed: {_needleSpeed:F2}");
         }
 
         // ── 5. Win condition ──────────────────────────────────────────────────
-        if (Hits >= _cfg.RequiredHits)
+        if (Hits >= RequiredHits)
             _isPanelSlidingOut = true;
 
         UpdateUI();
@@ -140,7 +163,7 @@ public class MixingMinigame : BaseMiniGame
     public override void EndGame()
     {
         base.EndGame();
-        Debug.Log($"Mixing Ended | Hits: {Hits}/{_cfg?.RequiredHits} | {CurrentState}");
+        Debug.Log($"Mixing Ended | Hits: {Hits}/{RequiredHits} | {CurrentState}");
     }
 
     protected override void ResetGame()
@@ -149,8 +172,8 @@ public class MixingMinigame : BaseMiniGame
         _needleDirection = 1f;
         Hits = 0;
 
-        _needleSpeed = _cfg != null ? _cfg.NeedleInitSpeed : 0.3f;
-        _zoneHalfSize = _cfg != null ? _cfg.TargetZoneMaxSize / 2f : 0.2f;
+        _needleSpeed = NeedleInitSpeed;
+        _zoneHalfSize = TargetZoneMaxSize / 2f;
 
         RandomizeZonePosition();
 
@@ -174,7 +197,7 @@ public class MixingMinigame : BaseMiniGame
     }
 
     public override string GetGameState()
-        => $"Mixing | Needle: {NeedlePosition:P0} | Zone: [{ZoneMin:F2}–{ZoneMax:F2}] | Hits: {Hits}/{_cfg?.RequiredHits} | Speed: {_needleSpeed:F2} | {CurrentState}";
+        => $"Mixing | Needle: {NeedlePosition:P0} | Zone: [{ZoneMin:F2}–{ZoneMax:F2}] | Hits: {Hits}/{RequiredHits} | Speed: {_needleSpeed:F2} | {CurrentState}";
 
     // ── Private Hit / Miss ─────────────────────────────────
 
@@ -184,12 +207,12 @@ public class MixingMinigame : BaseMiniGame
         Hits++;
 
         _zoneHalfSize = Mathf.Max(
-            _zoneHalfSize - _cfg.TargetZoneShrinkPerHit / 2f,
-            _cfg.TargetZoneMinSize / 2f);
+            _zoneHalfSize - TargetZoneShrinkPerHit / 2f,
+            TargetZoneMinSize / 2f);
 
         _needleSpeed = Mathf.Min(
-            _needleSpeed + _cfg.NeedleSpeedIncreasePerHit,
-            _cfg.NeedleMaxSpeed);
+            _needleSpeed + NeedleSpeedIncreasePerHit,
+            NeedleMaxSpeed);
 
         RandomizeZonePosition();
     }
@@ -198,11 +221,11 @@ public class MixingMinigame : BaseMiniGame
     private void OnMiss()
     {
         _zoneHalfSize = Mathf.Min(
-            _zoneHalfSize + _cfg.TargetZoneExtendPerMiss,
-            _cfg.TargetZoneMaxSize / 2f);
+            _zoneHalfSize + TargetZoneExtendPerMiss,
+            TargetZoneMaxSize / 2f);
 
-        _needleSpeed = _needleSpeed - _cfg.NeedleSpeedDecreasePerMiss;
-        _needleSpeed = Mathf.Max(_cfg.NeedleInitSpeed, _needleSpeed); //cap value and get more than one
+        _needleSpeed = _needleSpeed - NeedleSpeedDecreasePerMiss;
+        _needleSpeed = Mathf.Max(NeedleInitSpeed, _needleSpeed);
 
         RandomizeZonePosition();
     }
@@ -235,8 +258,5 @@ public class MixingMinigame : BaseMiniGame
     }
 
     private void UpdateHitsProgressVisual()
-    {
-        if (_cfg == null) return;
-        _hitsProgressSlider.value = (float)Hits / _cfg.RequiredHits;
-    }
+        => _hitsProgressSlider.value = (float)Hits / RequiredHits;
 }

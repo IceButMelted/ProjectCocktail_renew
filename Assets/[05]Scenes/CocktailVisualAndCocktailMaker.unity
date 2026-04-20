@@ -9172,6 +9172,17 @@ MonoBehaviour:
   <Setting>k__BackingField: {fileID: 11400000, guid: 69be31c6794215c4aa2b30c35ee31c89, type: 2}
   _minigamePanel: {fileID: 352594136477079249}
   _slidePanelSpeed: 800
+  _fallbackDuration: 1
+  _fallbackDifficultyMultiplier: 1
+  _fallbackTargetZoneMinSize: 0.4
+  _fallbackTargetZoneMaxSize: 0.7
+  _fallbackInitTargetZoneMinValue: 0.7
+  _fallbackTargetZoneShrinkPerProgress: 0.01
+  _fallbackGaugeDecayRate: 0.15
+  _fallbackGaugeIncreasePerClick: 0.08
+  _fallbackProgressIncreaseRate: 0.2
+  _fallbackProgressBarStartColor: {r: 0, g: 1, b: 0, a: 1}
+  _fallbackProgressBarEndColor: {r: 1, g: 0, b: 0, a: 1}
   _gaugeSlider: {fileID: 5760258907751204605}
   _progressSlider: {fileID: 6336353524985991205}
   _targetZoneSlider: {fileID: 110409847000785161}
@@ -11944,6 +11955,17 @@ MonoBehaviour:
   <Setting>k__BackingField: {fileID: 11400000, guid: 45c27c70917228d4caf8f135c6ddf856, type: 2}
   _minigamePanel: {fileID: 1435055770}
   _slidePanelSpeed: 800
+  _fallbackDuration: 5
+  _fallbackDifficultyMultiplier: 1
+  _fallbackTargetZoneMinSize: 0.1
+  _fallbackTargetZoneMaxSize: 0.4
+  _fallbackTargetZoneShrinkPerHit: 0.05
+  _fallbackTargetZoneExtendPerMiss: 0.15
+  _fallbackNeedleInitSpeed: 1
+  _fallbackNeedleMaxSpeed: 2
+  _fallbackNeedleSpeedIncreasePerHit: 0.15
+  _fallbackNeedleSpeedDecreasePerMiss: 0.25
+  _fallbackRequiredHits: 5
   _needleSlider: {fileID: 12441748}
   _hitsProgressSlider: {fileID: 1815873522}
   _targetZoneSlider: {fileID: 554768421}
