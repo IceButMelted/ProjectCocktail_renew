@@ -95,7 +95,7 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
     {
         IsRunning = false;
         _cocktailSystemManager?.OnApplyCocktail.Invoke();
-        _camera.SetCanRotateCamera(true);
+        //_camera.SetCanRotateCamera(true);
 
     }
 
