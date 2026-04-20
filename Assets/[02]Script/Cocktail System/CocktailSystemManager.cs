@@ -10,8 +10,10 @@ public class CocktailSystemManager : MonoBehaviour
     [SerializeField] private SO_CocktailList specialCocktailList;
     private List<S_Drink> NormalCocktails = new List<S_Drink>();
     private S_Drink targetcocktail = default(S_Drink);
+    [SerializeField] private Texture2D failCocktail;
 
-    [SerializeField] public CocktailShaker cocktailShaker;
+    public CocktailShaker cocktailShaker;
+    
 
     public UnityEvent OnApplyCocktail;
 
@@ -22,8 +24,7 @@ public class CocktailSystemManager : MonoBehaviour
 
     private void Start()
     {
-        RandomCocktail();
-        Debug.Log("All randome\n" + targetcocktail.GetOfCocktailInfo());
+        
 
         RandomCocktail(E_Cocktail.TypeOfCocktail.LowAlcohol);
         Debug.Log("Specific type\n" + targetcocktail.GetOfCocktailInfo());
@@ -42,6 +43,13 @@ public class CocktailSystemManager : MonoBehaviour
             UpdateCocktailInShaker();
             Debug.Log(cocktailShaker.currentCocktail.GetOfCocktailInfo());
         }
+
+
+    }
+
+    public void RandomCocktailForDebug() {
+        int randomIndex = Random.Range(0, normalCocktailList.cocktails.Count);
+        targetcocktail = normalCocktailList.cocktails[randomIndex].CocktailInfos;
     }
 
     public S_Drink RandomCocktail()
@@ -80,8 +88,16 @@ public class CocktailSystemManager : MonoBehaviour
         cocktailShaker.currentCocktail.UpdateName(NormalCocktails);
         cocktailShaker.currentCocktail.UpdatePrice(NormalCocktails);
         Texture2D newShakerSprite = cocktailShaker.currentCocktail.GetCocktailTexture(NormalCocktails) as Texture2D;
-        if (newShakerSprite != null ) 
-            cocktailShaker.SetBTNSprite(newShakerSprite,newShakerSprite,newShakerSprite);
+        if (newShakerSprite != null)
+            cocktailShaker.SetBTNSprite(newShakerSprite, newShakerSprite, newShakerSprite);
+        else
+            cocktailShaker.SetBTNSprite(failCocktail, failCocktail, failCocktail);
     }
-    
+
+    public string GetTargetName() {
+        return targetcocktail.Name;
+    }
+
+
+
 }

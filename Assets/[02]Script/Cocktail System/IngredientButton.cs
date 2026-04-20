@@ -17,6 +17,7 @@ public class IngredientButton : MonoBehaviour,
         Alcohol,
         Shaking,
         Mixing,
+        AddIce,
         Reset,
     }
 
@@ -88,6 +89,8 @@ public class IngredientButton : MonoBehaviour,
 
         ApplyIngredient();
 
+        
+
         m_Material.SetFloat("_EmssionStrength", 0.125f);
         m_Material.SetTexture("_CurrentTexture", T_Clicked);
     }
@@ -95,6 +98,11 @@ public class IngredientButton : MonoBehaviour,
     public void OnPointerUp(PointerEventData eventData)
     {
         if (!ShouldCanClick) return;
+
+        if (TypeIngredient == Behaviability.AddIce)
+        {
+            ShouldCanClick = false;
+        }
 
         m_Material.SetFloat("_EmssionStrength", 0);
         m_Material.SetTexture("_CurrentTexture", T_Default);
@@ -127,6 +135,9 @@ public class IngredientButton : MonoBehaviour,
 
             case Behaviability.Mixing:
                 _cocktailMaker.SetMethod(E_Cocktail.Method.Mixing);
+                break;
+            case Behaviability.AddIce:
+                _cocktailMaker.SetIceAddIce();
                 break;
         }
     }

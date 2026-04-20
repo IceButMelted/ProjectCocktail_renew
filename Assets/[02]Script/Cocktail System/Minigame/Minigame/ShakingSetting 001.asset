@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9e5fc186af29a7b499cf2911877bcb4e, type: 3}
+  m_Name: ShakingSetting 001
+  m_EditorClassIdentifier: Assembly-CSharp::SO_ShakingSetting
+  DifficultyMultiplier: 1
+  Duration: 5
+  TargetZoneMinSize: 0.4
+  TargetZoneMaxSize: 0.7
+  InitTargetZoneMinValue: 0.7
+  TargetZoneShrinkPerProgress: 0.01
+  GaugeDecayRate: 0.15
+  GaugeIncreasePerClick: 0.08
+  ProgressIncreaseRate: 0.2
+  ProgressBarStartColor: {r: 0, g: 1, b: 0, a: 1}
+  ProgressBarEndColor: {r: 1, g: 0, b: 0, a: 1}

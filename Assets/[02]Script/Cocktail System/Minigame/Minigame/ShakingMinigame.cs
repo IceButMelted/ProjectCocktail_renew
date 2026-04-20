@@ -7,7 +7,7 @@ public class ShakingMinigame : BaseMiniGame
 {
     // ── Config ─────────────────────────────────────────────
 
-    private SO_ShakingSetting _cfg => Setting as SO_ShakingSetting;
+    private SO_ShakingSetting _cfg;
 
     // ── Inspector ──────────────────────────────────────────
 
@@ -138,6 +138,20 @@ public class ShakingMinigame : BaseMiniGame
 
     private void InitTargetZone()
     {
+        //if (Setting == null)
+        //{ Debug.LogError("SHAKING: Setting field is completely empty — assign it in Inspector!"); return; }
+
+        if (_cfg == null)
+        { Debug.LogError($"SHAKING: Setting is assigned but wrong type! It's 'asdf', expected 'SO_ShakingSetting'"); return; }
+
+        // ── Null diagnostic — remove after fixing ──
+        if (_cfg == null) { Debug.LogError("SHAKING: _cfg (SO_ShakingSetting) is NULL — assign Setting in Inspector!"); return; }
+        if (_targetZoneSlider == null) { Debug.LogError("SHAKING: _targetZoneSlider is NULL — assign in Inspector!"); return; }
+        if (_targetZoneSlider.handleRect == null) { Debug.LogError("SHAKING: _targetZoneSlider has no Handle Rect assigned on its Slider component!"); return; }
+        if (_progressSlider == null) { Debug.LogError("SHAKING: _progressSlider is NULL — assign in Inspector!"); return; }
+        if (_progressSlider.fillRect == null) { Debug.LogError("SHAKING: _progressSlider has no Fill Rect assigned on its Slider component!"); return; }
+        // ──────────────────────────────────────────
+
         _zoneSize = _cfg.TargetZoneMaxSize;
 
         float halfSize = _zoneSize / 2f;
@@ -180,7 +194,7 @@ public class ShakingMinigame : BaseMiniGame
     {
         float t = Mathf.SmoothStep(0f, 1f, TimeInZone / _cfg.Duration);
 
-        _progressSlider.fillRect
-            .GetComponent<Image>().color = Oklab.OklabLerp(_cfg.ProgressBarStartColor, _cfg.ProgressBarEndColor, t);
+        //_progressSlider.fillRect
+        //    .GetComponent<Image>().color = Oklab.OklabLerp(_cfg.ProgressBarStartColor, _cfg.ProgressBarEndColor, t);
     }
 }

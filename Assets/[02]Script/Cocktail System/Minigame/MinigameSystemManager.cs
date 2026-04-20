@@ -60,7 +60,7 @@ public class MinigameSystemManager : MonoBehaviour
 
     private void SwitchTo(BaseMiniGame next)
     {
-        _activeMinigame?.EndGame();
+        _activeMinigame?.SetState(MiniGameState.Standby);
         _activeMinigame = next;
     }
 

@@ -18,16 +18,36 @@ public class MixerEvent : UnityEvent<Mixer, int> { }
 
 public class CocktailShaker : BTN_2_5D
 {
+    public Texture2D ShakerSprite;
+
     [Header("Add Ingredient")]
     public UnityEvent OnAddIngredient;
     public AlcoholEvent OnAddAlcohol;  // New typed event
     public MixerEvent OnAddMixer;      // New typed event
     public UnityEvent OnResetCocktail;
     
-
-    
     public S_Drink currentCocktail;
     private bool canClick = true;
+
+    [Header("UI")]
+    public bool canShowMethodUI = true;
+    public bool canShowServeUI = false;
+
+    public ToggleActive MethodUI;
+    //public ToggleActive VisualUI;
+    public ToggleActive ServeUI;
+
+    [Header("List of Ingredient BTN")]
+    public List<IngredientButton> ingredientButtons = new List<IngredientButton>();
+
+    public void SetCanShowServeUI(bool active) {
+        canShowServeUI = active;
+    }
+
+    public void SetCanShowMethodUI(bool active) {
+        canShowMethodUI = active;
+    }
+    
 
     protected override void Awake()
     {
@@ -59,6 +79,9 @@ public class CocktailShaker : BTN_2_5D
         canClick = active;
     }
 
+    public void SetIceAddIce() {
+        currentCocktail.AddIce = true;
+    }
 
     public void TryToAddAlcohol(Alcohol alcohol, int amount = 1) {
         currentCocktail.TryToAddAlcohol(alcohol,amount);
@@ -66,6 +89,10 @@ public class CocktailShaker : BTN_2_5D
 
     public void TryToAddMixer(Mixer mixer, int amount = 1) { 
         currentCocktail.TryToAddMixer(mixer, amount);
+    }
+
+    public void SetActiveServe(bool active) { 
+        ServeUI.gameObject.SetActive(active);
     }
 
     public void ResetShaker() {
@@ -79,7 +106,13 @@ public class CocktailShaker : BTN_2_5D
 
         currentCocktail.CompatibleGlasses = new List<GlassType>();
 
+        SetCanShowMethodUI(true);
+        SetCanShowServeUI(false);
+
+        SetBTNSprite(ShakerSprite,ShakerSprite,ShakerSprite);
+
         SetCanClick(true);
+
         
     }
 
@@ -90,6 +123,19 @@ public class CocktailShaker : BTN_2_5D
         if (!canClick) return;
 
         base.OnClick(context);
+    }
+
+    public void toggleUI() {
+        if (canShowMethodUI)
+            MethodUI.ToggleAtiveGameObject();
+        if (canShowServeUI)
+            ServeUI.ToggleAtiveGameObject();
+    }
+
+    public void ToggleCanClickIngredientBTN(bool active) {
+        for (int i = 0; i < ingredientButtons.Count; i++) {
+            ingredientButtons[i].enabled = active;
+        }
     }
 
 }
