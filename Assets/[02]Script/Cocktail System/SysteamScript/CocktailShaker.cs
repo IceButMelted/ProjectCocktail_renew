@@ -1,3 +1,5 @@
+using AYellowpaper.SerializedCollections;
+using JetBrains.Annotations;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -14,20 +16,23 @@ public class AlcoholEvent : UnityEvent<Alcohol, int> { }
 [System.Serializable]
 public class MixerEvent : UnityEvent<Mixer, int> { }
 
-public class CocktailMaker : BTN_2_5D
+public class CocktailShaker : BTN_2_5D
 {
     [Header("Add Ingredient")]
     public UnityEvent OnAddIngredient;
     public AlcoholEvent OnAddAlcohol;  // New typed event
     public MixerEvent OnAddMixer;      // New typed event
     public UnityEvent OnResetCocktail;
+    
 
-    [HideInInspector]
+    
     public S_Drink currentCocktail;
+    private bool canClick = true;
 
     protected override void Awake()
     {
         base.Awake();
+
     }
 
     protected override void Update()
@@ -50,6 +55,10 @@ public class CocktailMaker : BTN_2_5D
         currentCocktail.PreparationMethod = Method.Mixing;
     }
 
+    public void SetCanClick(bool active) {
+        canClick = active;
+    }
+
 
     public void TryToAddAlcohol(Alcohol alcohol, int amount = 1) {
         currentCocktail.TryToAddAlcohol(alcohol,amount);
@@ -59,10 +68,28 @@ public class CocktailMaker : BTN_2_5D
         currentCocktail.TryToAddMixer(mixer, amount);
     }
 
+    public void ResetShaker() {
+        currentCocktail.Name = "";
+        currentCocktail.AlcoholStrength = TypeOfCocktail.None;
+        currentCocktail.PreparationMethod = Method.None;
+        currentCocktail.AddIce = false;
+
+        currentCocktail.AlcoholList = new SerializedDictionary<Alcohol, int>();
+        currentCocktail.MixerList = new SerializedDictionary<Mixer, int>();
+
+        currentCocktail.CompatibleGlasses = new List<GlassType>();
+
+        SetCanClick(true);
+        
+    }
+
     protected override void OnClick(InputAction.CallbackContext context)
     {
         if (!(currentCocktail.GetTotalIngredient() > 0))
             return;
+        if (!canClick) return;
+
         base.OnClick(context);
     }
+
 }

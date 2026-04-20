@@ -32,12 +32,12 @@ public class IngredientButton : MonoBehaviour,
     [SerializeField] private E_Cocktail.Mixer mixer;
     [SerializeField] private E_Cocktail.Alcohol alcohol;
 
-    private CocktailMaker _cocktailMaker;
+    private CocktailShaker _cocktailMaker;
     private bool _canClick;
 
     private void Awake()
     {
-        _cocktailMaker = FindFirstObjectByType<CocktailMaker>();
+        _cocktailMaker = FindFirstObjectByType<CocktailShaker>();
 
         if (!ShouldCanClick) return;
 

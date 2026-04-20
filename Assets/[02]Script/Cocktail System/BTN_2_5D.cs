@@ -10,9 +10,9 @@ public class BTN_2_5D : MonoBehaviour
     private Camera mainCam;
 
     [Header("Textures")]
-    [SerializeField] private Texture2D T_Default;
-    [SerializeField] private Texture2D T_Hover;
-    [SerializeField] private Texture2D T_Clicked;
+    [SerializeField] protected Texture2D T_Default;
+    [SerializeField] protected Texture2D T_Hover;
+    [SerializeField] protected Texture2D T_Clicked;
 
     [Header("Input Actions")]
     [SerializeField] private InputActionReference pointAction;
@@ -129,6 +129,14 @@ public class BTN_2_5D : MonoBehaviour
     {
         m_Material.SetFloat(EmissionStrengthID, emission);
         m_Material.SetTexture(CurrentTextureID, tex);
+    }
+
+    public void SetBTNSprite(Texture2D _default, Texture2D _hover, Texture2D _clicked) {
+        T_Default = _default;
+        T_Hover = _hover;
+        T_Clicked = _clicked;
+
+        SetMaterial(0f, T_Default);
     }
 
     private void OnDestroy()

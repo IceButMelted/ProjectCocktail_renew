@@ -5,7 +5,7 @@ using static E_Cocktail;
 
 public class VisualizeCocktail : MonoBehaviour
 {
-    private CocktailMaker cocktailMaker;
+    private CocktailShaker cocktailMaker;
 
     public Image alcohol_fill;
     public Image mixer_fill;
@@ -29,7 +29,7 @@ public class VisualizeCocktail : MonoBehaviour
 
     private void Awake()
     {
-        cocktailMaker = FindFirstObjectByType<CocktailMaker>();
+        cocktailMaker = FindFirstObjectByType<CocktailShaker>();
         
     }
 
@@ -41,9 +41,6 @@ public class VisualizeCocktail : MonoBehaviour
         alcohol_fill.fillAmount = (float)currentCocktail.GetTotalAlcohol() / 10;
         mixer_fill.fillAmount = ((float)currentCocktail.GetTotalMixer() / 10) + (float)alcohol_fill.fillAmount;
 
-
-        //Debug.Log($"Alcohol Fill Amount: {alcohol_fill.fillAmount}");
-        //Debug.Log($"Mixer Fill Amount: {mixer_fill.fillAmount}");
     }
 
     public void ResetVisualBars() {

@@ -1,20 +1,108 @@
-﻿title : TestIf
+﻿// bar410_gameloop.yarn
+
+// ================================================================
+//  Step 1 + 2: Small talk → get order
+// ================================================================
+
+title: SmallTalkAndOrder
 ---
-<<set $gold_amount to 5>>
-<<set $reputation to 10>>
-<<if $gold_amount >= 5 and $reputation >= 8>>
-    // The player is both rich and popular
-    Merchant: You're rich enough and popular enough for me to serve you!
-    <<set $reputation = $reputation + $reputation>>
-<<elseif $gold_amount >= 10 or $reputation >= 10>>
-    // The player is either rich enough or popular enough to serve
-    Merchant: I wouldn't normally, but I'll serve you!
+// <<declare>> must live inside a node, not outside
+<<declare $satisfaction  = "Fail">>
+<<declare $minigame_win  = false>>
+<<declare $cocktail_type = "Any">>
+
+Narrator: A customer walks up to the bar and sits down.
+
+Alex: Hey there. Busy night, huh?
+
+-> Yeah, pretty packed.
+    Alex: Ha, tell me about it. I could really use a drink.
+-> Slow night actually.
+    Alex: Really? Seems lively to me.
+
+Alex: Anyway, could I get something?
+
+<<set_order "LowAlcohol">>
+
+Alex: I'll have something to drink, please.
+
+<<jump MakeCocktail>>
+===
+
+// ================================================================
+//  Step 3: Making the cocktail
+// ================================================================
+
+title: MakeCocktail
+---
+Narrator: Time to make the drink. Add your ingredients, then shake or stir.
+
+<<play_minigame "Shaking">>
+
+<<if $minigame_win>>
+    Narrator: A perfect shake!
 <<else>>
-    // The player is dirt
-    Merchant: You're neither rich enough nor important enough for me to serve!
+    Narrator: That didn't feel quite right...
 <<endif>>
-Guard: You're not allowed in!
--> Sure I am! The boss knows me! <<if $reputation > 10>>
--> Please?
--> I'll come back later.
+
+<<jump ServeCocktail>>
+===
+
+// ================================================================
+//  Step 3c + 4: Serve + reaction
+// ================================================================
+
+title: ServeCocktail
+---
+<<serve_cocktail>>
+
+<<if $satisfaction == "Perfect">>
+    <<jump React_Perfect>>
+<<elseif $satisfaction == "Acceptable">>
+    <<jump React_Acceptable>>
+<<else>>
+    <<jump React_Fail>>
+<<endif>>
+===
+
+// ================================================================
+//  Step 4: After-serve reactions
+// ================================================================
+
+title: React_Perfect
+---
+Alex: Wow. This is exactly what I needed. You're good at this.
+Narrator: Alex looks genuinely impressed.
+<<jump ContinueStory>>
+===
+
+title: React_Acceptable
+---
+Alex: Mm, not bad. Something's a little off, but it does the job.
+Narrator: Alex takes another sip, looking thoughtful.
+<<jump ContinueStory>>
+===
+
+title: React_Fail
+---
+Alex: Uh... I'm not sure this is right. Did you follow the recipe?
+Narrator: Alex pushes the glass to the side.
+<<jump ContinueStory>>
+===
+
+// ================================================================
+//  Step 5: Continue the story
+// ================================================================
+
+title: ContinueStory
+---
+Alex: So, how long have you worked here?
+
+-> Few months.
+    Alex: You're pretty good for a newcomer.
+-> A few years.
+    Alex: It shows.
+
+Alex: Well, I'll be back. Same time next week.
+Narrator: Alex leaves. Another night at Bar 410.
 ===

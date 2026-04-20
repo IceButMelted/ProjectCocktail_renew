@@ -1,5 +1,8 @@
-﻿using AYellowpaper.SerializedCollections;
-using System;
+﻿// ============================================================
+//  S_Drink — Cocktail data class
+// ============================================================
+
+using AYellowpaper.SerializedCollections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
@@ -8,256 +11,217 @@ using static E_Cocktail;
 [System.Serializable]
 public class S_Drink
 {
+    // ── Fields ─────────────────────────────────────────────
+
     public string Name;
-    public E_Cocktail.TypeOfCocktail AlcoholStrength;
-    public E_Cocktail.Method PreparationMethod;
+    public TypeOfCocktail AlcoholStrength;
+    public Method PreparationMethod;
     public bool AddIce;
     public float Price;
 
-    [Header("Ingrdients")]
-    [SerializedDictionary("Alcohol","Amount")]
-    public SerializedDictionary<Alcohol, int> AlcoholList;
+    [Header("Ingredients")]
+    [SerializedDictionary("Alcohol", "Amount")]
+    public SerializedDictionary<Alcohol, int> AlcoholList = new SerializedDictionary<Alcohol, int>();
+
     [SerializedDictionary("Mixer", "Amount")]
-    public SerializedDictionary<Mixer, int> MixerList;
-    [SerializeField]
+    public SerializedDictionary<Mixer, int> MixerList = new SerializedDictionary<Mixer, int>();
+
     public List<GlassType> CompatibleGlasses = new List<GlassType>();
 
+    /// <summary>Visual representation of this cocktail. Set via SO_Cocktails.</summary>
+    public Texture2D CocktailSprite;
+
+    // ── Constants ──────────────────────────────────────────
+
     private const int MAX_TOTAL_PARTS = 10;
+    private const float DEFAULT_PRICE = 5f;
+    private const string NO_MATCH_NAME = "NOT MATCH ANY";
 
+    // ── Validation ─────────────────────────────────────────
+
+    /// <summary>Returns true when total ingredient parts are below the cap.</summary>
     public bool IsValidRatio()
+        => AlcoholList.Values.Sum() + MixerList.Values.Sum() < MAX_TOTAL_PARTS;
+
+    // ── Update Derived Fields ──────────────────────────────
+
+    /// <summary>
+    /// Derives Name by matching this drink against a recipe list.
+    /// If no match is found, sets Name to "NOT MATCH ANY".
+    /// Same lookup logic as GetTypeOfAlcohol(List).
+    /// </summary>
+    public void UpdateName(List<S_Drink> recipes)
     {
-        int total = AlcoholList.Values.Sum() + MixerList.Values.Sum();
-        //Debug.Log(total <= MAX_TOTAL_PARTS);
-        return total < MAX_TOTAL_PARTS; 
+        var match = recipes?.FirstOrDefault(r =>
+            r.IngredientsMatch(this) 
+            //&&
+            //r.PreparationMethod == PreparationMethod &&
+            //r.AddIce == AddIce
+            );
+
+        Name = match != null ? match.Name : NO_MATCH_NAME;
     }
 
     /// <summary>
-    /// Give info of Cocktail
+    /// Derives Price by matching this drink against a recipe list.
+    /// If no match is found, sets Price to the default (5).
     /// </summary>
-    /// <returns></returns>
-    public string GetOfCocktailInfo() {
-        string info = "";
-        info += Name + "\n";
-        info += $"Type : {AlcoholStrength.ToString()} \nMethod : {PreparationMethod.ToString()}";
-        info += $"\nIce : {AddIce}";
-        info += $"\nPrice :{Price}";
+    public void UpdatePrice(List<S_Drink> recipes)
+    {
+        var match = recipes?.FirstOrDefault(r =>
+            r.IngredientsMatch(this) &&
+            r.PreparationMethod == PreparationMethod &&
+            r.AddIce == AddIce);
 
-        info += "\nAlcohol";
-        foreach (var item in AlcoholList)
-        {
-            info += $"\n{item.Key.ToString()} : {item.Value.ToString()}";
-        }
-
-        info += "\nMixer";
-        foreach (var item in MixerList)
-        {
-            info += $"\n{item.Key.ToString()} : {item.Value.ToString()}";
-        }
-
-
-        return info;
+        Price = match != null ? match.Price : DEFAULT_PRICE;
     }
 
+    /// <summary>Derives AlcoholStrength from actual alcohol parts in the drink.</summary>
+    public void UpdateTypeOfAlcohol() => AlcoholStrength = GetTypeOfAlcohol();
+
+    /// <summary>Derives AlcoholStrength by looking up this drink in a recipe list.</summary>
+    public void UpdateTypeOfAlcohol(List<S_Drink> recipes) => AlcoholStrength = GetTypeOfAlcohol(recipes);
+
+    // ── Queries ────────────────────────────────────────────
+
+    public int GetTotalAlcohol() => AlcoholList.Values.Sum();
+    public int GetTotalMixer() => MixerList.Values.Sum();
+    public int GetTotalIngredient() => GetTotalAlcohol() + GetTotalMixer();
+
+    /// <summary>Calculates AlcoholStrength from actual parts (>= 5 = High, > 0 = Low, else None).</summary>
+    public TypeOfCocktail GetTypeOfAlcohol()
+    {
+        int total = GetTotalAlcohol();
+        if (total >= 5) return TypeOfCocktail.HighAlcohol;
+        if (total > 0) return TypeOfCocktail.LowAlcohol;
+        return TypeOfCocktail.NoneAlcohol;
+    }
+
+    /// <summary>Resolves AlcoholStrength from an external recipe list, falls back to calculated value.</summary>
+    public TypeOfCocktail GetTypeOfAlcohol(List<S_Drink> recipes)
+    {
+        var match = recipes?.FirstOrDefault(r => r.Name == Name);
+        return match != null ? match.AlcoholStrength : GetTypeOfAlcohol();
+    }
+
+    // ── Comparison ─────────────────────────────────────────
+
     /// <summary>
-    /// Compare this Drink to Other Drink
+    /// Compares this drink to another.
+    /// technicalOnly = true skips Price and GlassType.
     /// </summary>
-    /// <param name="other">Other Drink that get to Compare</param>
-    /// <param name="technicalOnly">true = Not count Price and GlassType</param>
     public bool Check(S_Drink other, bool technicalOnly = true)
     {
         if (other == null) return false;
 
-        // เช็ค property หลัก
-        bool technicalMatch =
-            AddIce == other.AddIce &&
-            PreparationMethod == other.PreparationMethod &&
-            IngredientsMatch(other);
+        bool technical = AddIce == other.AddIce &&
+                         PreparationMethod == other.PreparationMethod &&
+                         IngredientsMatch(other);
 
-        if (technicalOnly) return technicalMatch;
+        if (technicalOnly) return technical;
 
-        // เช็คครบทุกอย่าง รวม Price และ GlassType
-        bool priceMatch = Mathf.Approximately(Price, other.Price);
-        bool glassMatch = CompatibleGlasses.OrderBy(g => g)
-                                           .SequenceEqual(other.CompatibleGlasses.OrderBy(g => g));
-
-        return technicalMatch && priceMatch && glassMatch;
+        return technical &&
+               Mathf.Approximately(Price, other.Price) &&
+               CompatibleGlasses.OrderBy(g => g).SequenceEqual(other.CompatibleGlasses.OrderBy(g => g));
     }
 
-    /// <summary>
-    /// Calculate Satisfaction with recipe BP
-    /// </summary>
-    /// <param name="recipe">Recipe that customer want</param>
+    /// <summary>Calculates customer satisfaction against a target recipe.</summary>
     public Satisfaction CalculateSatisfaction(S_Drink recipe)
     {
-        int ingredientErrors = CountIngredientErrors(recipe);
+        int errors = CountIngredientErrors(recipe);
 
-        // Perfect: ทุกอย่างถูกต้อง (ไม่นับ Price/Glass)
-        if (AddIce == recipe.AddIce &&
-            PreparationMethod == recipe.PreparationMethod &&
-            ingredientErrors == 0)
-        {
+        bool methodMatch = AddIce == recipe.AddIce && PreparationMethod == recipe.PreparationMethod;
+
+        if (methodMatch && errors == 0)
             return Satisfaction.Perfect;
-        }
 
-        // Acceptable: น้ำแข็งผิด หรือ วิธีชงผิด หรือ ส่วนผสมผิดเพียง 1 อย่าง
-        bool minorError = (AddIce != recipe.AddIce) ||
-                          (PreparationMethod != recipe.PreparationMethod) ||
-                          (ingredientErrors == 1);
-
-        if (minorError && ingredientErrors <= 1)
+        if ((!methodMatch || errors == 1) && errors <= 1)
             return Satisfaction.Acceptable;
 
-        // Fail: ส่วนผสมผิดมากกว่า 1 อย่าง
         return Satisfaction.Fail;
     }
 
-    /// <summary>
-    /// Overload 1: กำหนด TypeOfAlcohol จาก recipeList ภายนอก
-    /// (ใช้ตอน Load recipe จาก ScriptableObject)
-    /// </summary>
-    public TypeOfCocktail GetTypeOfAlcohol(List<S_Drink> standardRecipes)
-    {
-        var match = standardRecipes?.FirstOrDefault(r => r.Name == Name);
-        return match != null ? match.AlcoholStrength : GetTypeOfAlcohol();
-    }
+    // ── Mutation ───────────────────────────────────────────
 
-    /// <summary>
-    /// Overload 2: คำนวณ TypeOfAlcohol จากปริมาณ Alcohol ที่มีอยู่จริง
-    /// </summary>
-    public TypeOfCocktail GetTypeOfAlcohol()
-    {
-        int totalAlcohol = AlcoholList.Values.Sum();
-
-        if (totalAlcohol >= 5) return TypeOfCocktail.HighAlcohol;
-        if (totalAlcohol > 0) return TypeOfCocktail.LowAlcohol;
-        return TypeOfCocktail.NoneAlcohol;
-    }
-
-    /// <summary>
-    /// อัปเดต AlcoholStrength field โดยใช้ Overload 2
-    /// </summary>
-    public void UpdateTypeOfAlcohol() => AlcoholStrength = GetTypeOfAlcohol();
-
-    /// <summary>
-    /// Get Total Alcohol
-    /// </summary>
-    /// <returns>Number of Alcohol Ratio</returns>
-    public int GetTotalAlcohol() { 
-        return AlcoholList.Values.Sum();
-    }
-
-    /// <summary>
-    /// Get Total Mixer
-    /// </summary>
-    /// <returns> Number of Mixer Ratio</returns>
-    public int GetTotalMixer() { 
-        return MixerList.Values.Sum();
-    }
-
-    /// <summary>
-    /// Get Total of Ingredient
-    /// </summary>
-    /// <returns>Total of Ingredient</returns>
-    public int GetTotalIngredient() { 
-        return AlcoholList.Values.Sum() + MixerList.Values.Sum();
-    }
-
-    /// <summary>
-    /// Try to Add Alcohol to S_Drink
-    /// </summary>
-    /// <param name="alcohol">Alcohol that want to Add</param>
-    /// <param name="amount">Amount of Shot that want to add</param>
+    /// <summary>Adds alcohol if the total ingredient cap allows it.</summary>
     public void TryToAddAlcohol(Alcohol alcohol, int amount)
     {
-
-        if (!IsValidRatio())
-            return;
-
-        Debug.Log($"Add {alcohol} for {amount} shot");
-
-        if (AlcoholList.ContainsKey(alcohol))
-        {
-            AlcoholList[alcohol] += amount;
-        }
-        else
-        {
-            AlcoholList.Add(alcohol, amount);
-        }
-
+        if (!IsValidRatio()) return;
+        AlcoholList[alcohol] = AlcoholList.TryGetValue(alcohol, out int current) ? current + amount : amount;
+        Debug.Log($"[S_Drink] Added {amount}x {alcohol}");
     }
 
-    /// <summary>
-    /// Try to Add Mixer to S_Drink
-    /// </summary>
-    /// <param name="mixer">Mixer that want to Add</param>
-    /// <param name="amount">Amount of Shot that want to add</param>
+    /// <summary>Adds mixer if the total ingredient cap allows it.</summary>
     public void TryToAddMixer(Mixer mixer, int amount)
     {
-        if (!IsValidRatio())
-            return;
-
-        Debug.Log($"Add {mixer} for {amount} shot");
-
-        if (MixerList.ContainsKey(mixer))
-        {
-            MixerList[mixer] += amount;
-        }
-        else
-        {
-            MixerList.Add(mixer, amount);
-        }
-
+        if (!IsValidRatio()) return;
+        MixerList[mixer] = MixerList.TryGetValue(mixer, out int current) ? current + amount : amount;
+        Debug.Log($"[S_Drink] Added {amount}x {mixer}");
     }
 
-    /// <summary>
-    /// ตรวจว่า Dictionary ของส่วนผสมตรงกันทุก key/value หรือไม่
-    /// </summary>
-    private bool IngredientsMatch(S_Drink other)
+    // ── Debug ──────────────────────────────────────────────
+
+    public string GetOfCocktailInfo()
     {
-        return DictEquals(AlcoholList, other.AlcoholList) &&
-               DictEquals(MixerList, other.MixerList);
+        var sb = new System.Text.StringBuilder();
+        sb.AppendLine(Name);
+        sb.AppendLine($"Type: {AlcoholStrength} | Method: {PreparationMethod} | Ice: {AddIce} | Price: {Price}");
+        sb.Append("Alcohol: ");
+        sb.AppendLine(string.Join(", ", AlcoholList.Select(kv => $"{kv.Key}x{kv.Value}")));
+        sb.Append("Mixer:   ");
+        sb.AppendLine(string.Join(", ", MixerList.Select(kv => $"{kv.Key}x{kv.Value}")));
+        return sb.ToString();
     }
 
+    // ── Private Helpers ────────────────────────────────────
+
+    // Promoted to public so GetCocktailTexture can be called from outside
+    // (e.g. recipes[i].IngredientsMatch(playerDrink) in SO_Cocktails)
+    public bool IngredientsMatch(S_Drink other)
+        => DictEquals(AlcoholList, other.AlcoholList) &&
+           DictEquals(MixerList, other.MixerList);
+
     /// <summary>
-    /// นับจำนวนส่วนผสมที่ปริมาณไม่ตรงกับ recipe
-    /// (รวมทั้ง Alcohol และ Mixer)
+    /// Returns the CocktailSprite of the first recipe that matches
+    /// this drink's ingredients, method, and ice.
+    /// Returns null if no recipe matches.
     /// </summary>
+    public Texture2D GetCocktailTexture(List<S_Drink> recipes)
+    {
+        var match = recipes?.FirstOrDefault(r =>
+            r.IngredientsMatch(this) 
+            //&&
+            //r.PreparationMethod == PreparationMethod &&
+            //r.AddIce == AddIce
+            );
+
+        return match?.CocktailSprite;
+    }
+
     private int CountIngredientErrors(S_Drink recipe)
-    {
-        int errors = 0;
-        errors += CountDictErrors(AlcoholList, recipe.AlcoholList);
-        errors += CountDictErrors(MixerList, recipe.MixerList);
-        return errors;
-    }
+        => CountDictErrors(AlcoholList, recipe.AlcoholList) +
+           CountDictErrors(MixerList, recipe.MixerList);
 
-    private static bool DictEquals<TKey, TValue>(Dictionary<TKey, TValue> a, Dictionary<TKey, TValue> b)
+    private static bool DictEquals<TKey, TVal>(
+        IDictionary<TKey, TVal> a, IDictionary<TKey, TVal> b)
     {
         if (a.Count != b.Count) return false;
         foreach (var kv in a)
-        {
-            if (!b.TryGetValue(kv.Key, out var val)) return false;
-            if (!EqualityComparer<TValue>.Default.Equals(kv.Value, val)) return false;
-        }
+            if (!b.TryGetValue(kv.Key, out var val) ||
+                !EqualityComparer<TVal>.Default.Equals(kv.Value, val)) return false;
         return true;
     }
 
-    /// <summary>
-    /// Cont Key different or have in other dict but not have in anoter
-    /// </summary>
     private static int CountDictErrors<TKey>(
-        Dictionary<TKey, int> player, Dictionary<TKey, int> recipe)
+        IDictionary<TKey, int> player, IDictionary<TKey, int> recipe)
     {
-        int errors = 0;
-        var allKeys = new HashSet<TKey>(player.Keys);
-        allKeys.UnionWith(recipe.Keys);
-
-        foreach (var key in allKeys)
+        var keys = new HashSet<TKey>(player.Keys);
+        keys.UnionWith(recipe.Keys);
+        return keys.Count(k =>
         {
-            player.TryGetValue(key, out int pVal);
-            recipe.TryGetValue(key, out int rVal);
-            if (pVal != rVal) errors++;
-        }
-        return errors;
+            player.TryGetValue(k, out int p);
+            recipe.TryGetValue(k, out int r);
+            return p != r;
+        });
     }
-
 }

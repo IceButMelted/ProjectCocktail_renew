@@ -38,12 +38,14 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
     // ── Private ────────────────────────────────────────────
 
     private CameraController _camera;
+    private CocktailSystemManager _cocktailSystemManager;
 
     // ── Initialization ─────────────────────────────────────
 
-    public void Initialize(CameraController cam)
+    public void Initialize(CameraController cam, CocktailSystemManager cocktailSystemManager)
     {
         _camera = cam;
+        _cocktailSystemManager = cocktailSystemManager;
         IsRunning = false;
     }
 
@@ -92,7 +94,9 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
     public virtual void EndGame()
     {
         IsRunning = false;
+        _cocktailSystemManager?.OnApplyCocktail.Invoke();
         _camera.SetCanRotateCamera(true);
+
     }
 
     public virtual string GetGameState()
@@ -103,6 +107,7 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
     protected void FireEndEvent(bool success)
     {
         EndGame();
+        
         OnGameEnd?.Invoke(success);
     }
 

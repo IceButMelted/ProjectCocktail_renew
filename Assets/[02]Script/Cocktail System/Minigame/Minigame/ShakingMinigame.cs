@@ -16,6 +16,8 @@ public class ShakingMinigame : BaseMiniGame
     [SerializeField] private Slider _progressSlider;
     [SerializeField] private Slider _targetZoneSlider; // handle visually marks the zone
 
+    
+
     // ── Runtime State ──────────────────────────────────────
 
     public float GaugeValue { get; private set; }
@@ -98,6 +100,8 @@ public class ShakingMinigame : BaseMiniGame
     {
         base.EndGame();
         Debug.Log($"Shaking Ended | Gauge={GaugeValue:F2} | Progress={TimeInZone:F2} | {CurrentState}");
+    
+        
     }
 
     protected override void ResetGame()

@@ -1,32 +1,30 @@
-﻿using UnityEngine;
+﻿// ============================================================
+//  MinigameSystemManager — updated
+//  Added GetShakingMinigame() / GetMixingMinigame() so
+//  GameLoopManager can subscribe to OnGameEnd before starting.
+// ============================================================
+
+using UnityEngine;
 using static E_Cocktail;
 
-/// <summary>
-/// Owns all minigame instances, drives the active one each frame,
-/// and exposes public entry points for external systems (e.g. BeverageManager).
-/// </summary>
 public class MinigameSystemManager : MonoBehaviour
 {
-    // ── Inspector ──────────────────────────────────────────
-
     [Header("Camera")]
     [SerializeField] private CameraController _cocktailCamera;
-
-    // ── Private ────────────────────────────────────────────
+    [SerializeField] private CocktailSystemManager cocktailSystemManager;
 
     private ShakingMinigame _shakingMinigame;
     private MixingMinigame _mixingMinigame;
     private BaseMiniGame _activeMinigame;
-
-    // ── Unity Lifecycle ────────────────────────────────────
+    
 
     private void Awake()
     {
         _shakingMinigame = GetComponent<ShakingMinigame>();
-        _shakingMinigame.Initialize(_cocktailCamera);
+        _shakingMinigame.Initialize(_cocktailCamera, cocktailSystemManager);
 
         _mixingMinigame = GetComponent<MixingMinigame>();
-        _mixingMinigame.Initialize(_cocktailCamera);
+        _mixingMinigame.Initialize(_cocktailCamera, cocktailSystemManager);
 
         _activeMinigame = _shakingMinigame;
     }
@@ -41,11 +39,8 @@ public class MinigameSystemManager : MonoBehaviour
             Debug.LogWarning("MinigameSystemManager: No active minigame assigned.");
             return;
         }
-
         _activeMinigame.ProcessedGame();
     }
-
-    // ── Public API ─────────────────────────────────────────
 
     public void StartShakingMinigame()
     {
@@ -59,7 +54,9 @@ public class MinigameSystemManager : MonoBehaviour
         _activeMinigame.StartGame();
     }
 
-    // ── Private Helpers ────────────────────────────────────
+    // Accessors for GameLoopManager to subscribe OnGameEnd before starting
+    public ShakingMinigame GetShakingMinigame() => _shakingMinigame;
+    public MixingMinigame GetMixingMinigame() => _mixingMinigame;
 
     private void SwitchTo(BaseMiniGame next)
     {
