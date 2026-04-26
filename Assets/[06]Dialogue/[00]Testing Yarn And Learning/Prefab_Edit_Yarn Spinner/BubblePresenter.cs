@@ -2,22 +2,22 @@
  * BubblePresenter.cs
  * Based on LinePresenter.cs from YarnSpinner-Unity (current branch)
  *
- * Extends DialoguePresenterBase to display dialogue lines as speech bubbles.
- * The bubble RectTransform anchor/pivot is repositioned based on the speaker:
+ * The "Bubble Presenter" GameObject itself does NOT move.
+ * Instead, a separate child RectTransform ("bubbleContentRect") is shifted
+ * left / center / right by changing its anchorMin/Max and pivot, then
+ * resetting anchoredPosition to 0 so it snaps flush.
  *
- *   "Player"   → anchored LEFT   (pivot X = 0, anchor X = 0)
- *   "Narrator" → anchored CENTER (pivot X = 0.5, anchor X = 0.5)
- *   "NPC"      → anchored RIGHT  (pivot X = 1, anchor X = 1)
+ * Assign in Inspector:
+ *   bubbleRect        → the child RectTransform to reposition (e.g. Background,
+ *                        or a "BubbleContent" wrapper that holds Background + Text)
+ *   NOT the root Bubble Presenter RectTransform itself.
  *
- * Requires a BubblePresenterButtonHandler on the same (or any child) GameObject.
- * The presenter WAITS for the player to click before advancing — no auto-advance.
- *
- * Click behaviour (mirrors LinePresenterButtonHandler):
- *   • While typewriter is running  → click HURRIES (shows full text immediately).
- *   • Once text is fully displayed → click ADVANCES to next line.
+ * Character alignment:
+ *   "Player"   → LEFT   (anchor/pivot X = 0)
+ *   "Narrator" → CENTER (anchor/pivot X = 0.5)
+ *   "NPC"      → RIGHT  (anchor/pivot X = 1)
  */
 
-using System.Threading;
 using TMPro;
 using UnityEngine;
 using Yarn.Unity;
@@ -29,7 +29,9 @@ namespace YarnSpinner.Custom
         // ── Inspector ────────────────────────────────────────────────────────
 
         [Header("Bubble References")]
-        [Tooltip("The root RectTransform of the bubble panel that gets repositioned.")]
+        [Tooltip("The CHILD RectTransform to reposition left/center/right " +
+                 "(e.g. Background, or a BubbleContent wrapper). " +
+                 "Do NOT assign the root Bubble Presenter RectTransform here.")]
         [SerializeField] private RectTransform bubbleRect;
 
         [Tooltip("TextMeshPro label that shows the dialogue line text.")]
@@ -38,7 +40,8 @@ namespace YarnSpinner.Custom
         [Tooltip("(Optional) TextMeshPro label that shows the character name.")]
         [SerializeField] private TMP_Text characterNameText;
 
-        [Tooltip("(Optional) Root GameObject of the whole bubble — shown/hidden per line.")]
+        [Tooltip("Root GameObject of the whole bubble — shown/hidden per line. " +
+                 "Usually the Bubble Presenter GameObject itself.")]
         [SerializeField] private GameObject bubbleContainer;
 
         [Header("Typewriter")]
@@ -49,12 +52,12 @@ namespace YarnSpinner.Custom
         [SerializeField] private float typewriterSpeed = 60f;
 
         [Header("Input Handler")]
-        [Tooltip("Drag the BubblePresenterButtonHandler component here. " +
-                 "It manages click input and the continue indicator.")]
+        [Tooltip("BubblePresenterButtonHandler that manages click input. " +
+                 "Auto-found in children if left empty.")]
         [SerializeField] private BubblePresenterButtonHandler buttonHandler;
 
         [Header("Alignment Fallback")]
-        [Tooltip("Alignment used when the character name is not Player / NPC / Narrator.")]
+        [Tooltip("Alignment used for any character name not in the list.")]
         [SerializeField] private BubbleAlignment defaultAlignment = BubbleAlignment.Center;
 
         // ── Types ────────────────────────────────────────────────────────────
@@ -67,7 +70,6 @@ namespace YarnSpinner.Custom
         {
             SetBubbleVisible(false);
 
-            // Auto-find handler on the same GameObject if not assigned
             if (buttonHandler == null)
                 buttonHandler = GetComponentInChildren<BubblePresenterButtonHandler>();
         }
@@ -85,33 +87,35 @@ namespace YarnSpinner.Custom
 
         public override async YarnTask RunLineAsync(LocalizedLine line, LineCancellationToken token)
         {
-            // ── 1. Notify handler that a new line is starting ──────────────
+            // ── 1. New line starting ───────────────────────────────────────
             buttonHandler?.OnLineBegin();
 
-            // ── 2. Resolve alignment from character name ───────────────────
+            // ── 2. Resolve and apply alignment ────────────────────────────
             string characterName = line.CharacterName;
+            Debug.Log(characterName);
             ApplyAlignment(ResolveAlignment(characterName));
 
-            // ── 3. Update name label ───────────────────────────────────────
+            // ── 3. Update character name label ────────────────────────────
             if (characterNameText != null)
-                characterNameText.text = string.IsNullOrEmpty(characterName) ? string.Empty : characterName;
+                characterNameText.text = string.IsNullOrEmpty(characterName)
+                    ? string.Empty
+                    : characterName;
 
-            // ── 4. Show bubble ─────────────────────────────────────────────
+            // ── 4. Show bubble ────────────────────────────────────────────
             string lineBody = line.TextWithoutCharacterName.Text;
             SetBubbleVisible(true);
 
-            // ── 5. Typewriter ──────────────────────────────────────────────
+            // ── 5. Typewriter ─────────────────────────────────────────────
             if (useTypewriterEffect && lineText != null)
             {
                 lineText.text = lineBody;
                 lineText.maxVisibleCharacters = 0;
-
                 int totalChars = lineBody.Length;
 
                 for (int i = 0; i <= totalChars; i++)
                 {
-                    // YarnSpinner external next-line signal — dismiss immediately
-                    if (token.IsNextLineRequested)
+                    // External next-line → dismiss immediately
+                    if (token.IsNextContentRequested)
                     {
                         lineText.maxVisibleCharacters = totalChars;
                         buttonHandler?.OnLineDismiss();
@@ -119,11 +123,11 @@ namespace YarnSpinner.Custom
                         return;
                     }
 
-                    // YarnSpinner hurry-up (e.g. LineAdvancer) OR player first click
+                    // Hurry up: YarnSpinner signal OR player first-click
                     if (token.IsHurryUpRequested ||
                         (buttonHandler != null && buttonHandler.IsHurryUpRequested))
                     {
-                        break; // show full text below
+                        break;
                     }
 
                     lineText.maxVisibleCharacters = i;
@@ -135,7 +139,6 @@ namespace YarnSpinner.Custom
                     ).SuppressCancellationThrow();
                 }
 
-                // Ensure all characters are visible
                 lineText.maxVisibleCharacters = totalChars;
             }
             else
@@ -150,28 +153,19 @@ namespace YarnSpinner.Custom
             // ── 6. Typewriter done — show continue indicator ───────────────
             buttonHandler?.OnTypewriterComplete();
 
-            // ── 7. Wait for player click OR external advance ───────────────
-            //
-            // Poll each frame. Exits when:
-            //   a) Player clicked  → buttonHandler.IsAdvanceRequested == true
-            //   b) YarnSpinner signals next line externally (LineAdvancer, etc.)
-            //        → token.IsNextLineRequested == true
-            //
-            // We yield with a zero-duration Delay so we don't spin the CPU.
-            // token.NextLineToken cancels the Delay automatically when YS moves on.
-
-            while (!token.IsNextLineRequested)
+            // ── 7. Wait for player click or external advance ───────────────
+            while (!token.IsNextContentRequested)
             {
                 if (buttonHandler != null && buttonHandler.IsAdvanceRequested)
                     break;
 
                 await YarnTask.Delay(
                     System.TimeSpan.FromSeconds(0),
-                    token.NextLineToken
+                    token.NextContentToken
                 ).SuppressCancellationThrow();
             }
 
-            // ── 8. Dismiss ─────────────────────────────────────────────────
+            // ── 8. Dismiss ────────────────────────────────────────────────
             buttonHandler?.OnLineDismiss();
             SetBubbleVisible(false);
         }
@@ -193,36 +187,46 @@ namespace YarnSpinner.Custom
         }
 
         /// <summary>
-        /// Repositions bubbleRect's anchor and pivot horizontally.
-        ///   Left   → X = 0  |  Center → X = 0.5  |  Right → X = 1
-        /// Y values are untouched.
+        /// Moves bubbleRect to the left, centre, or right of its parent by
+        /// locking the anchor to centre-centre and computing anchoredPosition
+        /// from the parent's actual pixel width at runtime.
+        ///
+        ///   Left   → flush to left  edge of parent
+        ///   Center → centred in parent
+        ///   Right  → flush to right edge of parent
+        ///
+        /// Y position and height are never changed.
         /// </summary>
         private void ApplyAlignment(BubbleAlignment alignment)
         {
             if (bubbleRect == null) return;
 
-            float x = alignment switch
+            // Lock anchor + pivot X to centre so anchoredPosition is always
+            // relative to the parent's centre — stable regardless of design-time setup.
+            bubbleRect.anchorMin = new Vector2(0.5f, bubbleRect.anchorMin.y);
+            bubbleRect.anchorMax = new Vector2(0.5f, bubbleRect.anchorMax.y);
+            bubbleRect.pivot     = new Vector2(0.5f, bubbleRect.pivot.y);
+
+            // Read parent width at runtime (accounts for Canvas scaling).
+            float parentWidth = 0f;
+            if (bubbleRect.parent is RectTransform parentRect)
+                parentWidth = parentRect.rect.width;
+
+            float bubbleWidth = bubbleRect.rect.width;
+
+            // Half the gap between bubble edge and parent edge.
+            float maxOffset = (parentWidth - bubbleWidth) * 0.5f;
+
+            float targetX = alignment switch
             {
-                BubbleAlignment.Left   => 0f,
-                BubbleAlignment.Center => 0.5f,
-                BubbleAlignment.Right  => 1f,
-                _                      => 0.5f
+                BubbleAlignment.Left   => -maxOffset,   // move left
+                BubbleAlignment.Center =>  0f,          // stay centre
+                BubbleAlignment.Right  => +maxOffset,   // move right
+                _                      =>  0f
             };
 
-            Vector2 anchorMin = bubbleRect.anchorMin;
-            Vector2 anchorMax = bubbleRect.anchorMax;
-            Vector2 pivot     = bubbleRect.pivot;
-
-            anchorMin.x = x;
-            anchorMax.x = x;
-            pivot.x     = x;
-
-            bubbleRect.anchorMin = anchorMin;
-            bubbleRect.anchorMax = anchorMax;
-            bubbleRect.pivot     = pivot;
-
             Vector2 pos = bubbleRect.anchoredPosition;
-            pos.x = 0f;
+            pos.x = targetX;
             bubbleRect.anchoredPosition = pos;
         }
 
