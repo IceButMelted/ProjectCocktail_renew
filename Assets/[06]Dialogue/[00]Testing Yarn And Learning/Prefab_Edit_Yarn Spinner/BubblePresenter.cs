@@ -2,22 +2,36 @@
  * BubblePresenter.cs
  * Based on LinePresenter.cs from YarnSpinner-Unity (current branch)
  *
- * The "Bubble Presenter" GameObject itself does NOT move.
- * Instead, a separate child RectTransform ("bubbleContentRect") is shifted
- * left / center / right by changing its anchorMin/Max and pivot, then
- * resetting anchoredPosition to 0 so it snaps flush.
+ * Scene hierarchy expected:
+ *   Canvas
+ *   └── Bubble Presenter          (Stretch/Stretch, anchors 0,0 → 1,1)
+ *       └── BubbleContainer       (middle/center, anchor 0.5,0.5 pivot 0.5,0.5)
+ *           ├── Background
+ *           ├── Character Name
+ *           ├── Text
+ *           ├── Button Container
+ *           │   └── Continue Button
+ *           └── Tail
  *
- * Assign in Inspector:
- *   bubbleRect        → the child RectTransform to reposition (e.g. Background,
- *                        or a "BubbleContent" wrapper that holds Background + Text)
- *   NOT the root Bubble Presenter RectTransform itself.
+ * Inspector: assign BubbleContainer RectTransform to "Bubble Rect".
  *
- * Character alignment:
- *   "Player"   → LEFT   (anchor/pivot X = 0)
- *   "Narrator" → CENTER (anchor/pivot X = 0.5)
- *   "NPC"      → RIGHT  (anchor/pivot X = 1)
+ * ── MODES ────────────────────────────────────────────────────────────────────
+ *
+ *  MODE A  useWorldTargetAlignment = false
+ *    BubbleContainer stays in place (anchoredPosition unchanged).
+ *    Only the alignment label (Left/Center/Right) is resolved from
+ *    the character name — used to pick which side the tail sits on.
+ *
+ *  MODE B  useWorldTargetAlignment = true
+ *    BubbleContainer is moved so it floats ABOVE the speaker's
+ *    world-space Transform, converted to Canvas local space.
+ *    Alignment (Left/Center/Right) is derived from the target's
+ *    screen X position and controls where the tail base sits.
+ *    BubbleContainer anchor/pivot are NEVER changed at runtime.
  */
 
+using System;
+using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using Yarn.Unity;
@@ -26,214 +40,365 @@ namespace YarnSpinner.Custom
 {
     public class BubblePresenter : DialoguePresenterBase
     {
-        // ── Inspector ────────────────────────────────────────────────────────
+        // ─────────────────────────────────────────────────────────────────────
+        // Serialized types
+        // ─────────────────────────────────────────────────────────────────────
 
-        [Header("Bubble References")]
-        [Tooltip("The CHILD RectTransform to reposition left/center/right " +
-                 "(e.g. Background, or a BubbleContent wrapper). " +
-                 "Do NOT assign the root Bubble Presenter RectTransform here.")]
-        [SerializeField] private RectTransform bubbleRect;
-
-        [Tooltip("TextMeshPro label that shows the dialogue line text.")]
-        [SerializeField] private TMP_Text lineText;
-
-        [Tooltip("(Optional) TextMeshPro label that shows the character name.")]
-        [SerializeField] private TMP_Text characterNameText;
-
-        [Tooltip("Root GameObject of the whole bubble — shown/hidden per line. " +
-                 "Usually the Bubble Presenter GameObject itself.")]
-        [SerializeField] private GameObject bubbleContainer;
-
-        [Header("Typewriter")]
-        [Tooltip("Enable typewriter effect.")]
-        [SerializeField] private bool useTypewriterEffect = true;
-
-        [Tooltip("Characters revealed per second.")]
-        [SerializeField] private float typewriterSpeed = 60f;
-
-        [Header("Input Handler")]
-        [Tooltip("BubblePresenterButtonHandler that manages click input. " +
-                 "Auto-found in children if left empty.")]
-        [SerializeField] private BubblePresenterButtonHandler buttonHandler;
-
-        [Header("Alignment Fallback")]
-        [Tooltip("Alignment used for any character name not in the list.")]
-        [SerializeField] private BubbleAlignment defaultAlignment = BubbleAlignment.Center;
-
-        // ── Types ────────────────────────────────────────────────────────────
+        [Serializable]
+        public class CharacterTarget
+        {
+            [Tooltip("Exact character name used in the .yarn script.")]
+            public string characterName;
+            [Tooltip("World-space Transform to track (e.g. character head).")]
+            public Transform worldTarget;
+        }
 
         public enum BubbleAlignment { Left, Center, Right }
 
-        // ── Unity ────────────────────────────────────────────────────────────
+        // ─────────────────────────────────────────────────────────────────────
+        // Inspector
+        // ─────────────────────────────────────────────────────────────────────
+
+        [Header("Bubble References")]
+        [Tooltip("BubbleContainer RectTransform (middle/center, anchor 0.5,0.5).\n" +
+                 "In Mode B its anchoredPosition is moved above the world target.\n" +
+                 "Its anchor and pivot are never changed at runtime.")]
+        [SerializeField] private RectTransform bubbleRect;
+
+        [Tooltip("TMP_Text for the dialogue line body.")]
+        [SerializeField] private TMP_Text lineText;
+
+        [Tooltip("(Optional) TMP_Text for the character name label.")]
+        [SerializeField] private TMP_Text characterNameText;
+
+        [Tooltip("Root GameObject shown/hidden per line (Bubble Presenter itself, " +
+                 "or BubbleContainer — whichever you prefer to toggle).")]
+        [SerializeField] private GameObject bubbleContainer;
+
+        [Header("Tail / Pointer")]
+        [Tooltip("RectTransform of the Tail image (child of BubbleContainer).\n" +
+                 "Sprite should point DOWNWARD naturally.\n" +
+                 "Set its pivot to (0.5, 1) — top-centre.")]
+        [SerializeField] private RectTransform tailImage;
+
+        [Tooltip("Horizontal inset from the bubble left/right edge for the tail base (canvas px).")]
+        [SerializeField] private float tailEdgeInset = 24f;
+
+        [Header("Typewriter")]
+        [SerializeField] private bool useTypewriterEffect = true;
+        [SerializeField] private float typewriterSpeed = 60f;
+
+        [Header("Input Handler")]
+        [Tooltip("Auto-found in children if left empty.")]
+        [SerializeField] private BubblePresenterButtonHandler buttonHandler;
+
+        [Header("Alignment Mode")]
+        [Tooltip("OFF → character-name rules, bubble stays put (Mode A).\n" +
+                 "ON  → bubble moves above the speaker's 3-D Transform (Mode B).")]
+        [SerializeField] private bool useWorldTargetAlignment = false;
+
+        [Tooltip("Canvas-pixel gap between the bubble bottom and the projected target point.")]
+        [SerializeField] private float bubbleAboveTargetOffset = 20f;
+
+        [Tooltip("Fallback when the character name is not in the table (Mode A) " +
+                 "or no world target is found (Mode B).")]
+        [SerializeField] private BubbleAlignment defaultAlignment = BubbleAlignment.Center;
+
+        [Header("World Target Mapping  (Mode B only)")]
+        [Tooltip("One entry per speaking character. Name must match .yarn exactly.")]
+        [SerializeField] private List<CharacterTarget> characterTargets = new();
+
+        [Tooltip("Half-width of the \'center\' zone as a fraction of screen width.\n" +
+                 "0.10 = target between 40 %–60 % of screen width → Center alignment.")]
+        [Range(0.01f, 0.49f)]
+        [SerializeField] private float centerZoneFraction = 0.10f;
+
+        [Header("Bubble Horizontal Shift  (Mode B)")]
+        [Tooltip("When the target is in the LEFT zone (0 %–leftShiftThreshold %), " +
+                 "the bubble shifts RIGHT by this many screen pixels " +
+                 "so it doesn\'t overlap the edge.")]
+        [SerializeField] private float edgeShiftAmount = 80f;
+
+        [Tooltip("Normalised screen X below which the bubble shifts RIGHT. Default 0.30 = 30 %.")]
+        [Range(0f, 0.5f)]
+        [SerializeField] private float leftEdgeThreshold = 0.30f;
+
+        [Tooltip("Normalised screen X above which the bubble shifts LEFT. Default 0.70 = 70 %.")]
+        [Range(0.5f, 1f)]
+        [SerializeField] private float rightEdgeThreshold = 0.70f;
+
+        [Header("Fallback Position  (Mode B, no target found)")]
+        [Tooltip("Normalised screen position (0–1) used when no world target exists.\n" +
+                 "(0.5, 0.5) = screen centre.  Ignored in Mode A.")]
+        [SerializeField] private Vector2 fallbackScreenPointNorm = new Vector2(0.5f, 0.5f);
+
+        [Tooltip("(Optional) Assign a Transform whose screen position is used as the " +
+                 "fallback instead of fallbackScreenPointNorm.\n" +
+                 "Leave empty to use the normalised value above.")]
+        [SerializeField] private Transform fallbackTargetTransform;
+
+        // ─────────────────────────────────────────────────────────────────────
+        // Runtime
+        // ─────────────────────────────────────────────────────────────────────
+
+        private Dictionary<string, Transform> _targetLookup = new();
+        private Canvas   _canvas;
+        private Camera   _renderCam;
+
+        // ─────────────────────────────────────────────────────────────────────
+        // Unity
+        // ─────────────────────────────────────────────────────────────────────
 
         private void Awake()
         {
             SetBubbleVisible(false);
+            SetTailVisible(false);
 
             if (buttonHandler == null)
                 buttonHandler = GetComponentInChildren<BubblePresenterButtonHandler>();
+
+            _targetLookup.Clear();
+            foreach (var e in characterTargets)
+                if (!string.IsNullOrEmpty(e.characterName) && e.worldTarget != null)
+                    _targetLookup[e.characterName] = e.worldTarget;
+
+            _canvas    = GetComponentInParent<Canvas>();
+            _renderCam = (_canvas != null && _canvas.renderMode != RenderMode.ScreenSpaceOverlay)
+                         ? _canvas.worldCamera
+                         : Camera.main;
         }
 
-        // ── DialoguePresenterBase ────────────────────────────────────────────
+        // ─────────────────────────────────────────────────────────────────────
+        // DialoguePresenterBase
+        // ─────────────────────────────────────────────────────────────────────
 
         public override YarnTask OnDialogueStartedAsync() => YarnTask.CompletedTask;
 
         public override YarnTask OnDialogueCompleteAsync()
         {
-            SetBubbleVisible(false);
-            buttonHandler?.OnLineDismiss();
+            Dismiss();
             return YarnTask.CompletedTask;
         }
 
         public override async YarnTask RunLineAsync(LocalizedLine line, LineCancellationToken token)
         {
-            // ── 1. New line starting ───────────────────────────────────────
             buttonHandler?.OnLineBegin();
 
-            // ── 2. Resolve and apply alignment ────────────────────────────
-            string characterName = line.CharacterName;
-            Debug.Log(characterName);
-            ApplyAlignment(ResolveAlignment(characterName));
+            string characterName = line.CharacterName ?? string.Empty;
 
-            // ── 3. Update character name label ────────────────────────────
+            // ── Resolve alignment & position ──────────────────────────────
+            BubbleAlignment alignment;
+
+            if (useWorldTargetAlignment)
+            {
+                bool foundTarget = _targetLookup.TryGetValue(characterName, out Transform worldTarget)
+                                   && worldTarget != null;
+
+                Vector2 screenPos;
+
+                if (foundTarget)
+                {
+                    // ── MODE B — target found ─────────────────────────────
+                    screenPos = WorldToScreenPoint(worldTarget.position);
+                }
+                else
+                {
+                    // ── MODE B — no target → use fallback position ────────
+                    if (fallbackTargetTransform != null)
+                    {
+                        screenPos = WorldToScreenPoint(fallbackTargetTransform.position);
+                    }
+                    else
+                    {
+                        // Normalised → pixel
+                        screenPos = new Vector2(
+                            fallbackScreenPointNorm.x * Screen.width,
+                            fallbackScreenPointNorm.y * Screen.height);
+                    }
+                }
+
+                // Derive tail alignment from screen X
+                alignment = ScreenXToAlignment(screenPos.x);
+
+                // Compute horizontal shift so bubble avoids screen edges
+                float shiftX = ComputeEdgeShift(screenPos.x);
+
+                if (bubbleRect != null)
+                {
+                    bubbleRect.position = new Vector3(
+                        screenPos.x + shiftX,
+                        screenPos.y + bubbleAboveTargetOffset,
+                        0f
+                    );
+                }
+
+                PositionTail(alignment);
+                SetTailVisible(true);
+            }
+            else
+            {
+                // ── MODE A ────────────────────────────────────────────────
+                alignment = ResolveNameAlignment(characterName);
+                SetTailVisible(false);
+            }
+
+            // ── Character name label ──────────────────────────────────────
             if (characterNameText != null)
-                characterNameText.text = string.IsNullOrEmpty(characterName)
-                    ? string.Empty
-                    : characterName;
+                characterNameText.text = characterName;
 
-            // ── 4. Show bubble ────────────────────────────────────────────
+            // ── Show bubble ───────────────────────────────────────────────
             string lineBody = line.TextWithoutCharacterName.Text;
             SetBubbleVisible(true);
 
-            // ── 5. Typewriter ─────────────────────────────────────────────
+            // ── Typewriter ────────────────────────────────────────────────
             if (useTypewriterEffect && lineText != null)
             {
                 lineText.text = lineBody;
                 lineText.maxVisibleCharacters = 0;
-                int totalChars = lineBody.Length;
+                int total = lineBody.Length;
 
-                for (int i = 0; i <= totalChars; i++)
+                for (int i = 0; i <= total; i++)
                 {
-                    // External next-line → dismiss immediately
-                    if (token.IsNextContentRequested)
+                    if (token.IsNextLineRequested)
                     {
-                        lineText.maxVisibleCharacters = totalChars;
-                        buttonHandler?.OnLineDismiss();
-                        SetBubbleVisible(false);
-                        return;
+                        lineText.maxVisibleCharacters = total;
+                        Dismiss(); return;
                     }
 
-                    // Hurry up: YarnSpinner signal OR player first-click
                     if (token.IsHurryUpRequested ||
                         (buttonHandler != null && buttonHandler.IsHurryUpRequested))
-                    {
                         break;
-                    }
 
                     lineText.maxVisibleCharacters = i;
-
                     float delay = typewriterSpeed > 0f ? 1f / typewriterSpeed : 0f;
-                    await YarnTask.Delay(
-                        System.TimeSpan.FromSeconds(delay),
-                        token.HurryUpToken
-                    ).SuppressCancellationThrow();
+                    await YarnTask.Delay(TimeSpan.FromSeconds(delay), token.HurryUpToken)
+                                  .SuppressCancellationThrow();
                 }
-
-                lineText.maxVisibleCharacters = totalChars;
+                lineText.maxVisibleCharacters = total;
             }
-            else
+            else if (lineText != null)
             {
-                if (lineText != null)
-                {
-                    lineText.maxVisibleCharacters = int.MaxValue;
-                    lineText.text = lineBody;
-                }
+                lineText.maxVisibleCharacters = int.MaxValue;
+                lineText.text = lineBody;
             }
 
-            // ── 6. Typewriter done — show continue indicator ───────────────
+            // ── Wait for input ────────────────────────────────────────────
             buttonHandler?.OnTypewriterComplete();
 
-            // ── 7. Wait for player click or external advance ───────────────
-            while (!token.IsNextContentRequested)
+            while (!token.IsNextLineRequested)
             {
-                if (buttonHandler != null && buttonHandler.IsAdvanceRequested)
-                    break;
-
-                await YarnTask.Delay(
-                    System.TimeSpan.FromSeconds(0),
-                    token.NextContentToken
-                ).SuppressCancellationThrow();
+                if (buttonHandler != null && buttonHandler.IsAdvanceRequested) break;
+                await YarnTask.Delay(TimeSpan.FromSeconds(0), token.NextLineToken)
+                              .SuppressCancellationThrow();
             }
 
-            // ── 8. Dismiss ────────────────────────────────────────────────
-            buttonHandler?.OnLineDismiss();
-            SetBubbleVisible(false);
+            Dismiss();
         }
 
-        // ── Helpers ──────────────────────────────────────────────────────────
-
-        private BubbleAlignment ResolveAlignment(string characterName)
-        {
-            if (string.IsNullOrEmpty(characterName))
-                return defaultAlignment;
-
-            return characterName switch
-            {
-                "Player"   => BubbleAlignment.Left,
-                "Narrator" => BubbleAlignment.Center,
-                "NPC"      => BubbleAlignment.Right,
-                _          => defaultAlignment
-            };
-        }
+        // ─────────────────────────────────────────────────────────────────────
+        // Tail
+        // ─────────────────────────────────────────────────────────────────────
 
         /// <summary>
-        /// Moves bubbleRect to the left, centre, or right of its parent by
-        /// locking the anchor to centre-centre and computing anchoredPosition
-        /// from the parent's actual pixel width at runtime.
+        /// Places the tail at the bottom of BubbleContainer.
+        /// Tail pivot = (0.5, 1) means its top-centre anchors to the position,
+        /// and it hangs downward from there.
         ///
-        ///   Left   → flush to left  edge of parent
-        ///   Center → centred in parent
-        ///   Right  → flush to right edge of parent
+        ///   Left   → tail base near bottom-left  corner (inset by tailEdgeInset)
+        ///   Center → tail base at bottom-centre
+        ///   Right  → tail base near bottom-right corner (inset by tailEdgeInset)
         ///
-        /// Y position and height are never changed.
+        /// The tail is a child of BubbleContainer, so these are local coordinates.
+        /// anchorMin/Max (0.5, 0) = horizontally centred, vertically at bottom of parent.
         /// </summary>
-        private void ApplyAlignment(BubbleAlignment alignment)
+        private void PositionTail(BubbleAlignment alignment)
         {
-            if (bubbleRect == null) return;
+            if (tailImage == null || bubbleRect == null) return;
 
-            // Lock anchor + pivot X to centre so anchoredPosition is always
-            // relative to the parent's centre — stable regardless of design-time setup.
-            bubbleRect.anchorMin = new Vector2(0.5f, bubbleRect.anchorMin.y);
-            bubbleRect.anchorMax = new Vector2(0.5f, bubbleRect.anchorMax.y);
-            bubbleRect.pivot     = new Vector2(0.5f, bubbleRect.pivot.y);
+            // Anchor to bottom of BubbleContainer, pivot top-centre
+            tailImage.anchorMin = new Vector2(0.5f, 0f);
+            tailImage.anchorMax = new Vector2(0.5f, 0f);
+            tailImage.pivot     = new Vector2(0.5f, 1f);
 
-            // Read parent width at runtime (accounts for Canvas scaling).
-            float parentWidth = 0f;
-            if (bubbleRect.parent is RectTransform parentRect)
-                parentWidth = parentRect.rect.width;
+            float halfW = bubbleRect.rect.width * 0.5f;
 
-            float bubbleWidth = bubbleRect.rect.width;
-
-            // Half the gap between bubble edge and parent edge.
-            float maxOffset = (parentWidth - bubbleWidth) * 0.5f;
-
-            float targetX = alignment switch
+            float localX = alignment switch
             {
-                BubbleAlignment.Left   => -maxOffset,   // move left
-                BubbleAlignment.Center =>  0f,          // stay centre
-                BubbleAlignment.Right  => +maxOffset,   // move right
+                BubbleAlignment.Left   => -halfW + tailEdgeInset,
+                BubbleAlignment.Center =>  0f,
+                BubbleAlignment.Right  =>  halfW - tailEdgeInset,
                 _                      =>  0f
             };
 
-            Vector2 pos = bubbleRect.anchoredPosition;
-            pos.x = targetX;
-            bubbleRect.anchoredPosition = pos;
+            // Y = 0 → sits exactly on the bottom edge of BubbleContainer
+            tailImage.anchoredPosition = new Vector2(localX, 0f);
+            tailImage.localRotation    = Quaternion.identity; // sprite points down naturally
         }
 
-        private void SetBubbleVisible(bool visible)
+        // ─────────────────────────────────────────────────────────────────────
+        // Alignment helpers
+        // ─────────────────────────────────────────────────────────────────────
+
+        private BubbleAlignment ResolveNameAlignment(string name) => name switch
         {
-            if (bubbleContainer != null)
-                bubbleContainer.SetActive(visible);
+            "Player"   => BubbleAlignment.Left,
+            "Narrator" => BubbleAlignment.Center,
+            "NPC"      => BubbleAlignment.Right,
+            _          => defaultAlignment
+        };
+
+        private BubbleAlignment ScreenXToAlignment(float screenX)
+        {
+            float nx = screenX / Screen.width;
+            if (nx < 0.5f - centerZoneFraction) return BubbleAlignment.Left;
+            if (nx > 0.5f + centerZoneFraction) return BubbleAlignment.Right;
+            return BubbleAlignment.Center;
+        }
+
+        /// <summary>
+        /// Returns a horizontal pixel offset to shift the bubble away from
+        /// the screen edge so it stays readable.
+        ///
+        ///   target in  0 % – leftEdgeThreshold  (default 30 %) → shift RIGHT (+edgeShiftAmount)
+        ///   target in  rightEdgeThreshold – 100 % (default 70 %) → shift LEFT  (-edgeShiftAmount)
+        ///   target in  30 % – 70 %  → no shift (0)
+        /// </summary>
+        private float ComputeEdgeShift(float screenX)
+        {
+            float nx = screenX / Screen.width;
+            if (nx < leftEdgeThreshold)  return +edgeShiftAmount;   // near left  → push right
+            if (nx > rightEdgeThreshold) return -edgeShiftAmount;   // near right → push left
+            return 0f;
+        }
+
+        // ─────────────────────────────────────────────────────────────────────
+        // Coordinate helpers
+        // ─────────────────────────────────────────────────────────────────────
+
+        private Vector2 WorldToScreenPoint(Vector3 worldPos) =>
+            _renderCam != null
+                ? (Vector2)_renderCam.WorldToScreenPoint(worldPos)
+                : Vector2.zero;
+
+        // ─────────────────────────────────────────────────────────────────────
+        // Visibility helpers
+        // ─────────────────────────────────────────────────────────────────────
+
+        private void SetBubbleVisible(bool v)
+        {
+            if (bubbleContainer != null) bubbleContainer.SetActive(v);
+        }
+
+        private void SetTailVisible(bool v)
+        {
+            if (tailImage != null) tailImage.gameObject.SetActive(v);
+        }
+
+        private void Dismiss()
+        {
+            buttonHandler?.OnLineDismiss();
+            SetBubbleVisible(false);
+            SetTailVisible(false);
         }
     }
 }
