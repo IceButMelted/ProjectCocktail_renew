@@ -1,141 +1,93 @@
 using AYellowpaper.SerializedCollections;
-using JetBrains.Annotations;
-using System;
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
-
 using static E_Cocktail;
 
-// Define custom UnityEvent types at the top of your file
-[System.Serializable]
-public class AlcoholEvent : UnityEvent<Alcohol, int> { }
-
-[System.Serializable]
-public class MixerEvent : UnityEvent<Mixer, int> { }
+[System.Serializable] public class AlcoholEvent : UnityEvent<Alcohol, int> { }
+[System.Serializable] public class MixerEvent   : UnityEvent<Mixer, int>   { }
 
 public class CocktailShaker : BTN_2_5D
 {
+    [Header("Default Texture")]
     public Texture2D ShakerSprite;
 
-    [Header("Add Ingredient")]
-    public UnityEvent OnAddIngredient;
-    public AlcoholEvent OnAddAlcohol;  // New typed event
-    public MixerEvent OnAddMixer;      // New typed event
-    public UnityEvent OnResetCocktail;
-    
+    [Header("Ingredient Events")]
+    public UnityEvent   OnAddIngredient;
+    public AlcoholEvent OnAddAlcohol;
+    public MixerEvent   OnAddMixer;
+    public UnityEvent   OnResetCocktail;
+
+    [Header("Cocktail State")]
     public S_Drink currentCocktail;
-    private bool canClick = true;
 
-    [Header("UI")]
-    public bool canShowMethodUI = true;
-    public bool canShowServeUI = false;
-
+    [Header("UI Panels")]
     public ToggleActive MethodUI;
-    //public ToggleActive VisualUI;
     public ToggleActive ServeUI;
 
-    [Header("List of Ingredient BTN")]
+    [Header("Ingredient Buttons")]
     public List<IngredientButton> ingredientButtons = new List<IngredientButton>();
 
-    public void SetCanShowServeUI(bool active) {
-        canShowServeUI = active;
-    }
+    // ── Private State ────────────────────────────────────
+    private bool _canClick        = true;
+    private bool _canShowMethodUI = true;
+    private bool _canShowServeUI  = false;
 
-    public void SetCanShowMethodUI(bool active) {
-        canShowMethodUI = active;
-    }
-    
+    // ── Accessors ────────────────────────────────────────
+    public void SetCanShowServeUI(bool active)  => _canShowServeUI  = active;
+    public void SetCanShowMethodUI(bool active) => _canShowMethodUI = active;
+    public void SetCanClick(bool active)        => _canClick        = active;
 
-    protected override void Awake()
+    // ── Unity ────────────────────────────────────────────
+    protected override void Awake()  => base.Awake();
+    protected override void Update() => base.Update();
+
+    // ── Ingredient Helpers ───────────────────────────────
+    public void SetMethod(Method method)              => currentCocktail.PreparationMethod = method;
+    public void SetMethodToShake()                    => currentCocktail.PreparationMethod = Method.Shaking;
+    public void SetMethodToMixing()                   => currentCocktail.PreparationMethod = Method.Mixing;
+    public void SetIceAddIce()                        => currentCocktail.AddIce = true;
+    public void TryToAddAlcohol(Alcohol a, int n = 1) => currentCocktail.TryToAddAlcohol(a, n);
+    public void TryToAddMixer  (Mixer   m, int n = 1) => currentCocktail.TryToAddMixer  (m, n);
+
+    // ── UI ───────────────────────────────────────────────
+    public void SetActiveServe(bool active) => ServeUI.gameObject.SetActive(active);
+
+    public void ToggleUI()
     {
-        base.Awake();
-
+        if (_canShowMethodUI) MethodUI.ToggleAtiveGameObject();
+        if (_canShowServeUI)  ServeUI .ToggleAtiveGameObject();
     }
 
-    protected override void Update()
+    public void ToggleCanClickIngredientBTN(bool active)
     {
-        base.Update();
+        foreach (var btn in ingredientButtons)
+            btn.enabled = active;
     }
 
-    public void SetMethod(Method method)
+    // ── Reset ────────────────────────────────────────────
+    public void ResetShaker()
     {
-        currentCocktail.PreparationMethod = method;
-    }
-
-    public void SetMethodToShake()
-    {
-        currentCocktail.PreparationMethod = Method.Shaking;
-    }
-
-    public void SetMethodToMixing()
-    {
-        currentCocktail.PreparationMethod = Method.Mixing;
-    }
-
-    public void SetCanClick(bool active) {
-        canClick = active;
-    }
-
-    public void SetIceAddIce() {
-        currentCocktail.AddIce = true;
-    }
-
-    public void TryToAddAlcohol(Alcohol alcohol, int amount = 1) {
-        currentCocktail.TryToAddAlcohol(alcohol,amount);
-    }
-
-    public void TryToAddMixer(Mixer mixer, int amount = 1) { 
-        currentCocktail.TryToAddMixer(mixer, amount);
-    }
-
-    public void SetActiveServe(bool active) { 
-        ServeUI.gameObject.SetActive(active);
-    }
-
-    public void ResetShaker() {
-        currentCocktail.Name = "";
-        currentCocktail.AlcoholStrength = TypeOfCocktail.None;
+        currentCocktail.Name              = string.Empty;
+        currentCocktail.AlcoholStrength   = TypeOfCocktail.None;
         currentCocktail.PreparationMethod = Method.None;
-        currentCocktail.AddIce = false;
-
-        currentCocktail.AlcoholList = new SerializedDictionary<Alcohol, int>();
-        currentCocktail.MixerList = new SerializedDictionary<Mixer, int>();
-
+        currentCocktail.AddIce            = false;
+        currentCocktail.AlcoholList       = new SerializedDictionary<Alcohol, int>();
+        currentCocktail.MixerList         = new SerializedDictionary<Mixer, int>();
         currentCocktail.CompatibleGlasses = new List<GlassType>();
 
         SetCanShowMethodUI(true);
         SetCanShowServeUI(false);
-
-        SetBTNSprite(ShakerSprite,ShakerSprite,ShakerSprite);
-
         SetCanClick(true);
-
-        
+        SetBTNSprite(ShakerSprite, ShakerSprite, ShakerSprite);
     }
 
+    // ── Click Override ───────────────────────────────────
     protected override void OnClick(InputAction.CallbackContext context)
     {
-        if (!(currentCocktail.GetTotalIngredient() > 0))
-            return;
-        if (!canClick) return;
-
+        if (!_canClick) return;
+        if (currentCocktail.GetTotalIngredient() <= 0) return;
         base.OnClick(context);
     }
-
-    public void toggleUI() {
-        if (canShowMethodUI)
-            MethodUI.ToggleAtiveGameObject();
-        if (canShowServeUI)
-            ServeUI.ToggleAtiveGameObject();
-    }
-
-    public void ToggleCanClickIngredientBTN(bool active) {
-        for (int i = 0; i < ingredientButtons.Count; i++) {
-            ingredientButtons[i].enabled = active;
-        }
-    }
-
 }

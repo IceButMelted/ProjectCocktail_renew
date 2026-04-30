@@ -1,25 +1,28 @@
+#if UNITY_EDITOR
 using TMPro;
 using UnityEngine;
 
+/// <summary>
+/// Debug overlay — editor / development builds only.
+/// Displays target vs. current cocktail info and satisfaction.
+/// </summary>
 public class DebugCocktail : MonoBehaviour
 {
-    public CocktailShaker cocktailShaker;
-    public CocktailSystemManager cocktailSystemManager;
+    [SerializeField] private CocktailShaker        _shaker;
+    [SerializeField] private CocktailSystemManager _system;
 
-    public TextMeshProUGUI targetCocktail;
-    public TextMeshProUGUI currentCocktail;
-    public TextMeshProUGUI customerSatification;
+    [Header("UI Text")]
+    [SerializeField] private TextMeshProUGUI _targetText;
+    [SerializeField] private TextMeshProUGUI _currentText;
+    [SerializeField] private TextMeshProUGUI _satisfactionText;
 
-    private void Update(){
-        targetCocktail.text = "Target Cocktail :" + cocktailSystemManager.GetTargetName();
-        
-        currentCocktail.text = "Current in Shaker :\n" +cocktailShaker.currentCocktail.GetOfCocktailInfo();
+    private void Update()
+    {
+        _targetText.text  = "Target: " + _system.GetTargetName();
+        _currentText.text = "Shaker:\n" + _shaker.currentCocktail.GetOfCocktailInfo();
     }
 
-    public void UpdateSatification() {
-        customerSatification.text = "Customer Satification" + cocktailSystemManager.CalculateSatisfaction();
-    }
-
-
-
+    public void UpdateSatisfaction()
+        => _satisfactionText.text = "Satisfaction: " + _system.CalculateSatisfaction();
 }
+#endif

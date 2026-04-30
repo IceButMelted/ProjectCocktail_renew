@@ -1,16 +1,18 @@
-﻿using UnityEngine;
+using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.InputSystem;
+using static E_Cocktail;
 
+/// <summary>
+/// 2.5D ingredient button driven by Unity's EventSystem (Physics / Graphic raycaster).
+/// Supports Mixer, Alcohol, method selection, ice, and shaker reset.
+/// </summary>
 public class IngredientButton : MonoBehaviour,
     IPointerEnterHandler,
     IPointerExitHandler,
     IPointerDownHandler,
     IPointerUpHandler
 {
-    // ── Types ──────────────────────────────────────────────
-
-    private enum Behaviability
+    private enum Behaviour
     {
         None,
         Mixer,
@@ -21,124 +23,107 @@ public class IngredientButton : MonoBehaviour,
         Reset,
     }
 
-    // ── Inspector ──────────────────────────────────────────
+    // ── Inspector ────────────────────────────────────────
+    [SerializeField] private Material  _material;
+    [SerializeField] private Texture2D _texDefault;
+    [SerializeField] private Texture2D _texHover;
+    [SerializeField] private Texture2D _texClicked;
 
-    [SerializeField] private Material m_Material;
-    [SerializeField] private Texture2D T_Default;
-    [SerializeField] private Texture2D T_Hover;
-    [SerializeField] private Texture2D T_Clicked;
+    [SerializeField] private bool      _interactable = true;
+    [SerializeField] private Behaviour _behaviour;
+    [SerializeField] private Mixer     _mixer;
+    [SerializeField] private Alcohol   _alcohol;
 
-    [SerializeField] private bool ShouldCanClick = true;
-    [SerializeField] private Behaviability TypeIngredient;
-    [SerializeField] private E_Cocktail.Mixer mixer;
-    [SerializeField] private E_Cocktail.Alcohol alcohol;
+    // ── Cached Shader IDs ────────────────────────────────
+    private static readonly int EmissionID = Shader.PropertyToID("_EmssionStrength");
+    private static readonly int TextureID  = Shader.PropertyToID("_CurrentTexture");
 
-    private CocktailShaker _cocktailMaker;
-    private bool _canClick;
+    // ── Private State ────────────────────────────────────
+    private CocktailShaker _shaker;
+    private bool           _pointerOver;
 
+    // ── Unity ────────────────────────────────────────────
     private void Awake()
     {
-        _cocktailMaker = FindFirstObjectByType<CocktailShaker>();
+        _shaker = FindFirstObjectByType<CocktailShaker>();
 
-        if (!ShouldCanClick) return;
-
-        m_Material = GetComponent<MeshRenderer>().material;
-        m_Material.SetFloat("_EmssionStrength", 0);
-        m_Material.SetTexture("_CurrentTexture", T_Default);
+        if (!_interactable) return;
+        _material = GetComponent<MeshRenderer>().material;
+        ApplyMaterial(0f, _texDefault);
     }
 
-    // ── Pointer Events ─────────────────────────────────────
-
-    public void OnPointerEnter(PointerEventData eventData)
+    // ── Pointer Events ───────────────────────────────────
+    public void OnPointerEnter(PointerEventData _)
     {
-        if (!ShouldCanClick) return;
-
-        _canClick = true;
-        m_Material.SetFloat("_EmssionStrength", 0.25f);
-        m_Material.SetTexture("_CurrentTexture", T_Hover);
+        if (!_interactable) return;
+        _pointerOver = true;
+        ApplyMaterial(0.25f, _texHover);
     }
 
-    public void OnPointerExit(PointerEventData eventData)
+    public void OnPointerExit(PointerEventData _)
     {
-        if (!ShouldCanClick) return;
-
-        _canClick = false;
-        m_Material.SetFloat("_EmssionStrength", 0);
-        m_Material.SetTexture("_CurrentTexture", T_Default);
+        if (!_interactable) return;
+        _pointerOver = false;
+        ApplyMaterial(0f, _texDefault);
     }
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        if (!ShouldCanClick || !_canClick) return;
-
-        // ── FIX ───────────────────────────────────────────
-        // Removed: if (Mouse.current.leftButton.wasPressedThisFrame)
-        //
-        // Reason: OnPointerDown only fires when the EventSystem's raycaster
-        // determines this object is the top-most hit. If a Canvas with a
-        // GraphicRaycaster (Blocking Mask = 2.5D UI) sits in front, the
-        // EventSystem stops here and OnPointerDown never reaches this object.
-        // Adding a raw Mouse.current check on top of that does nothing useful
-        // and can cause the opposite problem — it evaluates the raw input state
-        // independently of the raycaster, so it never correctly blocks.
-        //
-        // OnPointerDown receiving the call IS the left-click confirmation.
-        // ─────────────────────────────────────────────────
-
+        if (!_interactable || !_pointerOver) return;
         if (eventData.button != PointerEventData.InputButton.Left) return;
 
         ApplyIngredient();
-
-        
-
-        m_Material.SetFloat("_EmssionStrength", 0.125f);
-        m_Material.SetTexture("_CurrentTexture", T_Clicked);
+        ApplyMaterial(0.125f, _texClicked);
     }
 
-    public void OnPointerUp(PointerEventData eventData)
+    public void OnPointerUp(PointerEventData _)
     {
-        if (!ShouldCanClick) return;
+        if (!_interactable) return;
 
-        if (TypeIngredient == Behaviability.AddIce)
-        {
-            ShouldCanClick = false;
-        }
+        // One-shot ice button — disable after use
+        if (_behaviour == Behaviour.AddIce)
+            _interactable = false;
 
-        m_Material.SetFloat("_EmssionStrength", 0);
-        m_Material.SetTexture("_CurrentTexture", T_Default);
+        ApplyMaterial(0f, _texDefault);
     }
 
-    // ── Public ─────────────────────────────────────────────
-
-    /// <summary>Can also be called directly (e.g. from keyboard shortcut).</summary>
+    // ── Public ───────────────────────────────────────────
+    /// <summary>Programmatic trigger — e.g. from a keyboard shortcut.</summary>
     public void SetCocktailIngredient() => ApplyIngredient();
 
-    // ── Private ────────────────────────────────────────────
-
+    // ── Private ──────────────────────────────────────────
     private void ApplyIngredient()
     {
-        switch (TypeIngredient)
+        switch (_behaviour)
         {
-            case Behaviability.Mixer:
-                _cocktailMaker.OnAddMixer?.Invoke(mixer, 1);
-                _cocktailMaker.OnAddIngredient?.Invoke();
+            case Behaviour.Mixer:
+                _shaker.OnAddMixer?.Invoke(_mixer, 1);
+                _shaker.OnAddIngredient?.Invoke();
                 break;
 
-            case Behaviability.Alcohol:
-                _cocktailMaker.OnAddAlcohol?.Invoke(alcohol, 1);
-                _cocktailMaker.OnAddIngredient?.Invoke();
+            case Behaviour.Alcohol:
+                _shaker.OnAddAlcohol?.Invoke(_alcohol, 1);
+                _shaker.OnAddIngredient?.Invoke();
                 break;
 
-            case Behaviability.Shaking:
-                _cocktailMaker.SetMethod(E_Cocktail.Method.Shaking);
+            case Behaviour.Shaking:
+                _shaker.SetMethod(Method.Shaking);
                 break;
 
-            case Behaviability.Mixing:
-                _cocktailMaker.SetMethod(E_Cocktail.Method.Mixing);
+            case Behaviour.Mixing:
+                _shaker.SetMethod(Method.Mixing);
                 break;
-            case Behaviability.AddIce:
-                _cocktailMaker.SetIceAddIce();
+
+            case Behaviour.AddIce:
+                _shaker.SetIceAddIce();
                 break;
         }
+    }
+
+    private void ApplyMaterial(float emission, Texture2D tex)
+    {
+        if (_material == null) return;
+        _material.SetFloat(EmissionID, emission);
+        _material.SetTexture(TextureID, tex);
     }
 }
