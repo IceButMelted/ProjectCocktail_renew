@@ -1,103 +1,94 @@
-﻿using System.Collections.Generic;
+using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
-using static E_Cocktail;
 using UnityEngine.Events;
+using static E_Cocktail;
 
 public class CocktailSystemManager : MonoBehaviour
 {
-    [SerializeField] private SO_CocktailList normalCocktailList;
-    [SerializeField] private SO_CocktailList specialCocktailList;
-    private List<S_Drink> NormalCocktails = new List<S_Drink>();
-    private S_Drink targetcocktail = default(S_Drink);
-    [SerializeField] private Texture2D failCocktail;
+    [Header("Cocktail Lists")]
+    [SerializeField] private SO_CocktailList _normalCocktailList;
+    [SerializeField] private SO_CocktailList _specialCocktailList;
 
+    [Header("Fallback")]
+    [SerializeField] private Texture2D _failCocktailTexture;
+
+    [Header("References")]
     public CocktailShaker cocktailShaker;
-    
 
     public UnityEvent OnApplyCocktail;
 
-    private void Awake()
-    {
-        
-    }
+    // ── Private State ────────────────────────────────────
+    private List<S_Drink> _normalDrinks = new List<S_Drink>();
+    private S_Drink       _targetCocktail;
 
+    // ── Unity ────────────────────────────────────────────
     private void Start()
     {
-        
+        // Cache runtime list once
+        foreach (var so in _normalCocktailList.cocktails)
+            _normalDrinks.Add(so.CocktailInfos);
 
-        RandomCocktail(E_Cocktail.TypeOfCocktail.LowAlcohol);
-        Debug.Log("Specific type\n" + targetcocktail.GetOfCocktailInfo());
-
-        foreach (SO_Cocktails s in normalCocktailList.cocktails)
-        {
-            S_Drink drink = s.CocktailInfos;
-            NormalCocktails.Add(drink);
-        }
+        RandomCocktail(TypeOfCocktail.LowAlcohol);
+        Debug.Log("[CocktailSystem] Target set:\n" + _targetCocktail.GetOfCocktailInfo());
     }
 
     private void Update()
     {
+#if UNITY_EDITOR
         if (Input.GetKeyDown(KeyCode.P))
         {
             UpdateCocktailInShaker();
             Debug.Log(cocktailShaker.currentCocktail.GetOfCocktailInfo());
         }
-
-
+#endif
     }
 
-    public void RandomCocktailForDebug() {
-        int randomIndex = Random.Range(0, normalCocktailList.cocktails.Count);
-        targetcocktail = normalCocktailList.cocktails[randomIndex].CocktailInfos;
-    }
+    // ── Public API ───────────────────────────────────────
 
+    /// <summary>Pick a random cocktail (any type) as the current target.</summary>
     public S_Drink RandomCocktail()
     {
-        int randomIndex = Random.Range(0, normalCocktailList.cocktails.Count);
-        targetcocktail = normalCocktailList.cocktails[randomIndex].CocktailInfos;
-        return targetcocktail;
+        int idx = Random.Range(0, _normalCocktailList.cocktails.Count);
+        _targetCocktail = _normalCocktailList.cocktails[idx].CocktailInfos;
+        return _targetCocktail;
     }
 
-    public S_Drink RandomCocktail(E_Cocktail.TypeOfCocktail _typeCocktail)
+    /// <summary>Pick a random cocktail of a specific type as the current target.</summary>
+    public S_Drink RandomCocktail(TypeOfCocktail type)
     {
-        // Get all cocktails matching the type
-        var matchingCocktails = normalCocktailList.cocktails
-            .Where(c => c.CocktailInfos.GetTypeOfAlcohol() == _typeCocktail)
+        var matches = _normalCocktailList.cocktails
+            .Where(c => c.CocktailInfos.GetTypeOfAlcohol() == type)
             .ToList();
 
-        // If no matching cocktails found, return default or log warning
-        if (matchingCocktails.Count == 0)
+        if (matches.Count == 0)
         {
-            Debug.LogWarning($"No cocktails found of type: {_typeCocktail}");
-            return default(S_Drink); // or return RandomCocktail() for fallback
+            Debug.LogWarning($"[CocktailSystem] No cocktails of type {type}. Falling back to random.");
+            return RandomCocktail();
         }
 
-        // Pick random from matching cocktails
-        int randomIndex = Random.Range(0, matchingCocktails.Count);
-        targetcocktail = matchingCocktails[randomIndex].CocktailInfos;
-        return targetcocktail;
+        _targetCocktail = matches[Random.Range(0, matches.Count)].CocktailInfos;
+        return _targetCocktail;
     }
 
-    public Satisfaction CalculateSatisfaction() {
-        return targetcocktail.CalculateSatisfaction(cocktailShaker.currentCocktail);
+    public Satisfaction CalculateSatisfaction()
+        => _targetCocktail.CalculateSatisfaction(cocktailShaker.currentCocktail);
+
+    public string GetTargetName() => _targetCocktail.Name;
+
+    /// <summary>Derive identity of whatever is currently in the shaker and update visuals.</summary>
+    public void UpdateCocktailInShaker()
+    {
+        var current = cocktailShaker.currentCocktail;
+        current.UpdateTypeOfAlcohol(_normalDrinks);
+        current.UpdateName(_normalDrinks);
+        current.UpdatePrice(_normalDrinks);
+
+        Texture2D tex = current.GetCocktailTexture(_normalDrinks) ?? _failCocktailTexture;
+        cocktailShaker.SetBTNSprite(tex, tex, tex);
     }
 
-    public void UpdateCocktailInShaker() {
-        cocktailShaker.currentCocktail.UpdateTypeOfAlcohol(NormalCocktails);
-        cocktailShaker.currentCocktail.UpdateName(NormalCocktails);
-        cocktailShaker.currentCocktail.UpdatePrice(NormalCocktails);
-        Texture2D newShakerSprite = cocktailShaker.currentCocktail.GetCocktailTexture(NormalCocktails) as Texture2D;
-        if (newShakerSprite != null)
-            cocktailShaker.SetBTNSprite(newShakerSprite, newShakerSprite, newShakerSprite);
-        else
-            cocktailShaker.SetBTNSprite(failCocktail, failCocktail, failCocktail);
-    }
-
-    public string GetTargetName() {
-        return targetcocktail.Name;
-    }
-
-
-
+    // ── Debug Helpers ─────────────────────────────────────
+    /// <summary>Editor/debug helper — sets a random target without returning it.</summary>
+    public void RandomCocktailForDebug() => RandomCocktail();
 }
