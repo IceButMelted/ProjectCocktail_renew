@@ -135,8 +135,6 @@ public class MixingMinigame : BaseMiniGame
             _needleDirection = 1f;
         }
 
-        Debug.Log($"current Speed : {currentSpeed} ; ");
-
         // ── 3. Poll click ─────────────────────────────────────────────────────
         base.ProcessedGame();
 

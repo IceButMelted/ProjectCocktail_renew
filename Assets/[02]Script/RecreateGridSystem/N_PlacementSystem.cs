@@ -1,126 +1,79 @@
-using System.Data.SqlTypes;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 public class N_PlacementSystem : MonoBehaviour
 {
-    private InputSystemManager inputSystemManager;
+    [SerializeField] private GameObject     _mouseIndicator;
+    [SerializeField] private N_InputManager _inputManager;
+    [SerializeField] private float          _floatingDistance = 3f;
 
-    [SerializeField]
-    private GameObject mouseIndicator;
-    [SerializeField]
-    private N_InputManager inputManager;
-
-    [SerializeField]
-    private float floatingDistance = 3f;
-
-    private GameObject selectedObject;
-    private DragableObject selectedDragsObject;
-    private bool selectedObjectIsFloating = false;
-
-    private bool IsHolding;
-
-    private float bottomOffset;
-
-    private void Awake()
-    {
-        if (inputSystemManager = FindFirstObjectByType<InputSystemManager>())
-        {
-            Debug.Log("Found InputSystemManager");
-        }
-        else { 
-            Debug.LogError("Cannot find InputSystemManager");
-        }
-    }
-
-    private void Start()
-    {
-
-        inputSystemManager.holdActionRef.action.started += context =>
-        {
-        };
-
-        inputSystemManager.holdActionRef.action.performed += context => 
-        {
-            DragObject();
-        };
-
-        inputSystemManager.holdActionRef.action.canceled += context =>
-        {
-            ReleaseObject();
-
-        };
-    }
+    private DragableObject _selectedDragable;
+    private GameObject     _selectedObject;
+    private float          _bottomOffset;
+    private bool           _isFloating;
 
     private void Update()
     {
-        Vector3 mousePos = inputManager.GetSelectedMapPosition();
-        mouseIndicator.transform.position = mousePos;
+        _mouseIndicator.transform.position = _inputManager.GetSelectedMapPosition();
+        if (_selectedObject != null)
+            UpdateDragPosition();
+    }
 
-        if (selectedObject != null && IsHolding)
+    /// <summary>Called by DragableObject when drag threshold is crossed.</summary>
+    public void StartDrag(DragableObject dragable)
+    {
+        if (dragable == null) return;
+        _selectedDragable            = dragable;
+        _selectedObject              = dragable.gameObject;
+        _bottomOffset                = GetBottomOffset(_selectedObject);
+        _selectedDragable.BeingDrags = true;
+    }
+
+    /// <summary>Called by DragableObject on mouse-up after dragging.</summary>
+    public void ReleaseObject()
+    {
+        if (_selectedObject != null && _selectedDragable != null)
         {
-
-            if (inputManager.TryGetPlacementPoint(out Vector3 placementPoint))
+            if (_selectedDragable.CanPlaced && !_isFloating)
             {
-                // On placement layer
-                selectedObject.transform.position = placementPoint + Vector3.up * bottomOffset;
-                selectedObjectIsFloating = false;
+                Vector3 snapPos = _inputManager.GetSelectedMapPosition() + Vector3.up * _bottomOffset;
+                _selectedDragable.PastLocation     = snapPos;
+                _selectedObject.transform.position = snapPos;
             }
             else
             {
-                // Not on placement layer  float in front of camera
-                selectedObject.transform.position = inputManager.GetFloatingPosition(floatingDistance);
-                selectedObjectIsFloating = true;
+                _selectedObject.transform.position = _selectedDragable.PastLocation;
             }
+            _selectedDragable.BeingDrags = false;
+            _selectedDragable.CanPlaced  = true;
         }
+        ResetSelection();
+    }
 
+    private void UpdateDragPosition()
+    {
+        if (_inputManager.TryGetPlacementPoint(out Vector3 placementPoint))
+        {
+            _selectedObject.transform.position = placementPoint + Vector3.up * _bottomOffset;
+            _isFloating = false;
+        }
+        else
+        {
+            _selectedObject.transform.position = _inputManager.GetFloatingPosition(_floatingDistance);
+            _isFloating = true;
+        }
     }
 
     private float GetBottomOffset(GameObject obj)
     {
         Renderer r = obj.GetComponentInChildren<Renderer>();
+        if (r == null) return 0f;
         return obj.transform.position.y - r.bounds.min.y;
     }
 
-    private void ReleaseObject() {
-        Vector3 mousePos = inputManager.GetSelectedMapPosition();
-        mouseIndicator.transform.position = mousePos;
-
-        if (selectedObject != null && selectedDragsObject != null)
-        {
-            //if can placed that place
-            if (selectedDragsObject.CanPlaced && !selectedObjectIsFloating)
-            {
-                selectedDragsObject.PastLocation = transform.position = mousePos + Vector3.up * bottomOffset;
-                //to where mouse are
-                selectedObject.transform.position = mousePos + Vector3.up * bottomOffset;
-            }
-            else
-            {
-                selectedObject.transform.position = selectedDragsObject.PastLocation;
-            }
-
-            selectedDragsObject.BeingDrags = false;
-            selectedDragsObject.CanPlaced = true;
-        }
-
-
-        selectedObject = null;
-        selectedDragsObject = null;
-
-        IsHolding = false;
+    private void ResetSelection()
+    {
+        _selectedObject   = null;
+        _selectedDragable = null;
+        _isFloating       = false;
     }
-
-    private void DragObject() {
-        selectedObject = inputManager.GetObjectSelected();
-        selectedDragsObject = inputManager.GetDragableObject();
-
-        if (selectedObject != null && selectedDragsObject != null)
-        {
-            bottomOffset = GetBottomOffset(selectedObject);
-            selectedDragsObject.BeingDrags = true;
-        }
-        IsHolding = true;
-    }
-
 }

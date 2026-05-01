@@ -2,146 +2,121 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.InputSystem;
 
+/// <summary>
+/// A 2.5D mesh button that responds to hover and click via raycasting.
+/// Extend this class for specialised buttons (e.g. CocktailShaker).
+/// </summary>
 public class BTN_2_5D : MonoBehaviour
 {
-    private Material m_Material;
-    private MeshRenderer meshRenderer;
-    private Camera mainCam;
+    // ── Shader IDs ────────────────────────────────────────
+    private static readonly int EmissionID = Shader.PropertyToID("_EmssionStrength");
+    private static readonly int TextureID  = Shader.PropertyToID("_CurrentTexture");
 
+    // ── Inspector ─────────────────────────────────────────
     [Header("Textures")]
     [SerializeField] protected Texture2D T_Default;
     [SerializeField] protected Texture2D T_Hover;
     [SerializeField] protected Texture2D T_Clicked;
 
-    [Header("Input Actions")]
-    [SerializeField] private InputActionReference pointAction;
-    [SerializeField] private InputActionReference clickAction;
+    [Header("Input")]
+    [SerializeField] private InputActionReference _pointAction;
+    [SerializeField] private InputActionReference _clickAction;
 
-    [Header("ByPass Layer")]
-    [SerializeField] private LayerMask boxplacementLayerMark;
+    [Header("Layer Mask")]
+    [Tooltip("Layers this button is NOT blocked by.")]
+    [SerializeField] private LayerMask _bypassLayerMask;
 
-    [Space()]
+    [Space]
     public UnityEvent OnClicked;
 
-    private bool isHovering;
+    // ── Private State ─────────────────────────────────────
+    private Material    _material;
+    private MeshRenderer _meshRenderer;
+    private Camera      _mainCam;
+    private bool        _isHovering;
 
-    // Shader property IDs
-    private static readonly int EmissionStrengthID = Shader.PropertyToID("_EmssionStrength");
-    private static readonly int CurrentTextureID = Shader.PropertyToID("_CurrentTexture");
-
+    // ── Unity ─────────────────────────────────────────────
     protected virtual void Awake()
     {
-        pointAction = FindFirstObjectByType<InputSystemManager>().PointActionRef;
-        clickAction = FindFirstObjectByType<InputSystemManager>().TapActionRef;
+        var inputManager = FindFirstObjectByType<InputSystemManager>();
+        _pointAction = inputManager.PointActionRef;
+        _clickAction = inputManager.TapActionRef;
 
-        meshRenderer = GetComponent<MeshRenderer>();
-        m_Material = meshRenderer.material;
-        mainCam = Camera.main;
+        _meshRenderer = GetComponent<MeshRenderer>();
+        _material     = _meshRenderer.material;
+        _mainCam      = Camera.main;
 
-        SetMaterial(0f, T_Default);
+        ApplyMaterial(0f, T_Default);
     }
-
 
     private void OnEnable()
     {
-        pointAction.action.Enable();
-        clickAction.action.Enable();
-
-        clickAction.action.performed += OnClick;
+        _pointAction.action.Enable();
+        _clickAction.action.Enable();
+        _clickAction.action.performed += OnClick;
     }
 
     private void OnDisable()
     {
-        clickAction.action.performed -= OnClick;
-
-        pointAction.action.Disable();
-        clickAction.action.Disable();
+        _clickAction.action.performed -= OnClick;
+        _pointAction.action.Disable();
+        _clickAction.action.Disable();
     }
 
-    private void Start()
+    protected virtual void Update() => CheckHover();
+
+    private void OnDestroy()
     {
-        //clickAction.action.started += Context =>
-        //{
-        //    Debug.Log($"{name} clicked (New Input System - started)");
-        //};
-
-        //clickAction.action.performed += Context =>
-        //{
-        //    Debug.Log($"{name} clicked (New Input System - performed)");
-        //};
-
-        //clickAction.action.canceled += Context => {
-        //    Debug.Log($"{name} clicked (New Input System - cancled)");
-        //};
+        if (_material != null) Destroy(_material);
     }
 
-    protected virtual void Update()
-    {
-        CheckHover();
-    }
-
+    // ── Hover ─────────────────────────────────────────────
     private void CheckHover()
     {
-        Vector2 mousePos = pointAction.action.ReadValue<Vector2>();
-        Ray ray = mainCam.ScreenPointToRay(mousePos);
+        Vector2 screenPos = _pointAction.action.ReadValue<Vector2>();
+        Ray ray = _mainCam.ScreenPointToRay(screenPos);
 
-        if (Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, ~boxplacementLayerMark))
+        bool hittingThis = Physics.Raycast(ray, out RaycastHit hit, Mathf.Infinity, ~_bypassLayerMask)
+                           && hit.collider.gameObject == gameObject;
+
+        if (hittingThis && !_isHovering)
         {
-            if (hit.collider.gameObject == gameObject)
-            {
-                if (!isHovering)
-                {
-                    isHovering = true;
-                    SetMaterial(0.25f, T_Hover);
-                    //Debug.Log($"{name} - Hover Enter");
-                }
-                return;
-            }
+            _isHovering = true;
+            ApplyMaterial(0.25f, T_Hover);
         }
-
-        if (isHovering)
+        else if (!hittingThis && _isHovering)
         {
-            isHovering = false;
-            SetMaterial(0f, T_Default);
-            //Debug.Log($"{name} - Hover Exit");
+            _isHovering = false;
+            ApplyMaterial(0f, T_Default);
         }
     }
 
-
-
+    // ── Click ─────────────────────────────────────────────
     protected virtual void OnClick(InputAction.CallbackContext context)
     {
-        if (!isHovering) return;
+        if (!_isHovering) return;
 
-        //Debug.Log($"{name} clicked (New Input System)");
         OnClicked?.Invoke();
-
-        SetMaterial(0.125f, T_Clicked);
+        ApplyMaterial(0.125f, T_Clicked);
         Invoke(nameof(ResetVisual), 0.1f);
     }
 
     private void ResetVisual()
+        => ApplyMaterial(_isHovering ? 0.25f : 0f, _isHovering ? T_Hover : T_Default);
+
+    // ── Helpers ───────────────────────────────────────────
+    private void ApplyMaterial(float emission, Texture2D tex)
     {
-        SetMaterial(isHovering ? 0.25f : 0f, isHovering ? T_Hover : T_Default);
+        _material.SetFloat(EmissionID, emission);
+        _material.SetTexture(TextureID, tex);
     }
 
-    private void SetMaterial(float emission, Texture2D tex)
+    /// <summary>Swap all three textures and reset to default state.</summary>
+    public void SetBTNSprite(Texture2D defaultTex, Texture2D hoverTex, Texture2D clickedTex)
     {
-        m_Material.SetFloat(EmissionStrengthID, emission);
-        m_Material.SetTexture(CurrentTextureID, tex);
-    }
-
-    public void SetBTNSprite(Texture2D _default, Texture2D _hover, Texture2D _clicked) {
-        T_Default = _default;
-        T_Hover = _hover;
-        T_Clicked = _clicked;
-
-        SetMaterial(0f, T_Default);
-    }
-
-    private void OnDestroy()
-    {
-        if (m_Material != null)
-            Destroy(m_Material);
+        T_Default = defaultTex;
+        T_Hover   = hoverTex;
+        T_Clicked = clickedTex;
+        ApplyMaterial(0f, T_Default);
     }
 }

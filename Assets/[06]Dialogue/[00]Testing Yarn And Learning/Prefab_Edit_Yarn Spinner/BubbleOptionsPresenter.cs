@@ -58,6 +58,12 @@ namespace YarnSpinner.Custom
                  "Shown only when the last line has a non-empty character name.")]
         [SerializeField] private GameObject lastLineCharacterNameContainer;
 
+        [Header("Presenter GameObject")]
+        [Tooltip("Root GameObject for the BubblePresenterGameObject. To Set Last Line Container to BubblePresenterGameObject place")]
+        [SerializeField] private GameObject bubblePresenterGameObject;
+        [Tooltip("Root GameObject for the FacllBackGameObject. To set Last Line Container to FallBackGameObject")]
+        [SerializeField] private GameObject fallBackGameObject;
+
         // ── State ─────────────────────────────────────────────────────────────
 
         private BubbleOptionItem[] _activeItems = new BubbleOptionItem[2];
@@ -136,7 +142,8 @@ namespace YarnSpinner.Custom
                 item.OnOptionSelected = OnOptionSelected;
 
                 if (i < optionAnchors.Length && optionAnchors[i] != null)
-                    CentreOnAnchor(item.GetComponent<RectTransform>(), optionAnchors[i]);
+                    item.transform.position = optionAnchors[i].position;
+                //CentreOnAnchor(item.GetComponent<RectTransform>(), optionAnchors[i]);
 
                 _activeItems[i] = item;
                 item.gameObject.SetActive(true);
@@ -187,6 +194,14 @@ namespace YarnSpinner.Custom
 
             if (lastLineCharacterNameContainer != null)
                 lastLineCharacterNameContainer.SetActive(hasName);
+
+            //Set Last Line Container to persenter place
+            if (bubblePresenterGameObject != null)
+                lastLineContainer.transform.position = bubblePresenterGameObject.transform.position;
+            else if (fallBackGameObject != null)
+                lastLineContainer.transform.position = fallBackGameObject.transform.position;
+            else
+                Debug.LogWarning("[BubbleOptionsPresenter] No presenterGameObject or fallBackGameObject assigned for last line container position.");
         }
 
         /// <summary>
@@ -209,7 +224,9 @@ namespace YarnSpinner.Custom
 
         // ── Option Helpers ────────────────────────────────────────────────────
 
+        /// Note: NOT USE IN THIS VERSION. We just set the option item position to the anchor's world position.
         /// <summary>
+        /// Note: NOT USE IN THIS VERSION. We just set the option item position to the anchor's world position.
         /// Centre <paramref name="rect"/> on the world position of <paramref name="anchor"/>.
         /// Works for Screen Space – Overlay and Screen Space – Camera canvases.
         /// </summary>

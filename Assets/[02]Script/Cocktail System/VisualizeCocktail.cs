@@ -3,51 +3,42 @@ using UnityEngine;
 using UnityEngine.UI;
 using static E_Cocktail;
 
+/// <summary>
+/// Updates fill bars to visually represent the current cocktail's alcohol / mixer ratio.
+/// Max capacity is always 10 parts total.
+/// </summary>
 public class VisualizeCocktail : MonoBehaviour
 {
-    private CocktailShaker cocktailMaker;
+    private const float MAX_PARTS = 10f;
 
-    public Image alcohol_fill;
-    public Image mixer_fill;
+    [Header("Fill Bars")]
+    public Image alcoholFill;
+    public Image mixerFill;
 
-    private readonly Dictionary<Alcohol, Color> AlcoholColors = new Dictionary<Alcohol, Color>()
-        {
-            { Alcohol.Vodka, Color.orangeRed },
-            { Alcohol.Gin, Color.orangeRed },
-            { Alcohol.Triplesec, Color.orangeRed },
-            { Alcohol.Vermouth, Color.orangeRed }
-        };
-    private readonly Dictionary<Mixer, Color> MixerColors = new Dictionary<Mixer, Color>()
-        {
-            { Mixer.CanberryJuice, Color.olive },
-            { Mixer.GrapefruitJuice, Color.olive },
-            { Mixer.LemonJuice, Color.olive },
-            { Mixer.Soda, Color.olive },
-            { Mixer.Syrup, Color.olive },
-            { Mixer.PepperMint, Color.olive }
-        };
+    private CocktailShaker _shaker;
 
     private void Awake()
-    {
-        cocktailMaker = FindFirstObjectByType<CocktailShaker>();
-        
-    }
+        => _shaker = FindFirstObjectByType<CocktailShaker>();
 
+    /// <summary>Show the bars and refresh them to match the current shaker state.</summary>
     public void UpdateCocktailBars()
     {
-        this.gameObject.SetActive(true);
-        S_Drink currentCocktail = cocktailMaker.currentCocktail;
+        gameObject.SetActive(true);
 
-        alcohol_fill.fillAmount = (float)currentCocktail.GetTotalAlcohol() / 10;
-        mixer_fill.fillAmount = ((float)currentCocktail.GetTotalMixer() / 10) + (float)alcohol_fill.fillAmount;
+        S_Drink d = _shaker.currentCocktail;
+        float alcoholRatio = d.GetTotalAlcohol() / MAX_PARTS;
+        float mixerRatio   = d.GetTotalMixer()   / MAX_PARTS;
 
+        alcoholFill.fillAmount = alcoholRatio;
+        // Stacked bar: mixer starts where alcohol ends
+        mixerFill.fillAmount   = alcoholRatio + mixerRatio;
     }
 
-    public void ResetVisualBars() {
-        alcohol_fill.fillAmount = 0;
-        mixer_fill.fillAmount = 0;
-
-        this.gameObject.SetActive(false);
+    /// <summary>Hide and reset the bars.</summary>
+    public void ResetVisualBars()
+    {
+        alcoholFill.fillAmount = 0f;
+        mixerFill.fillAmount   = 0f;
+        gameObject.SetActive(false);
     }
 }
-
