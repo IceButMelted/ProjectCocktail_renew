@@ -507,9 +507,9 @@ MonoBehaviour:
   T_Default: {fileID: 2800000, guid: bfc67da96f6d94748b9f55d1dbf4a307, type: 3}
   T_Hover: {fileID: 2800000, guid: 46178cda4901a884997e1532105ffd25, type: 3}
   T_Clicked: {fileID: 2800000, guid: bfc67da96f6d94748b9f55d1dbf4a307, type: 3}
-  pointAction: {fileID: 1387763809}
-  clickAction: {fileID: 1423579587}
-  boxplacementLayerMark:
+  _pointAction: {fileID: 0}
+  _clickAction: {fileID: 0}
+  _bypassLayerMask:
     serializedVersion: 2
     m_Bits: 0
   OnClicked:
@@ -1044,14 +1044,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e35202e08e403cd4fba7fceeb6e444a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IngredientButton
-  m_Material: {fileID: 0}
-  T_Default: {fileID: 0}
-  T_Hover: {fileID: 0}
-  T_Clicked: {fileID: 0}
-  ShouldCanClick: 0
-  TypeIngredient: 0
-  mixer: 0
-  alcohol: 0
+  _material: {fileID: 0}
+  _texDefault: {fileID: 0}
+  _texHover: {fileID: 0}
+  _texClicked: {fileID: 0}
+  _interactable: 1
+  _behaviour: 0
+  _mixer: 0
+  _alcohol: 0
 --- !u!114 &317855882
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3379,11 +3379,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb3ba2775ea058346a91525b82aad98f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  cocktailShaker: {fileID: 8574095458204193703}
-  cocktailSystemManager: {fileID: 8574095458204193704}
-  targetCocktail: {fileID: 1308643082}
-  currentCocktail: {fileID: 525285163}
-  customerSatification: {fileID: 1374501920}
+  _shaker: {fileID: 0}
+  _system: {fileID: 0}
+  _targetText: {fileID: 0}
+  _currentText: {fileID: 0}
+  _satisfactionText: {fileID: 0}
 --- !u!1 &993867501
 GameObject:
   m_ObjectHideFlags: 0
@@ -4116,14 +4116,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e35202e08e403cd4fba7fceeb6e444a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IngredientButton
-  m_Material: {fileID: 0}
-  T_Default: {fileID: 2800000, guid: fc204844cc7271d489738ae1d067f92b, type: 3}
-  T_Hover: {fileID: 2800000, guid: fc204844cc7271d489738ae1d067f92b, type: 3}
-  T_Clicked: {fileID: 2800000, guid: fc204844cc7271d489738ae1d067f92b, type: 3}
-  ShouldCanClick: 1
-  TypeIngredient: 5
-  mixer: 2
-  alcohol: 3
+  _material: {fileID: 0}
+  _texDefault: {fileID: 0}
+  _texHover: {fileID: 0}
+  _texClicked: {fileID: 0}
+  _interactable: 1
+  _behaviour: 0
+  _mixer: 0
+  _alcohol: 0
 --- !u!114 &1210994899
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5069,20 +5069,6 @@ Transform:
   - {fileID: 42139702}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1387763809
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fc1515ab76e54f068e2f2207940fab32, type: 3}
-  m_Name: Cocktail/Pointer
-  m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.InputActionReference
-  m_Asset: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  m_ActionId: 3355aa1d-2ab6-4cce-884f-dad1d9c3f3f2
 --- !u!1 &1391005545
 GameObject:
   m_ObjectHideFlags: 0
@@ -5363,20 +5349,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1410940489}
   m_CullTransparentMesh: 1
---- !u!114 &1423579587
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fc1515ab76e54f068e2f2207940fab32, type: 3}
-  m_Name: Cocktail/Interact_Hold
-  m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.InputActionReference
-  m_Asset: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  m_ActionId: 9458f363-10a5-42cd-817d-dce45ea1623f
 --- !u!1 &1435055769
 GameObject:
   m_ObjectHideFlags: 0
@@ -6310,20 +6282,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1820639517}
   m_CullTransparentMesh: 1
---- !u!114 &1846501767
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fc1515ab76e54f068e2f2207940fab32, type: 3}
-  m_Name: Cocktail/Pointer
-  m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.InputActionReference
-  m_Asset: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  m_ActionId: 3355aa1d-2ab6-4cce-884f-dad1d9c3f3f2
 --- !u!1 &1869347007
 GameObject:
   m_ObjectHideFlags: 0
@@ -6505,20 +6463,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0bc8df65b57878848914d49225f19407, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ToggleActive
---- !u!114 &2032482189
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: fc1515ab76e54f068e2f2207940fab32, type: 3}
-  m_Name: Cocktail/Interact_Hold
-  m_EditorClassIdentifier: Unity.InputSystem::UnityEngine.InputSystem.InputActionReference
-  m_Asset: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
-  m_ActionId: 9458f363-10a5-42cd-817d-dce45ea1623f
 --- !u!1 &2034673126
 GameObject:
   m_ObjectHideFlags: 0
@@ -8399,14 +8343,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e35202e08e403cd4fba7fceeb6e444a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IngredientButton
-  m_Material: {fileID: 0}
-  T_Default: {fileID: 2800000, guid: 61dead64264f27b40b2ff9f4c2ca1946, type: 3}
-  T_Hover: {fileID: 2800000, guid: 44baf45470b59df4a9c6118f8e446c83, type: 3}
-  T_Clicked: {fileID: 2800000, guid: 7dce1c903ab6fcf45817c2924de91ad2, type: 3}
-  ShouldCanClick: 1
-  TypeIngredient: 1
-  mixer: 3
-  alcohol: 2
+  _material: {fileID: 0}
+  _texDefault: {fileID: 0}
+  _texHover: {fileID: 0}
+  _texClicked: {fileID: 0}
+  _interactable: 1
+  _behaviour: 0
+  _mixer: 0
+  _alcohol: 0
 --- !u!1 &2118773625993468563
 GameObject:
   m_ObjectHideFlags: 0
@@ -8577,14 +8521,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e35202e08e403cd4fba7fceeb6e444a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IngredientButton
-  m_Material: {fileID: 0}
-  T_Default: {fileID: 0}
-  T_Hover: {fileID: 0}
-  T_Clicked: {fileID: 0}
-  ShouldCanClick: 0
-  TypeIngredient: 3
-  mixer: 0
-  alcohol: 0
+  _material: {fileID: 0}
+  _texDefault: {fileID: 0}
+  _texHover: {fileID: 0}
+  _texClicked: {fileID: 0}
+  _interactable: 1
+  _behaviour: 0
+  _mixer: 0
+  _alcohol: 0
 --- !u!4 &2578505869682881187
 Transform:
   m_ObjectHideFlags: 0
@@ -9637,14 +9581,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e35202e08e403cd4fba7fceeb6e444a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IngredientButton
-  m_Material: {fileID: 0}
-  T_Default: {fileID: 2800000, guid: 8036660d851b6dd449af7a7edc73945f, type: 3}
-  T_Hover: {fileID: 2800000, guid: febfe039047ed1c4bb761f4dcbfa6c25, type: 3}
-  T_Clicked: {fileID: 2800000, guid: 8c967cec7f9b1ed44b7ad9b9838b3f12, type: 3}
-  ShouldCanClick: 1
-  TypeIngredient: 2
-  mixer: 0
-  alcohol: 3
+  _material: {fileID: 0}
+  _texDefault: {fileID: 0}
+  _texHover: {fileID: 0}
+  _texClicked: {fileID: 0}
+  _interactable: 1
+  _behaviour: 0
+  _mixer: 0
+  _alcohol: 0
 --- !u!23 &3995666945040132133
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -9706,14 +9650,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e35202e08e403cd4fba7fceeb6e444a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IngredientButton
-  m_Material: {fileID: 0}
-  T_Default: {fileID: 2800000, guid: bb099c1bab71061418bf27e4a35b281b, type: 3}
-  T_Hover: {fileID: 2800000, guid: 463ea70b261edaa4b99833eac53f2bf5, type: 3}
-  T_Clicked: {fileID: 2800000, guid: 9bf365fc4dfa9854cb9a7cf6c5eaa633, type: 3}
-  ShouldCanClick: 1
-  TypeIngredient: 2
-  mixer: 0
-  alcohol: 1
+  _material: {fileID: 0}
+  _texDefault: {fileID: 0}
+  _texHover: {fileID: 0}
+  _texClicked: {fileID: 0}
+  _interactable: 1
+  _behaviour: 0
+  _mixer: 0
+  _alcohol: 0
 --- !u!222 &4104205463728686321
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -9987,8 +9931,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 3486176e33c32744a9acffddd5caeb5d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::VisualizeCocktail
-  alcohol_fill: {fileID: 8970149554978222618}
-  mixer_fill: {fileID: 9159271125676600673}
+  alcoholFill: {fileID: 0}
+  mixerFill: {fileID: 0}
 --- !u!114 &4459317239308383414
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10180,14 +10124,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e35202e08e403cd4fba7fceeb6e444a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IngredientButton
-  m_Material: {fileID: 0}
-  T_Default: {fileID: 2800000, guid: 066984d47636db145bec21d55a673a3f, type: 3}
-  T_Hover: {fileID: 2800000, guid: 9e52ce2ad57e2cb4199dbb137524c4cd, type: 3}
-  T_Clicked: {fileID: 2800000, guid: 2335bea3343aca84ba06ba669f2c3df7, type: 3}
-  ShouldCanClick: 1
-  TypeIngredient: 1
-  mixer: 6
-  alcohol: 3
+  _material: {fileID: 0}
+  _texDefault: {fileID: 0}
+  _texHover: {fileID: 0}
+  _texClicked: {fileID: 0}
+  _interactable: 1
+  _behaviour: 0
+  _mixer: 0
+  _alcohol: 0
 --- !u!114 &4638031820057236083
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10200,14 +10144,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e35202e08e403cd4fba7fceeb6e444a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IngredientButton
-  m_Material: {fileID: 0}
-  T_Default: {fileID: 2800000, guid: f678bb946d213874b908194a9af7726c, type: 3}
-  T_Hover: {fileID: 2800000, guid: acd7cf59d96e8ea4eb34ae115982c089, type: 3}
-  T_Clicked: {fileID: 2800000, guid: 601d055b82252cb44bef4cb56621a920, type: 3}
-  ShouldCanClick: 1
-  TypeIngredient: 2
-  mixer: 0
-  alcohol: 2
+  _material: {fileID: 0}
+  _texDefault: {fileID: 0}
+  _texHover: {fileID: 0}
+  _texClicked: {fileID: 0}
+  _interactable: 1
+  _behaviour: 0
+  _mixer: 0
+  _alcohol: 0
 --- !u!108 &4656615594657961501
 Light:
   m_ObjectHideFlags: 0
@@ -10427,14 +10371,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e35202e08e403cd4fba7fceeb6e444a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IngredientButton
-  m_Material: {fileID: 0}
-  T_Default: {fileID: 2800000, guid: 7256f19f1d1974548ab979702d95ce8f, type: 3}
-  T_Hover: {fileID: 2800000, guid: d555d94255b50594e8416ded815ec2d2, type: 3}
-  T_Clicked: {fileID: 2800000, guid: d919386702d39ce46a7aa40acb065c95, type: 3}
-  ShouldCanClick: 1
-  TypeIngredient: 2
-  mixer: 0
-  alcohol: 4
+  _material: {fileID: 0}
+  _texDefault: {fileID: 0}
+  _texHover: {fileID: 0}
+  _texClicked: {fileID: 0}
+  _interactable: 1
+  _behaviour: 0
+  _mixer: 0
+  _alcohol: 0
 --- !u!225 &4852097172303428097
 CanvasGroup:
   m_ObjectHideFlags: 0
@@ -10685,14 +10629,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e35202e08e403cd4fba7fceeb6e444a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IngredientButton
-  m_Material: {fileID: 0}
-  T_Default: {fileID: 2800000, guid: 6dd47ba122bdcca4e8e55dd0a1b81167, type: 3}
-  T_Hover: {fileID: 2800000, guid: 9326326a802937a4aa2d44de9a04c848, type: 3}
-  T_Clicked: {fileID: 2800000, guid: 23f48003aa23e2c46b210f3b316b9e04, type: 3}
-  ShouldCanClick: 1
-  TypeIngredient: 1
-  mixer: 5
-  alcohol: 4
+  _material: {fileID: 0}
+  _texDefault: {fileID: 0}
+  _texHover: {fileID: 0}
+  _texClicked: {fileID: 0}
+  _interactable: 1
+  _behaviour: 0
+  _mixer: 0
+  _alcohol: 0
 --- !u!114 &5304219145303575847
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10705,14 +10649,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e35202e08e403cd4fba7fceeb6e444a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IngredientButton
-  m_Material: {fileID: 0}
-  T_Default: {fileID: 2800000, guid: 14ae198fdb6730a4fa7289680a4c5e42, type: 3}
-  T_Hover: {fileID: 2800000, guid: 68c1075e38dfc1f4d81a75c050834d31, type: 3}
-  T_Clicked: {fileID: 2800000, guid: e0b8ab599a506ca46b1cfdda1dc9cf29, type: 3}
-  ShouldCanClick: 1
-  TypeIngredient: 1
-  mixer: 1
-  alcohol: 1
+  _material: {fileID: 0}
+  _texDefault: {fileID: 0}
+  _texHover: {fileID: 0}
+  _texClicked: {fileID: 0}
+  _interactable: 1
+  _behaviour: 0
+  _mixer: 0
+  _alcohol: 0
 --- !u!4 &5323505581335462733
 Transform:
   m_ObjectHideFlags: 0
@@ -11284,14 +11228,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e35202e08e403cd4fba7fceeb6e444a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IngredientButton
-  m_Material: {fileID: 0}
-  T_Default: {fileID: 2800000, guid: bab165074020fb24a8277c796f5ece3f, type: 3}
-  T_Hover: {fileID: 2800000, guid: 6d5280c153fa82a42a46a544030d3bc3, type: 3}
-  T_Clicked: {fileID: 2800000, guid: 07d93d97d2100f441b9b127740d17d2c, type: 3}
-  ShouldCanClick: 1
-  TypeIngredient: 1
-  mixer: 4
-  alcohol: 4
+  _material: {fileID: 0}
+  _texDefault: {fileID: 0}
+  _texHover: {fileID: 0}
+  _texClicked: {fileID: 0}
+  _interactable: 1
+  _behaviour: 0
+  _mixer: 0
+  _alcohol: 0
 --- !u!114 &6070395856331201664
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12648,14 +12592,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e35202e08e403cd4fba7fceeb6e444a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IngredientButton
-  m_Material: {fileID: 0}
-  T_Default: {fileID: 2800000, guid: cdb32641de392d749bbaca65b9d46d93, type: 3}
-  T_Hover: {fileID: 2800000, guid: fd5574b4f10eca948bf8bbfb70acbea9, type: 3}
-  T_Clicked: {fileID: 2800000, guid: d1a44c36942f0014b9236958a0c1273e, type: 3}
-  ShouldCanClick: 1
-  TypeIngredient: 1
-  mixer: 2
-  alcohol: 3
+  _material: {fileID: 0}
+  _texDefault: {fileID: 0}
+  _texHover: {fileID: 0}
+  _texClicked: {fileID: 0}
+  _interactable: 1
+  _behaviour: 0
+  _mixer: 0
+  _alcohol: 0
 --- !u!64 &8241609909907820127
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -12894,14 +12838,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: e35202e08e403cd4fba7fceeb6e444a4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IngredientButton
-  m_Material: {fileID: 0}
-  T_Default: {fileID: 0}
-  T_Hover: {fileID: 0}
-  T_Clicked: {fileID: 0}
-  ShouldCanClick: 0
-  TypeIngredient: 4
-  mixer: 0
-  alcohol: 0
+  _material: {fileID: 0}
+  _texDefault: {fileID: 0}
+  _texHover: {fileID: 0}
+  _texClicked: {fileID: 0}
+  _interactable: 1
+  _behaviour: 0
+  _mixer: 0
+  _alcohol: 0
 --- !u!64 &8562375883573096746
 MeshCollider:
   m_ObjectHideFlags: 0
@@ -12962,17 +12906,17 @@ MonoBehaviour:
   T_Default: {fileID: 2800000, guid: a38d06b768b5fff4284ccec1b5925d53, type: 3}
   T_Hover: {fileID: 2800000, guid: a38d06b768b5fff4284ccec1b5925d53, type: 3}
   T_Clicked: {fileID: 2800000, guid: a38d06b768b5fff4284ccec1b5925d53, type: 3}
-  pointAction: {fileID: 1846501767}
-  clickAction: {fileID: 2032482189}
-  boxplacementLayerMark:
+  _pointAction: {fileID: 0}
+  _clickAction: {fileID: 0}
+  _bypassLayerMask:
     serializedVersion: 2
-    m_Bits: 256
+    m_Bits: 0
   OnClicked:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 8574095458204193703}
         m_TargetAssemblyTypeName: CocktailShaker, Assembly-CSharp
-        m_MethodName: toggleUI
+        m_MethodName: ToggleUI
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -13091,8 +13035,6 @@ MonoBehaviour:
       _serializedList: []
     CompatibleGlasses: 
     CocktailSprite: {fileID: 0}
-  canShowMethodUI: 1
-  canShowServeUI: 0
   MethodUI: {fileID: 8375022794840548311}
   ServeUI: {fileID: 1955886498}
   ingredientButtons:
@@ -13118,9 +13060,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4fc40022cfeeeff45a895e08d156163e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  normalCocktailList: {fileID: 11400000, guid: e64c41a62842fd54491c7e08deb2cd77, type: 2}
-  specialCocktailList: {fileID: 0}
-  failCocktail: {fileID: 2800000, guid: 098ccd04d394f96479ed4a40fae4c482, type: 3}
+  _normalCocktailList: {fileID: 11400000, guid: e64c41a62842fd54491c7e08deb2cd77, type: 2}
+  _specialCocktailList: {fileID: 0}
+  _failCocktailTexture: {fileID: 0}
   cocktailShaker: {fileID: 8574095458204193703}
   OnApplyCocktail:
     m_PersistentCalls:

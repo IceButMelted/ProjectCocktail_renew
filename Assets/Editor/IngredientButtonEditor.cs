@@ -4,34 +4,31 @@ using UnityEngine;
 [CustomEditor(typeof(IngredientButton))]
 public class IngredientButtonEditor : Editor
 {
-    SerializedProperty T_Default;
-    SerializedProperty T_Hover;
-    SerializedProperty T_Clicked;
+    // ── Serialized Properties ─────────────────────────────
+    // Textures
+    SerializedProperty _texDefault;
+    SerializedProperty _texHover;
+    SerializedProperty _texClicked;
 
-    SerializedProperty pointAction;
-    SerializedProperty clickAction;
+    // Behaviour
+    SerializedProperty _interactable;
+    SerializedProperty _behaviour;
+    SerializedProperty _mixer;
+    SerializedProperty _alcohol;
 
-    SerializedProperty ShouldCanClick;
-    SerializedProperty TypeIngredient;
-    SerializedProperty mixer;
-    SerializedProperty alcohol;
-
-    private bool showVisualSettings = true;
-    private bool showInputSettings = true;
+    // Foldout state
+    private bool _showVisuals = true;
 
     private void OnEnable()
     {
-        T_Default = serializedObject.FindProperty("T_Default");
-        T_Hover = serializedObject.FindProperty("T_Hover");
-        T_Clicked = serializedObject.FindProperty("T_Clicked");
+        _texDefault   = serializedObject.FindProperty("_texDefault");
+        _texHover     = serializedObject.FindProperty("_texHover");
+        _texClicked   = serializedObject.FindProperty("_texClicked");
 
-        pointAction = serializedObject.FindProperty("pointAction");
-        clickAction = serializedObject.FindProperty("clickAction");
-
-        ShouldCanClick = serializedObject.FindProperty("ShouldCanClick");
-        TypeIngredient = serializedObject.FindProperty("TypeIngredient");
-        mixer = serializedObject.FindProperty("mixer");
-        alcohol = serializedObject.FindProperty("alcohol");
+        _interactable = serializedObject.FindProperty("_interactable");
+        _behaviour    = serializedObject.FindProperty("_behaviour");
+        _mixer        = serializedObject.FindProperty("_mixer");
+        _alcohol      = serializedObject.FindProperty("_alcohol");
     }
 
     public override void OnInspectorGUI()
@@ -49,51 +46,50 @@ public class IngredientButtonEditor : Editor
         GUI.enabled = true;
 
         EditorGUILayout.Space(5);
-        EditorGUILayout.PropertyField(ShouldCanClick);
 
-        // =========================
-        // Input Settings
-        // =========================
-        //showInputSettings = EditorGUILayout.Foldout(showInputSettings, "Input Settings", true);
-        //if (showInputSettings)
-        //{
-        //    EditorGUI.indentLevel++;
-        //    EditorGUILayout.PropertyField(pointAction, new GUIContent("Point Action"));
-        //    EditorGUILayout.PropertyField(clickAction, new GUIContent("Click Action"));
-        //    EditorGUI.indentLevel--;
-        //}
+        // ── Interactable Toggle ───────────────────────────
+        EditorGUILayout.PropertyField(_interactable, new GUIContent("Interactable"));
 
         EditorGUILayout.Space(5);
 
-        // =========================
-        // Visual Settings
-        // =========================
-        showVisualSettings = EditorGUILayout.Foldout(showVisualSettings, "Visual Settings", true);
-        if (showVisualSettings)
+        // ── Visual Settings (foldout) ─────────────────────
+        _showVisuals = EditorGUILayout.Foldout(_showVisuals, "Visual Settings", true);
+        if (_showVisuals)
         {
             EditorGUI.indentLevel++;
-            EditorGUILayout.PropertyField(T_Default);
-            EditorGUILayout.PropertyField(T_Hover);
-            EditorGUILayout.PropertyField(T_Clicked);
+            EditorGUILayout.PropertyField(_texDefault,  new GUIContent("Default"));
+            EditorGUILayout.PropertyField(_texHover,    new GUIContent("Hover"));
+            EditorGUILayout.PropertyField(_texClicked,  new GUIContent("Clicked"));
             EditorGUI.indentLevel--;
         }
 
         EditorGUILayout.Space(10);
 
-        // =========================
-        // Ingredient Logic
-        // =========================
-        EditorGUILayout.PropertyField(TypeIngredient, new GUIContent("Type Ingredient"));
+        // ── Behaviour + Conditional Fields ───────────────
+        EditorGUILayout.PropertyField(_behaviour, new GUIContent("Behaviour"));
 
-        int enumValue = TypeIngredient.enumValueIndex;
-
-        if (enumValue == 1) // Mixer
+        // Behaviour enum: None=0, Mixer=1, Alcohol=2, Shaking=3, Mixing=4, AddIce=5, Reset=6
+        int enumIdx = _behaviour.enumValueIndex;
+        if (enumIdx == 1) // Mixer
         {
-            EditorGUILayout.PropertyField(mixer);
+            EditorGUI.indentLevel++;
+            EditorGUILayout.PropertyField(_mixer, new GUIContent("Mixer Type"));
+            EditorGUI.indentLevel--;
         }
-        else if (enumValue == 2) // Alcohol
+        else if (enumIdx == 2) // Alcohol
         {
-            EditorGUILayout.PropertyField(alcohol);
+            EditorGUI.indentLevel++;
+            EditorGUILayout.PropertyField(_alcohol, new GUIContent("Alcohol Type"));
+            EditorGUI.indentLevel--;
+        }
+
+        // Info box for one-shot behaviours
+        if (enumIdx == 5) // AddIce
+        {
+            EditorGUILayout.HelpBox(
+                "AddIce is a one-shot button — it disables itself after the first click.",
+                MessageType.Info
+            );
         }
 
         serializedObject.ApplyModifiedProperties();

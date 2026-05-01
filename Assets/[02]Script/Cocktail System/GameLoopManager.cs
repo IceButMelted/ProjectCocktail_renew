@@ -5,100 +5,55 @@ using static E_Cocktail;
 
 public class GameLoopManager : MonoBehaviour
 {
-    // ── Inspector ──────────────────────────────────────────
-
+    // ── Inspector ─────────────────────────────────────────
     [Header("Yarn")]
     [SerializeField] private DialogueRunner _dialogueRunner;
 
     [Header("Systems")]
     [SerializeField] private CocktailSystemManager _cocktailSystem;
-    [SerializeField] private MinigameSystemManager  _minigameSystem;
-    [SerializeField] private CocktailShaker         _cocktailShaker;
+    [SerializeField] private MinigameSystemManager _minigameSystem;
+    [SerializeField] private CocktailShaker        _cocktailShaker;
 
-    // ── Yarn Variable Names ────────────────────────────────
+    // ── Yarn Variable Names ───────────────────────────────
+    private const string VAR_SATISFACTION  = "$satisfaction";
+    private const string VAR_MINIGAME_WIN  = "$minigame_win";
+    private const string VAR_COCKTAIL_TYPE = "$cocktail_type";
 
-    // Written by this manager, read by Yarn scripts
-    private const string VAR_SATISFACTION   = "$satisfaction";    // "Perfect" | "Acceptable" | "Fail"
-    private const string VAR_MINIGAME_WIN   = "$minigame_win";    // bool
-    private const string VAR_COCKTAIL_TYPE  = "$cocktail_type";   // "HighAlcohol" | "LowAlcohol" | "NoneAlcohol"
+    // ── State ─────────────────────────────────────────────
+    private bool _minigameComplete;
+    private bool _minigameSuccess;
 
-    // ── State ──────────────────────────────────────────────
-
-    private bool _minigameComplete = false;
-    private bool _minigameSuccess  = false;
-
-    // ── Unity ──────────────────────────────────────────────
-
+    // ── Unity ─────────────────────────────────────────────
     private void Awake()
     {
-        // Register all Yarn Commands on this MonoBehaviour
-        // Yarnspinner will call these when it sees <<command_name>> in a .yarn file
-
-        _dialogueRunner.AddCommandHandler<string>(
-            "set_order", SetOrder);
-
-        _dialogueRunner.AddCommandHandler<string>(
-            "play_minigame", cmd => StartCoroutine(PlayMinigame(cmd)));
-
-        _dialogueRunner.AddCommandHandler(
-            "serve_cocktail", ServeCocktail);
-
-        _dialogueRunner.AddCommandHandler(
-            "reset_shaker", ResetShaker);
+        _dialogueRunner.AddCommandHandler<string>("set_order",     SetOrder);
+        _dialogueRunner.AddCommandHandler<string>("play_minigame", t => StartCoroutine(PlayMinigame(t)));
+        _dialogueRunner.AddCommandHandler("serve_cocktail",        ServeCocktail);
+        _dialogueRunner.AddCommandHandler("reset_shaker",          ResetShaker);
     }
 
-    // ── Yarn Commands ──────────────────────────────────────
+    // ── Yarn Commands ─────────────────────────────────────
 
-    /// <summary>
-    /// <<set_order [type]>>
-    /// Picks a random cocktail of the given TypeOfCocktail for the customer.
-    /// Type can be: "HighAlcohol", "LowAlcohol", "NoneAlcohol", or "Any"
-    ///
-    /// Example Yarn:
-    ///   <<set_order "LowAlcohol">>
-    ///   <<set_order "Any">>
-    /// </summary>
-    private void SetOrder(string type)
+    /// <<set_order [type]>> — "LowAlcohol" | "HighAlcohol" | "NoneAlcohol" | "Any"
+private void SetOrder(string type)
     {
         S_Drink order;
-
-        if (type == "Any" || !System.Enum.TryParse<TypeOfCocktail>(type, out var parsedType))
-        {
+        if (type == "Any" || !System.Enum.TryParse<TypeOfCocktail>(type, out TypeOfCocktail parsed))
             order = _cocktailSystem.RandomCocktail();
-        }
         else
-        {
-            order = _cocktailSystem.RandomCocktail(parsedType);
-        }
+            order = _cocktailSystem.RandomCocktail(parsed);
 
-        // Write cocktail type to Yarn so dialogue can reference it
-        _dialogueRunner.VariableStorage.SetValue(
-            VAR_COCKTAIL_TYPE, order.AlcoholStrength.ToString());
-
+        _dialogueRunner.VariableStorage.SetValue(VAR_COCKTAIL_TYPE, order.AlcoholStrength.ToString());
         Debug.Log($"[GameLoop] Order set: {order.Name} ({order.AlcoholStrength})");
     }
 
-    /// <summary>
-    /// <<play_minigame [type]>>
-    /// Starts a minigame and SUSPENDS Yarn dialogue until it completes.
-    /// Type: "Shaking" or "Mixing"
-    ///
-    /// After the minigame ends, $minigame_win is set in Yarn.
-    ///
-    /// Example Yarn:
-    ///   <<play_minigame "Shaking">>
-    ///   <<if $minigame_win>>
-    ///       You shook it perfectly!
-    ///   <<else>>
-    ///       Hmm, something went wrong...
-    ///   <<endif>>
-    /// </summary>
+    /// <<play_minigame [type]>> — "Shaking" | "Mixing"
+    /// Suspends Yarn until the minigame fires OnGameEnd.
     private IEnumerator PlayMinigame(string type)
     {
         _minigameComplete = false;
         _minigameSuccess  = false;
 
-        // Subscribe to result before starting so we never miss it
         BaseMiniGame game = SelectMinigame(type);
         if (game == null)
         {
@@ -106,64 +61,37 @@ public class GameLoopManager : MonoBehaviour
             yield break;
         }
 
+        // Subscribe BEFORE starting so we never miss the event
         game.OnGameEnd += OnMinigameEnded;
 
-        // Start the correct minigame via the manager
-        if (type == "Shaking")
-            _minigameSystem.StartShakingMinigame();
-        else if (type == "Mixing")
-            _minigameSystem.StartMixingMinigame();
+        if      (type == "Shaking") _minigameSystem.StartShakingMinigame();
+        else if (type == "Mixing")  _minigameSystem.StartMixingMinigame();
 
-        // Suspend Yarn until the minigame fires OnGameEnd
         yield return new WaitUntil(() => _minigameComplete);
 
         game.OnGameEnd -= OnMinigameEnded;
 
-        // Write result to Yarn
         _dialogueRunner.VariableStorage.SetValue(VAR_MINIGAME_WIN, _minigameSuccess);
-
         Debug.Log($"[GameLoop] Minigame '{type}' ended — success: {_minigameSuccess}");
     }
 
-    /// <summary>
-    /// <<serve_cocktail>>
-    /// Compares the player's cocktail against the target recipe,
-    /// writes $satisfaction ("Perfect" / "Acceptable" / "Fail") to Yarn,
-    /// then resets the shaker for the next round.
-    ///
-    /// Example Yarn:
-    ///   <<serve_cocktail>>
-    ///   <<if $satisfaction == "Perfect">>
-    ///       Customer: Wow, this is amazing!
-    ///   <<elseif $satisfaction == "Acceptable">>
-    ///       Customer: It's decent, thanks.
-    ///   <<else>>
-    ///       Customer: This doesn't taste right...
-    ///   <<endif>>
-    /// </summary>
+    /// <<serve_cocktail>> — evaluates and resets the shaker
     private void ServeCocktail()
     {
         Satisfaction result = _cocktailSystem.CalculateSatisfaction();
-
         _dialogueRunner.VariableStorage.SetValue(VAR_SATISFACTION, result.ToString());
-
-        Debug.Log($"[GameLoop] Cocktail served — satisfaction: {result}");
-
+        Debug.Log($"[GameLoop] Served — satisfaction: {result}");
         _cocktailShaker.ResetShaker();
     }
 
-    /// <summary>
-    /// <<reset_shaker>>
-    /// Clears the shaker without serving (e.g. player cancels).
-    /// </summary>
+    /// <<reset_shaker>> — clears without serving
     private void ResetShaker()
     {
         _cocktailShaker.ResetShaker();
         Debug.Log("[GameLoop] Shaker reset.");
     }
 
-    // ── Private Helpers ────────────────────────────────────
-
+    // ── Helpers ───────────────────────────────────────────
     private void OnMinigameEnded(bool success)
     {
         _minigameSuccess  = success;
@@ -174,6 +102,6 @@ public class GameLoopManager : MonoBehaviour
     {
         "Shaking" => _minigameSystem.GetShakingMinigame(),
         "Mixing"  => _minigameSystem.GetMixingMinigame(),
-        _         => null
+        _          => null
     };
 }

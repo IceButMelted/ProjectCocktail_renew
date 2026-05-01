@@ -1209,6 +1209,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::YarnSpinner.Custom.BubblePresenter
   bubbleRect: {fileID: 2910750883058809818}
+  backGroundText: {fileID: 5935967947110271324}
   lineText: {fileID: 6564762378386364794}
   characterNameText: {fileID: 5218487181680324699}
   bubbleContainer: {fileID: 4785411401143388756}
@@ -1559,7 +1560,6 @@ GameObject:
   - component: {fileID: 6118472479172229409}
   - component: {fileID: 6548282777098919080}
   - component: {fileID: 6548282777098919081}
-  - component: {fileID: 6548282777098919082}
   m_Layer: 5
   m_Name: Background
   m_TagString: Untagged
@@ -2017,7 +2017,7 @@ MonoBehaviour:
   m_ChildAlignment: 4
   m_Spacing: 0
   m_ChildForceExpandWidth: 0
-  m_ChildForceExpandHeight: 0
+  m_ChildForceExpandHeight: 1
   m_ChildControlWidth: 1
   m_ChildControlHeight: 1
   m_ChildScaleWidth: 0
@@ -2037,18 +2037,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.ContentSizeFitter
   m_HorizontalFit: 0
   m_VerticalFit: 2
---- !u!225 &6548282777098919082
-CanvasGroup:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4963900987754267328}
-  m_Enabled: 1
-  m_Alpha: 1
-  m_Interactable: 1
-  m_BlocksRaycasts: 1
-  m_IgnoreParentGroups: 0
 --- !u!114 &6564762378386364794
 MonoBehaviour:
   m_ObjectHideFlags: 0
