@@ -226,7 +226,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 1
+  m_IsActive: 0
 --- !u!224 &13586711
 RectTransform:
   m_ObjectHideFlags: 0
@@ -517,7 +517,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 13586712}
         m_TargetAssemblyTypeName: BookUI, Assembly-CSharp
-        m_MethodName: ToggleAcitve
+        m_MethodName: Toggle
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -2479,7 +2479,7 @@ MonoBehaviour:
   m_EventMask:
     serializedVersion: 2
     m_Bits: 672
-  m_MaxRayIntersections: 100
+  m_MaxRayIntersections: 200
 --- !u!1 &743509888
 GameObject:
   m_ObjectHideFlags: 0
@@ -4360,6 +4360,14 @@ PrefabInstance:
       propertyPath: DebugDraw
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1827497582659521546, guid: 29604c82d8d0f2c4494cb4fa8d02c324, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1827497582659521546, guid: 29604c82d8d0f2c4494cb4fa8d02c324, type: 3}
+      propertyPath: _dragThreshold
+      value: 5
+      objectReference: {fileID: 0}
     - target: {fileID: 2383033270529986323, guid: 29604c82d8d0f2c4494cb4fa8d02c324, type: 3}
       propertyPath: m_LocalPosition.x
       value: -0.178
@@ -4403,6 +4411,14 @@ PrefabInstance:
     - target: {fileID: 3229928991928026398, guid: 29604c82d8d0f2c4494cb4fa8d02c324, type: 3}
       propertyPath: m_Name
       value: ObjectMaker (3)
+      objectReference: {fileID: 0}
+    - target: {fileID: 3979269304280579733, guid: 29604c82d8d0f2c4494cb4fa8d02c324, type: 3}
+      propertyPath: m_Layer
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 4652416735141765960, guid: 29604c82d8d0f2c4494cb4fa8d02c324, type: 3}
+      propertyPath: m_Enabled
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -7023,7 +7039,7 @@ MeshRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 914843397538274479}
-  m_Enabled: 0
+  m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -7506,7 +7522,7 @@ SphereCollider:
   m_LayerOverridePriority: 0
   m_IsTrigger: 0
   m_ProvidesContacts: 0
-  m_Enabled: 0
+  m_Enabled: 1
   serializedVersion: 3
   m_Radius: 0.5
   m_Center: {x: 0, y: 0, z: 0}
@@ -7836,9 +7852,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 22effe1264a37d740b5115b3812424af, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::N_PlacementSystem
-  mouseIndicator: {fileID: 914843397538274479}
-  inputManager: {fileID: 4767475621571479435}
-  floatingDistance: 1
+  _mouseIndicator: {fileID: 914843397538274479}
+  _inputManager: {fileID: 4767475621571479435}
+  _floatingDistance: 1
 --- !u!4 &1442337836670175977
 Transform:
   m_ObjectHideFlags: 0
@@ -10326,15 +10342,15 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 44ca199b41c9e354c9b5f6f587849f31, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::N_InputManager
-  sceneCamera: {fileID: 696697199}
-  range: 100
-  placementLayerMark:
+  _sceneCamera: {fileID: 696697199}
+  _range: 100
+  _placementLayer:
     serializedVersion: 2
     m_Bits: 64
-  boxplacementLayerMark:
+  _boxPlacementLayer:
     serializedVersion: 2
     m_Bits: 256
-  draggableLayer:
+  _draggableLayer:
     serializedVersion: 2
     m_Bits: 128
 --- !u!1 &4830344093932836758
@@ -12506,12 +12522,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6102873c730fa6445b33680b1e865215, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DragableObject
-  CanPlaced: 1
-  numbersObjectOverlaying: 0
+  _dragThreshold: 10
   boxHalfExtents: {x: 0.06, y: 0.06, z: 0.13}
   detectLayerMask:
     serializedVersion: 2
     m_Bits: 128
+  _placementSystem: {fileID: 0}
   DebugDraw: 0
 --- !u!1 &8171910069274797629
 GameObject:
