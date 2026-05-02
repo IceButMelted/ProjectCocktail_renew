@@ -2,22 +2,28 @@ using AYellowpaper.SerializedCollections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
-using UnityEngine.InputSystem;
 using static E_Cocktail;
 
 [System.Serializable] public class AlcoholEvent : UnityEvent<Alcohol, int> { }
-[System.Serializable] public class MixerEvent   : UnityEvent<Mixer, int>   { }
+[System.Serializable] public class MixerEvent : UnityEvent<Mixer, int> { }
 
-public class CocktailShaker : BTN_2_5D
+/// <summary>
+/// The cocktail shaker object. Inherits hover/click/drag handling from
+/// <see cref="Interactable3DObject"/>; overrides <see cref="CanClick"/> to
+/// guard against empty cocktails or a locked state, and <see cref="OnClick"/>
+/// for shaker-specific behaviour.
+/// </summary>
+public class CocktailShaker : Interactable3DObject
 {
-    [Header("Default Texture")]
-    public Texture2D ShakerSprite;
+    [Header("Default Sprite")]
+    public Sprite ShakerSprite;
 
     [Header("Ingredient Events")]
-    public UnityEvent   OnAddIngredient;
     public AlcoholEvent OnAddAlcohol;
-    public MixerEvent   OnAddMixer;
-    public UnityEvent   OnResetCocktail;
+    public MixerEvent OnAddMixer;
+    public UnityEvent OnAddIngredient;
+    public UnityEvent OnResetCocktail;
+
 
     [Header("Cocktail State")]
     public S_Drink currentCocktail;
@@ -27,37 +33,54 @@ public class CocktailShaker : BTN_2_5D
     public ToggleActive ServeUI;
 
     [Header("Ingredient Buttons")]
-    public List<IngredientButton> ingredientButtons = new List<IngredientButton>();
+    public List<IngredientButtonUI> ingredientButtons = new List<IngredientButtonUI>();
 
-    // ── Private State ────────────────────────────────────
-    private bool _canClick        = true;
+    // ── Private State ────────────────────────────────────────────────────────
+    private bool _canClick = true;
     private bool _canShowMethodUI = true;
-    private bool _canShowServeUI  = false;
+    private bool _canShowServeUI = false;
 
-    // ── Accessors ────────────────────────────────────────
-    public void SetCanShowServeUI(bool active)  => _canShowServeUI  = active;
+    // ── Accessors ────────────────────────────────────────────────────────────
+    public void SetCanShowServeUI(bool active) => _canShowServeUI = active;
     public void SetCanShowMethodUI(bool active) => _canShowMethodUI = active;
-    public void SetCanClick(bool active)        => _canClick        = active;
+    public void SetCanClick(bool active) => _canClick = active;
 
-    // ── Unity ────────────────────────────────────────────
-    protected override void Awake()  => base.Awake();
-    protected override void Update() => base.Update();
+    // ── Unity Lifecycle ───────────────────────────────────────────────────────
+    protected override void Awake() => base.Awake();
 
-    // ── Ingredient Helpers ───────────────────────────────
-    public void SetMethod(Method method)              => currentCocktail.PreparationMethod = method;
-    public void SetMethodToShake()                    => currentCocktail.PreparationMethod = Method.Shaking;
-    public void SetMethodToMixing()                   => currentCocktail.PreparationMethod = Method.Mixing;
-    public void SetIceAddIce()                        => currentCocktail.AddIce = true;
+    // ── Click Overrides ───────────────────────────────────────────────────────
+
+    /// <summary>
+    /// Block the click if the shaker is locked or has no ingredients.
+    /// </summary>
+    protected override bool CanClick()
+        => _canClick && currentCocktail.GetTotalIngredient() > 0;
+
+    /// <summary>
+    /// Runs after a confirmed, guarded click — add any shaker-specific
+    /// behaviour here (e.g. triggering a shake animation, playing a sound).
+    /// <see cref="Interactable3DObject.OnClicked"/> has already been invoked.
+    /// </summary>
+    protected override void OnClick()
+    {
+        // Add shaker-specific click behaviour here.
+    }
+
+    // ── Ingredient Helpers ────────────────────────────────────────────────────
+    public void SetMethod(Method method) => currentCocktail.PreparationMethod = method;
+    public void SetMethodToShake() => currentCocktail.PreparationMethod = Method.Shaking;
+    public void SetMethodToMixing() => currentCocktail.PreparationMethod = Method.Mixing;
+    public void SetIceAddIce() => currentCocktail.AddIce = true;
     public void TryToAddAlcohol(Alcohol a, int n = 1) => currentCocktail.TryToAddAlcohol(a, n);
-    public void TryToAddMixer  (Mixer   m, int n = 1) => currentCocktail.TryToAddMixer  (m, n);
+    public void TryToAddMixer(Mixer m, int n = 1) => currentCocktail.TryToAddMixer(m, n);
 
-    // ── UI ───────────────────────────────────────────────
+    // ── UI ────────────────────────────────────────────────────────────────────
     public void SetActiveServe(bool active) => ServeUI.gameObject.SetActive(active);
 
     public void ToggleUI()
     {
         if (_canShowMethodUI) MethodUI.ToggleAtiveGameObject();
-        if (_canShowServeUI)  ServeUI .ToggleAtiveGameObject();
+        if (_canShowServeUI) ServeUI.ToggleAtiveGameObject();
     }
 
     public void ToggleCanClickIngredientBTN(bool active)
@@ -66,28 +89,24 @@ public class CocktailShaker : BTN_2_5D
             btn.enabled = active;
     }
 
-    // ── Reset ────────────────────────────────────────────
+    public void DebugClicked() { 
+        Debug.Log("Shaker clicked! Current cocktail:\n" + currentCocktail.GetOfCocktailInfo());
+    }
+
+    // ── Reset ─────────────────────────────────────────────────────────────────
     public void ResetShaker()
     {
-        currentCocktail.Name              = string.Empty;
-        currentCocktail.AlcoholStrength   = TypeOfCocktail.None;
+        currentCocktail.Name = string.Empty;
+        currentCocktail.AlcoholStrength = TypeOfCocktail.None;
         currentCocktail.PreparationMethod = Method.None;
-        currentCocktail.AddIce            = false;
-        currentCocktail.AlcoholList       = new SerializedDictionary<Alcohol, int>();
-        currentCocktail.MixerList         = new SerializedDictionary<Mixer, int>();
+        currentCocktail.AddIce = false;
+        currentCocktail.AlcoholList = new SerializedDictionary<Alcohol, int>();
+        currentCocktail.MixerList = new SerializedDictionary<Mixer, int>();
         currentCocktail.CompatibleGlasses = new List<GlassType>();
 
         SetCanShowMethodUI(true);
         SetCanShowServeUI(false);
         SetCanClick(true);
         SetBTNSprite(ShakerSprite, ShakerSprite, ShakerSprite);
-    }
-
-    // ── Click Override ───────────────────────────────────
-    protected override void OnClick(InputAction.CallbackContext context)
-    {
-        if (!_canClick) return;
-        if (currentCocktail.GetTotalIngredient() <= 0) return;
-        base.OnClick(context);
     }
 }

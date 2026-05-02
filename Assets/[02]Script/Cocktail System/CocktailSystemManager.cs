@@ -85,7 +85,7 @@ public class CocktailSystemManager : MonoBehaviour
         current.UpdatePrice(_normalDrinks);
 
         Texture2D tex = current.GetCocktailTexture(_normalDrinks) ?? _failCocktailTexture;
-        cocktailShaker.SetBTNSprite(tex, tex, tex);
+        //cocktailShaker.SetBTNSprite(tex, tex, tex);
     }
 
     // ── Debug Helpers ─────────────────────────────────────
