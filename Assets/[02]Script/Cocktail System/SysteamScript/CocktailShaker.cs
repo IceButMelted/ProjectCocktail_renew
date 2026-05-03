@@ -22,7 +22,7 @@ public class CocktailShaker : Interactable3DObject
     public AlcoholEvent OnAddAlcohol;
     public MixerEvent OnAddMixer;
     public UnityEvent OnAddIngredient;
-    public UnityEvent OnResetCocktail;
+    public UnityEvent OnResetedCocktail;
 
 
     [Header("Cocktail State")]
@@ -79,6 +79,7 @@ public class CocktailShaker : Interactable3DObject
 
     public void ToggleUI()
     {
+        Debug.Log($"Toggling UI: MethodUI active={MethodUI.gameObject.activeSelf}");
         if (_canShowMethodUI) MethodUI.ToggleAtiveGameObject();
         if (_canShowServeUI) ServeUI.ToggleAtiveGameObject();
     }
@@ -108,5 +109,7 @@ public class CocktailShaker : Interactable3DObject
         SetCanShowServeUI(false);
         SetCanClick(true);
         SetBTNSprite(ShakerSprite, ShakerSprite, ShakerSprite);
+
+        OnResetedCocktail?.Invoke();
     }
 }

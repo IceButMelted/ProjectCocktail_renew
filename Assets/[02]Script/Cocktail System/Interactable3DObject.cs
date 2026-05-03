@@ -21,18 +21,17 @@ public class Interactable3DObject : MonoBehaviour,
     IDragHandler
 {
     // ── Inspector ─────────────────────────────────────────────────────────────
+    [Header("Interaction")]
+    [SerializeField] private bool _interactable = true;
 
     [Header("Sprites")]
     [SerializeField] protected Sprite S_Default;
     [SerializeField] protected Sprite S_Hover;
     [SerializeField] protected Sprite S_Clicked;
-
-    [Header("Interaction")]
-    [SerializeField] private bool  _interactable  = true;
     [Tooltip("Sprite to show when Interactable is false. If null, falls back to S_Default with disabled colour.")]
     [SerializeField] private Sprite _disabledSprite;
     [Tooltip("Sprite colour applied when Interactable is false (matches Unity Button behaviour).")]
-    [SerializeField] private Color _disabledColour = new Color(1f, 1f, 1f, 0.5f);
+    [SerializeField] private Color _disabledColour = new Color(1f, 1f, 1f, 0.5f);    
 
     [Header("Drag Detection")]
     [Tooltip("Pixels the pointer must travel while held before the gesture is " +
@@ -81,6 +80,7 @@ public class Interactable3DObject : MonoBehaviour,
 
     public void OnPointerEnter(PointerEventData eventData)
     {
+        if (_isDragging) return;
         if (!_interactable) return;
         _isHovering            = true;
         _spriteRenderer.sprite = S_Hover;

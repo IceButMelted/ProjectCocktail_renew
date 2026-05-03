@@ -5,6 +5,9 @@
 // ============================================================
 
 using UnityEngine;
+using UnityEngine.Events;
+using UnityEngine.EventSystems;
+
 using static E_Cocktail;
 
 public class MinigameSystemManager : MonoBehaviour
@@ -12,6 +15,8 @@ public class MinigameSystemManager : MonoBehaviour
     [Header("Camera")]
     [SerializeField] private CameraController _cocktailCamera;
     [SerializeField] private CocktailSystemManager cocktailSystemManager;
+
+    public UnityEvent OnStartedMinigame;
 
     private ShakingMinigame _shakingMinigame;
     private MixingMinigame _mixingMinigame;
@@ -46,12 +51,14 @@ public class MinigameSystemManager : MonoBehaviour
     {
         SwitchTo(_shakingMinigame);
         _activeMinigame.StartGame();
+        OnStartedMinigame?.Invoke();
     }
 
     public void StartMixingMinigame()
     {
         SwitchTo(_mixingMinigame);
         _activeMinigame.StartGame();
+        OnStartedMinigame?.Invoke();
     }
 
     // Accessors for GameLoopManager to subscribe OnGameEnd before starting

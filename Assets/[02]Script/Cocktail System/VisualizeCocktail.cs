@@ -1,7 +1,5 @@
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using static E_Cocktail;
 
 /// <summary>
 /// Updates fill bars to visually represent the current cocktail's alcohol / mixer ratio.
@@ -12,13 +10,26 @@ public class VisualizeCocktail : MonoBehaviour
     private const float MAX_PARTS = 10f;
 
     [Header("Fill Bars")]
-    public Image alcoholFill;
-    public Image mixerFill;
+    [SerializeField] private Image alcoholFill;
+    [SerializeField] private Image mixerFill;
 
     private CocktailShaker _shaker;
 
     private void Awake()
-        => _shaker = FindFirstObjectByType<CocktailShaker>();
+    {
+        _shaker = FindFirstObjectByType<CocktailShaker>();
+
+        // Ensure both images respond to fillAmount regardless of Inspector setting
+        InitFillImage(alcoholFill);
+        InitFillImage(mixerFill);
+    }
+
+    private static void InitFillImage(Image img)
+    {
+        img.type = Image.Type.Filled;
+        img.fillMethod = Image.FillMethod.Radial180;
+        img.fillAmount = 0f;
+    }
 
     /// <summary>Show the bars and refresh them to match the current shaker state.</summary>
     public void UpdateCocktailBars()
@@ -27,18 +38,17 @@ public class VisualizeCocktail : MonoBehaviour
 
         S_Drink d = _shaker.currentCocktail;
         float alcoholRatio = d.GetTotalAlcohol() / MAX_PARTS;
-        float mixerRatio   = d.GetTotalMixer()   / MAX_PARTS;
+        float mixerRatio = d.GetTotalMixer() / MAX_PARTS;
 
-        alcoholFill.fillAmount = alcoholRatio;
-        // Stacked bar: mixer starts where alcohol ends
-        mixerFill.fillAmount   = alcoholRatio + mixerRatio;
+        alcoholFill.fillAmount = Mathf.Clamp01(alcoholRatio);
+        mixerFill.fillAmount = Mathf.Clamp01(alcoholRatio + mixerRatio);
     }
 
     /// <summary>Hide and reset the bars.</summary>
     public void ResetVisualBars()
     {
         alcoholFill.fillAmount = 0f;
-        mixerFill.fillAmount   = 0f;
+        mixerFill.fillAmount = 0f;
         gameObject.SetActive(false);
     }
 }
