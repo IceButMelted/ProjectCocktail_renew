@@ -12,7 +12,7 @@ using UnityEngine.UI;
 /// DRAG   — pointer moves past _dragThreshold while held
 ///          => calls N_PlacementSystem.StartDrag, moves object until pointer-up.
 /// </summary>
-[RequireComponent(typeof(Collider))]
+//[RequireComponent(typeof(Collider))]
 public class DragableObject : MonoBehaviour,
     IPointerDownHandler,
     IPointerUpHandler,
@@ -21,9 +21,6 @@ public class DragableObject : MonoBehaviour,
     [Header("Drag Settings")]
     [Tooltip("Pixels pointer must move while held before drag begins.")]
     [SerializeField] private float _dragThreshold = 10f;
-
-    [Tooltip("Half-extents of the overlap box used for placement collision checks.")]
-    public Vector3 boxHalfExtents = new Vector3(1f, 1f, 1f);
 
     [Tooltip("Layers to check for overlapping objects.")]
     public LayerMask detectLayerMask;
@@ -40,14 +37,19 @@ public class DragableObject : MonoBehaviour,
     public Vector3 PastLocation            { get; set; }
     public int     NumbersObjectOverlaying { get; private set; }
 
-    private Button  _button;
+    private Button   _button;
+    private Collider  _collider;
     private Vector2 _pointerDownScreenPos;
     private bool    _dragStarted;
 
-    private void Awake()
+private void Awake()
     {
         PastLocation = transform.position;
         _button      = GetComponent<Button>();
+        _collider    = GetComponent<Collider>();
+
+        if (_collider == null)
+            Debug.LogWarning($"[DragableObject] No Collider found on '{name}' or its children.");
 
         if (_placementSystem == null)
             _placementSystem = FindFirstObjectByType<N_PlacementSystem>();
@@ -100,21 +102,25 @@ public class DragableObject : MonoBehaviour,
 
     // ── Collision Check ───────────────────────────────────
 
-    private void CheckForCollisions()
+private void CheckForCollisions()
     {
-        Collider[] hits = Physics.OverlapBox(
-            transform.position, boxHalfExtents, transform.rotation, detectLayerMask);
-        NumbersObjectOverlaying = hits.Length - 1; // exclude self
+        if (_collider == null) return;
+
+        Bounds  b    = _collider.bounds;
+        Collider[] hits = Physics.OverlapBox(b.center, b.extents, transform.rotation, detectLayerMask);
+        NumbersObjectOverlaying = hits.Length - 1;
         CanPlaced = NumbersObjectOverlaying <= 0;
     }
 
     // ── Gizmos ────────────────────────────────────────────
 
-    private void OnDrawGizmos()
+private void OnDrawGizmos()
     {
         if (!DebugDraw) return;
-        Gizmos.color  = CanPlaced ? Color.green : Color.red;
-        Gizmos.matrix = Matrix4x4.TRS(transform.position, transform.rotation, Vector3.one);
-        Gizmos.DrawWireCube(Vector3.zero, boxHalfExtents * 2f);
+        Collider col = _collider != null ? _collider : GetComponent<Collider>();
+        if (col == null) return;
+        Bounds b = col.bounds;
+        Gizmos.color = CanPlaced ? Color.green : Color.red;
+        Gizmos.DrawWireCube(b.center, b.size);
     }
 }

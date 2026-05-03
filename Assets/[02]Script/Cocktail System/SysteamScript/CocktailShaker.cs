@@ -33,7 +33,7 @@ public class CocktailShaker : Interactable3DObject
     public ToggleActive ServeUI;
 
     [Header("Ingredient Buttons")]
-    public List<IngredientButtonUI> ingredientButtons = new List<IngredientButtonUI>();
+    public List<Interactable3DObject> ingredientButtons = new List<Interactable3DObject>();
 
     // ── Private State ────────────────────────────────────────────────────────
     private bool _canClick = true;
@@ -86,7 +86,7 @@ public class CocktailShaker : Interactable3DObject
     public void ToggleCanClickIngredientBTN(bool active)
     {
         foreach (var btn in ingredientButtons)
-            btn.enabled = active;
+            btn.Interactable = active;
     }
 
     public void DebugClicked() { 
