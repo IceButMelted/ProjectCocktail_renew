@@ -62,7 +62,7 @@ public class E_Cocktail
         SmashNMixing
     }
 
-    public enum TypeOfCocktail : byte
+    public enum TypeOfCocktail
     {
         None,
         HighAlcohol,
@@ -71,8 +71,9 @@ public class E_Cocktail
         NotMatch
     }
 
-    public enum Satisfaction : byte
+    public enum Satisfaction
     {
+        None,
         Fail,        
         Acceptable,  
         Perfect      
