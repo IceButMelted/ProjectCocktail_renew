@@ -7,7 +7,7 @@ title: Main
 title: WaitLoop
 ---
 Narrator: I'm waiting for you to finish the task...
-<<wait_for_task TaskManager>>
+<<wait_for_task SystemGame>>
 <<if $task_done == true>>
     Narrator : Task finish
     
@@ -15,13 +15,13 @@ Narrator: I'm waiting for you to finish the task...
 
 <<if $satisfaction == Satisfaction.Perfect>>
     Narrator: WOW! this Great
-    <<Reset_Variable TaskManager>>
+    <<Reset_Variable SystemGame>>
 <<elseif $satisfaction == Satisfaction.Acceptable>>
     Narrator: Hmmm..... it's Ok
-    <<Reset_Variable TaskManager>>
+    <<Reset_Variable SystemGame>>
 <<elseif $satisfaction == Satisfaction.Fail>>
     Narrator: Unacceptable YUCK
-    <<Reset_Variable TaskManager>>
+    <<Reset_Variable SystemGame>>
 <<endif>>
 <<jump WaitLoop>>
 ===

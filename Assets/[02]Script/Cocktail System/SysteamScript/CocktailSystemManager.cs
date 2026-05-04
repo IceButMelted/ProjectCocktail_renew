@@ -14,7 +14,7 @@ public class CocktailSystemManager : MonoBehaviour
     [SerializeField] private Texture2D _failCocktailTexture;
 
     [Header("References")]
-    public CocktailShaker cocktailShaker;
+    public CocktailShakerData cocktailShaker;
 
     // ── Private State ────────────────────────────────────
     private List<S_Drink> _normalDrinks = new List<S_Drink>();

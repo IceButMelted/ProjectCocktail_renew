@@ -31,7 +31,8 @@ using static E_Cocktail;
 public class TaskManager : MonoBehaviour
 {
     [Header("References")]
-    [SerializeField] private DialogueRunner dialogueRunner;
+    [SerializeField] private DialogueRunner _dialogueRunner;
+    [SerializeField] private CocktailSystemManager _cocktailSystemManager;
 
     private bool _myGameCondition = false;
     private TypeOfCocktail _cocktailType = TypeOfCocktail.None;
@@ -48,7 +49,7 @@ public class TaskManager : MonoBehaviour
     public void CompleteTask()
     {
         _myGameCondition = true;
-        dialogueRunner.VariableStorage.SetValue(TaskDoneVariableName, true);
+        _dialogueRunner.VariableStorage.SetValue(TaskDoneVariableName, true);
     }
 
     private void Update()
@@ -109,19 +110,29 @@ public class TaskManager : MonoBehaviour
     {
         if (_myGameCondition && _satisfaction != Satisfaction.None)
         {
+           
             // Cast enum to its integer index — this is the type Yarn actually stores.
             // Satisfaction order in .yarn: None=0, Fail=1, Acceptable=2, Perfect=3
-            dialogueRunner.VariableStorage.SetValue(SatisfactionVariableName,
+            _dialogueRunner.VariableStorage.SetValue(SatisfactionVariableName,
                                                     (float)(int)_satisfaction);
 
             // TypeOfCocktail order: None=0, HighAlcohol=1, LowAlcohol=2, NoneAlcohol=3, NotMatch=4
-            dialogueRunner.VariableStorage.SetValue(TypeOfCocktailVariableName,
+            _dialogueRunner.VariableStorage.SetValue(TypeOfCocktailVariableName,
                                                     (float)(int)_cocktailType);
 
-            dialogueRunner.VariableStorage.SetValue(TaskDoneVariableName, true);
+            _dialogueRunner.VariableStorage.SetValue(TaskDoneVariableName, true);
             return true;
         }
         return false;
+    }
+    public void UpdateVariableInYarnTrigger()
+    {
+        _myGameCondition = true;
+        SetSatisfaction(_cocktailSystemManager.CalculateSatisfaction());
+        Debug.Log($"[TaskManager] Satisfaction set to {_satisfaction} based on cocktail comparison.");
+        DebugVariableFromYarn();
+        UpdateVariableInYarn();
+        DebugVariableFromYarn();
     }
 
     // ─────────────────────────────────────────────────────────────────────
@@ -154,9 +165,9 @@ public class TaskManager : MonoBehaviour
         _cocktailType = TypeOfCocktail.None;
 
         // Reset Yarn storage — use 0f for enums (integer index of None)
-        dialogueRunner.VariableStorage.SetValue(SatisfactionVariableName, 0f);
-        dialogueRunner.VariableStorage.SetValue(TypeOfCocktailVariableName, 0f);
-        dialogueRunner.VariableStorage.SetValue(TaskDoneVariableName, false);
+        _dialogueRunner.VariableStorage.SetValue(SatisfactionVariableName, 0f);
+        _dialogueRunner.VariableStorage.SetValue(TypeOfCocktailVariableName, 0f);
+        _dialogueRunner.VariableStorage.SetValue(TaskDoneVariableName, false);
 
         Debug.Log("[TaskManager] All variables reset — ready for next loop.");
     }
@@ -184,13 +195,13 @@ public class TaskManager : MonoBehaviour
     [ContextMenu("Debug Yarn Variables")]
     public void DebugVariableFromYarn()
     {
-        if (dialogueRunner == null || dialogueRunner.VariableStorage == null)
+        if (_dialogueRunner == null || _dialogueRunner.VariableStorage == null)
         {
             Debug.LogWarning("[TaskManager] Cannot debug — DialogueRunner or VariableStorage is null.");
             return;
         }
 
-        var storage = dialogueRunner.VariableStorage;
+        var storage = _dialogueRunner.VariableStorage;
 
         // Read bool
         storage.TryGetValue(TaskDoneVariableName, out bool yarnTaskDone);

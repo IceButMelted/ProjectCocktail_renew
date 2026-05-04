@@ -23,29 +23,27 @@ title: Script_2_2
 title: TestLoopPart
 ---
 Owen: Can you make me a drink?
-<<wait_for_task TaskManager>>
+<<wait_for_task SystemGame>>
 <<if $satisfaction == Satisfaction.Perfect>>
     Owen: WOW! this Great.
-    <<Reset_Variable TaskManager>>
 <<elseif $satisfaction == Satisfaction.Acceptable>>
     Owen: Hmmm..... it's Ok.
-    <<Reset_Variable TaskManager>>
 <<elseif $satisfaction == Satisfaction.Fail>>
     Owen: Unacceptable YUCK.
-    <<Reset_Variable TaskManager>>
 <<endif>>
+<<Reset_Variable SystemGame>>
 
 Walter: Can you make me someDrink not like Owen. hahaha
-<<wait_for_task TaskManager>>
+<<wait_for_task SystemGame>>
 <<if $satisfaction == Satisfaction.Perfect>>
     Walter: WOW! like old day.
-    <<Reset_Variable TaskManager>>
+    <<Reset_Variable SystemGame>>
 <<elseif $satisfaction == Satisfaction.Acceptable>>
     Walter: Hmmm..... good but not perfect.
-    <<Reset_Variable TaskManager>>
+    <<Reset_Variable SystemGame>>
 <<elseif $satisfaction == Satisfaction.Fail>>
     Walter: Oh.... taste bad.
-    <<Reset_Variable TaskManager>>
+    <<Reset_Variable SystemGame>>
 <<endif>>
 
 NOW IT WILL LOOP
