@@ -102,4 +102,13 @@ public class E_Cocktail
         Building
     }
 
+    public enum NPCName
+    {
+        None = 0,
+        Cole,
+        Owen,
+        Walter,
+        Freya,
+        Isla 
+    }
 }

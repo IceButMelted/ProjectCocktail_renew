@@ -19,6 +19,8 @@ public class CocktailSystemManager : MonoBehaviour
     // ── Private State ────────────────────────────────────
     private List<S_Drink> _normalDrinks = new List<S_Drink>();
     private S_Drink       _targetCocktail;
+    public S_Drink TargetCocktail { get; set; }
+
 
     // ── Unity ────────────────────────────────────────────
     private void Start()

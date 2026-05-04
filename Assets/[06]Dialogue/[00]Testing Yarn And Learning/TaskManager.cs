@@ -2,6 +2,8 @@ using UnityEngine;
 using Yarn.Unity;
 using System.Collections;
 using static E_Cocktail;
+using AYellowpaper.SerializedCollections;
+using System.Collections.Generic;
 
 /// <summary>
 /// Manages a task condition that YarnSpinner polls via a loop.
@@ -32,7 +34,8 @@ public class TaskManager : MonoBehaviour
 {
     [Header("References")]
     [SerializeField] private DialogueRunner _dialogueRunner;
-    [SerializeField] private CocktailSystemManager _cocktailSystemManager;
+    [SerializeField] public static CocktailSystemManager _cocktailSystemManager;
+    [SerializeField] public static CharacterData _characterData;
 
     private bool _myGameCondition = false;
     private TypeOfCocktail _cocktailType = TypeOfCocktail.None;
@@ -42,11 +45,43 @@ public class TaskManager : MonoBehaviour
     const string TypeOfCocktailVariableName = "$type_of_cocktail";
     const string SatisfactionVariableName = "$satisfaction";
 
-    
+    private void Awake()
+    {
+        _cocktailSystemManager = FindAnyObjectByType<CocktailSystemManager>();
+        if (_cocktailSystemManager == null)
+        {
+            Debug.LogError("[TaskManager] CocktailSystemManager not found in scene.");
+        }
+        _characterData = FindAnyObjectByType<CharacterData>();
+        if (_characterData == null)
+        {
+            Debug.LogError("[TaskManager] CharacterData not found in scene.");
+        }
+    }
+
     // ─────────────────────────────────────────────────────────────────────
     // Public API
     // ─────────────────────────────────────────────────────────────────────
+    [YarnFunction("Random_Order_Cocktail")]
+    public static string RandomOrderCocktail(int NPC)
+    {
+        List<TypeOfCocktail> defaultOptions = new() { TypeOfCocktail.HighAlcohol, TypeOfCocktail.LowAlcohol, TypeOfCocktail.NoneAlcohol };
 
+        NPCName npcName = (NPCName)NPC;
+
+        if (!_characterData.NPC_Favorite_Drink.TryGetValue(npcName, out List<TypeOfCocktail> cocktailOptions)
+            || cocktailOptions.Count == 0)
+        {
+            Debug.LogWarning($"[TaskManager] No favorites found for {npcName}, using default.");
+            cocktailOptions = defaultOptions;
+        }
+
+        S_Drink TargetOCktail = _cocktailSystemManager.RandomCocktail(cocktailOptions[Random.Range(0, cocktailOptions.Count)]);
+
+        return TargetOCktail.Name;
+        //Test out put
+        //return string.Join(", ", cocktailOptions);
+    }
 
     public void CompleteTask()
     {

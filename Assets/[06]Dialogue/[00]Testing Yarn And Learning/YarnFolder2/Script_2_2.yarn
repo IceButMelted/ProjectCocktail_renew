@@ -13,16 +13,34 @@ title: Script_2_2
     <<case Acceptable>>
     <<case Perfect>>
 <<endenum>>
+<<enum NPC_Name>>
+    <<case None>>
+    <<case Cole>>
+    <<case Owen>>
+    <<case Walter>>
+    <<case Freya>>
+    <<case Isla>>
+<<endenum>>
 // Declare the variable (set false by default)
 <<declare $task_done = false>>
 <<declare $type_of_cocktail = TypeOfCocktail.None>>
 <<declare $satisfaction = Satisfaction.None>>
+
 <<jump TestLoopPart>>
 ===
 
 title: TestLoopPart
 ---
-Owen: Can you make me a drink?
+
+// Test part Cole {Random_Order_Cocktail(NPC_Name.Cole)}
+// Test part Owen {Random_Order_Cocktail(NPC_Name.Owen)}
+// Test part Walter {Random_Order_Cocktail(NPC_Name.Walter)}
+// Test part Freya {Random_Order_Cocktail(NPC_Name.Freya)}
+// Test part Isla {Random_Order_Cocktail(NPC_Name.Isla)}
+
+
+Owen: Can you make me a drink? {Random_Order_Cocktail(NPC_Name.Owen)}
+
 <<wait_for_task SystemGame>>
 <<if $satisfaction == Satisfaction.Perfect>>
     Owen: WOW! this Great.
@@ -34,6 +52,7 @@ Owen: Can you make me a drink?
 <<Reset_Variable SystemGame>>
 
 Walter: Can you make me someDrink not like Owen. hahaha
+Walter: I want {Random_Order_Cocktail(NPC_Name.Walter)}
 <<wait_for_task SystemGame>>
 <<if $satisfaction == Satisfaction.Perfect>>
     Walter: WOW! like old day.
