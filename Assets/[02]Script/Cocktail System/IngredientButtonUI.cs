@@ -48,7 +48,8 @@ public class IngredientButtonUI : MonoBehaviour
     public void AddIce()
     {
         _shaker.SetIceAddIce();
-        GetComponent<UnityEngine.UI.Button>().interactable = false;
+        
+        GetComponent<Interactable3DObject>().Interactable = false;
     }
 
     /// <summary>Reset the shaker to empty state.</summary>
