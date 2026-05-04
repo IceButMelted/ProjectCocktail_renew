@@ -14,6 +14,8 @@ public class S_Drink
     // ── Fields ─────────────────────────────────────────────
 
     public string Name;
+    [TextArea(3,10)]
+    public string Description;
     public TypeOfCocktail AlcoholStrength;
     public Method PreparationMethod;
     public bool AddIce;

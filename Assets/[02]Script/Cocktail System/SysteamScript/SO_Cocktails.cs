@@ -16,6 +16,8 @@ public class SO_Cocktails : ScriptableObject
     public Texture2D CocktailSprite;
 
     public string Name;
+    [TextArea(3,10)]
+    public string Description;
     public TypeOfCocktail AlcoholStrength;
     public Method PreparationMethod;
     public bool AddIce;
@@ -45,6 +47,7 @@ public class SO_Cocktails : ScriptableObject
         CocktailInfos ??= new S_Drink();
 
         CocktailInfos.Name = Name;
+        CocktailInfos.Description = Description;
         CocktailInfos.PreparationMethod = PreparationMethod;
         CocktailInfos.AddIce = AddIce;
         CocktailInfos.Price = Price;

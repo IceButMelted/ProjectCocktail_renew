@@ -32,15 +32,21 @@ title: Script_2_2
 title: TestLoopPart
 ---
 
-// Test part Cole {Random_Order_Cocktail(NPC_Name.Cole)}
-// Test part Owen {Random_Order_Cocktail(NPC_Name.Owen)}
-// Test part Walter {Random_Order_Cocktail(NPC_Name.Walter)}
-// Test part Freya {Random_Order_Cocktail(NPC_Name.Freya)}
-// Test part Isla {Random_Order_Cocktail(NPC_Name.Isla)}
+// Test part Cole {Order_Cocktail_OutName(NPC_Name.Cole)}
+// Test part Owen {Order_Cocktail_OutName(NPC_Name.Owen)}
+// Test part Walter {Order_Cocktail_OutName(NPC_Name.Walter)}
+// Test part Freya {Order_Cocktail_OutName(NPC_Name.Freya)}
+// Test part Isla {Order_Cocktail_OutName(NPC_Name.Isla)}
 
+// Test part Cole {Order_Cocktail_OutDescription(NPC_Name.Cole)}
+// Test part Owen {Order_Cocktail_OutDescription(NPC_Name.Owen)}
+// Test part Walter {Order_Cocktail_OutDescription(NPC_Name.Walter)}
+// Test part Freya {Order_Cocktail_OutDescription(NPC_Name.Freya)}
+// Test part Isla {Order_Cocktail_OutDescription(NPC_Name.Isla)}
 
-Owen: Can you make me a drink? {Random_Order_Cocktail(NPC_Name.Owen)}
+<<MoveIn NPC_Owen 2>>
 
+Owen: Can you make me a drink? {Order_Cocktail_OutDescription(NPC_Name.Owen)}
 <<wait_for_task SystemGame>>
 <<if $satisfaction == Satisfaction.Perfect>>
     Owen: WOW! this Great.
@@ -51,8 +57,16 @@ Owen: Can you make me a drink? {Random_Order_Cocktail(NPC_Name.Owen)}
 <<endif>>
 <<Reset_Variable SystemGame>>
 
+Owen: Oh.... i see someone coming.
+-> Who's coming?
+    Owen: Now Let see.
+-> New Customer!?!?!
+    Owen: No, he is Walter
+
+<<MoveIn NPC_Walter 1>>
+Walter: Howdy new bartender.
 Walter: Can you make me someDrink not like Owen. hahaha
-Walter: I want {Random_Order_Cocktail(NPC_Name.Walter)}
+Walter: I want {Order_Cocktail_OutName(NPC_Name.Walter)}
 <<wait_for_task SystemGame>>
 <<if $satisfaction == Satisfaction.Perfect>>
     Walter: WOW! like old day.

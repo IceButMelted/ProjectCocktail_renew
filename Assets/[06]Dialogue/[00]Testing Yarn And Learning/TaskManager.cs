@@ -2,7 +2,6 @@ using UnityEngine;
 using Yarn.Unity;
 using System.Collections;
 using static E_Cocktail;
-using AYellowpaper.SerializedCollections;
 using System.Collections.Generic;
 
 /// <summary>
@@ -62,8 +61,8 @@ public class TaskManager : MonoBehaviour
     // ─────────────────────────────────────────────────────────────────────
     // Public API
     // ─────────────────────────────────────────────────────────────────────
-    [YarnFunction("Random_Order_Cocktail")]
-    public static string RandomOrderCocktail(int NPC)
+    [YarnFunction("Order_Cocktail_OutName")]
+    public static string RandomOrderCocktail_OutName(int NPC)
     {
         List<TypeOfCocktail> defaultOptions = new() { TypeOfCocktail.HighAlcohol, TypeOfCocktail.LowAlcohol, TypeOfCocktail.NoneAlcohol };
 
@@ -79,6 +78,26 @@ public class TaskManager : MonoBehaviour
         S_Drink TargetOCktail = _cocktailSystemManager.RandomCocktail(cocktailOptions[Random.Range(0, cocktailOptions.Count)]);
 
         return TargetOCktail.Name;
+        //Test out put
+        //return string.Join(", ", cocktailOptions);
+    }
+    [YarnFunction("Order_Cocktail_OutDescription")]
+    public static string RandomOrderCocktail_OutDescription(int NPC)
+    {
+        List<TypeOfCocktail> defaultOptions = new() { TypeOfCocktail.HighAlcohol, TypeOfCocktail.LowAlcohol, TypeOfCocktail.NoneAlcohol };
+
+        NPCName npcName = (NPCName)NPC;
+
+        if (!_characterData.NPC_Favorite_Drink.TryGetValue(npcName, out List<TypeOfCocktail> cocktailOptions)
+            || cocktailOptions.Count == 0)
+        {
+            Debug.LogWarning($"[TaskManager] No favorites found for {npcName}, using default.");
+            cocktailOptions = defaultOptions;
+        }
+
+        S_Drink TargetOCktail = _cocktailSystemManager.RandomCocktail(cocktailOptions[Random.Range(0, cocktailOptions.Count)]);
+
+        return TargetOCktail.Description;
         //Test out put
         //return string.Join(", ", cocktailOptions);
     }
