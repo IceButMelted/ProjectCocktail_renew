@@ -1,5 +1,6 @@
 using System;
 using UnityEngine;
+using UnityEngine.Events;
 using static E_Cocktail;
 
 /// <summary>
@@ -18,8 +19,8 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
     [SerializeField] private float _slidePanelSpeed = 800f;
 
     // ── Public State ──────────────────────────────────────
-    public bool          IsRunning     { get; protected set; }
-    public MiniGameState CurrentState  { get; protected set; } = MiniGameState.Standby;
+    public bool IsRunning { get; protected set; }
+    public MiniGameState CurrentState { get; protected set; } = MiniGameState.Standby;
 
     /// <summary>
     /// Fired when the minigame ends. True = success, false = failure.
@@ -32,15 +33,17 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
     protected bool IsClickedThisFrame { get; private set; }
 
     // ── Private ───────────────────────────────────────────
-    private CameraController       _camera;
-    private CocktailSystemManager  _cocktailSystem;
+    private CameraController _camera;
+    private CocktailSystemManager _cocktailSystem;
+    private MinigameSystemManager _minigameSystemManager;
 
     // ── Initialization ────────────────────────────────────
-    public void Initialize(CameraController cam, CocktailSystemManager system)
+    public void Initialize(CameraController cam, CocktailSystemManager system, MinigameSystemManager minigameSystemManager)
     {
-        _camera         = cam;
+        _camera = cam;
         _cocktailSystem = system;
-        IsRunning       = false;
+        _minigameSystemManager = minigameSystemManager;
+        IsRunning = false;
     }
 
     // ── State Machine ─────────────────────────────────────
@@ -52,14 +55,14 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
         switch (newState)
         {
             case MiniGameState.Processing: OnProcessing(); break;
-            case MiniGameState.Success:    OnSuccess();    break;
-            case MiniGameState.Standby:    OnStandby();    break;
+            case MiniGameState.Success: OnSuccess(); break;
+            case MiniGameState.Standby: OnStandby(); break;
         }
     }
 
     protected virtual void OnProcessing() { }
-    protected virtual void OnSuccess()    => FireEndEvent(true);
-    protected virtual void OnStandby()    => ResetGame();
+    protected virtual void OnSuccess() => FireEndEvent(true);
+    protected virtual void OnStandby() => ResetGame();
 
     // ── IMinigame ─────────────────────────────────────────
     public virtual void StartGame()
@@ -82,6 +85,7 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
     public virtual void EndGame()
     {
         IsRunning = false;
+        _minigameSystemManager?.OnEndedGame?.Invoke();
         _cocktailSystem?.OnApplyCocktail.Invoke();
     }
 
@@ -103,11 +107,11 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
 
     private static Vector2 DirectionToVector(Direction dir) => dir switch
     {
-        Direction.Left  => Vector2.left,
+        Direction.Left => Vector2.left,
         Direction.Right => Vector2.right,
-        Direction.Up    => Vector2.up,
-        Direction.Down  => Vector2.down,
-        _               => Vector2.zero
+        Direction.Up => Vector2.up,
+        Direction.Down => Vector2.down,
+        _ => Vector2.zero
     };
 
     private Rect GetPanelRectInParent()
@@ -128,9 +132,9 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
 
     private (bool fullyIn, bool fullyOut) CheckBoundary()
     {
-        Rect panel  = GetPanelRectInParent();
+        Rect panel = GetPanelRectInParent();
         Rect screen = GetParentRect();
-        bool fullyIn  = panel.xMin >= screen.xMin && panel.xMax <= screen.xMax &&
+        bool fullyIn = panel.xMin >= screen.xMin && panel.xMax <= screen.xMax &&
                          panel.yMin >= screen.yMin && panel.yMax <= screen.yMax;
         bool fullyOut = !panel.Overlaps(screen);
         return (fullyIn, fullyOut);
@@ -153,18 +157,18 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
 
         bool crossed = dir switch
         {
-            Direction.Left  => before.x >= targetPosition.x && after.x <= targetPosition.x,
+            Direction.Left => before.x >= targetPosition.x && after.x <= targetPosition.x,
             Direction.Right => before.x <= targetPosition.x && after.x >= targetPosition.x,
-            Direction.Up    => before.y <= targetPosition.y && after.y >= targetPosition.y,
-            Direction.Down  => before.y >= targetPosition.y && after.y <= targetPosition.y,
-            _               => false
+            Direction.Up => before.y <= targetPosition.y && after.y >= targetPosition.y,
+            Direction.Down => before.y >= targetPosition.y && after.y <= targetPosition.y,
+            _ => false
         };
 
         if (crossed)
         {
             Vector2 snapped = after;
-            if (dir == Direction.Left  || dir == Direction.Right) snapped.x = targetPosition.x;
-            if (dir == Direction.Up    || dir == Direction.Down)  snapped.y = targetPosition.y;
+            if (dir == Direction.Left || dir == Direction.Right) snapped.x = targetPosition.x;
+            if (dir == Direction.Up || dir == Direction.Down) snapped.y = targetPosition.y;
             _minigamePanel.anchoredPosition = snapped;
         }
 

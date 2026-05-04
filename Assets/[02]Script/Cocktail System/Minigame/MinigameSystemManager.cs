@@ -14,22 +14,23 @@ public class MinigameSystemManager : MonoBehaviour
 {
     [Header("Camera")]
     [SerializeField] private CameraController _cocktailCamera;
-    [SerializeField] private CocktailSystemManager cocktailSystemManager;
+    [SerializeField] private CocktailSystemManager _cocktailSystemManager;
 
     public UnityEvent OnStartedMinigame;
+    public UnityEvent OnEndedGame;
 
     private ShakingMinigame _shakingMinigame;
     private MixingMinigame _mixingMinigame;
     private BaseMiniGame _activeMinigame;
-    
+
 
     private void Awake()
     {
         _shakingMinigame = GetComponent<ShakingMinigame>();
-        _shakingMinigame.Initialize(_cocktailCamera, cocktailSystemManager);
+        _shakingMinigame.Initialize(_cocktailCamera, _cocktailSystemManager, this);
 
         _mixingMinigame = GetComponent<MixingMinigame>();
-        _mixingMinigame.Initialize(_cocktailCamera, cocktailSystemManager);
+        _mixingMinigame.Initialize(_cocktailCamera, _cocktailSystemManager, this);
 
         _activeMinigame = _shakingMinigame;
     }

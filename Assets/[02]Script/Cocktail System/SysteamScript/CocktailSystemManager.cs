@@ -17,6 +17,8 @@ public class CocktailSystemManager : MonoBehaviour
     public CocktailShaker cocktailShaker;
 
     public UnityEvent OnApplyCocktail;
+    public UnityEvent OnServedCocktail;
+    public void ServeCocktail() => OnServedCocktail?.Invoke();
 
     // ── Private State ────────────────────────────────────
     private List<S_Drink> _normalDrinks = new List<S_Drink>();

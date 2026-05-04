@@ -61,10 +61,6 @@ public class CocktailShaker : Interactable3DObject
     /// behaviour here (e.g. triggering a shake animation, playing a sound).
     /// <see cref="Interactable3DObject.OnClicked"/> has already been invoked.
     /// </summary>
-    protected override void OnClick()
-    {
-        // Add shaker-specific click behaviour here.
-    }
 
     // ── Ingredient Helpers ────────────────────────────────────────────────────
     public void SetMethod(Method method) => currentCocktail.PreparationMethod = method;
@@ -84,19 +80,37 @@ public class CocktailShaker : Interactable3DObject
         if (_canShowServeUI) ServeUI.ToggleAtiveGameObject();
     }
 
-    public void ToggleCanClickIngredientBTN(bool active)
+    public void SetIngredientActive(bool active)
     {
         foreach (var btn in ingredientButtons)
             btn.Interactable = active;
+    }
+
+    public void CanIngredientActive()
+    {
+        if(currentCocktail.GetTotalIngredient() >= 10)
+        {
+            SetIngredientActive(false);
+        }
+        else
+        {
+            SetIngredientActive(true);
+        }
     }
 
     public void DebugClicked() { 
         Debug.Log("Shaker clicked! Current cocktail:\n" + currentCocktail.GetOfCocktailInfo());
     }
 
+
+
     // ── Reset ─────────────────────────────────────────────────────────────────
     public void ResetShaker()
     {
+        OnResetedCocktail?.Invoke();
+    }
+
+    public void InternalResetShaker() {
         currentCocktail.Name = string.Empty;
         currentCocktail.AlcoholStrength = TypeOfCocktail.None;
         currentCocktail.PreparationMethod = Method.None;
@@ -104,12 +118,10 @@ public class CocktailShaker : Interactable3DObject
         currentCocktail.AlcoholList = new SerializedDictionary<Alcohol, int>();
         currentCocktail.MixerList = new SerializedDictionary<Mixer, int>();
         currentCocktail.CompatibleGlasses = new List<GlassType>();
+        SetIngredientActive(true);
 
         SetCanShowMethodUI(true);
         SetCanShowServeUI(false);
         SetCanClick(true);
-        SetBTNSprite(ShakerSprite, ShakerSprite, ShakerSprite);
-
-        OnResetedCocktail?.Invoke();
     }
 }
