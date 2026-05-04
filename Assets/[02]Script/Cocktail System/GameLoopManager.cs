@@ -12,7 +12,7 @@ public class GameLoopManager : MonoBehaviour
     [Header("Systems")]
     [SerializeField] private CocktailSystemManager _cocktailSystem;
     [SerializeField] private MinigameSystemManager _minigameSystem;
-    [SerializeField] private CocktailShaker        _cocktailShaker;
+    [SerializeField] private CocktailShakerData        _cocktailShaker;
 
     // ── Yarn Variable Names ───────────────────────────────
     private const string VAR_SATISFACTION  = "$satisfaction";
@@ -81,7 +81,7 @@ private void SetOrder(string type)
         Satisfaction result = _cocktailSystem.CalculateSatisfaction();
         _dialogueRunner.VariableStorage.SetValue(VAR_SATISFACTION, result.ToString());
         Debug.Log($"[GameLoop] Served — satisfaction: {result}");
-        _cocktailShaker.ResetShaker();
+        //_cocktailShaker.ResetShaker();
     }
 
     /// <<reset_shaker>> — clears without serving

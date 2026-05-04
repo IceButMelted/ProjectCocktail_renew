@@ -8078,6 +8078,7 @@ GameObject:
   - component: {fileID: 2050554073}
   - component: {fileID: 2050554072}
   - component: {fileID: 2050554071}
+  - component: {fileID: 2050554076}
   - component: {fileID: 2050554070}
   - component: {fileID: 2050554075}
   m_Layer: 9
@@ -8103,12 +8104,6 @@ MonoBehaviour:
   _specialCocktailList: {fileID: 0}
   _failCocktailTexture: {fileID: 2800000, guid: 098ccd04d394f96479ed4a40fae4c482, type: 3}
   cocktailShaker: {fileID: 2050554071}
-  OnApplyCocktail:
-    m_PersistentCalls:
-      m_Calls: []
-  OnServedCocktail:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!114 &2050554071
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8144,114 +8139,6 @@ MonoBehaviour:
           m_BoolArgument: 0
         m_CallState: 2
   ShakerSprite: {fileID: 21300000, guid: 098ccd04d394f96479ed4a40fae4c482, type: 3}
-  OnAddAlcohol:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 2050554071}
-        m_TargetAssemblyTypeName: CocktailShaker, Assembly-CSharp
-        m_MethodName: TryToAddAlcohol
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  OnAddMixer:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 2050554071}
-        m_TargetAssemblyTypeName: CocktailShaker, Assembly-CSharp
-        m_MethodName: TryToAddMixer
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  OnAddIngredient:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 2120624861}
-        m_TargetAssemblyTypeName: VisualizeCocktail, Assembly-CSharp
-        m_MethodName: UpdateCocktailBars
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 2050554071}
-        m_TargetAssemblyTypeName: CocktailShaker, Assembly-CSharp
-        m_MethodName: CanIngredientActive
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  OnResetedCocktail:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 2050554071}
-        m_TargetAssemblyTypeName: CocktailShaker, Assembly-CSharp
-        m_MethodName: InternalResetShaker
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 2120624861}
-        m_TargetAssemblyTypeName: VisualizeCocktail, Assembly-CSharp
-        m_MethodName: UpdateCocktailBars
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 2120624855}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  currentCocktail:
-    Name: 
-    AlcoholStrength: 0
-    PreparationMethod: 0
-    AddIce: 0
-    Price: 0
-    AlcoholList:
-      _serializedList: []
-    MixerList:
-      _serializedList: []
-    CompatibleGlasses: 
-    CocktailSprite: {fileID: 0}
   MethodUI: {fileID: 174613561}
   ServeUI: {fileID: 1352778573}
   ingredientButtons:
@@ -8376,9 +8263,129 @@ MonoBehaviour:
   _dragThreshold: 10
   detectLayerMask:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 128
   _placementSystem: {fileID: 0}
   DebugDraw: 1
+--- !u!114 &2050554076
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2050554069}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c8089d3203e65e84f927c45ab82a06a3, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::CocktailShakerData
+  OnAddAlcohol:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 2050554076}
+        m_TargetAssemblyTypeName: CocktailShakerData, Assembly-CSharp
+        m_MethodName: TryToAddAlcohol
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  OnAddMixer:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 2050554076}
+        m_TargetAssemblyTypeName: CocktailShakerData, Assembly-CSharp
+        m_MethodName: TryToAddMixer
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  OnAddIngredient:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 2120624861}
+        m_TargetAssemblyTypeName: VisualizeCocktail, Assembly-CSharp
+        m_MethodName: UpdateCocktailBars
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 2050554071}
+        m_TargetAssemblyTypeName: CocktailShaker, Assembly-CSharp
+        m_MethodName: CanIngredientActive
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  OnResetedCocktail:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 2050554071}
+        m_TargetAssemblyTypeName: CocktailShaker, Assembly-CSharp
+        m_MethodName: InternalResetShaker
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 2120624861}
+        m_TargetAssemblyTypeName: VisualizeCocktail, Assembly-CSharp
+        m_MethodName: UpdateCocktailBars
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 2120624855}
+        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
+        m_MethodName: SetActive
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  currentCocktail:
+    Name: 
+    AlcoholStrength: 0
+    PreparationMethod: 0
+    AddIce: 0
+    Price: 0
+    AlcoholList:
+      _serializedList: []
+    MixerList:
+      _serializedList: []
+    CompatibleGlasses: 
+    CocktailSprite: {fileID: 0}
 --- !u!1 &2075687886
 GameObject:
   m_ObjectHideFlags: 0
@@ -9290,6 +9297,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5854058046892378484}
+  - component: {fileID: 5854058046892378485}
   m_Layer: 0
   m_Name: System
   m_TagString: Untagged
@@ -11524,6 +11532,22 @@ Transform:
   - {fileID: 414523508666873183}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &5854058046892378485
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 780689006250851129}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13645d71fec79774483dffbd2739034a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GameLoopManager
+  _dialogueRunner: {fileID: 0}
+  _cocktailSystem: {fileID: 0}
+  _minigameSystem: {fileID: 0}
+  _cocktailShaker: {fileID: 0}
 --- !u!1 &5862868506681079988
 GameObject:
   m_ObjectHideFlags: 0
@@ -12194,6 +12218,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 2050554071}
+        m_TargetAssemblyTypeName: CocktailShaker, Assembly-CSharp
+        m_MethodName: set_Interactable
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   OnEndedGame:
     m_PersistentCalls:
       m_Calls:
@@ -12212,6 +12248,30 @@ MonoBehaviour:
       - m_Target: {fileID: 2050554071}
         m_TargetAssemblyTypeName: CocktailShaker, Assembly-CSharp
         m_MethodName: SetCanShowServeUI
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+      - m_Target: {fileID: 2050554070}
+        m_TargetAssemblyTypeName: CocktailSystemManager, Assembly-CSharp
+        m_MethodName: UpdateCocktailInShaker
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+      - m_Target: {fileID: 2050554071}
+        m_TargetAssemblyTypeName: CocktailShaker, Assembly-CSharp
+        m_MethodName: set_Interactable
         m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

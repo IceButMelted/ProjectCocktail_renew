@@ -15,10 +15,10 @@ public class IngredientButtonUI : MonoBehaviour
     [SerializeField] private Alcohol _alcohol;
 
     // ── Private ───────────────────────────────────────────
-    private CocktailShaker _shaker;
+    private CocktailShakerData _shaker;
 
     private void Awake()
-        => _shaker = FindFirstObjectByType<CocktailShaker>();
+        => _shaker = FindFirstObjectByType<CocktailShakerData>();
 
     // ── Public Methods (wire these to Button.OnClick) ─────
 

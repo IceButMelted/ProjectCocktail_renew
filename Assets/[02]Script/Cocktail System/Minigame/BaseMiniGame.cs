@@ -86,7 +86,7 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
     {
         IsRunning = false;
         _minigameSystemManager?.OnEndedGame?.Invoke();
-        _cocktailSystem?.OnApplyCocktail.Invoke();
+       
     }
 
     public virtual string GetGameState()
