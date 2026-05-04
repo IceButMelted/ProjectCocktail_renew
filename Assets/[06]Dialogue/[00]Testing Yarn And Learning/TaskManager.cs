@@ -42,9 +42,11 @@ public class TaskManager : MonoBehaviour
     const string TypeOfCocktailVariableName = "$type_of_cocktail";
     const string SatisfactionVariableName = "$satisfaction";
 
+    
     // ─────────────────────────────────────────────────────────────────────
     // Public API
     // ─────────────────────────────────────────────────────────────────────
+
 
     public void CompleteTask()
     {
