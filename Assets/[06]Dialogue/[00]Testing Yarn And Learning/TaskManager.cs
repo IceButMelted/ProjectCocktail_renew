@@ -115,6 +115,16 @@ public class TaskManager : MonoBehaviour
             CompleteTask();
             Debug.Log("[TaskManager] Task marked complete via E key.");
         }
+
+        if (Input.GetKeyDown(KeyCode.A)) { 
+            SetSatifiactionPerfect();
+        }
+        if(Input.GetKeyDown(KeyCode.S)) { 
+            SetSatisfactionAcceptable();
+        }
+        if(Input.GetKeyDown(KeyCode.D)) { 
+            SetSatisfactionFail();
+        }
     }
 
     [ContextMenu("Perfect Satisfaction")]

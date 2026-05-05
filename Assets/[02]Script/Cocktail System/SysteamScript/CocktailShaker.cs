@@ -85,6 +85,7 @@ public class CocktailShaker : Interactable3DObject
         SetCanShowMethodUI(true);
         SetCanShowServeUI(false);
         SetCanClick(true);
+        SetBTNSprite(ShakerSprite, ShakerSprite, ShakerSprite);
     }
 
     /// <summary>Full reset — cocktail data + UI. Drop-in replacement for the old InternalResetShaker().</summary>

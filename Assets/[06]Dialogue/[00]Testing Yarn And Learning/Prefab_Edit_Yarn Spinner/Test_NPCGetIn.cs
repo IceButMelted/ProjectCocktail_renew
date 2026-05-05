@@ -4,6 +4,12 @@ using Yarn.Unity;
 
 public class Test_NPCGetIn : MonoBehaviour
 {
+    [Header("Sprite Emotional")]
+    public SpriteRenderer SpriteRenderer;
+    [SerializeField] public Sprite _neutralSprite;
+    [SerializeField] public Sprite _happySprite;
+    [SerializeField] public Sprite _upsetSprite;
+
     [Header("Waypoints")]
     [SerializeField] private Transform[] _waypoints;
 
@@ -31,6 +37,29 @@ public class Test_NPCGetIn : MonoBehaviour
 
         transform.position += dir.normalized * (_moveSpeed * Time.deltaTime);
         //transform.rotation = Quaternion.LookRotation(dir);
+    }
+
+    [YarnCommand("SetEmotion")]
+    public static void SetEmotion(string npcName, string emotion)
+    {
+        Test_NPCGetIn npc = FindNPC(npcName);
+        if (npc == null) return;
+        npc.DoSetEmotion(emotion);
+    }
+
+    private void DoSetEmotion(string emotion)
+    {
+        SpriteRenderer sr = SpriteRenderer;
+        sr.sprite = emotion.ToLower() switch
+        {
+            "happy" => _happySprite,
+            "upset" => _upsetSprite,
+            "neutral" => _neutralSprite,
+            _ => sr.sprite // keep current on unknown
+        };
+
+        if (sr.sprite == null)
+            Debug.LogWarning($"Unknown emotion '{emotion}' for {name}");
     }
 
     [YarnCommand("MoveIn")]

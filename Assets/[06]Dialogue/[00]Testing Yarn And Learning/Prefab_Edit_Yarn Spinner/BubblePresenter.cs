@@ -29,10 +29,13 @@
  *      Canvas in the Editor). Alignment is still derived from its screen X.
  *
  * ── EDGE SHIFT ───────────────────────────────────────────────────────────────
- *  Edge shift is DYNAMIC: computed each line as  bubbleRect.rect.width / 2.
- *  This ensures the shift is exactly half the bubble width so the bubble
- *  stays on-screen regardless of its content-driven size.
- *  The old static "edgeShiftAmount" inspector field has been removed.
+ *  Base shift  = bubbleRect.rect.width * 0.5 * sideShiftMultiplier
+ *  Total shift = base shift + sideShiftExtraPixels
+ *  Both values are tunable in the Inspector under "Bubble Edge Shift".
+ *
+ * ── SCREEN CLAMPING ──────────────────────────────────────────────────────────
+ *  After positioning, the bubble is clamped so no edge exits the screen.
+ *  A configurable screenBorderPadding (default 50 px) keeps it inset.
  *
  * ── FALLBACK CANVAS ANCHOR SETUP ─────────────────────────────────────────────
  *  1. In your Canvas, create an empty GameObject (e.g. "BubbleFallbackAnchor").
@@ -92,7 +95,7 @@ namespace YarnSpinner.Custom
 
         [Tooltip("Root GameObject shown/hidden per line.")]
         [SerializeField] private GameObject bubbleContainer;
-        
+
 
         [Header("Tail / Pointer")]
         [Tooltip("RectTransform of the Tail image (child of BubbleContainer).\n" +
@@ -133,9 +136,15 @@ namespace YarnSpinner.Custom
         [SerializeField] private float centerZoneFraction = 0.10f;
 
         [Header("Bubble Edge Shift  (Mode B)")]
-        // edgeShiftAmount is no longer a serialized field.
-        // It is computed at runtime as: bubbleRect.rect.width / 2
-        // so it always shifts the bubble by exactly half its own width.
+        [Tooltip("Multiplier applied to (bubbleRect.width * 0.5) to get the base shift amount.\n" +
+                 "1.0 = shift by exactly half the bubble width (default).\n" +
+                 "Increase to shift more, decrease to shift less.")]
+        [Range(0f, 3f)]
+        [SerializeField] private float sideShiftMultiplier = 1.0f;
+
+        [Tooltip("Extra flat pixel offset added on top of the multiplied shift.\n" +
+                 "Use this to fine-tune without changing the multiplier.")]
+        [SerializeField] private float sideShiftExtraPixels = 0f;
 
         [Tooltip("Normalised screen X BELOW which the bubble shifts RIGHT.\nDefault 0.30 = 30%.")]
         [Range(0f, 0.5f)]
@@ -144,6 +153,12 @@ namespace YarnSpinner.Custom
         [Tooltip("Normalised screen X ABOVE which the bubble shifts LEFT.\nDefault 0.70 = 70%.")]
         [Range(0.5f, 1f)]
         [SerializeField] private float rightEdgeThreshold = 0.70f;
+
+        [Header("Screen Boundary Clamping  (Mode B)")]
+        [Tooltip("Minimum distance in screen pixels between any bubble edge and the screen border.\n" +
+                 "If the bubble would go outside this margin it is pushed inward.\n" +
+                 "Default 50 px.")]
+        [SerializeField] private float screenBorderPadding = 50f;
 
         [Header("Fallback Canvas Anchor  (Mode B — no target found)")]
         [Tooltip("A plain empty RectTransform placed anywhere on the Canvas.\n\n" +
@@ -251,45 +266,34 @@ namespace YarnSpinner.Custom
                     // Alignment from screen X
                     alignment = ScreenXToAlignment(screenPos.x);
 
-                    // Dynamic edge shift = half the bubble width (computed fresh each line
-                    // so it is correct even when the bubble resizes due to content).
-                    float edgeShiftAmount = bubbleRect != null ? bubbleRect.rect.width * 0.5f : 0f;
+                    // Side shift: (halfWidth * multiplier) + extra pixels
+                    float halfBubbleW = bubbleRect != null ? bubbleRect.rect.width * 0.5f : 0f;
+                    float edgeShiftAmount = halfBubbleW * sideShiftMultiplier + sideShiftExtraPixels;
                     float shiftX = ComputeEdgeShift(screenPos.x, edgeShiftAmount);
-                    float shiftY;
 
+                    float shiftY;
                     if (backGroundText != null)
                         shiftY = bubbleAboveTargetOffset + backGroundText.rect.height * 0.5f;
                     else
                     {
                         shiftY = bubbleAboveTargetOffset;
-                        Debug.LogWarning("BackGroundText reference is missing. Using bubbleAboveTargetOffset only for vertical shift.");
+                        Debug.LogWarning("[BubblePresenter] BackGroundText reference is missing. Using bubbleAboveTargetOffset only.");
                     }
-
-                    Debug.Log($"Target '{characterName}' → screenPos={screenPos} alignment={alignment} shiftX={shiftX} Background={backGroundText.rect.height}");
 
                     if (bubbleRect != null)
                     {
-                        if (foundTarget)
-                        {
-                            bubbleRect.position = new Vector3(
-                                screenPos.x + shiftX,
-                                screenPos.y + shiftY,
-                                0f
-                            );
-                        }
-                        else
-                        {
-                            bubbleRect.position = new Vector3(
-                               screenPos.x,
-                               screenPos.y + shiftY,
-                               0f
-                           );
-                        }
+                        float rawX = foundTarget ? screenPos.x + shiftX : screenPos.x;
+                        float rawY = screenPos.y + shiftY;
+
+                        // Clamp so no part of the bubble exits the screen
+                        Vector2 clamped = ClampBubbleToScreen(rawX, rawY);
+
+                        bubbleRect.position = new Vector3(clamped.x, clamped.y, 0f);
                     }
 
                     PositionTail(alignment);
 
-                    if(foundTarget)
+                    if (foundTarget)
                         SetTailVisible(true);
                     else
                         SetTailVisible(false);
@@ -427,8 +431,7 @@ namespace YarnSpinner.Custom
         ///   Right zone (nx &gt; rightEdgeThreshold) → shift LEFT   (-edgeShiftAmount)
         ///   Centre                                  → no shift    (0)
         ///
-        /// edgeShiftAmount is passed in as bubbleRect.rect.width * 0.5f so the
-        /// shift is always proportional to the bubble's current width.
+        /// edgeShiftAmount = (bubbleRect.width * 0.5 * sideShiftMultiplier) + sideShiftExtraPixels
         /// </summary>
         private float ComputeEdgeShift(float screenX, float edgeShiftAmount)
         {
@@ -436,6 +439,40 @@ namespace YarnSpinner.Custom
             if (nx < leftEdgeThreshold) return +edgeShiftAmount;
             if (nx > rightEdgeThreshold) return -edgeShiftAmount;
             return 0f;
+        }
+
+        /// <summary>
+        /// Clamps the bubble's screen-space position so that no edge of bubbleRect
+        /// goes outside the screen minus screenBorderPadding.
+        ///
+        /// bubbleRect.position is the CENTRE of the rect (pivot 0.5, 0.5).
+        /// So half-width and half-height are subtracted/added to find edges.
+        ///
+        /// Uses backGroundText.rect for size when available (more accurate than
+        /// bubbleRect which may include invisible padding), falls back to bubbleRect.
+        /// </summary>
+        private Vector2 ClampBubbleToScreen(float x, float y)
+        {
+            // Use the visual background size for accurate edge calculation
+            RectTransform sizeRef = backGroundText != null ? backGroundText : bubbleRect;
+            if (sizeRef == null) return new Vector2(x, y);
+
+            float halfW = sizeRef.rect.width * 0.5f;
+            float halfH = sizeRef.rect.height * 0.5f;
+
+            float pad = screenBorderPadding;
+
+            // Horizontal clamp
+            float minX = pad + halfW;
+            float maxX = Screen.width - pad - halfW;
+            x = Mathf.Clamp(x, minX, maxX);
+
+            // Vertical clamp
+            float minY = pad + halfH;
+            float maxY = Screen.height - pad - halfH;
+            y = Mathf.Clamp(y, minY, maxY);
+
+            return new Vector2(x, y);
         }
 
         // ─────────────────────────────────────────────────────────────────────
@@ -485,7 +522,7 @@ namespace YarnSpinner.Custom
 
         private void SetTailVisible(bool v)
         {
-            
+
             if (tailImage != null) tailImage.gameObject.SetActive(v);
         }
 

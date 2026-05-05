@@ -14,7 +14,8 @@ public class CocktailSystemManager : MonoBehaviour
     [SerializeField] private Texture2D _failCocktailTexture;
 
     [Header("References")]
-    public CocktailShakerData cocktailShaker;
+    public CocktailShakerData _cocktailShakerData;
+    public CocktailShaker _cocktailShaker;
 
     // ── Private State ────────────────────────────────────
     private List<S_Drink> _normalDrinks = new List<S_Drink>();
@@ -39,7 +40,7 @@ public class CocktailSystemManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.P))
         {
             UpdateCocktailInShaker();
-            Debug.Log(cocktailShaker.currentCocktail.GetOfCocktailInfo());
+            Debug.Log(_cocktailShakerData.currentCocktail.GetOfCocktailInfo());
         }
 #endif
     }
@@ -72,20 +73,21 @@ public class CocktailSystemManager : MonoBehaviour
     }
 
     public Satisfaction CalculateSatisfaction()
-        => _targetCocktail.CalculateSatisfaction(cocktailShaker.currentCocktail);
+        => _targetCocktail.CalculateSatisfaction(_cocktailShakerData.currentCocktail);
 
     public string GetTargetName() => _targetCocktail.Name;
 
     /// <summary>Derive identity of whatever is currently in the shaker and update visuals.</summary>
     public void UpdateCocktailInShaker()
     {
-        var current = cocktailShaker.currentCocktail;
+        S_Drink current = _cocktailShakerData.currentCocktail;
         current.UpdateTypeOfAlcohol(_normalDrinks);
         current.UpdateName(_normalDrinks);
         current.UpdatePrice(_normalDrinks);
 
         Texture2D tex = current.GetCocktailTexture(_normalDrinks) ?? _failCocktailTexture;
-        //cocktailShaker.SetBTNSprite(tex, tex, tex);
+        Sprite sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(.5f,0));
+        _cocktailShaker.SetBTNSprite(sprite, sprite, sprite);
     }
 
     // ── Debug Helpers ─────────────────────────────────────
