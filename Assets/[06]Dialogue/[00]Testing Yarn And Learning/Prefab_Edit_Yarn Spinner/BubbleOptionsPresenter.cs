@@ -2,7 +2,7 @@
  * BubbleOptionsPresenter.cs
  * Based on OptionsPresenter.cs from YarnSpinner-Unity (current branch)
  *
- * Shows up to 2 option bubbles anchored to inspector-assigned Transform points.
+ * Shows up to 4 option bubbles anchored to inspector-assigned Transform points.
  *
  * Also displays the LAST SPOKEN LINE while options are visible, using:
  *   lastLineText                 – TMP_Text for the line body
@@ -16,6 +16,8 @@
  * Option anchors:
  *   optionAnchors[0] → position for option 1
  *   optionAnchors[1] → position for option 2
+ *   optionAnchors[2] → position for option 3
+ *   optionAnchors[3] → position for option 4
  */
 
 using System.Threading;
@@ -33,11 +35,10 @@ namespace YarnSpinner.Custom
         [Tooltip("Prefab with BubbleOptionItem + Button + TMP_Text.")]
         [SerializeField] private BubbleOptionItem optionItemPrefab;
 
-        [Header("Anchor Points (max 2)")]
+        [Header("Anchor Points (max 4)")]
         [Tooltip("Empty GameObjects whose positions place each option bubble. " +
-                 "Index 0 = first option, Index 1 = second option.")]
-        [SerializeField] private Transform[] optionAnchors = new Transform[2];
-
+                 "Index 0 = first option, Index 1 = second option, Index 2 = third option, Index 3 = fourth option.")]
+        [SerializeField] private Transform[] optionAnchors = new Transform[4];
         [Header("Options Container")]
         [Tooltip("Parent RectTransform under which option items are spawned.")]
         [SerializeField] private RectTransform optionsContainer;
@@ -66,7 +67,7 @@ namespace YarnSpinner.Custom
 
         // ── State ─────────────────────────────────────────────────────────────
 
-        private BubbleOptionItem[] _activeItems = new BubbleOptionItem[2];
+        private BubbleOptionItem[] _activeItems = new BubbleOptionItem[4];
         private YarnTaskCompletionSource<DialogueOption> _completionSource;
 
         // Cache the last received line so we can display it during options
@@ -131,8 +132,8 @@ namespace YarnSpinner.Custom
             // ── Clear any leftover option buttons ──────────────────────────
             ClearOptions();
 
-            // ── Spawn option buttons (max 2) ───────────────────────────────
-            int count = Mathf.Min(dialogueOptions.Length, 2);
+            // ── Spawn option buttons (max 4) ───────────────────────────────
+            int count = Mathf.Min(dialogueOptions.Length, 4);
             _completionSource = new YarnTaskCompletionSource<DialogueOption>();
 
             for (int i = 0; i < count; i++)

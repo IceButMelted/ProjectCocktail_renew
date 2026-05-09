@@ -176,6 +176,10 @@ namespace YarnSpinner.Custom
                  "is found (stays at its last known position).")]
         [SerializeField] private RectTransform fallbackCanvasAnchor;
 
+        [Tooltip("Screen border padding (px) used when clamping the bubble to the fallback anchor position.\nSeparate from screenBorderPadding so you can tune them independently.")]
+        [SerializeField] private float fallbackScreenBorderPadding = 50f; 
+        //
+
         // ─────────────────────────────────────────────────────────────────────
         // Runtime
         // ─────────────────────────────────────────────────────────────────────
@@ -241,6 +245,7 @@ namespace YarnSpinner.Custom
                     // ── MODE B — world target found ───────────────────────
                     screenPos = WorldToScreenPoint(worldTarget.position);
                     shouldReposition = true;
+
                 }
                 else if (fallbackCanvasAnchor != null)
                 {
@@ -281,20 +286,31 @@ namespace YarnSpinner.Custom
                     }
 
                     if (bubbleRect != null)
+                    if (bubbleRect != null)
                     {
-                        float rawX = foundTarget ? screenPos.x + shiftX : screenPos.x;
-                        float rawY = screenPos.y + shiftY;
-
-                        // Clamp so no part of the bubble exits the screen
-                        Vector2 clamped = ClampBubbleToScreen(rawX, rawY);
-
-                        bubbleRect.position = new Vector3(clamped.x, clamped.y, 0f);
+                        if (foundTarget)
+                        {
+                            float rawX = screenPos.x + shiftX;
+                            float rawY = screenPos.y + shiftY;
+                            Vector2 clamped = ClampBubbleToScreen(rawX, rawY, screenBorderPadding);
+                            bubbleRect.position = new Vector3(clamped.x, clamped.y, 0f);
+                        }
+                        else
+                        {
+                            float rawX = screenPos.x;
+                            float rawY = screenPos.y;
+                            Vector2 clamped = ClampBubbleToScreen(rawX, rawY, fallbackScreenBorderPadding);
+                            bubbleRect.position = new Vector3(clamped.x, clamped.y, 0f);
+                        }
                     }
 
-                    PositionTail(alignment);
 
+                    // Tail
                     if (foundTarget)
+                    {
+                        PositionTail(alignment);
                         SetTailVisible(true);
+                    }
                     else
                         SetTailVisible(false);
                 }
@@ -451,26 +467,16 @@ namespace YarnSpinner.Custom
         /// Uses backGroundText.rect for size when available (more accurate than
         /// bubbleRect which may include invisible padding), falls back to bubbleRect.
         /// </summary>
-        private Vector2 ClampBubbleToScreen(float x, float y)
+private Vector2 ClampBubbleToScreen(float x, float y, float padding)
         {
-            // Use the visual background size for accurate edge calculation
             RectTransform sizeRef = backGroundText != null ? backGroundText : bubbleRect;
             if (sizeRef == null) return new Vector2(x, y);
 
-            float halfW = sizeRef.rect.width * 0.5f;
+            float halfW = sizeRef.rect.width  * 0.5f;
             float halfH = sizeRef.rect.height * 0.5f;
 
-            float pad = screenBorderPadding;
-
-            // Horizontal clamp
-            float minX = pad + halfW;
-            float maxX = Screen.width - pad - halfW;
-            x = Mathf.Clamp(x, minX, maxX);
-
-            // Vertical clamp
-            float minY = pad + halfH;
-            float maxY = Screen.height - pad - halfH;
-            y = Mathf.Clamp(y, minY, maxY);
+            x = Mathf.Clamp(x, padding + halfW, Screen.width  - padding - halfW);
+            y = Mathf.Clamp(y, padding + halfH, Screen.height - padding - halfH);
 
             return new Vector2(x, y);
         }
