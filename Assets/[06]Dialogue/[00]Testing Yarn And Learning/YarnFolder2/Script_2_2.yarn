@@ -29,93 +29,6 @@ title: Script_2_2
 <<jump TestLoopPart>>
 ===
 
-title: TestConversation1
----
-<<wait 3>>
-// Owen enters and greets the player
-<<MoveIn NPC_Owen 2>>
-<<SetEmotion NPC_Owen Happy>>
-Owen: Howdy! How's it going, mate?
--> Good, not bad.
-    Player: Good, not bad.
-    <<SetEmotion NPC_Owen Neutral>>
-    Owen: Well, that's something at least.
--> Trying to be better every day.
-    Player: I try my best every day.
-    Owen: I can see that in you — keep it up.
-
-// Walter arrives
-<<SetEmotion NPC_Owen Neutral>>
-<<MoveIn NPC_Walter 1>>
-Owen: Oh! Who's coming in now... wait, is that the old man himself?
-Walter: Ho ho, long time no see, Owen. How have you been?
-<<SetEmotion NPC_Owen Happy>>
-Owen: Can't complain, honestly.
-<<SetEmotion NPC_Walter Happy>>
-Walter: And you must be the new bartender. The place looks lovely — you've got a good eye.
-<<SetEmotion NPC_Walter Neutral>>
--> Thank you.
-    Player: Thank you, I appreciate it.
-    Walter: Keep it up. This place suits you.
--> *Shy*
-    Player: T-Thanks...
-    <<SetEmotion NPC_Walter Happy>>
-    Walter: Hahaha! No need to be shy, kid. Own it!
-===
-
-title: TestConversation
----
-// ── Owen's Order ──────────────────────────────────────────
-<<MoveIn NPC_Owen 2>>
-<<SetEmotion NPC_Owen Happy>>
-Owen: Hey, could you make me something? I'm thinking {Order_Cocktail_OutName(NPC_Name.Owen)}.
-
-<<wait_for_task SystemGame>>
-
-<<if $satisfaction == Satisfaction.Perfect>>
-    <<SetEmotion NPC_Owen Happy>>
-    Owen: Wow! Now THAT is a drink. You're good at this.
-<<elseif $satisfaction == Satisfaction.Acceptable>>
-    <<SetEmotion NPC_Owen Neutral>>
-    Owen: Hmm... not bad. I've had better, but I've had worse.
-<<elseif $satisfaction == Satisfaction.Fail>>
-    <<SetEmotion NPC_Owen Upset>>
-    Owen: Ugh... that's rough, mate. Really rough.
-<<endif>>
-
-<<SetEmotion NPC_Owen Neutral>>
-<<Reset_Variable SystemGame>>
-
-// ── Walter Arrives ────────────────────────────────────────
-Owen: Oh, looks like someone's coming in.
-
--> Who is it?
-    Owen: See for yourself...
--> A new customer?
-    Owen: Nah, it's just Walter. The old man himself.
-
-<<MoveIn NPC_Walter 1>>
-Walter: Well, well — the new bartender! Place looks great, kid.
-Walter: I'll have something, and make it better than whatever you gave Owen. Ha!
-Walter: I'm after {Order_Cocktail_OutDescription(NPC_Name.Walter)}.
-
-<<wait_for_task SystemGame>>
-
-<<if $satisfaction == Satisfaction.Perfect>>
-    <<SetEmotion NPC_Walter Happy>>
-    Walter: Now THAT takes me back. Just like the old days. Well done.
-<<elseif $satisfaction == Satisfaction.Acceptable>>
-    <<SetEmotion NPC_Walter Neutral>>
-    Walter: Decent enough. A little more practice and you'll get there.
-<<elseif $satisfaction == Satisfaction.Fail>>
-    <<SetEmotion NPC_Walter Upset>>
-    Walter: Oh dear... that's not quite it, is it. Keep at it, kid.
-<<endif>>
-
-<<SetEmotion NPC_Walter Neutral>>
-<<Reset_Variable SystemGame>>
-===
-
 title: TestLoopPart
 ---
 // <<SetEmotion NPC_Owen Happy>>
@@ -135,7 +48,7 @@ title: TestLoopPart
 // Test part Isla {Order_Cocktail_OutDescription(NPC_Name.Isla)}
 
 
-// ── Owen Arrives ──────────────────────────────────────────
+// ── Owen Arrives 
 <<MoveIn NPC_Owen 2>>
 <<SetEmotion NPC_Owen Happy>>
 Owen: Hey! You must be the new bartender everyone's been talking about.
@@ -149,7 +62,7 @@ Owen: Place looks good. Someone's been busy.
     Player: I've been here longer than you'd think.
     Owen: Oh! My bad, you just look fresh. Good thing I didn't say anything rude then, eh?
 
-// ── Owen's Order ──────────────────────────────────────────
+// ── Owen's Order 
 Owen: Anyway — could you make me something? I'm thinking {Order_Cocktail_OutName(NPC_Name.Owen)}.
 
 <<wait_for_task SystemGame>>
@@ -285,7 +198,6 @@ Walter: ...Different.
     Walter: When have I ever scared anyone off?
     <<SetEmotion NPC_Owen Happy>>
     Owen: Should I get the list?
-
 -> Glad you both stopped by.
     Player: Well, glad you both came in today.
     <<SetEmotion NPC_Walter Happy>>
