@@ -11,14 +11,18 @@
  *   - Fade In / Fade Out (adjustable durations).
  *   - Tick box to show unavailable options (greyed out).
  *   - Last-line display (character name + body).
- *   - Timeout: tag any option with #fallback in your Yarn script to make it the
- *     auto-selected option when the timer runs out. The timer bar is driven by
- *     the companion TimeoutBar component.
+ *   - Timeout: ONLY activates when ALL options end with "?" AND one is tagged #fallback.
+ *     The "?" is stripped from the displayed button label automatically.
  *
- * Yarn script usage:
+ * Yarn script usage (timeout ON — every option ends with "?"):
+ *   -> Option A?
+ *   -> Option B?
+ *   -> This is chosen automatically? #fallback
+ *
+ * Yarn script usage (timeout OFF — no "?" suffix):
  *   -> Option A
  *   -> Option B
- *   -> This is chosen automatically #fallback
+ *   -> This will NOT auto-select even though it has #fallback
  */
 
 using System.Collections.Generic;
@@ -71,8 +75,8 @@ namespace YarnSpinner.Custom
                  "Leave empty to disable the bar visual (timeout still works).")]
         [SerializeField] private TimeoutBar timedBar;
 
-        [Tooltip("Seconds the player has to pick an option before the #fallback is chosen. " +
-                 "Only active when at least one option is tagged #fallback.")]
+        [Tooltip("Seconds the player has to pick an option before the #fallback is chosen.\n" +
+                 "Only active when options end with '?' AND one option is tagged #fallback.")]
         [SerializeField] public float autoSelectDuration = 10f;
 
         // ── Last Line ─────────────────────────────────────────────────────────
@@ -98,7 +102,7 @@ namespace YarnSpinner.Custom
         // ── State ─────────────────────────────────────────────────────────────
 
         private readonly List<OptionType2Item> _pool = new List<OptionType2Item>();
-        private string _lastLineBody          = string.Empty;
+        private string _lastLineBody = string.Empty;
         private string _lastLineCharacterName = string.Empty;
 
         // ── Canvas Group Helpers ──────────────────────────────────────────────
@@ -106,8 +110,8 @@ namespace YarnSpinner.Custom
         private void ResetCanvasGroup()
         {
             if (optionPresenterCanvasGroup == null) return;
-            optionPresenterCanvasGroup.alpha          = 0f;
-            optionPresenterCanvasGroup.interactable   = false;
+            optionPresenterCanvasGroup.alpha = 0f;
+            optionPresenterCanvasGroup.interactable = false;
             optionPresenterCanvasGroup.blocksRaycasts = false;
         }
 
@@ -143,7 +147,7 @@ namespace YarnSpinner.Custom
             if (showsLastLine)
             {
                 _lastLineCharacterName = line.CharacterName ?? string.Empty;
-                _lastLineBody          = line.TextWithoutCharacterName.Text ?? string.Empty;
+                _lastLineBody = line.TextWithoutCharacterName.Text ?? string.Empty;
             }
             return YarnTask.CompletedTask;
         }
@@ -164,10 +168,24 @@ namespace YarnSpinner.Custom
                 return await DialogueRunner.NoOptionSelected;
             }
 
-            // ── Scan options for timeout metadata ─────────────────────────────
-            TimeoutOptionType timeoutType   = TimeoutOptionType.None;
-            DialogueOption    fallbackOpt   = null;
-            int               fallbackCount = 0;
+            // ── Gate 1: Check if this option set uses the "?" timeout convention ──
+            // Timeout only activates when at least one option text ends with "?".
+            // Options WITHOUT "?" never trigger timeout, even if #fallback is present.
+            bool hasTimeoutMarker = false;
+            foreach (var opt in dialogueOptions)
+            {
+                string raw = opt.Line.TextWithoutCharacterName.Text ?? string.Empty;
+                if (raw.TrimEnd().EndsWith("?"))
+                {
+                    hasTimeoutMarker = true;
+                    break;
+                }
+            }
+
+            // ── Gate 2: Scan for #fallback metadata ───────────────────────────
+            TimeoutOptionType timeoutType = TimeoutOptionType.None;
+            DialogueOption fallbackOpt = null;
+            int fallbackCount = 0;
 
             foreach (var opt in dialogueOptions)
             {
@@ -178,26 +196,28 @@ namespace YarnSpinner.Custom
                     // Unavailable fallbacks are ignored
                     if (!opt.IsAvailable) continue;
 
-                    timeoutType   = TimeoutOptionType.HiddenFallback;
-                    fallbackOpt   = opt;
+                    fallbackOpt = opt;
                     fallbackCount++;
                     break;
                 }
             }
 
-            // Validate: exactly one fallback allowed
-            if (timeoutType == TimeoutOptionType.HiddenFallback)
+            // Timeout requires BOTH: "?" marker on options AND a valid #fallback
+            if (hasTimeoutMarker && fallbackOpt != null)
             {
-                if (fallbackCount != 1)
+                if (fallbackCount > 1)
                 {
                     Debug.LogError("[OptionPresenterType2] More than one option is tagged #fallback. Only one is allowed.");
                     return await DialogueRunner.NoOptionSelected;
                 }
-                if (fallbackOpt == null)
-                {
-                    Debug.LogError("[OptionPresenterType2] #fallback tag found but option is null.");
-                    return await DialogueRunner.NoOptionSelected;
-                }
+                timeoutType = TimeoutOptionType.HiddenFallback;
+            }
+            else if (!hasTimeoutMarker && fallbackOpt != null)
+            {
+                // #fallback exists but no "?" — treat as a normal visible option, no timeout.
+                Debug.Log("[OptionPresenterType2] #fallback found but no '?' suffix on options — timeout disabled. " +
+                          "Fallback will be shown as a normal button.");
+                fallbackOpt = null; // don't hide it from the player
             }
 
             // ── Check at least one visible option exists ───────────────────────
@@ -205,7 +225,7 @@ namespace YarnSpinner.Custom
             foreach (var opt in dialogueOptions)
             {
                 if (!opt.IsAvailable) continue;
-                // fallback option is hidden from the player
+                // Hidden fallback is represented by the bar, not a button
                 if (timeoutType == TimeoutOptionType.HiddenFallback &&
                     fallbackOpt != null &&
                     opt.DialogueOptionID == fallbackOpt.DialogueOptionID) continue;
@@ -230,7 +250,7 @@ namespace YarnSpinner.Custom
                 _pool.Add(CreatePooledItem());
 
             // ── Completion + cancellation sources ─────────────────────────────
-            var selectionSource    = new YarnTaskCompletionSource<DialogueOption>();
+            var selectionSource = new YarnTaskCompletionSource<DialogueOption>();
             var completionCancelSrc = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken);
 
             // Monitor outer cancellation: if the runner cancels us, resolve with null
@@ -243,6 +263,7 @@ namespace YarnSpinner.Custom
             WatchExternalCancel().Forget();
 
             // ── Configure option items ────────────────────────────────────────
+            // Pass hasTimeoutMarker so items know to strip the trailing "?" from their label.
             int activeCount = 0;
             for (int i = 0; i < dialogueOptions.Length; i++)
             {
@@ -257,7 +278,8 @@ namespace YarnSpinner.Custom
                     opt.DialogueOptionID == fallbackOpt.DialogueOptionID) continue;
 
                 var item = _pool[activeCount];
-                item.Configure(opt, showUnavailableOptions, selectionSource, completionCancelSrc.Token);
+                item.Configure(opt, showUnavailableOptions, selectionSource,
+                               completionCancelSrc.Token, stripTrailingQuestionMark: hasTimeoutMarker);
                 item.gameObject.SetActive(true);
                 activeCount++;
             }
@@ -279,7 +301,7 @@ namespace YarnSpinner.Custom
             }
 
             // ── Fade IN ───────────────────────────────────────────────────────
-            optionPresenterCanvasGroup.interactable   = false;
+            optionPresenterCanvasGroup.interactable = false;
             optionPresenterCanvasGroup.blocksRaycasts = false;
 
             if (useFadeEffect && fadeInDuration > 0f)
@@ -287,7 +309,7 @@ namespace YarnSpinner.Custom
             else
                 optionPresenterCanvasGroup.alpha = 1f;
 
-            optionPresenterCanvasGroup.interactable   = true;
+            optionPresenterCanvasGroup.interactable = true;
             optionPresenterCanvasGroup.blocksRaycasts = true;
 
             // ── Kick off timeout bar shrink ───────────────────────────────────
@@ -300,7 +322,7 @@ namespace YarnSpinner.Custom
             // ── Clean up ──────────────────────────────────────────────────────
             completionCancelSrc.Cancel();
 
-            optionPresenterCanvasGroup.interactable   = false;
+            optionPresenterCanvasGroup.interactable = false;
             optionPresenterCanvasGroup.blocksRaycasts = false;
 
             if (useFadeEffect && fadeOutDuration > 0f)
@@ -362,8 +384,8 @@ namespace YarnSpinner.Custom
 
         private void ShowLastLine(string characterName, string body)
         {
-            if (lastLineText != null)            lastLineText.text = body;
-            if (lastLineContainer != null)       lastLineContainer.SetActive(true);
+            if (lastLineText != null) lastLineText.text = body;
+            if (lastLineContainer != null) lastLineContainer.SetActive(true);
 
             bool hasName = !string.IsNullOrEmpty(characterName);
             if (lastLineCharacterNameText != null)
@@ -374,10 +396,10 @@ namespace YarnSpinner.Custom
 
         private void HideLastLine()
         {
-            if (lastLineContainer != null)            lastLineContainer.SetActive(false);
+            if (lastLineContainer != null) lastLineContainer.SetActive(false);
             if (lastLineCharacterNameContainer != null) lastLineCharacterNameContainer.SetActive(false);
-            if (lastLineText != null)                 lastLineText.text = string.Empty;
-            if (lastLineCharacterNameText != null)    lastLineCharacterNameText.text = string.Empty;
+            if (lastLineText != null) lastLineText.text = string.Empty;
+            if (lastLineCharacterNameText != null) lastLineCharacterNameText.text = string.Empty;
         }
     }
 }
