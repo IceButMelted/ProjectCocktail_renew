@@ -47,6 +47,24 @@ title: TestLoopPart
 // Test part Freya {Order_Cocktail_OutDescription(NPC_Name.Freya)}
 // Test part Isla {Order_Cocktail_OutDescription(NPC_Name.Isla)}
 
+-> Option A
+-> Option B
+-> This gets auto-picked if time runs out #fallback
+
+Owen: Place looks good. Someone's been busy.
+
+-> Thanks, still getting used to it. ?
+    Player: Thanks, still finding my feet honestly.
+    Owen: Ha! You'll be fine. First week's always the hardest.
+-> I've been here a while actually. #fallback
+    Player: I've been here longer than you'd think.
+    Owen: Oh! My bad, you just look fresh. Good thing I didn't say anything rude then, eh?
+-> OPtoin 3 ?
+    Player: I've been here longer than you'd think.
+    Owen: Oh! My bad, you just look fresh. Good thing I didn't say anything rude then, eh?
+-> Option 4 ?
+    Player: I've been here longer than you'd think.
+    Owen: Oh! My bad, you just look fresh. Good thing I didn't say anything rude then, eh?
 
 // ── Owen Arrives 
 <<MoveIn NPC_Owen 2>>
