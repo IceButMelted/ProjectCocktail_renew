@@ -2,10 +2,10 @@
  * OptionType2Item.cs
  * Companion component for OptionPresenterType2.
  *
- * Updated to use YarnTaskCompletionSource<DialogueOption> directly,
- * matching how the official Yarn Spinner OptionItem works — so the
- * presenter's completion source is resolved safely and only once
- * per option set, with proper cancellation guard.
+ * Updated to accept a stripTrailingQuestionMark flag from the presenter.
+ * When true, the trailing "?" (used as the timeout convention marker in
+ * Yarn scripts) is removed from the displayed button label so players
+ * never see it.
  *
  * Wire the Unity Button's OnClick → OnButtonClicked() in your prefab.
  */
@@ -63,20 +63,41 @@ namespace YarnSpinner.Custom
         /// Cancelled when another option has already been selected — prevents
         /// double-resolution of the completion source.
         /// </param>
+        /// <param name="stripTrailingQuestionMark">
+        /// When true, a trailing "?" is stripped from the displayed label text.
+        /// The presenter sets this when the option set uses the "?" timeout convention,
+        /// so players see "Option A" instead of "Option A?".
+        /// </param>
         public void Configure(
             DialogueOption option,
             bool showIfUnavailable,
             YarnTaskCompletionSource<DialogueOption> completionSource,
-            CancellationToken completionToken)
+            CancellationToken completionToken,
+            bool stripTrailingQuestionMark = false)
         {
-            Option            = option;
+            Option = option;
             _completionSource = completionSource;
-            _completionToken  = completionToken;
-            _hasSubmitted     = false;
+            _completionToken = completionToken;
+            _hasSubmitted = false;
 
-            // Label text
+            // Label text — strip trailing "?" if this is a timeout-convention option set
             if (optionText != null)
-                optionText.text = option.Line.TextWithoutCharacterName.Text;
+            {
+                string text = option.Line.TextWithoutCharacterName.Text ?? string.Empty;
+
+                if (stripTrailingQuestionMark)
+                {
+                    // Trim whitespace, remove a single trailing "?", trim again
+                    // e.g. "Option 1?"  → "Option 1"
+                    //      "Option 1? " → "Option 1"   (handles trailing spaces)
+                    string trimmed = text.TrimEnd();
+                    if (trimmed.EndsWith("?"))
+                        trimmed = trimmed.Substring(0, trimmed.Length - 1).TrimEnd();
+                    text = trimmed;
+                }
+
+                optionText.text = text;
+            }
 
             // Button interactability
             var btn = GetComponent<Button>();
@@ -95,11 +116,11 @@ namespace YarnSpinner.Custom
         /// </summary>
         public void OnButtonClicked()
         {
-            if (Option == null)                        return;
-            if (!Option.IsAvailable)                   return;
-            if (_hasSubmitted)                         return;
+            if (Option == null) return;
+            if (!Option.IsAvailable) return;
+            if (_hasSubmitted) return;
             if (_completionToken.IsCancellationRequested) return;
-            if (_completionSource == null)             return;
+            if (_completionSource == null) return;
 
             _hasSubmitted = true;
             _completionSource.TrySetResult(Option);
