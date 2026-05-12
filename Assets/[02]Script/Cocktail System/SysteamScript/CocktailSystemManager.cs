@@ -74,9 +74,6 @@ public class CocktailSystemManager : MonoBehaviour
         // Cache runtime drink list once
         foreach (var so in _normalCocktailList.cocktails)
             _normalDrinks.Add(so.CocktailInfos);
-
-        RandomCocktail(TypeOfCocktail.LowAlcohol);
-        Debug.Log("[CocktailSystem] Target set:\n" + _targetCocktail.GetOfCocktailInfo());
     }
 
     private void Update()
