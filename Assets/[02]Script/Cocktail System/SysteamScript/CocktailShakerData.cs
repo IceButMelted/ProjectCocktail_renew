@@ -23,6 +23,9 @@ public class CocktailShakerData : MonoBehaviour
     [Header("Cocktail State")]
     public S_Drink currentCocktail;
 
+    [Header("Ingredient Buttons")]
+    public List<Interactable3DObject> ingredientButtons = new List<Interactable3DObject>();
+
     // ── Ingredient Helpers ────────────────────────────────────────────────────
     public void SetMethod(Method method) => currentCocktail.PreparationMethod = method;
     public void SetMethodToShake() => currentCocktail.PreparationMethod = Method.Shaking;
@@ -57,5 +60,16 @@ public class CocktailShakerData : MonoBehaviour
         currentCocktail.AlcoholList = new SerializedDictionary<Alcohol, int>();
         currentCocktail.MixerList = new SerializedDictionary<Mixer, int>();
         currentCocktail.CompatibleGlasses = new List<GlassType>();
+        SetIngredientActive(true);
+    }
+
+    
+
+    public void CanIngredientActive()
+        => SetIngredientActive(currentCocktail.GetTotalIngredient() < 10);
+    public void SetIngredientActive(bool active)
+    {
+        foreach (var btn in ingredientButtons)
+            btn.Interactable = active;
     }
 }

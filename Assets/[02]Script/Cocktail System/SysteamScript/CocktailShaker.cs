@@ -18,9 +18,6 @@ public class CocktailShaker : Interactable3DObject
     public ToggleActive MethodUI;
     public ToggleActive ServeUI;
 
-    [Header("Ingredient Buttons")]
-    public List<Interactable3DObject> ingredientButtons = new List<Interactable3DObject>();
-
     // ── Private State ─────────────────────────────────────────────────────────
     private CocktailShakerData _data;
     private bool _canClick = true;
@@ -60,15 +57,6 @@ public class CocktailShaker : Interactable3DObject
         if (_canShowServeUI) ServeUI.ToggleAtiveGameObject();
     }
 
-    public void SetIngredientActive(bool active)
-    {
-        foreach (var btn in ingredientButtons)
-            btn.Interactable = active;
-    }
-
-    public void CanIngredientActive()
-        => SetIngredientActive(_data.currentCocktail.GetTotalIngredient() < 10);
-
     public void DebugClicked()
         => Debug.Log("Shaker clicked! Current cocktail:\n" + _data.currentCocktail.GetOfCocktailInfo());
 
@@ -81,7 +69,7 @@ public class CocktailShaker : Interactable3DObject
     /// <summary>Resets UI state back to defaults.</summary>
     public void ResetShakerUI()
     {
-        SetIngredientActive(true);
+        //_data.SetIngredientActive(true);
         SetCanShowMethodUI(true);
         SetCanShowServeUI(false);
         SetCanClick(true);
