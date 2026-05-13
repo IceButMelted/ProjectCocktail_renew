@@ -1,10 +1,10 @@
-﻿using AYellowpaper.SerializedCollections;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using static E_Cocktail;
 
 [System.Serializable] public class AlcoholEvent : UnityEvent<BaseSpirit, int> { }
+[System.Serializable] public class LiqueurEvent : UnityEvent<Liqueur, int> { }
 [System.Serializable] public class MixerEvent : UnityEvent<Mixer, int> { }
 
 /// <summary>
@@ -16,6 +16,7 @@ public class CocktailShakerData : MonoBehaviour
 {
     [Header("Ingredient Events")]
     public AlcoholEvent OnAddAlcohol;
+    public LiqueurEvent OnAddLiqueur;
     public MixerEvent OnAddMixer;
     public UnityEvent OnAddIngredient;
     public UnityEvent OnResetedCocktail;
@@ -32,6 +33,7 @@ public class CocktailShakerData : MonoBehaviour
     public void SetMethodToMixing() => currentCocktail.PreparationMethod = Method.Mixing;
     public void SetIceAddIce() => currentCocktail.AddIce = true;
     public void TryToAddAlcohol(BaseSpirit a, int n = 1) => currentCocktail.TryToAddAlcohol(a, n);
+    public void TryToAddLiqueur(Liqueur l, int n = 1) => currentCocktail.TryToAddLiqueur(l, n);
     public void TryToAddMixer(Mixer m, int n = 1) => currentCocktail.TryToAddMixer(m, n);
 
     // ── Cocktail Identity ─────────────────────────────────────────────────────
@@ -43,7 +45,7 @@ public class CocktailShakerData : MonoBehaviour
         currentCocktail.UpdatePrice(normalDrinks);
 
         Texture2D tex = currentCocktail.GetCocktailTexture(normalDrinks) ?? failCocktailTexture;
-        //SetBTNSprite(tex, tex, tex);
+        // SetBTNSprite(tex, tex, tex); — handled by CocktailShaker / CocktailSystemManager
     }
 
     // ── Reset ─────────────────────────────────────────────────────────────────
@@ -57,16 +59,17 @@ public class CocktailShakerData : MonoBehaviour
         currentCocktail.AlcoholStrength = TypeOfCocktail.None;
         currentCocktail.PreparationMethod = Method.None;
         currentCocktail.AddIce = false;
-        currentCocktail.AlcoholList = new SerializedDictionary<BaseSpirit, int>();
-        currentCocktail.MixerList = new SerializedDictionary<Mixer, int>();
+        currentCocktail.AlcoholList = new List<AlcoholIngredient>();
+        currentCocktail.LiqueurList = new List<LiqueurIngredient>();
+        currentCocktail.MixerList = new List<MixerIngredient>();
         currentCocktail.CompatibleGlasses = new List<GlassType>();
         SetIngredientActive(true);
     }
 
-    
-
+    // ── Ingredient Button Helpers ─────────────────────────────────────────────
     public void CanIngredientActive()
         => SetIngredientActive(currentCocktail.GetTotalIngredient() < 10);
+
     public void SetIngredientActive(bool active)
     {
         foreach (var btn in ingredientButtons)

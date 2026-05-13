@@ -2,13 +2,12 @@
 //  SO_Cocktails — ScriptableObject for a single cocktail recipe
 // ============================================================
 
-using AYellowpaper.SerializedCollections;
 using System.Collections.Generic;
 using UnityEngine;
 using static E_Cocktail;
 
 [CreateAssetMenu(fileName = "SO_Cocktail", menuName = "Scriptable Objects/SO_Cocktail")]
-public class SO_Cocktails : ScriptableObject
+public class SO_Cocktail : ScriptableObject
 {
     // ── Inspector ──────────────────────────────────────────
 
@@ -16,7 +15,7 @@ public class SO_Cocktails : ScriptableObject
     public Texture2D CocktailSprite;
 
     public string Name;
-    [TextArea(3,10)]
+    [TextArea(3, 10)]
     public string Description;
     public TypeOfCocktail AlcoholStrength;
     public Method PreparationMethod;
@@ -24,11 +23,9 @@ public class SO_Cocktails : ScriptableObject
     public float Price;
 
     [Header("Ingredients")]
-    [SerializedDictionary("Alcohol", "Amount")]
-    public SerializedDictionary<BaseSpirit, int> AlcoholList;
-
-    [SerializedDictionary("Mixer", "Amount")]
-    public SerializedDictionary<Mixer, int> MixerList;
+    public List<AlcoholIngredient> AlcoholList = new List<AlcoholIngredient>();
+    public List<LiqueurIngredient> LiqueurList = new List<LiqueurIngredient>();
+    public List<MixerIngredient> MixerList = new List<MixerIngredient>();
 
     public List<GlassType> CompatibleGlasses = new List<GlassType>();
 
@@ -53,8 +50,10 @@ public class SO_Cocktails : ScriptableObject
         CocktailInfos.Price = Price;
         CocktailInfos.CocktailSprite = CocktailSprite;
 
-        CocktailInfos.AlcoholList = Copy(AlcoholList);
-        CocktailInfos.MixerList = Copy(MixerList);
+        // Structs are value types — a new List copy gives independent data.
+        CocktailInfos.AlcoholList = new List<AlcoholIngredient>(AlcoholList);
+        CocktailInfos.LiqueurList = new List<LiqueurIngredient>(LiqueurList);
+        CocktailInfos.MixerList = new List<MixerIngredient>(MixerList);
         CocktailInfos.CompatibleGlasses = CompatibleGlasses != null
             ? new List<GlassType>(CompatibleGlasses)
             : new List<GlassType>();
@@ -64,17 +63,5 @@ public class SO_Cocktails : ScriptableObject
 #if UNITY_EDITOR
         UnityEditor.EditorUtility.SetDirty(this);
 #endif
-    }
-
-    // ── Helper ─────────────────────────────────────────────
-
-    private static SerializedDictionary<TKey, TVal> Copy<TKey, TVal>(
-        SerializedDictionary<TKey, TVal> source)
-    {
-        var dict = new SerializedDictionary<TKey, TVal>();
-        if (source != null)
-            foreach (var kv in source)
-                dict[kv.Key] = kv.Value;
-        return dict;
     }
 }
