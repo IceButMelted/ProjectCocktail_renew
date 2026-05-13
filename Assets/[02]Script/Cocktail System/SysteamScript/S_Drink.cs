@@ -8,6 +8,28 @@ using System.Linq;
 using UnityEngine;
 using static E_Cocktail;
 
+
+/// ----------------------------
+/// New structs to replace the old tuple-based ingredient lists, for better readability and maintainability.
+/// ----------------------------
+public struct AlcoholIngredient
+{
+    public BaseSpirit Type;
+    public int Amount;
+}
+public struct LiqueurIngredient
+{
+    public Liqueur Type;
+    public int Amount;
+}
+
+public struct MixerIngredient
+{
+    public Mixer Type;
+    public int Amount;
+}
+///----------------------------
+
 [System.Serializable]
 public class S_Drink
 {
@@ -23,7 +45,7 @@ public class S_Drink
 
     [Header("Ingredients")]
     [SerializedDictionary("Alcohol", "Amount")]
-    public SerializedDictionary<Alcohol, int> AlcoholList = new SerializedDictionary<Alcohol, int>();
+    public SerializedDictionary<BaseSpirit, int> AlcoholList = new SerializedDictionary<BaseSpirit, int>();
 
     [SerializedDictionary("Mixer", "Amount")]
     public SerializedDictionary<Mixer, int> MixerList = new SerializedDictionary<Mixer, int>();
@@ -146,7 +168,7 @@ public class S_Drink
     // ── Mutation ───────────────────────────────────────────
 
     /// <summary>Adds alcohol if the total ingredient cap allows it.</summary>
-    public void TryToAddAlcohol(Alcohol alcohol, int amount)
+    public void TryToAddAlcohol(BaseSpirit alcohol, int amount)
     {
         if (!IsValidRatio()) return;
         AlcoholList[alcohol] = AlcoholList.TryGetValue(alcohol, out int current) ? current + amount : amount;

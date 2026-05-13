@@ -4,7 +4,7 @@ using UnityEngine;
 using UnityEngine.Events;
 using static E_Cocktail;
 
-[System.Serializable] public class AlcoholEvent : UnityEvent<Alcohol, int> { }
+[System.Serializable] public class AlcoholEvent : UnityEvent<BaseSpirit, int> { }
 [System.Serializable] public class MixerEvent : UnityEvent<Mixer, int> { }
 
 /// <summary>
@@ -31,7 +31,7 @@ public class CocktailShakerData : MonoBehaviour
     public void SetMethodToShake() => currentCocktail.PreparationMethod = Method.Shaking;
     public void SetMethodToMixing() => currentCocktail.PreparationMethod = Method.Mixing;
     public void SetIceAddIce() => currentCocktail.AddIce = true;
-    public void TryToAddAlcohol(Alcohol a, int n = 1) => currentCocktail.TryToAddAlcohol(a, n);
+    public void TryToAddAlcohol(BaseSpirit a, int n = 1) => currentCocktail.TryToAddAlcohol(a, n);
     public void TryToAddMixer(Mixer m, int n = 1) => currentCocktail.TryToAddMixer(m, n);
 
     // ── Cocktail Identity ─────────────────────────────────────────────────────
@@ -57,7 +57,7 @@ public class CocktailShakerData : MonoBehaviour
         currentCocktail.AlcoholStrength = TypeOfCocktail.None;
         currentCocktail.PreparationMethod = Method.None;
         currentCocktail.AddIce = false;
-        currentCocktail.AlcoholList = new SerializedDictionary<Alcohol, int>();
+        currentCocktail.AlcoholList = new SerializedDictionary<BaseSpirit, int>();
         currentCocktail.MixerList = new SerializedDictionary<Mixer, int>();
         currentCocktail.CompatibleGlasses = new List<GlassType>();
         SetIngredientActive(true);

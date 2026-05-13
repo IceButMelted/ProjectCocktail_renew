@@ -25,7 +25,7 @@ public class SO_Cocktails : ScriptableObject
 
     [Header("Ingredients")]
     [SerializedDictionary("Alcohol", "Amount")]
-    public SerializedDictionary<Alcohol, int> AlcoholList;
+    public SerializedDictionary<BaseSpirit, int> AlcoholList;
 
     [SerializedDictionary("Mixer", "Amount")]
     public SerializedDictionary<Mixer, int> MixerList;

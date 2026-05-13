@@ -12,7 +12,7 @@ public class IngredientButtonUI : MonoBehaviour
 {
     [Header("Ingredient Settings")]
     [SerializeField] private Mixer   _mixer;
-    [SerializeField] private Alcohol _alcohol;
+    [SerializeField] private BaseSpirit _alcohol;
 
     // ── Private ───────────────────────────────────────────
     private CocktailShakerData _shaker;

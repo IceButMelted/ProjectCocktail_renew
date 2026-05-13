@@ -5,13 +5,23 @@ public class E_Cocktail
     /// <summary>
     /// List of alcohol types.
     /// </summary>
-    public enum Alcohol
+    public enum BaseSpirit
     {
         None = 0,
         Vodka,
         Gin,
+        Whiskey,
+        Rum,
+        Tequila
+    }
+
+    public enum Liqueur
+    {
+        None = 0,
         Triplesec,
-        Vermouth
+        DryVermouth,
+        SweetVermouth,
+        Campari
     }
 
     /// <summary>
@@ -19,12 +29,14 @@ public class E_Cocktail
     /// </summary>
     public enum Mixer
     {   None = 0,
-        CanberryJuice,
-        GrapefruitJuice,
-        LemonJuice,
         Soda,
+        CanberryJuice,
+        LimeJuice,
+        LemonJuice,
+        GrapefruitJuice,
         Syrup,
-        PepperMint
+        PepperMint,
+        OrangeJuice
     }
 
     public enum Direction : byte
