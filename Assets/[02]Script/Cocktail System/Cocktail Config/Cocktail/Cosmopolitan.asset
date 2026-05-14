@@ -16,23 +16,14 @@ MonoBehaviour:
   CocktailSprite: {fileID: 2800000, guid: bd1cae2b92b680344bb24ae5fa2d1925, type: 3}
   Name: Cosmopolitan
   Description: '''Tart and lightly sweet'''
-  AlcoholStrength: 1
   PreparationMethod: 1
   AddIce: 0
   Price: 120
-  AlcoholList: []
-  LiqueurList: []
+  AlcoholList:
+  - Type: 1
+    Amount: 0
+  LiqueurList:
+  - Type: 0
+    Amount: 0
   MixerList: []
   CompatibleGlasses: 
-  CocktailInfos:
-    Name: Cosmopolitan
-    Description: '''Tart and lightly sweet'''
-    AlcoholStrength: 3
-    PreparationMethod: 1
-    AddIce: 0
-    Price: 120
-    AlcoholList: []
-    LiqueurList: []
-    MixerList: []
-    CompatibleGlasses: 
-    CocktailSprite: {fileID: 2800000, guid: bd1cae2b92b680344bb24ae5fa2d1925, type: 3}

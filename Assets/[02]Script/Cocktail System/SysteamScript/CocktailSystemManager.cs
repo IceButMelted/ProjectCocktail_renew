@@ -73,7 +73,7 @@ public class CocktailSystemManager : MonoBehaviour
     {
         // Cache runtime drink list once
         foreach (var so in _normalCocktailList.cocktails)
-            _normalDrinks.Add(so.CocktailInfos);
+            _normalDrinks.Add(so.ToDrink());
     }
 
     private void Update()
@@ -84,7 +84,7 @@ public class CocktailSystemManager : MonoBehaviour
             UpdateCocktailInShaker();
             Debug.Log(_cocktailShakerData.currentCocktail.GetOfCocktailInfo());
         }
-#endif
+
 
         // ── Task debug shortcuts ─────────────────────────────────────
         if (Input.GetKeyDown(KeyCode.E))
@@ -95,6 +95,7 @@ public class CocktailSystemManager : MonoBehaviour
         if (Input.GetKeyDown(KeyCode.A)) SetSatisfactionPerfect();
         if (Input.GetKeyDown(KeyCode.S)) SetSatisfactionAcceptable();
         if (Input.GetKeyDown(KeyCode.D)) SetSatisfactionFail();
+#endif
     }
 
     // ═════════════════════════════════════════════════════════════════════
@@ -105,7 +106,7 @@ public class CocktailSystemManager : MonoBehaviour
     public S_Drink RandomCocktail()
     {
         int idx = Random.Range(0, _normalCocktailList.cocktails.Count);
-        _targetCocktail = _normalCocktailList.cocktails[idx].CocktailInfos;
+        _targetCocktail = _normalCocktailList.cocktails[idx].ToDrink();
         return _targetCocktail;
     }
 
@@ -113,7 +114,7 @@ public class CocktailSystemManager : MonoBehaviour
     public S_Drink RandomCocktail(TypeOfCocktail type)
     {
         var matches = _normalCocktailList.cocktails
-            .Where(c => c.CocktailInfos.GetTypeOfAlcohol() == type)
+            .Where(c => c.GetTypeOfAlcohol() == type)
             .ToList();
 
         if (matches.Count == 0)
@@ -122,7 +123,7 @@ public class CocktailSystemManager : MonoBehaviour
             return RandomCocktail();
         }
 
-        _targetCocktail = matches[Random.Range(0, matches.Count)].CocktailInfos;
+        _targetCocktail = matches[Random.Range(0, matches.Count)].ToDrink();
         return _targetCocktail;
     }
 
@@ -205,6 +206,10 @@ public class CocktailSystemManager : MonoBehaviour
 
     public void SetSatisfaction(Satisfaction satisfaction) => _satisfaction = satisfaction;
 
+
+    #region Uitility / Debug
+    #if UNITY_EDITOR
+
     [ContextMenu("Perfect Satisfaction")]
     public void SetSatisfactionPerfect()
     {
@@ -234,6 +239,8 @@ public class CocktailSystemManager : MonoBehaviour
         UpdateVariableInYarn();
         DebugVariableFromYarn();
     }
+    #endif
+    #endregion
 
     /// <summary>
     /// Writes C# state into Yarn's VariableStorage.
@@ -311,7 +318,7 @@ public class CocktailSystemManager : MonoBehaviour
 
         Debug.Log("[CocktailSystemManager] All variables reset — ready for next loop.");
     }
-
+    #region Debug Commands
     // ═════════════════════════════════════════════════════════════════════
     // Debug
     // ═════════════════════════════════════════════════════════════════════
@@ -390,4 +397,5 @@ public class CocktailSystemManager : MonoBehaviour
     /// <summary>&lt;&lt;debug_yarn_variables CocktailSystemManager&gt;&gt;</summary>
     [YarnCommand("debug_yarn_variables")]
     public void YarnDebugVariables() => DebugVariableFromYarn();
+    #endregion
 }

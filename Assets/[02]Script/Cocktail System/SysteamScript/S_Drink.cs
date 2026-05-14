@@ -154,7 +154,7 @@ public class S_Drink
         bool methodMatch = AddIce == recipe.AddIce && PreparationMethod == recipe.PreparationMethod;
 
         if (methodMatch && errors == 0) return Satisfaction.Perfect;
-        if (errors <= 1) return Satisfaction.Acceptable;
+        if (errors <= 2) return Satisfaction.Acceptable;
         return Satisfaction.Fail;
     }
 

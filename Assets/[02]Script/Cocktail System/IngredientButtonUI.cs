@@ -3,16 +3,32 @@ using static E_Cocktail;
 
 /// <summary>
 /// UI-friendly ingredient button for use with Unity's Button component (WorldSpace Canvas).
-/// Assign each method to the Button's OnClick() event in the Inspector.
+///
+/// Set <see cref="Action"/> in the Inspector to choose what this button does.
+/// Wire the Button's OnClick() to <see cref="Invoke"/> — one connection, no manual swapping.
 ///
 /// Unlike IngredientButton (mesh/raycast), this component owns no visual logic —
 /// the Button component handles all interaction and the Animator/Transition handles visuals.
 /// </summary>
 public class IngredientButtonUI : MonoBehaviour
 {
-    [Header("Ingredient Settings")]
-    [SerializeField] private Mixer   _mixer;
+    // ── Button Action Enum ────────────────────────────────
+    public enum ButtonAction
+    {
+        None,
+        AddMixer,
+        AddAlcohol,
+        AddLiqueur,
+        SetShaking,
+        SetMixing,
+        AddIce,
+        ResetShaker
+    }
+    [SerializeField] private ButtonAction _action;
+
+    [SerializeField] private Mixer _mixer;
     [SerializeField] private BaseSpirit _alcohol;
+    [SerializeField] private Liqueur _liqueur;
 
     // ── Private ───────────────────────────────────────────
     private CocktailShakerData _shaker;
@@ -20,7 +36,39 @@ public class IngredientButtonUI : MonoBehaviour
     private void Awake()
         => _shaker = FindFirstObjectByType<CocktailShakerData>();
 
-    // ── Public Methods (wire these to Button.OnClick) ─────
+    // ── Single entry-point (wire this to Button.OnClick) ──
+
+    /// <summary>
+    /// Dispatches to the correct action based on <see cref="Action"/>.
+    /// Wire only this method to the Button's OnClick() event.
+    /// </summary>
+    public void Invoke()
+    {
+        switch (_action)
+        {
+            case ButtonAction.AddMixer: AddMixer(); break;
+            case ButtonAction.AddAlcohol: AddAlcohol(); break;
+            case ButtonAction.AddLiqueur: AddLiqueur(); break;
+            case ButtonAction.SetShaking: SetShaking(); break;
+            case ButtonAction.SetMixing: SetMixing(); break;
+            case ButtonAction.AddIce: AddIce(); break;
+            case ButtonAction.ResetShaker: ResetShaker(); break;
+        }
+    }
+
+    public void ActionBehavior() {
+        switch (_action) {
+            case ButtonAction.AddMixer: AddMixer(); break;
+            case ButtonAction.AddAlcohol: AddAlcohol(); break;
+            case ButtonAction.AddLiqueur: AddLiqueur(); break;
+            case ButtonAction.SetShaking: SetShaking(); break;
+            case ButtonAction.SetMixing: SetMixing(); break;
+            case ButtonAction.AddIce: AddIce(); break;
+            case ButtonAction.ResetShaker: ResetShaker(); break;
+        }
+    }
+
+    // ── Individual methods (also available directly) ──────
 
     /// <summary>Add the assigned Mixer to the shaker.</summary>
     public void AddMixer()
@@ -36,6 +84,13 @@ public class IngredientButtonUI : MonoBehaviour
         _shaker.OnAddIngredient?.Invoke();
     }
 
+    /// <summary>Add the assigned Liqueur to the shaker.</summary>
+    public void AddLiqueur()
+    {
+        _shaker.OnAddLiqueur?.Invoke(_liqueur, 1);
+        _shaker.OnAddIngredient?.Invoke();
+    }
+
     /// <summary>Set preparation method to Shaking.</summary>
     public void SetShaking()
         => _shaker.SetMethod(Method.Shaking);
@@ -48,8 +103,7 @@ public class IngredientButtonUI : MonoBehaviour
     public void AddIce()
     {
         _shaker.SetIceAddIce();
-        
-        GetComponent<Interactable3DObject>().Interactable = false;
+        GetComponent<UnityEngine.UI.Button>().interactable = false;
     }
 
     /// <summary>Reset the shaker to empty state.</summary>
