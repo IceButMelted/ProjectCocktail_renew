@@ -105,13 +105,13 @@ public class MixingMinigame : BaseMiniGame
 
         if (_isPanelSlidingIn)
         {
-            if (!SlideMinigame(Direction.Right, FinishCondition.FullyIn)) return;
+            if (!SlideMinigame(Direction.Up, FinishCondition.FullyIn)) return;
             _isPanelSlidingIn = false;
         }
 
         if (_isPanelSlidingOut)
         {
-            if (!SlideMinigame(Direction.Left, FinishCondition.FullyOut)) return;
+            if (!SlideMinigame(Direction.Down, FinishCondition.FullyOut)) return;
             _isPanelSlidingOut = false;
             SetState(MiniGameState.Success);
             return;
