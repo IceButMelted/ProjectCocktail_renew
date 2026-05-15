@@ -2,11 +2,11 @@ using UnityEngine;
 
 public class N_InputManager : MonoBehaviour
 {
-    [SerializeField] private Camera    _sceneCamera;
-    [SerializeField] private float     _range             = 100f;
+    [SerializeField] private Camera _sceneCamera;
+    [SerializeField] private float _range = 100f;
     [SerializeField] private LayerMask _placementLayer;
     [SerializeField] private LayerMask _boxPlacementLayer;
-    //[SerializeField] private LayerMask _draggableLayer;
+    [SerializeField] private LayerMask _draggableLayer;
 
     public Camera Camera => _sceneCamera;
 
@@ -26,23 +26,23 @@ public class N_InputManager : MonoBehaviour
         return _lastPosition;
     }
 
-    //public DragableObject GetDragableObject()
-    //{
-    //    Ray ray  = MouseRay();
-    //    int mask = ~_boxPlacementLayer;
-    //    if (Physics.Raycast(ray, out RaycastHit hit, _range, mask))
-    //        if (((1 << hit.collider.gameObject.layer) & _draggableLayer) != 0)
-    //            return hit.collider.gameObject.GetComponent<DragableObject>();
-    //    return null;
-    //}
+    public DragableObject GetDragableObject()
+    {
+        Ray ray = MouseRay();
+        int mask = ~_boxPlacementLayer;
+        if (Physics.Raycast(ray, out RaycastHit hit, _range, mask))
+            if (((1 << hit.collider.gameObject.layer) & _draggableLayer) != 0)
+                return hit.collider.gameObject.GetComponent<DragableObject>();
+        return null;
+    }
 
-    //public GameObject GetObjectMouseHover()
-    //{
-    //    Ray ray = MouseRay();
-    //    if (Physics.Raycast(ray, out RaycastHit hit, _range, _draggableLayer))
-    //        return hit.collider.gameObject;
-    //    return null;
-    //}
+    public GameObject GetObjectMouseHover()
+    {
+        Ray ray = MouseRay();
+        if (Physics.Raycast(ray, out RaycastHit hit, _range, _draggableLayer))
+            return hit.collider.gameObject;
+        return null;
+    }
 
     public Vector3 GetFloatingPosition(float distance)
     {
@@ -74,12 +74,12 @@ public class N_InputManager : MonoBehaviour
     private Vector3 CalculateSnappedPosition(RaycastHit hit, Renderer r)
     {
         if (r == null) return hit.point;
-        Bounds  b       = r.bounds;
-        float   bottomY = b.min.y;
-        Vector3 center  = b.center;
-        bool    fixZ    = b.size.x > b.size.z;
+        Bounds b = r.bounds;
+        float bottomY = b.min.y;
+        Vector3 center = b.center;
+        bool fixZ = b.size.x > b.size.z;
         return fixZ
             ? new Vector3(hit.point.x, bottomY, center.z)
-            : new Vector3(center.x,    bottomY, hit.point.z);
+            : new Vector3(center.x, bottomY, hit.point.z);
     }
 }

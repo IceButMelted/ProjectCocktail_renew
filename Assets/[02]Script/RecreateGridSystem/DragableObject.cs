@@ -32,23 +32,22 @@ public class DragableObject : MonoBehaviour,
     public bool DebugDraw = false;
 
     // State readable by N_PlacementSystem
-    public bool    CanPlaced               { get; set; } = false;
-    public bool    BeingDrags              { get; set; } = false;
-    public Vector3 PastLocation            { get; set; }
-    public int     NumbersObjectOverlaying { get; private set; }
-
+    public bool CanPlaced { get; set; } = false;
+    public bool BeingDrags { get; set; } = false;
+    public Vector3 PastLocation { get; set; }
+    public int NumbersObjectOverlaying { get; private set; }
     public bool IsDragging => BeingDrags && _dragStarted;
 
-    private Button   _button;
-    private Collider  _collider;
+    private Button _button;
+    private Collider _collider;
     private Vector2 _pointerDownScreenPos;
-    private bool    _dragStarted;
+    private bool _dragStarted;
 
-private void Awake()
+    private void Awake()
     {
         PastLocation = transform.position;
-        _button      = GetComponent<Button>();
-        _collider    = GetComponent<Collider>();
+        _button = GetComponent<Button>();
+        _collider = GetComponent<Collider>();
 
         if (_collider == null)
             Debug.LogWarning($"[DragableObject] No Collider found on '{name}' or its children.");
@@ -68,7 +67,7 @@ private void Awake()
     public void OnPointerDown(PointerEventData eventData)
     {
         if (eventData.button != PointerEventData.InputButton.Left) return;
-        _dragStarted          = false;
+        _dragStarted = false;
         _pointerDownScreenPos = eventData.position;
     }
 
@@ -91,7 +90,7 @@ private void Awake()
         if (_dragStarted)
         {
             _placementSystem.ReleaseObject();
-            BeingDrags   = false;
+            BeingDrags = false;
         }
         else
         {
@@ -104,11 +103,11 @@ private void Awake()
 
     // ── Collision Check ───────────────────────────────────
 
-private void CheckForCollisions()
+    private void CheckForCollisions()
     {
         if (_collider == null) return;
 
-        Bounds  b    = _collider.bounds;
+        Bounds b = _collider.bounds;
         Collider[] hits = Physics.OverlapBox(b.center, b.extents, transform.rotation, detectLayerMask);
         NumbersObjectOverlaying = hits.Length - 1;
         CanPlaced = NumbersObjectOverlaying <= 0;
@@ -116,7 +115,7 @@ private void CheckForCollisions()
 
     // ── Gizmos ────────────────────────────────────────────
 
-private void OnDrawGizmos()
+    private void OnDrawGizmos()
     {
         if (!DebugDraw) return;
         Collider col = _collider != null ? _collider : GetComponent<Collider>();

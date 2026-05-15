@@ -2,14 +2,14 @@ using UnityEngine;
 
 public class N_PlacementSystem : MonoBehaviour
 {
-    [SerializeField] private GameObject     _mouseIndicator;
+    [SerializeField] private GameObject _mouseIndicator;
     [SerializeField] private N_InputManager _inputManager;
-    [SerializeField] private float          _floatingDistance = 3f;
+    [SerializeField] private float _floatingDistance = 3f;
 
     private DragableObject _selectedDragable;
-    private GameObject     _selectedObject;
-    private float          _bottomOffset;
-    private bool           _isFloating;
+    private GameObject _selectedObject;
+    private float _bottomOffset;
+    private bool _isFloating;
 
     private void Update()
     {
@@ -22,9 +22,9 @@ public class N_PlacementSystem : MonoBehaviour
     public void StartDrag(DragableObject dragable)
     {
         if (dragable == null) return;
-        _selectedDragable            = dragable;
-        _selectedObject              = dragable.gameObject;
-        _bottomOffset                = GetBottomOffset(_selectedObject);
+        _selectedDragable = dragable;
+        _selectedObject = dragable.gameObject;
+        _bottomOffset = GetBottomOffset(_selectedObject);
         _selectedDragable.BeingDrags = true;
     }
 
@@ -36,7 +36,7 @@ public class N_PlacementSystem : MonoBehaviour
             if (_selectedDragable.CanPlaced && !_isFloating)
             {
                 Vector3 snapPos = _inputManager.GetSelectedMapPosition() + Vector3.up * _bottomOffset;
-                _selectedDragable.PastLocation     = snapPos;
+                _selectedDragable.PastLocation = snapPos;
                 _selectedObject.transform.position = snapPos;
             }
             else
@@ -44,7 +44,7 @@ public class N_PlacementSystem : MonoBehaviour
                 _selectedObject.transform.position = _selectedDragable.PastLocation;
             }
             _selectedDragable.BeingDrags = false;
-            _selectedDragable.CanPlaced  = true;
+            _selectedDragable.CanPlaced = true;
         }
         ResetSelection();
     }
@@ -72,8 +72,8 @@ public class N_PlacementSystem : MonoBehaviour
 
     private void ResetSelection()
     {
-        _selectedObject   = null;
+        _selectedObject = null;
         _selectedDragable = null;
-        _isFloating       = false;
+        _isFloating = false;
     }
 }
