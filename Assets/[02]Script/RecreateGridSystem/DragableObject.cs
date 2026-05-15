@@ -37,6 +37,8 @@ public class DragableObject : MonoBehaviour,
     public Vector3 PastLocation            { get; set; }
     public int     NumbersObjectOverlaying { get; private set; }
 
+    public bool IsDragging => BeingDrags && _dragStarted;
+
     private Button   _button;
     private Collider  _collider;
     private Vector2 _pointerDownScreenPos;
