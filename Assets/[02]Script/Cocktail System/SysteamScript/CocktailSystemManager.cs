@@ -89,7 +89,7 @@ public class CocktailSystemManager : MonoBehaviour
         // ── Task debug shortcuts ─────────────────────────────────────
         if (Input.GetKeyDown(KeyCode.E))
         {
-            CompleteTask();
+            ServeDrink();
             Debug.Log("[CocktailSystemManager] Task marked complete via E key.");
         }
         if (Input.GetKeyDown(KeyCode.A)) SetSatisfactionPerfect();
@@ -206,16 +206,17 @@ public class CocktailSystemManager : MonoBehaviour
 
     public void SetSatisfaction(Satisfaction satisfaction) => _satisfaction = satisfaction;
 
+    public void ServeDrink() => UpdateVariableInYarnTrigger();
 
     #region Uitility / Debug
-    #if UNITY_EDITOR
+#if UNITY_EDITOR
 
     [ContextMenu("Perfect Satisfaction")]
     public void SetSatisfactionPerfect()
     {
         DebugVariableFromYarn();
         SetSatisfaction(Satisfaction.Perfect);
-        CompleteTask();
+        ServeDrink();
         UpdateVariableInYarn();
         DebugVariableFromYarn();
     }
@@ -225,7 +226,7 @@ public class CocktailSystemManager : MonoBehaviour
     {
         DebugVariableFromYarn();
         SetSatisfaction(Satisfaction.Acceptable);
-        CompleteTask();
+        ServeDrink();
         UpdateVariableInYarn();
         DebugVariableFromYarn();
     }
@@ -235,7 +236,7 @@ public class CocktailSystemManager : MonoBehaviour
     {
         DebugVariableFromYarn();
         SetSatisfaction(Satisfaction.Fail);
-        CompleteTask();
+        ServeDrink();
         UpdateVariableInYarn();
         DebugVariableFromYarn();
     }
@@ -250,7 +251,7 @@ public class CocktailSystemManager : MonoBehaviour
     /// CRITICAL: enum values MUST be cast to (float)(int) — Yarn stores
     /// enums as integers, not strings.
     /// </summary>
-    public bool UpdateVariableInYarn()
+    private bool UpdateVariableInYarn()
     {
         if (_myGameCondition && _satisfaction != Satisfaction.None)
         {
@@ -272,7 +273,7 @@ public class CocktailSystemManager : MonoBehaviour
     /// Calculates satisfaction from the current shaker vs target, then pushes
     /// all variables to Yarn. Call this when the player submits their cocktail.
     /// </summary>
-    public void UpdateVariableInYarnTrigger()
+    private void UpdateVariableInYarnTrigger()
     {
         _myGameCondition = true;
         SetSatisfaction(CalculateSatisfaction());
@@ -281,6 +282,7 @@ public class CocktailSystemManager : MonoBehaviour
         UpdateVariableInYarn();
         DebugVariableFromYarn();
     }
+    
 
     // ═════════════════════════════════════════════════════════════════════
     // Yarn Commands

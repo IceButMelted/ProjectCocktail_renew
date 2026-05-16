@@ -89,6 +89,24 @@ public class CameraController : MonoBehaviour
     /// </summary>
     public ViewDirection CurrentDirection => currentDirection;
 
+    private bool isFixedCamera = false;
+
+    /// <summary>
+    /// When set to true, immediately resets the camera to the forward view
+    /// and prevents any further mouse-driven transitions.
+    /// </summary>
+    public bool IsFixedCamera
+    {
+        get => isFixedCamera;
+        set
+        {
+            if (isFixedCamera == value) return;
+            isFixedCamera = value;
+            if (isFixedCamera)
+                ResetCamera();
+        }
+    }
+
     #endregion
 
     #region Unity Lifecycle
@@ -118,19 +136,20 @@ public class CameraController : MonoBehaviour
 
     private void Update()
     {
+        // Let any in-progress rotation/movement finish
         if (isRotating)
-        {
             UpdateRotation();
-        }
-        else
+
+        if (isMoving)
+            UpdateMovement();
+
+        // Block new transitions when camera is fixed
+        if (isFixedCamera) return;
+
+        if (!isRotating)
         {
             UpdateHoverDelay();
             CheckForTransitions();
-        }
-
-        if (isMoving)
-        {
-            UpdateMovement();
         }
     }
 
@@ -279,6 +298,12 @@ public class CameraController : MonoBehaviour
         movementProgress = 0f;
         startPosition = transform.position;
         targetPosition = direction == ViewDirection.Down ? downPosition : initialPosition;
+    }
+
+    private void ResetCamera() { 
+        currentDirection = ViewDirection.Forward;
+        StartRotation(ViewDirection.Forward);
+        StartMovement(ViewDirection.Forward);
     }
     #endregion
 
