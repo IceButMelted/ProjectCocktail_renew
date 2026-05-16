@@ -42,7 +42,7 @@ public class UIPointerSound : MonoBehaviour,
             _canPlayUp = false;
         }
 
-            bool isDragging = _dragableObject.IsDragging;
+        bool isDragging = _dragableObject.IsDragging;
         if (isDragging && !_wasDragging)
         {
             _canPlayEnter = false;

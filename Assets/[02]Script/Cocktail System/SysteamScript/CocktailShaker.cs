@@ -62,7 +62,7 @@ public class CocktailShaker : Interactable3DObject
 
     // ── Passthrough to data ───────────────────────────────────────────────────
     /// <summary>Passthrough so CocktailSystemManager can call this without knowing about the split.</summary>
-    public void UpdateCocktailInShaker(List<S_Drink> normalDrinks, Texture2D failCocktailTexture)
+    public void UpdateCocktailInShaker(List<S_Drink> normalDrinks, Sprite failCocktailTexture)
         => _data.UpdateCocktailInShaker(normalDrinks, failCocktailTexture);
 
     // ── Reset ─────────────────────────────────────────────────────────────────

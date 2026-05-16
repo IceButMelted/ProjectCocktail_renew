@@ -13,7 +13,7 @@ public class SO_Cocktail : ScriptableObject
     // ── Inspector ──────────────────────────────────────────
 
     public GameObject CocktailGameObject;
-    public Texture2D CocktailSprite;
+    public Sprite CocktailSprite;
 
     public string Name;
     [TextArea(3, 10)]

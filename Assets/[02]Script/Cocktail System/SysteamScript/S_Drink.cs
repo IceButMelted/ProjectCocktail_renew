@@ -55,7 +55,7 @@ public class S_Drink
     public List<GlassType> CompatibleGlasses = new List<GlassType>();
 
     /// <summary>Visual representation of this cocktail.</summary>
-    public Texture2D CocktailSprite;
+    public Sprite CocktailSprite;
 
     // ── Constants ──────────────────────────────────────────
 
@@ -233,7 +233,7 @@ public class S_Drink
     /// Returns the CocktailSprite of the first recipe whose ingredients match this drink.
     /// Returns null if no recipe matches.
     /// </summary>
-    public Texture2D GetCocktailTexture(List<S_Drink> recipes)
+    public Sprite GetCocktailTexture(List<S_Drink> recipes)
     {
         var match = recipes?.FirstOrDefault(r => r.IngredientsMatch(this));
         return match?.CocktailSprite;

@@ -38,14 +38,14 @@ public class CocktailShakerData : MonoBehaviour
 
     // ── Cocktail Identity ─────────────────────────────────────────────────────
     /// <summary>Derive identity of whatever is currently in the shaker and update visuals.</summary>
-    public void UpdateCocktailInShaker(List<S_Drink> normalDrinks, Texture2D failCocktailTexture)
+    public void UpdateCocktailInShaker(List<S_Drink> normalDrinks, Sprite failCocktailSprite)
     {
         currentCocktail.UpdateTypeOfAlcohol(normalDrinks);
         currentCocktail.UpdateName(normalDrinks);
         currentCocktail.UpdatePrice(normalDrinks);
 
-        Texture2D tex = currentCocktail.GetCocktailTexture(normalDrinks) ?? failCocktailTexture;
-        // SetBTNSprite(tex, tex, tex); — handled by CocktailShaker / CocktailSystemManager
+        Sprite sprite = currentCocktail.GetCocktailTexture(normalDrinks) ?? failCocktailSprite;
+        // SetBTNSprite(sprite, sprite, sprite); — handled by CocktailShaker / CocktailSystemManager
     }
 
     // ── Reset ─────────────────────────────────────────────────────────────────

@@ -29,7 +29,7 @@ public class CocktailSystemManager : MonoBehaviour
     [SerializeField] private SO_CocktailList _specialCocktailList;
 
     [Header("Fallback")]
-    [SerializeField] private Texture2D _failCocktailTexture;
+    [SerializeField] private Sprite _failCocktailSprite;
 
     [Header("Cocktail References")]
     public CocktailShakerData _cocktailShakerData;
@@ -140,8 +140,8 @@ public class CocktailSystemManager : MonoBehaviour
         current.UpdateName(_normalDrinks);
         current.UpdatePrice(_normalDrinks);
 
-        Texture2D tex = current.GetCocktailTexture(_normalDrinks) ?? _failCocktailTexture;
-        Sprite sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(.5f, 0));
+        Sprite sprite = current.GetCocktailTexture(_normalDrinks) ?? _failCocktailSprite;
+        //Sprite sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(.5f, 0));
         _cocktailShaker.SetBTNSprite(sprite, sprite, sprite);
     }
 
