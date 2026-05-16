@@ -31,10 +31,31 @@ title: Script_2_2
 
 title: TestLoopPart
 ---
-
-<<Switch_Camera CamController MainCam>>
-<<wait 3>>
+<<wait 2>>
+<<Fix_Camera CamController true>>
 <<Switch_Camera CamController ResultCam>>
+<<wait 2>>
+<<Switch_Camera CamController MainCam>>
+<<wait 2>>
+<<Switch_Camera CamController FarRightCam>>
+<<wait 2>>
+<<Switch_Camera CamController FarLeftCam>>
+<<wait 2>>
+<<Switch_Camera CamController CenterCam>>
+<<wait 2>>
+<<Switch_Camera CamController NearLeftCam>>
+<<wait 2>>
+<<Switch_Camera CamController NearRighCam>>
+<<wait 2>>
+
+//<<Switch_Camera CamController MainCam>>
+//<<Switch_Camera CamController ResultCam>>
+//<<Switch_Camera CamController FarRightCam>>
+//<<Switch_Camera CamController FarLeftCam>>
+//<<Switch_Camera CamController CenterCam>>
+//<<Switch_Camera CamController NearLeftCam>>
+//<<Switch_Camera CamController NearRighCam>>
+
 // <<SetEmotion NPC_Owen Happy>>
 // <<SetEmotion NPC_Cole Upset>>
 // <<SetEmotion NPC_Owen Neutral>>

@@ -1,6 +1,8 @@
 using System;
+using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using Yarn.Unity;
 
 /// <summary>
 /// Mouse-driven camera controller that smoothly transitions between different view angles
@@ -13,6 +15,9 @@ using UnityEngine.InputSystem;
 public class CameraController : MonoBehaviour
 {
     #region Serialized Fields
+
+    // References
+    [SerializeField] private CinemachineVirtualCameraBase virtualCamera;
 
     [Tooltip("ScriptableObject asset containing all camera controller settings. " +
              "Create one via: Assets > Create > Camera > Camera Controller Settings")]
@@ -41,8 +46,7 @@ public class CameraController : MonoBehaviour
 
     #region Private Fields
 
-    // References
-    private Camera mainCamera;
+    
 
     // Position tracking
     private Vector3 initialPosition;
@@ -106,6 +110,10 @@ public class CameraController : MonoBehaviour
                 ResetCamera();
         }
     }
+    [YarnCommand("Fix_Camera")]
+    public void SetFixedCamera(bool value) { 
+        IsFixedCamera = value;
+    }
 
     #endregion
 
@@ -113,9 +121,9 @@ public class CameraController : MonoBehaviour
 
     private void Awake()
     {
-        mainCamera = Camera.main;
+        //virtualCamera = Camera.main;
 
-        if (mainCamera == null)
+        if (virtualCamera == null)
         {
             Debug.LogError("CameraController: No main camera found in scene!");
             enabled = false;
@@ -131,7 +139,7 @@ public class CameraController : MonoBehaviour
 
     private void Start()
     {
-        mainCamera.transform.localRotation = Quaternion.Euler(ForwardAngle);
+        virtualCamera.transform.localRotation = Quaternion.Euler(ForwardAngle);
     }
 
     private void Update()
@@ -275,7 +283,7 @@ public class CameraController : MonoBehaviour
     {
         isRotating = true;
         rotationProgress = 0f;
-        startRotation = mainCamera.transform.localRotation;
+        startRotation = virtualCamera.transform.localRotation;
 
         Vector3 targetEuler = direction switch
         {
@@ -315,14 +323,14 @@ public class CameraController : MonoBehaviour
 
         if (rotationProgress >= 1f)
         {
-            mainCamera.transform.localRotation = targetRotation;
+            virtualCamera.transform.localRotation = targetRotation;
             isRotating = false;
             rotationProgress = 0f;
         }
         else
         {
             float smoothed = Mathf.SmoothStep(0f, 1f, rotationProgress);
-            mainCamera.transform.localRotation = Quaternion.Slerp(startRotation, targetRotation, smoothed);
+            virtualCamera.transform.localRotation = Quaternion.Slerp(startRotation, targetRotation, smoothed);
         }
     }
 
