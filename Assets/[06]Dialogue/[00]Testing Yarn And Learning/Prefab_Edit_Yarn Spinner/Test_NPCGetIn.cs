@@ -1,6 +1,7 @@
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 using Yarn.Unity;
+using static E_Cocktail;
 
 public class Test_NPCGetIn : MonoBehaviour
 {
@@ -9,6 +10,8 @@ public class Test_NPCGetIn : MonoBehaviour
     [SerializeField] public Sprite _neutralSprite;
     [SerializeField] public Sprite _happySprite;
     [SerializeField] public Sprite _upsetSprite;
+
+    public NPC_Name Name;
 
     [Header("Waypoints")]
     [SerializeField] private Transform[] _waypoints;
@@ -36,15 +39,56 @@ public class Test_NPCGetIn : MonoBehaviour
         }
 
         transform.position += dir.normalized * (_moveSpeed * Time.deltaTime);
-        //transform.rotation = Quaternion.LookRotation(dir);
     }
 
+
+    // ─── Yarn Commands ───────────────────────────────────────────────────────
+
     [YarnCommand("SetEmotion")]
-    public static void SetEmotion(string npcName, string emotion)
+    public static void SetEmotion(string npcNameStr, string emotion)
     {
-        Test_NPCGetIn npc = FindNPC(npcName);
+        Test_NPCGetIn npc = FindNPC(npcNameStr);
         if (npc == null) return;
         npc.DoSetEmotion(emotion);
+    }
+
+    [YarnCommand("MoveIn")]
+    public static IEnumerator MoveIn(string npcNameStr, int waypointIndex)
+    {
+        Test_NPCGetIn npc = FindNPC(npcNameStr);
+        if (npc == null) yield break;
+        yield return npc.StartCoroutine(npc.DoMoveTo(waypointIndex));
+    }
+
+    [YarnCommand("MoveOut")]
+    public static IEnumerator MoveOut(string npcNameStr)
+    {
+        yield return MoveIn(npcNameStr, 0);
+    }
+
+    // ─── Helper Methods ─────────────────────────────────────────────────────
+    private static Test_NPCGetIn FindNPC(string npcNameStr)
+    {
+        // Yarn passes "NPC_Name.Owen" — strip the prefix if present
+        string rawName = npcNameStr.Contains(".")
+            ? npcNameStr.Split('.')[1]
+            : npcNameStr;
+
+        if (!System.Enum.TryParse<NPC_Name>(rawName, ignoreCase: true, out NPC_Name targetName)
+            || targetName == NPC_Name.None)
+        {
+            Debug.LogWarning($"[FindNPC] Invalid NPC name: '{npcNameStr}'");
+            return null;
+        }
+
+        foreach (Test_NPCGetIn npc in FindObjectsByType<Test_NPCGetIn>(FindObjectsSortMode.None))
+        {
+            if (npc.Name == targetName)
+                return npc;
+        }
+
+        Debug.LogWarning($"[FindNPC] No NPC with NPCName.{targetName} found in scene.");
+        return null;
     }
 
     private void DoSetEmotion(string emotion)
@@ -55,25 +99,11 @@ public class Test_NPCGetIn : MonoBehaviour
             "happy" => _happySprite,
             "upset" => _upsetSprite,
             "neutral" => _neutralSprite,
-            _ => sr.sprite // keep current on unknown
+            _ => sr.sprite
         };
 
         if (sr.sprite == null)
             Debug.LogWarning($"Unknown emotion '{emotion}' for {name}");
-    }
-
-    [YarnCommand("MoveIn")]
-    public static IEnumerator MoveIn(string npcName, int waypointIndex)
-    {
-        Test_NPCGetIn npc = FindNPC(npcName);
-        if (npc == null) yield break;
-        yield return npc.StartCoroutine(npc.DoMoveTo(waypointIndex));
-    }
-
-    [YarnCommand("MoveOut")]
-    public static IEnumerator MoveOut(string npcName)
-    {
-        yield return MoveIn(npcName, 0);
     }
 
     private IEnumerator DoMoveTo(int waypointIndex)
@@ -81,30 +111,12 @@ public class Test_NPCGetIn : MonoBehaviour
         if (!IsValidIndex(waypointIndex)) yield break;
 
         Debug.Log($"{name} moving to waypoint {waypointIndex}");
-
         _currentIndex = waypointIndex;
         _arrived = false;
         _isMoving = true;
 
         yield return new WaitUntil(() => _arrived);
-
         Debug.Log($"{name} reached waypoint {waypointIndex}");
-    }
-
-    private static Test_NPCGetIn FindNPC(string npcName)
-    {
-        GameObject go = GameObject.Find(npcName);
-        if (go == null)
-        {
-            Debug.LogWarning($"[MoveIn] No GameObject named '{npcName}' found.");
-            return null;
-        }
-
-        Test_NPCGetIn npc = go.GetComponent<Test_NPCGetIn>();
-        if (npc == null)
-            Debug.LogWarning($"[MoveIn] '{npcName}' has no Test_NPCGetIn component.");
-
-        return npc;
     }
 
     private bool IsValidIndex(int index)

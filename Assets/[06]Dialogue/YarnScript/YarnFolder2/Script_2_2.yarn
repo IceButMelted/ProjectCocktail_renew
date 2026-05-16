@@ -31,34 +31,9 @@ title: Script_2_2
 
 title: TestLoopPart
 ---
-<<wait 2>>
-<<Fix_Camera CamController true>>
-<<Switch_Camera CamController ResultCam>>
-<<wait 2>>
-<<Switch_Camera CamController MainCam>>
-<<wait 2>>
-<<Switch_Camera CamController FarRightCam>>
-<<wait 2>>
-<<Switch_Camera CamController FarLeftCam>>
-<<wait 2>>
-<<Switch_Camera CamController CenterCam>>
-<<wait 2>>
-<<Switch_Camera CamController NearLeftCam>>
-<<wait 2>>
-<<Switch_Camera CamController NearRighCam>>
-<<wait 2>>
-
-//<<Switch_Camera CamController MainCam>>
-//<<Switch_Camera CamController ResultCam>>
-//<<Switch_Camera CamController FarRightCam>>
-//<<Switch_Camera CamController FarLeftCam>>
-//<<Switch_Camera CamController CenterCam>>
-//<<Switch_Camera CamController NearLeftCam>>
-//<<Switch_Camera CamController NearRighCam>>
-
-// <<SetEmotion NPC_Owen Happy>>
-// <<SetEmotion NPC_Cole Upset>>
-// <<SetEmotion NPC_Owen Neutral>>
+// <<SetEmotion NPC_Name.Owen "happy">>
+// <<SetEmotion NPC_Name.Cole "upset">>
+// <<SetEmotion NPC_Name.Owen "neutral">>
 
 // Test part Cole {Order_Cocktail_OutName(NPC_Name.Cole)}
 // Test part Owen {Order_Cocktail_OutName(NPC_Name.Owen)}
@@ -72,49 +47,43 @@ title: TestLoopPart
 // Test part Freya {Order_Cocktail_OutDescription(NPC_Name.Freya)}
 // Test part Isla {Order_Cocktail_OutDescription(NPC_Name.Isla)}
 
+// ── Owen Arrives ──────────────────────────────────────────
+<<Fix_Camera CamController true>>
+<<Reset_Camera CamController>>
+<<Switch_Camera CamController "MainCam">>
 
-Owen: Place looks good. Someone's been busy.
-
--> Thanks, still getting used to it. ?
-    Player: Thanks, still finding my feet honestly.
-    Owen: Ha! You'll be fine. First week's always the hardest.
--> I've been here a while actually. #fallback
-    Player: I've been here longer than you'd think.
-    Owen: Oh! My bad, you just look fresh. Good thing I didn't say anything rude then, eh?
--> OPtoin 3 ?
-    Player: I've been here longer than you'd think.
-    Owen: Oh! My bad, you just look fresh. Good thing I didn't say anything rude then, eh?
--> Option 4 ?
-    Player: I've been here longer than you'd think.
-    Owen: Oh! My bad, you just look fresh. Good thing I didn't say anything rude then, eh?
-
-// ── Owen Arrives 
-<<MoveIn NPC_Owen 2>>
-<<SetEmotion NPC_Owen Happy>>
+<<MoveIn NPC_Name.Owen 2>>
+<<Switch_Camera CamController "CenterCam">>
+<<SetEmotion NPC_Name.Owen "happy">>
 Owen: Hey! You must be the new bartender everyone's been talking about.
 Owen: Place looks good. Someone's been busy.
 
 -> Thanks, still getting used to it.
     Player: Thanks, still finding my feet honestly.
-    <<SetEmotion NPC_Owen Happy>>
+    <<SetEmotion NPC_Name.Owen "happy">>
     Owen: Ha! You'll be fine. First week's always the hardest.
 -> I've been here a while actually.
     Player: I've been here longer than you'd think.
     Owen: Oh! My bad, you just look fresh. Good thing I didn't say anything rude then, eh?
--> OPtoin 3
+-> Option 3
     Player: I've been here longer than you'd think.
     Owen: Oh! My bad, you just look fresh. Good thing I didn't say anything rude then, eh?
 -> Option 4
     Player: I've been here longer than you'd think.
     Owen: Oh! My bad, you just look fresh. Good thing I didn't say anything rude then, eh?
 
-// ── Owen's Order 
+// ── Owen's Order ──────────────────────────────────────────
 Owen: Anyway — could you make me something? I'm thinking {Order_Cocktail_OutName(NPC_Name.Owen)}.
 
+<<Reset_Camera CamController>>
+<<Switch_Camera CamController "MainCam">>
+<<Fix_Camera CamController false>>
 <<wait_for_task SystemGame>>
+<<Fix_Camera CamController true>>
+<<Switch_Camera CamController "CenterCam">>
 
 <<if $satisfaction == Satisfaction.Perfect>>
-    <<SetEmotion NPC_Owen Happy>>
+    <<SetEmotion NPC_Name.Owen "happy">>
     Owen: Wow. NOW that is a drink. You're good at this.
     Owen: Seriously, where did you learn that?
     -> Just picked it up.
@@ -124,7 +93,7 @@ Owen: Anyway — could you make me something? I'm thinking {Order_Cocktail_OutNa
         Player: I had someone show me the ropes early on.
         Owen: Smart. Always learn from the best.
 <<elseif $satisfaction == Satisfaction.Acceptable>>
-    <<SetEmotion NPC_Owen Neutral>>
+    <<SetEmotion NPC_Name.Owen "neutral">>
     Owen: Hmm... not bad. I've had better, but I've had worse.
     Owen: Maybe a little less of the mixer next time?
     -> I'll keep that in mind.
@@ -132,23 +101,23 @@ Owen: Anyway — could you make me something? I'm thinking {Order_Cocktail_OutNa
         Owen: That's the spirit. Don't let it get to you.
     -> You're a tough crowd.
         Player: Wow, tough crowd.
-        <<SetEmotion NPC_Owen Happy>>
+        <<SetEmotion NPC_Name.Owen "happy">>
         Owen: Ha! You have no idea, mate.
 <<elseif $satisfaction == Satisfaction.Fail>>
-    <<SetEmotion NPC_Owen Upset>>
+    <<SetEmotion NPC_Name.Owen "upset">>
     Owen: Ugh... that's rough, mate. Really rough.
     Owen: What did you even put in there?
     -> I might have overdone it.
         Player: Yeah... I think I overdid something.
-        <<SetEmotion NPC_Owen Neutral>>
+        <<SetEmotion NPC_Name.Owen "neutral">>
         Owen: A little, yeah. Try again sometime — I don't give up easy.
     -> Sorry, still learning.
         Player: Sorry, still learning the recipes.
-        <<SetEmotion NPC_Owen Neutral>>
+        <<SetEmotion NPC_Name.Owen "neutral">>
         Owen: It's fine. Just maybe don't serve that one to Walter.
 <<endif>>
 
-<<SetEmotion NPC_Owen Neutral>>
+<<SetEmotion NPC_Name.Owen "neutral">>
 <<Reset_Variable SystemGame>>
 
 // ── Walter Arrives ────────────────────────────────────────
@@ -159,10 +128,11 @@ Owen: Oh, looks like someone's coming in.
 -> A new customer?
     Owen: Nah, it's just Walter. The old man himself.
 
-<<MoveIn NPC_Walter 1>>
-<<SetEmotion NPC_Walter Happy>>
+<<MoveIn NPC_Name.Walter 1>>
+<<Switch_Camera CamController "NearLeftCam">>
+<<SetEmotion NPC_Name.Walter "happy">>
 Walter: Well, well — Owen! Didn't expect to see you here on a weekday.
-<<SetEmotion NPC_Owen Happy>>
+<<SetEmotion NPC_Name.Owen "happy">>
 Owen: Walter! You look terrible, old man.
 Walter: Ha! And you look like you haven't changed since high school.
 Owen: I'll take that as a compliment.
@@ -172,62 +142,67 @@ Walter: And you must be the new bartender. Good to meet you, kid.
 
 -> Nice to meet you too.
     Player: Nice to meet you, sir.
-    <<SetEmotion NPC_Walter Happy>>
+    <<SetEmotion NPC_Name.Walter "happy">>
     Walter: "Sir"! Oh I like this one, Owen. Very respectful.
-    <<SetEmotion NPC_Owen Happy>>
+    <<SetEmotion NPC_Name.Owen "happy">>
     Owen: Don't let it go to your head, Walter.
 -> I've heard a lot about you.
     Player: I've actually heard a lot about you.
     Walter: Oh? Good things I hope.
-    <<SetEmotion NPC_Owen Happy>>
+    <<SetEmotion NPC_Name.Owen "happy">>
     Owen: Absolutely not.
-    <<SetEmotion NPC_Walter Happy>>
+    <<SetEmotion NPC_Name.Walter "happy">>
     Walter: Ha! Sounds about right.
 
 // ── Walter's Order ────────────────────────────────────────
 Walter: Right then — I'll have something, and make it better than whatever you gave Owen. Ha!
-<<SetEmotion NPC_Owen Neutral>>
+<<SetEmotion NPC_Name.Owen "neutral">>
 Owen: Hey, mine was fine.
 Walter: Sure it was, son.
 Walter: I'm after {Order_Cocktail_OutDescription(NPC_Name.Walter)}.
 
+<<Reset_Camera CamController>>
+<<Switch_Camera CamController "MainCam">>
+<<Fix_Camera CamController false>>
 <<wait_for_task SystemGame>>
+<<Fix_Camera CamController true>>
+<<Switch_Camera CamController "NearLeftCam">>
 
 <<if $satisfaction == Satisfaction.Perfect>>
-    <<SetEmotion NPC_Walter Happy>>
+    <<SetEmotion NPC_Name.Walter "happy">>
     Walter: Now THAT takes me back. Just like the old days. Well done, kid.
     Owen: Okay... I'll admit that looks better than mine.
     Walter: It IS better than yours, Owen.
-    <<SetEmotion NPC_Owen Upset>>
+    <<SetEmotion NPC_Name.Owen "upset">>
     Owen: I didn't ask, Walter.
-    <<SetEmotion NPC_Walter Happy>>
+    <<SetEmotion NPC_Name.Walter "happy">>
     Walter: Ha! That's the spirit. Don't let an old man get to you.
-    <<SetEmotion NPC_Owen Neutral>>
+    <<SetEmotion NPC_Name.Owen "neutral">>
     Owen: You're insufferable, you know that?
     Walter: And yet here you are, still talking to me.
 <<elseif $satisfaction == Satisfaction.Acceptable>>
-    <<SetEmotion NPC_Walter Neutral>>
+    <<SetEmotion NPC_Name.Walter "neutral">>
     Walter: Decent enough. A little more practice and you'll get there.
     Owen: See? He's tough to please.
     Walter: I'm not tough, I just have standards.
-    <<SetEmotion NPC_Owen Happy>>
+    <<SetEmotion NPC_Name.Owen "happy">>
     Owen: Same thing, old man.
     Walter: You'd know nothing about standards, Owen.
     Owen: ...Rude.
 <<elseif $satisfaction == Satisfaction.Fail>>
-    <<SetEmotion NPC_Walter Upset>>
+    <<SetEmotion NPC_Name.Walter "upset">>
     Walter: Oh dear... that's not quite it, is it.
-    <<SetEmotion NPC_Owen Happy>>
+    <<SetEmotion NPC_Name.Owen "happy">>
     Owen: Ha! So mine wasn't that bad after all.
-    <<SetEmotion NPC_Walter Neutral>>
+    <<SetEmotion NPC_Name.Walter "neutral">>
     Walter: Don't get smug, Owen. Yours wasn't great either.
     Owen: I'll take a partial win.
     Walter: Keep at it, kid. You'll get there.
 <<endif>>
 
 // ── Wrap Up ───────────────────────────────────────────────
-<<SetEmotion NPC_Walter Neutral>>
-<<SetEmotion NPC_Owen Neutral>>
+<<SetEmotion NPC_Name.Walter "neutral">>
+<<SetEmotion NPC_Name.Owen "neutral">>
 <<Reset_Variable SystemGame>>
 
 Walter: You know, I used to come to this place years ago. Before your time.
@@ -238,19 +213,23 @@ Walter: ...Different.
 
 -> Will you come back?
     Player: Will you be coming back?
-    <<SetEmotion NPC_Walter Happy>>
+    <<SetEmotion NPC_Name.Walter "happy">>
     Walter: If the drinks keep improving? Absolutely.
     Owen: I'll be back tomorrow. Assuming Walter doesn't scare you off.
     Walter: When have I ever scared anyone off?
-    <<SetEmotion NPC_Owen Happy>>
+    <<SetEmotion NPC_Name.Owen "happy">>
     Owen: Should I get the list?
 -> Glad you both stopped by.
     Player: Well, glad you both came in today.
-    <<SetEmotion NPC_Walter Happy>>
+    <<SetEmotion NPC_Name.Walter "happy">>
     Walter: Likewise, kid. You've got potential.
-    <<SetEmotion NPC_Owen Happy>>
+    <<SetEmotion NPC_Name.Owen "happy">>
     Owen: Don't let him fool you — that's basically a standing ovation from Walter.
     Walter: ...Don't push it, Owen.
+
+<<Switch_Camera CamController "MainCam">>
+<<MoveOut NPC_Name.Walter>>
+<<MoveOut NPC_Name.Owen>>
 
 NOW IT WILL LOOP
 <<jump TestLoopPart>>

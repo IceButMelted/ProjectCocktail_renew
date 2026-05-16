@@ -180,7 +180,7 @@ public class CocktailSystemManager : MonoBehaviour
         drink = default;
         List<TypeOfCocktail> defaultOptions = new() { TypeOfCocktail.HighAlcohol, TypeOfCocktail.LowAlcohol, TypeOfCocktail.NoneAlcohol };
 
-        NPCName npcName = (NPCName)NPC;
+        NPC_Name npcName = (NPC_Name)NPC;
 
         if (data == null
             || !data.NPC_Favorite_Drink.TryGetValue(npcName, out List<TypeOfCocktail> cocktailOptions)

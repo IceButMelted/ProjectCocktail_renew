@@ -66,7 +66,7 @@ public class TaskManager : MonoBehaviour
     //{
     //    List<TypeOfCocktail> defaultOptions = new() { TypeOfCocktail.HighAlcohol, TypeOfCocktail.LowAlcohol, TypeOfCocktail.NoneAlcohol };
 
-    //    NPCName npcName = (NPCName)NPC;
+    //    NPC_Name npcName = (NPC_Name)NPC;
 
     //    if (!_characterData.NPC_Favorite_Drink.TryGetValue(npcName, out List<TypeOfCocktail> cocktailOptions)
     //        || cocktailOptions.Count == 0)
@@ -86,7 +86,7 @@ public class TaskManager : MonoBehaviour
     //{
     //    List<TypeOfCocktail> defaultOptions = new() { TypeOfCocktail.HighAlcohol, TypeOfCocktail.LowAlcohol, TypeOfCocktail.NoneAlcohol };
 
-    //    NPCName npcName = (NPCName)NPC;
+    //    NPC_Name npcName = (NPC_Name)NPC;
 
     //    if (!_characterData.NPC_Favorite_Drink.TryGetValue(npcName, out List<TypeOfCocktail> cocktailOptions)
     //        || cocktailOptions.Count == 0)

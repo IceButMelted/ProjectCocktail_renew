@@ -351,6 +351,7 @@ public class CameraController : MonoBehaviour
         }
     }
 
+    [YarnCommand("Reset_Camera")]
     public void ResetRotaionAndMovement() { 
         currentDirection = ViewDirection.Forward;
         StartRotation(ViewDirection.Forward);

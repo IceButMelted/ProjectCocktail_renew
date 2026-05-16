@@ -114,7 +114,7 @@ public class E_Cocktail
         Building
     }
 
-    public enum NPCName
+    public enum NPC_Name
     {
         None = 0,
         Cole,
