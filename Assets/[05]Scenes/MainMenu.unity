@@ -549,7 +549,7 @@ MonoBehaviour:
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
-          m_StringArgument: CocktailVisualAndCocktailMaker
+          m_StringArgument: GamePlayScene
           m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &664729465
@@ -590,6 +590,67 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 664729462}
   m_CullTransparentMesh: 1
+--- !u!1001 &699275280
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 0}
+    m_Modifications:
+    - target: {fileID: 6559767331297106402, guid: 417b04182a4b7ec4e84a6abe136a5335, type: 3}
+      propertyPath: m_Name
+      value: SoundSystem
+      objectReference: {fileID: 0}
+    - target: {fileID: 8246347767388262365, guid: 417b04182a4b7ec4e84a6abe136a5335, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 7.18419
+      objectReference: {fileID: 0}
+    - target: {fileID: 8246347767388262365, guid: 417b04182a4b7ec4e84a6abe136a5335, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8246347767388262365, guid: 417b04182a4b7ec4e84a6abe136a5335, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 7.30164
+      objectReference: {fileID: 0}
+    - target: {fileID: 8246347767388262365, guid: 417b04182a4b7ec4e84a6abe136a5335, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 8246347767388262365, guid: 417b04182a4b7ec4e84a6abe136a5335, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8246347767388262365, guid: 417b04182a4b7ec4e84a6abe136a5335, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8246347767388262365, guid: 417b04182a4b7ec4e84a6abe136a5335, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8246347767388262365, guid: 417b04182a4b7ec4e84a6abe136a5335, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8246347767388262365, guid: 417b04182a4b7ec4e84a6abe136a5335, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 8246347767388262365, guid: 417b04182a4b7ec4e84a6abe136a5335, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 9213904461191353842, guid: 417b04182a4b7ec4e84a6abe136a5335, type: 3}
+      propertyPath: BGMStart
+      value: TMP_BGM001
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 417b04182a4b7ec4e84a6abe136a5335, type: 3}
 --- !u!1 &1161673158
 GameObject:
   m_ObjectHideFlags: 0
@@ -1210,3 +1271,4 @@ SceneRoots:
   - {fileID: 560015728}
   - {fileID: 1906201964}
   - {fileID: 1686220029}
+  - {fileID: 699275280}

@@ -11,28 +11,20 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e334e4af58a99445a8dadc5aaedcf4f, type: 3}
   m_Name: Greyhound
-  m_EditorClassIdentifier: Assembly-CSharp::SO_Cocktails
+  m_EditorClassIdentifier: Assembly-CSharp::SO_Cocktail
   CocktailGameObject: {fileID: 0}
-  CocktailSprite: {fileID: 2800000, guid: 084402ddf1ab12844951505d07fdc369, type: 3}
+  CocktailSprite: {fileID: 0}
   Name: Greyhound
-  Description: '''Clean and slightly bitter'''
-  AlcoholStrength: 2
+  Description: Greyhound
   PreparationMethod: 2
+  TypeOfAlcohol: 2
   AddIce: 1
-  Price: 100
-  AlcoholList: []
+  Price: 0
+  AlcoholList:
+  - Type: 1
+    Amount: 4
   LiqueurList: []
-  MixerList: []
+  MixerList:
+  - Type: 5
+    Amount: 6
   CompatibleGlasses: 
-  CocktailInfos:
-    Name: Greyhound
-    Description: '''Clean and slightly bitter'''
-    AlcoholStrength: 3
-    PreparationMethod: 2
-    AddIce: 1
-    Price: 100
-    AlcoholList: []
-    LiqueurList: []
-    MixerList: []
-    CompatibleGlasses: 
-    CocktailSprite: {fileID: 2800000, guid: 084402ddf1ab12844951505d07fdc369, type: 3}

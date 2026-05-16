@@ -10,21 +10,21 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e334e4af58a99445a8dadc5aaedcf4f, type: 3}
-  m_Name: Martini
+  m_Name: OldFashioned
   m_EditorClassIdentifier: Assembly-CSharp::SO_Cocktail
   CocktailGameObject: {fileID: 0}
   CocktailSprite: {fileID: 0}
-  Name: Martini
-  Description: Martini
+  Name: Old Fashioned
+  Description: Old Fashioned
   PreparationMethod: 2
   TypeOfAlcohol: 1
-  AddIce: 0
+  AddIce: 1
   Price: 0
   AlcoholList:
-  - Type: 2
-    Amount: 8
-  LiqueurList:
-  - Type: 2
-    Amount: 2
-  MixerList: []
+  - Type: 3
+    Amount: 9
+  LiqueurList: []
+  MixerList:
+  - Type: 6
+    Amount: 1
   CompatibleGlasses: 

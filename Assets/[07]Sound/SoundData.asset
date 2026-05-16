@@ -13,14 +13,20 @@ MonoBehaviour:
   m_Name: SoundData
   m_EditorClassIdentifier: Assembly-CSharp::SoundData
   ambients: []
-  bgms: []
+  bgms:
+  - id: TMP_BGM001
+    clip: {fileID: 8300000, guid: 887765fccd8e5674ca964d6622d2bf35, type: 3}
+    volume: 0.25
+  - id: TMP_BGM002
+    clip: {fileID: 8300000, guid: 14d67983da1f7bf4597d594035a1e9e5, type: 3}
+    volume: 0.25
   effects:
   - id: TMP_SFX_BottleOnTable
     clip: {fileID: 8300000, guid: 57789008b66a10740a98bd1f0542c3e3, type: 3}
-    volume: 1
+    volume: 0.25
   - id: TMP_SFX_BottleClink
     clip: {fileID: 8300000, guid: 3327b409d8a279148a8aa7721540b3e8, type: 3}
-    volume: 1
+    volume: 0.25
   - id: TMP_SFX_Pouring
     clip: {fileID: 8300000, guid: ec3c8063122b135409e80ab1f565d996, type: 3}
-    volume: 1
+    volume: 0.25

@@ -11,19 +11,24 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e334e4af58a99445a8dadc5aaedcf4f, type: 3}
   m_Name: Cosmopolitan
-  m_EditorClassIdentifier: Assembly-CSharp::SO_Cocktails
+  m_EditorClassIdentifier: Assembly-CSharp::SO_Cocktail
   CocktailGameObject: {fileID: 0}
-  CocktailSprite: {fileID: 2800000, guid: bd1cae2b92b680344bb24ae5fa2d1925, type: 3}
+  CocktailSprite: {fileID: 0}
   Name: Cosmopolitan
-  Description: '''Tart and lightly sweet'''
+  Description: Cosmopolitan
   PreparationMethod: 1
+  TypeOfAlcohol: 0
   AddIce: 0
-  Price: 120
+  Price: 0
   AlcoholList:
   - Type: 1
-    Amount: 0
+    Amount: 5
   LiqueurList:
-  - Type: 0
-    Amount: 0
-  MixerList: []
+  - Type: 1
+    Amount: 2
+  MixerList:
+  - Type: 2
+    Amount: 2
+  - Type: 4
+    Amount: 1
   CompatibleGlasses: 

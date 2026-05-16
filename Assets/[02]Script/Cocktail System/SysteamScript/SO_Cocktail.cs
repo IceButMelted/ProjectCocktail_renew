@@ -19,6 +19,7 @@ public class SO_Cocktail : ScriptableObject
     [TextArea(3, 10)]
     public string Description;
     public Method PreparationMethod;
+    public TypeOfCocktail TypeOfAlcohol; 
     public bool AddIce;
     public float Price;
 
@@ -37,6 +38,9 @@ public class SO_Cocktail : ScriptableObject
     /// </summary>
     public TypeOfCocktail GetTypeOfAlcohol()
     {
+        if(TypeOfAlcohol != TypeOfCocktail.None)
+        return TypeOfAlcohol; // if already set in inspector, use that value (allows for manual overrides)
+
         int total = AlcoholList.Sum(a => a.Amount) + LiqueurList.Sum(l => l.Amount);
         if (total >= 5) return TypeOfCocktail.HighAlcohol;
         if (total > 0) return TypeOfCocktail.LowAlcohol;

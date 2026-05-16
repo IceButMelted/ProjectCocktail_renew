@@ -11,28 +11,24 @@ MonoBehaviour:
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 4e334e4af58a99445a8dadc5aaedcf4f, type: 3}
   m_Name: Nojito
-  m_EditorClassIdentifier: Assembly-CSharp::SO_Cocktails
+  m_EditorClassIdentifier: Assembly-CSharp::SO_Cocktail
   CocktailGameObject: {fileID: 0}
-  CocktailSprite: {fileID: 2800000, guid: 783e28cb568fffa41b195e95864fa021, type: 3}
+  CocktailSprite: {fileID: 0}
   Name: Nojito
-  Description: '''Sweet and sparklingly refreshing'''
-  AlcoholStrength: 2
+  Description: Nojito
   PreparationMethod: 2
+  TypeOfAlcohol: 3
   AddIce: 1
-  Price: 100
+  Price: 0
   AlcoholList: []
   LiqueurList: []
-  MixerList: []
+  MixerList:
+  - Type: 1
+    Amount: 4
+  - Type: 3
+    Amount: 3
+  - Type: 6
+    Amount: 2
+  - Type: 7
+    Amount: 1
   CompatibleGlasses: 
-  CocktailInfos:
-    Name: Nojito
-    Description: '''Sweet and sparklingly refreshing'''
-    AlcoholStrength: 3
-    PreparationMethod: 2
-    AddIce: 1
-    Price: 100
-    AlcoholList: []
-    LiqueurList: []
-    MixerList: []
-    CompatibleGlasses: 
-    CocktailSprite: {fileID: 2800000, guid: 783e28cb568fffa41b195e95864fa021, type: 3}
