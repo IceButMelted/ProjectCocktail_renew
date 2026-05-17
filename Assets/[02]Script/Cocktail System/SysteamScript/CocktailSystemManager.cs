@@ -255,6 +255,7 @@ public class CocktailSystemManager : MonoBehaviour
     {
         if (_myGameCondition && _satisfaction != Satisfaction.None)
         {
+            EnableButtonInYarn(false);
             // Satisfaction order in .yarn: None=0, Fail=1, Acceptable=2, Perfect=3
             _dialogueRunner.VariableStorage.SetValue(SatisfactionVariableName,
                                                      (float)(int)_satisfaction);
@@ -296,7 +297,21 @@ public class CocktailSystemManager : MonoBehaviour
     [YarnCommand("wait_for_task")]
     public IEnumerator WaitForTask()
     {
+        EnableButtonInYarn(true);
         yield return new WaitUntil(() => UpdateVariableInYarn());
+    }
+
+
+    /// <summary>
+    /// Enables the interactable object (e.g. cocktail shaker) so the player can click it.
+    /// </summary>
+    [YarnCommand("Enable_InteractableObject")]
+    public void EnableButtonInYarn(bool enable)
+    {
+        _cocktailShaker.Interactable = enable;
+        _cocktailShakerData.SetIngredientActive(enable);
+        _cocktailShakerData.ingredientButtons.ForEach(btn => btn.GetComponent<UIPointerSound>().CanInteract = enable);
+
     }
 
     /// <summary>

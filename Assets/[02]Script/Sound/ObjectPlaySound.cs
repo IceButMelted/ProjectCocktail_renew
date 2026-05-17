@@ -19,6 +19,28 @@ public class UIPointerSound : MonoBehaviour,
     [Header("Drag Throttle")]
     [SerializeField, Min(0f)] private float _dragInterval = 0.08f;
 
+    private bool _canInteract = true;
+    public bool CanInteract
+    {
+        get => _canInteract;
+        set
+        {
+            _canInteract = value;
+            if (!_canInteract)
+            {
+                _canPlayEnter = false;
+                _canPlayExit = false;
+                _canPlayUp = false;
+            }
+            else
+            {
+                _canPlayEnter = true;
+                _canPlayExit = true;
+                _canPlayUp = true;
+            }
+        }
+    }
+
 
     private DragableObject _dragableObject;
     private float _lastDragTime = -1f;
@@ -31,6 +53,7 @@ public class UIPointerSound : MonoBehaviour,
     }
     private void LateUpdate()
     {
+        if (!_canInteract) return;
         if (_dragableObject == null) return;
 
         if (!_wasDragging)
