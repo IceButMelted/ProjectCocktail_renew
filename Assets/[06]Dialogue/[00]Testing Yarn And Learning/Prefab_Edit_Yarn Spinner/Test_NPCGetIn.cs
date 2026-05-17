@@ -11,6 +11,11 @@ public class Test_NPCGetIn : MonoBehaviour
     [SerializeField] public Sprite _happySprite;
     [SerializeField] public Sprite _upsetSprite;
 
+    [Header("Sprite Look Direction")]
+    [SerializeField] private Sprite _lookLeftSprite;
+    [SerializeField] private Sprite _lookRightSprite;
+    [SerializeField] private Sprite _lookForwardSprite;
+
     public NPC_Name Name;
 
     [Header("Waypoints")]
@@ -22,6 +27,16 @@ public class Test_NPCGetIn : MonoBehaviour
     private bool _isMoving = false;
     private bool _arrived = false;
     private int _currentIndex = -1;
+
+    private void Start()
+    {
+        if (SpriteRenderer == null)
+            SpriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        if (_waypoints == null || _waypoints.Length == 0)
+            Debug.LogWarning($"{name} has no waypoints assigned.");
+        if(_lookForwardSprite == null)
+            _lookForwardSprite = _neutralSprite;
+    }
 
     private void Update()
     {
@@ -50,6 +65,14 @@ public class Test_NPCGetIn : MonoBehaviour
         Test_NPCGetIn npc = FindNPC(npcNameStr);
         if (npc == null) return;
         npc.DoSetEmotion(emotion);
+    }
+    [YarnCommand("SetLookDirection")]
+    public static void SetLookDirection(string npcNameStr, string direction)
+    {
+        Test_NPCGetIn npc = FindNPC(npcNameStr);
+        if (npc == null) return;
+        Debug.Log($"{npc.name} now looking {direction}");
+        npc.DoLookDirection(direction);
     }
 
     [YarnCommand("MoveIn")]
@@ -104,6 +127,27 @@ public class Test_NPCGetIn : MonoBehaviour
 
         if (sr.sprite == null)
             Debug.LogWarning($"Unknown emotion '{emotion}' for {name}");
+    }
+
+    private void DoLookDirection(string direction)
+    {
+        string dir = direction.ToLower();
+        string rawDir = direction.Contains(".") ? dir.Split('.')[1] : dir;
+        switch (rawDir)
+        {
+            case "left":
+                SpriteRenderer.sprite = _lookLeftSprite;
+                break;
+            case "right":
+                SpriteRenderer.sprite = _lookRightSprite;
+                break;
+            case "forward":
+                SpriteRenderer.sprite = _lookForwardSprite;
+                break;
+            default:
+                Debug.LogWarning($"Unknown look direction '{direction}' for {name}");
+                break;
+        }
     }
 
     private IEnumerator DoMoveTo(int waypointIndex)

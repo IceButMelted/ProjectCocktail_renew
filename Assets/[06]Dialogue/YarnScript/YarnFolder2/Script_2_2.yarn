@@ -21,6 +21,12 @@ title: Script_2_2
     <<case Freya>>
     <<case Isla>>
 <<endenum>>
+<<enum LookDirection>>
+    <<case None>>
+    <<case Right>>
+    <<case Left>>
+    <<case Forward>>
+<<endenum>>
 // Declare the variable (set false by default)
 <<declare $task_done = false>>
 <<declare $type_of_cocktail = TypeOfCocktail.None>>
@@ -55,6 +61,11 @@ title: TestLoopPart
 <<MoveIn NPC_Name.Owen 2>>
 <<Switch_Camera CamController "CenterCam">>
 <<SetEmotion NPC_Name.Owen "happy">>
+<<SetLookDirection NPC_Name.Owen LookDirection.Right>>
+<<wait 0.6>>
+<<SetLookDirection NPC_Name.Owen LookDirection.Left>>
+<<wait 0.6>>
+<<SetLookDirection NPC_Name.Owen LookDirection.Forward>>
 Owen: Hey! You must be the new bartender everyone's been talking about.
 Owen: Place looks good. Someone's been busy.
 
@@ -129,6 +140,7 @@ Owen: Oh, looks like someone's coming in.
     Owen: Nah, it's just Walter. The old man himself.
 
 <<MoveIn NPC_Name.Walter 1>>
+<<SetLookDirection NPC_Name.Walter LookDirection.Right>>
 <<Switch_Camera CamController "NearLeftCam">>
 <<SetEmotion NPC_Name.Walter "happy">>
 Walter: Well, well — Owen! Didn't expect to see you here on a weekday.
@@ -138,6 +150,7 @@ Walter: Ha! And you look like you haven't changed since high school.
 Owen: I'll take that as a compliment.
 Walter: It wasn't one.
 
+<<SetLookDirection NPC_Name.Walter LookDirection.Forward>>
 Walter: And you must be the new bartender. Good to meet you, kid.
 
 -> Nice to meet you too.
