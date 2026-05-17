@@ -1,7 +1,9 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.InteropServices.WindowsRuntime;
 using UnityEngine;
+using UnityEngine.UI;
 using Yarn.Unity;
 using static E_Cocktail;
 
@@ -30,6 +32,9 @@ public class CocktailSystemManager : MonoBehaviour
 
     [Header("Fallback")]
     [SerializeField] private Sprite _failCocktailSprite;
+
+    [Header("BTN End Shift")]
+    [SerializeField] private Button _endShiftBTN;
 
     [Header("Cocktail References")]
     public CocktailShakerData _cocktailShakerData;
@@ -207,6 +212,7 @@ public class CocktailSystemManager : MonoBehaviour
     public void SetSatisfaction(Satisfaction satisfaction) => _satisfaction = satisfaction;
 
     public void ServeDrink() => UpdateVariableInYarnTrigger();
+    private void DebugServeDrink() => DebugUpdateVariableInYarnTrigger();
 
     #region Uitility / Debug
 #if UNITY_EDITOR
@@ -216,8 +222,8 @@ public class CocktailSystemManager : MonoBehaviour
     {
         DebugVariableFromYarn();
         SetSatisfaction(Satisfaction.Perfect);
-        ServeDrink();
-        UpdateVariableInYarn();
+        DebugServeDrink();
+        //UpdateVariableInYarn();
         DebugVariableFromYarn();
     }
 
@@ -226,8 +232,8 @@ public class CocktailSystemManager : MonoBehaviour
     {
         DebugVariableFromYarn();
         SetSatisfaction(Satisfaction.Acceptable);
-        ServeDrink();
-        UpdateVariableInYarn();
+        DebugServeDrink();
+        //UpdateVariableInYarn();
         DebugVariableFromYarn();
     }
 
@@ -236,8 +242,8 @@ public class CocktailSystemManager : MonoBehaviour
     {
         DebugVariableFromYarn();
         SetSatisfaction(Satisfaction.Fail);
-        ServeDrink();
-        UpdateVariableInYarn();
+        DebugServeDrink();
+        //UpdateVariableInYarn();
         DebugVariableFromYarn();
     }
     #endif
@@ -283,7 +289,17 @@ public class CocktailSystemManager : MonoBehaviour
         UpdateVariableInYarn();
         DebugVariableFromYarn();
     }
-    
+
+    private void DebugUpdateVariableInYarnTrigger()
+    {
+        _myGameCondition = true;
+        //SetSatisfaction(CalculateSatisfaction());
+        Debug.Log($"[CocktailSystemManager] Satisfaction set to {_satisfaction} based on cocktail comparison.");
+        DebugVariableFromYarn();
+        UpdateVariableInYarn();
+        DebugVariableFromYarn();
+    }
+
 
     // ═════════════════════════════════════════════════════════════════════
     // Yarn Commands
@@ -301,6 +317,13 @@ public class CocktailSystemManager : MonoBehaviour
         yield return new WaitUntil(() => UpdateVariableInYarn());
     }
 
+    [YarnCommand("Can_End_Shift")]
+    public void CanEndShift() { 
+        EnableButtonInYarn(false);
+        _endShiftBTN.gameObject.SetActive(true);
+        Debug.Log($"[CocktailSystemManager] CanEndShift called.");
+    }
+
 
     /// <summary>
     /// Enables the interactable object (e.g. cocktail shaker) so the player can click it.
@@ -310,7 +333,21 @@ public class CocktailSystemManager : MonoBehaviour
     {
         _cocktailShaker.Interactable = enable;
         _cocktailShakerData.SetIngredientActive(enable);
-        _cocktailShakerData.ingredientButtons.ForEach(btn => btn.GetComponent<UIPointerSound>().CanInteract = enable);
+        foreach (var btn in _cocktailShakerData.ingredientButtons)
+        {
+            var interactable = btn.GetComponent<Interactable3DObject>();
+            if (interactable != null)
+                interactable.Interactable = enable;
+            var sound = btn.GetComponent<UIPointerSound>();
+            if (sound != null)
+                sound.Interactable = enable;
+            var draggable = btn.GetComponent<DragableObject>();
+            if (draggable != null)
+                draggable.Interactable = enable;
+            var scaleOnHover = btn.GetComponent<ScaleOnHover>();
+            if (scaleOnHover != null)
+                scaleOnHover.Interactable = enable;
+        }
 
     }
 

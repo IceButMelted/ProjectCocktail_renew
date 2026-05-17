@@ -4,7 +4,7 @@ using UnityEngine.EventSystems;
 
 /// <summary>
 /// EventSystem-driven 3D interactable that behaves like a UI Button:
-///   - Interactable toggle (inspector tick + public get/set)
+///   - Interactable toggle inherited from <see cref="PointerInteractableBase"/>
 ///   - Disabled colour tint when non-interactable
 ///   - Hover / click sprite swap
 ///   - Drag suppression (own threshold + optional DragableObject sibling)
@@ -13,16 +13,9 @@ using UnityEngine.EventSystems;
 /// </summary>
 [RequireComponent(typeof(Collider))]
 [RequireComponent(typeof(SpriteRenderer))]
-public class Interactable3DObject : MonoBehaviour,
-    IPointerEnterHandler,
-    IPointerExitHandler,
-    IPointerDownHandler,
-    IPointerUpHandler,
-    IDragHandler
+public class Interactable3DObject : PointerInteractableBase
 {
     // ── Inspector ─────────────────────────────────────────────────────────────
-    [Header("Interaction")]
-    [SerializeField] private bool _interactable = true;
 
     [Header("Sprites")]
     [SerializeField] protected Sprite S_Default;
@@ -31,7 +24,7 @@ public class Interactable3DObject : MonoBehaviour,
     [Tooltip("Sprite to show when Interactable is false. If null, falls back to S_Default with disabled colour.")]
     [SerializeField] private Sprite _disabledSprite;
     [Tooltip("Sprite colour applied when Interactable is false (matches Unity Button behaviour).")]
-    [SerializeField] private Color _disabledColour = new Color(1f, 1f, 1f, 0.5f);    
+    [SerializeField] private Color _disabledColour = new Color(1f, 1f, 1f, 0.5f);
 
     [Header("Drag Detection")]
     [Tooltip("Pixels the pointer must travel while held before the gesture is " +
@@ -41,78 +34,69 @@ public class Interactable3DObject : MonoBehaviour,
     [Space]
     public UnityEvent OnClicked;
 
-    // ── Interactable property (public get + set) ──────────────────────────────
-
-    /// <summary>
-    /// Whether this object responds to pointer events — identical to UI Button.interactable.
-    /// Tick in the Inspector or set at runtime. Automatically updates the visual tint.
-    /// </summary>
-    public bool Interactable
-    {
-        get => _interactable;
-        set
-        {
-            if (_interactable == value) return;
-            _interactable = value;
-            ApplyInteractableVisual();
-        }
-    }
-
     // ── Private State ─────────────────────────────────────────────────────────
 
     private SpriteRenderer _spriteRenderer;
-    private bool           _isHovering;
-    private bool           _isDragging;
-    private Vector2        _pointerDownScreenPos;
+    private bool _isHovering;
+    private bool _isDragging;
+    private Vector2 _pointerDownScreenPos;
     private DragableObject _dragableObject; // optional sibling — may be null
 
     // ── Unity Lifecycle ───────────────────────────────────────────────────────
 
     protected virtual void Awake()
     {
-        _spriteRenderer        = GetComponent<SpriteRenderer>();
-        _dragableObject        = GetComponent<DragableObject>();
+        _spriteRenderer = GetComponent<SpriteRenderer>();
+        _dragableObject = GetComponent<DragableObject>();
         _spriteRenderer.sprite = S_Default;
+        ApplyInteractableVisual();
+    }
+
+    // ── PointerInteractableBase Override ─────────────────────────────────────
+
+    /// <summary>Refresh sprite and tint whenever Interactable flips.</summary>
+    protected override void OnInteractableChanged(bool interactable)
+    {
         ApplyInteractableVisual();
     }
 
     // ── Pointer Handlers ──────────────────────────────────────────────────────
 
-    public void OnPointerEnter(PointerEventData eventData)
+    public override void OnPointerEnter(PointerEventData eventData)
     {
         if (_isDragging) return;
-        if (!_interactable) return;
-        _isHovering            = true;
+        if (!Interactable) return;
+        _isHovering = true;
         _spriteRenderer.sprite = S_Hover;
     }
 
-    public void OnPointerExit(PointerEventData eventData)
+    public override void OnPointerExit(PointerEventData eventData)
     {
-        _isHovering            = false;
-        if (!_interactable) return;
+        _isHovering = false;
+        if (!Interactable) return;
         _spriteRenderer.sprite = S_Default;
     }
 
-    public void OnPointerDown(PointerEventData eventData)
+    public override void OnPointerDown(PointerEventData eventData)
     {
-        if (!_interactable) return;
+        if (!Interactable) return;
         if (eventData.button != PointerEventData.InputButton.Left) return;
 
-        _isDragging           = false;
+        _isDragging = false;
         _pointerDownScreenPos = eventData.position;
         _spriteRenderer.sprite = S_Clicked;
     }
 
-    public void OnDrag(PointerEventData eventData)
+    public override void OnDrag(PointerEventData eventData)
     {
         if (_isDragging) return;
         if (Vector2.Distance(eventData.position, _pointerDownScreenPos) >= _dragThreshold)
             _isDragging = true;
     }
 
-    public void OnPointerUp(PointerEventData eventData)
+    public override void OnPointerUp(PointerEventData eventData)
     {
-        if (!_interactable) return;
+        if (!Interactable) return;
         if (eventData.button != PointerEventData.InputButton.Left) return;
 
         _spriteRenderer.sprite = _isHovering ? S_Hover : S_Default;
@@ -136,9 +120,9 @@ public class Interactable3DObject : MonoBehaviour,
 
     /// <summary>
     /// Override to add extra guard conditions (e.g. cooldowns, ingredient count).
-    /// Return false to block the click. Base always returns <see cref="Interactable"/>.
+    /// Return false to block the click. Base always returns <see cref="PointerInteractableBase.Interactable"/>.
     /// </summary>
-    protected virtual bool CanClick() => _interactable;
+    protected virtual bool CanClick() => Interactable;
 
     /// <summary>
     /// Override to run custom logic after a confirmed click.
@@ -152,7 +136,7 @@ public class Interactable3DObject : MonoBehaviour,
     public void SetBTNSprite(Sprite defaultSprite, Sprite hoverSprite, Sprite clickedSprite)
     {
         S_Default = defaultSprite;
-        S_Hover   = hoverSprite;
+        S_Hover = hoverSprite;
         S_Clicked = clickedSprite;
         ApplyInteractableVisual();
     }
@@ -161,21 +145,20 @@ public class Interactable3DObject : MonoBehaviour,
     /// Applies colour tint based on current Interactable state,
     /// mirroring how Unity's Button greys out when disabled.
     /// </summary>
-private void ApplyInteractableVisual()
+    private void ApplyInteractableVisual()
     {
         if (_spriteRenderer == null) return;
 
-        if (_interactable)
+        if (Interactable)
         {
             _spriteRenderer.sprite = S_Default;
-            _spriteRenderer.color  = Color.white;
+            _spriteRenderer.color = Color.white;
         }
         else
         {
-            // Disabled sprite takes priority; colour-tinted S_Default is the fallback
             _spriteRenderer.sprite = _disabledSprite != null ? _disabledSprite : S_Default;
-            _spriteRenderer.color  = _disabledColour;
-            _isHovering            = false;
+            _spriteRenderer.color = _disabledColour;
+            _isHovering = false;
         }
     }
 }

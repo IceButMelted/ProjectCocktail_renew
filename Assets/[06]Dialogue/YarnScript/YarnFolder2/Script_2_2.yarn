@@ -32,7 +32,14 @@ title: Script_2_2
 <<declare $type_of_cocktail = TypeOfCocktail.None>>
 <<declare $satisfaction = Satisfaction.None>>
 
+<<Enable_InteractableObject SystemGame false>>
+<<Fix_Camera CamController true>>
+<<Reset_Camera CamController>>
+<<Switch_Camera CamController "MainCam">>
+
 <<jump ShowcaseMain>>
+
+
 ===
 
 title: TestLoopPart
@@ -291,7 +298,7 @@ Owen: Isla! Small world.
 Isla: Or small bar.
 
 Isla: Bartender — can I get something? I'm not sure what I want though...
-
+<<SetLookDirection NPC_Name.Isla LookDirection.Forward>>
 // ── [SHOWCASE: Option Timeout — ? และ #fallback] ─────────
 -> Any recommendations tonight? ?
     Player: We've got some great specials on.
@@ -309,6 +316,7 @@ Isla: Bartender — can I get something? I'm not sure what I want though...
     Isla: Love the confidence!
 
 // ── [SHOWCASE: Order_Cocktail_OutName + wait_for_task] ───
+<<SetLookDirection NPC_Name.Owen LookDirection.Forward>>
 Owen: Right, since we're here — I'll have {Order_Cocktail_OutName(NPC_Name.Owen)}, please.
 
 <<Reset_Camera CamController>>
@@ -379,7 +387,8 @@ Isla: Okay my turn! Something {Order_Cocktail_OutDescription(NPC_Name.Isla)}, pl
 <<if $satisfaction == Satisfaction.Perfect>>
     <<SetEmotion NPC_Name.Isla "happy">>
     Isla: This is AMAZING. Owen, try this!
-    <<SetEmotion NPC_Name.Owen "happy">>
+    <<SetLookDirection NPC_Name.Isla LookDirection.Right>>
+    <<SetLookDirection NPC_Name.Owen LookDirection.Left>>
     Owen: ...Okay fine. *sip* ...Yeah. That's actually good.
     Isla: Right?!
     -> Really glad that hit the mark.
@@ -432,28 +441,23 @@ Isla: Okay my turn! Something {Order_Cocktail_OutDescription(NPC_Name.Isla)}, pl
 // Walter arrives at position 3
 Isla: Oh — someone just walked in.
 
-<<SetLookDirection NPC_Name.Owen LookDirection.Right>>
-<<SetLookDirection NPC_Name.Isla LookDirection.Right>>
-<<wait 0.6>>
-
 <<MoveIn NPC_Name.Walter 3>>
 <<Switch_Camera CamController "MainCam">>
 <<SetEmotion NPC_Name.Walter "neutral">>
 Walter: Evening all. Don't mind me.
 
-<<SetLookDirection NPC_Name.Owen LookDirection.Forward>>
-<<SetLookDirection NPC_Name.Isla LookDirection.Forward>>
-
-<<SetEmotion NPC_Name.Owen "happy">>
+<<SetLookDirection NPC_Name.Owen LookDirection.Right>>
+<<SetLookDirection NPC_Name.Isla LookDirection.Right>>
+<<wait 1>>
 Owen: Walter! Didn't have you pegged as a Tuesday night man.
-<<SetEmotion NPC_Name.Walter "happy">>
+<<SetLookDirection NPC_Name.Walter LookDirection.Left>>
 Walter: Every night's a Tuesday when you're my age, son.
-<<SetEmotion NPC_Name.Isla "happy">>
 Isla: That's either very wise or very sad.
 Walter: Both, probably.
 
 // ── [SHOWCASE: Switch_Camera FarRightCam — focus Walter] ─
 <<Switch_Camera CamController "FarRightCam">>
+<<SetLookDirection NPC_Name.Walter LookDirection.Forward>>
 
 Walter: And you — you're the new one. I'll have something {Order_Cocktail_OutDescription(NPC_Name.Walter)}.
 
@@ -530,7 +534,7 @@ Walter: And you — you're the new one. I'll have something {Order_Cocktail_OutD
 <<Reset_Variable SystemGame>>
 
 // ── [SHOWCASE: SetLookDirection ทุกตัวพร้อมกัน + Wrap Up] 
-<<Switch_Camera CamController "MainCam">>
+<<Switch_Camera CamController "CenterCam">>
 
 Walter: You know, I've been coming to bars like this for forty years.
 <<SetLookDirection NPC_Name.Walter LookDirection.Left>>
@@ -584,6 +588,9 @@ Isla: Byeee! See you next time!
 Walter: Mm. Not bad.
 <<MoveOut NPC_Name.Walter>>
 
-<<Switch_Camera CamController "MainCam">>
+<<Switch_Camera CamController "CenterCam">>
 <<Fix_Camera CamController false>>
+<<wait 5>>
+<<Can_End_Shift SystemGame>>
+
 ===

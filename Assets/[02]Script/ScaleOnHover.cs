@@ -1,73 +1,71 @@
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.EventSystems;
-using UnityEngine.InputSystem;
 
-public class ScaleOnHover : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler
+public class ScaleOnHover : PointerInteractableBase
 {
-    private Vector3 initScale;
+    // ── Inspector ─────────────────────────────────────────────────────────────
 
-    [SerializeField]
-    private float newScale = 1.1f;
+    [SerializeField] private float newScale = 1.1f;
+    [SerializeField] private float scaleDuration = 0.2f;
 
-    [SerializeField]
-    private float scaleDuration = 0.2f; 
+    // ── Private State ─────────────────────────────────────────────────────────
 
-    private Vector3 targetScale;
-    private bool isScaling = false;
+    private Vector3 _initScale;
+    private Vector3 _targetScale;
+    private bool _isScaling;
+
+    // ── Unity Lifecycle ───────────────────────────────────────────────────────
 
     private void Awake()
     {
-        initScale = transform.localScale;
-        targetScale = initScale;
+        _initScale = transform.localScale;
+        _targetScale = _initScale;
 
-        // Check if object has a collider
-        Collider col = GetComponent<Collider>();
-        if (col == null)
+        if (GetComponent<Collider>() == null)
         {
-            Debug.LogWarning($"ScaleOnHover on '{gameObject.name}' requires a Collider component! Adding BoxCollider...");
+            Debug.LogWarning($"ScaleOnHover on '{gameObject.name}' requires a Collider. Adding BoxCollider...");
             gameObject.AddComponent<BoxCollider>();
         }
     }
 
     private void Update()
     {
+        if (!_isScaling) return;
 
-        if (isScaling)
+        transform.localScale = Vector3.Lerp(transform.localScale, _targetScale, Time.deltaTime / scaleDuration);
+
+        if (Vector3.Distance(transform.localScale, _targetScale) < 0.001f)
         {
-            transform.localScale = Vector3.Lerp(transform.localScale, targetScale, Time.deltaTime / scaleDuration);
-
-            if (Vector3.Distance(transform.localScale, targetScale) < 0.001f)
-            {
-                transform.localScale = targetScale;
-                isScaling = false;
-            }
+            transform.localScale = _targetScale;
+            _isScaling = false;
         }
     }
 
-    private void ChangeScale(bool status)
-    {
-        if (status)
-        {
-            targetScale = initScale * newScale;
-        }
-        else
-        {
-            targetScale = initScale;
-        }
+    // ── PointerInteractableBase Overrides ─────────────────────────────────────
 
-        // For smooth scaling
-        isScaling = true;
+    /// <summary>Snap back to normal scale when disabled mid-hover.</summary>
+    protected override void OnInteractableChanged(bool interactable)
+    {
+        if (!interactable)
+            ChangeScale(false);
     }
 
-    public void OnPointerEnter(PointerEventData eventData)
+    public override void OnPointerEnter(PointerEventData eventData)
     {
+        if (!Interactable) return;
         ChangeScale(true);
-        //Debug.Log("Mouse entered: " + gameObject.name);
     }
 
-    public void OnPointerExit(PointerEventData eventData)
+    public override void OnPointerExit(PointerEventData eventData)
     {
         ChangeScale(false);
-        //Debug.Log("Mouse entered: " + gameObject.name);
+    }
+
+    // ── Helpers ───────────────────────────────────────────────────────────────
+
+    private void ChangeScale(bool enlarge)
+    {
+        _targetScale = enlarge ? _initScale * newScale : _initScale;
+        _isScaling = true;
     }
 }

@@ -25,7 +25,7 @@ public class CocktailShakerData : MonoBehaviour
     public S_Drink currentCocktail;
 
     [Header("Ingredient Buttons")]
-    public List<Interactable3DObject> ingredientButtons = new List<Interactable3DObject>();
+    public List<GameObject> ingredientButtons = new List<GameObject>();
 
     // ── Ingredient Helpers ────────────────────────────────────────────────────
     public void SetMethod(Method method) => currentCocktail.PreparationMethod = method;
@@ -72,7 +72,8 @@ public class CocktailShakerData : MonoBehaviour
 
     public void SetIngredientActive(bool active)
     {
-        foreach (var btn in ingredientButtons)
-            btn.Interactable = active;
+        ingredientButtons.ForEach(btn => btn.GetComponent<Interactable3DObject>().Interactable = active);
+        ingredientButtons.ForEach(btn => btn.GetComponent<UIPointerSound>().Interactable = active);
+        ingredientButtons.ForEach(btn => btn.GetComponent<DragableObject>().Interactable = active);
     }
 }

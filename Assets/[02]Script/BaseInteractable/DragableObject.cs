@@ -4,20 +4,19 @@ using UnityEngine.UI;
 
 /// <summary>
 /// Attach to any 3D object that should be draggable on the placement grid.
-/// Requires a PhysicsRaycaster on the camera and an EventSystem in the scene
-/// (same setup ScaleOnHover uses).
+/// Requires a PhysicsRaycaster on the camera and an EventSystem in the scene.
 ///
 /// CLICK  — PointerDown + PointerUp without crossing _dragThreshold pixels
 ///          => fires the sibling Button.onClick (if one exists).
 /// DRAG   — pointer moves past _dragThreshold while held
 ///          => calls N_PlacementSystem.StartDrag, moves object until pointer-up.
+///
+/// Inherits <see cref="Interactable"/> from <see cref="PointerInteractableBase"/>.
 /// </summary>
-//[RequireComponent(typeof(Collider))]
-public class DragableObject : MonoBehaviour,
-    IPointerDownHandler,
-    IPointerUpHandler,
-    IDragHandler
+public class DragableObject : PointerInteractableBase
 {
+    // ── Inspector ─────────────────────────────────────────────────────────────
+
     [Header("Drag Settings")]
     [Tooltip("Pixels pointer must move while held before drag begins.")]
     [SerializeField] private float _dragThreshold = 10f;
@@ -31,17 +30,22 @@ public class DragableObject : MonoBehaviour,
     [Header("Debug")]
     public bool DebugDraw = false;
 
-    // State readable by N_PlacementSystem
+    // ── Public State (readable by N_PlacementSystem / siblings) ──────────────
+
     public bool CanPlaced { get; set; } = false;
     public bool BeingDrags { get; set; } = false;
     public Vector3 PastLocation { get; set; }
     public int NumbersObjectOverlaying { get; private set; }
     public bool IsDragging => BeingDrags && _dragStarted;
 
+    // ── Private State ─────────────────────────────────────────────────────────
+
     private Button _button;
     private Collider _collider;
     private Vector2 _pointerDownScreenPos;
     private bool _dragStarted;
+
+    // ── Unity Lifecycle ───────────────────────────────────────────────────────
 
     private void Awake()
     {
@@ -50,7 +54,7 @@ public class DragableObject : MonoBehaviour,
         _collider = GetComponent<Collider>();
 
         if (_collider == null)
-            Debug.LogWarning($"[DragableObject] No Collider found on '{name}' or its children.");
+            Debug.LogWarning($"[DragableObject] No Collider found on '{name}'.");
 
         if (_placementSystem == null)
             _placementSystem = FindFirstObjectByType<N_PlacementSystem>();
@@ -62,29 +66,43 @@ public class DragableObject : MonoBehaviour,
             CheckForCollisions();
     }
 
-    // ── EventSystem Pointer Handlers ──────────────────────
+    // ── PointerInteractableBase Overrides ─────────────────────────────────────
 
-    public void OnPointerDown(PointerEventData eventData)
+    /// <summary>Cancel any active drag when disabled at runtime.</summary>
+    protected override void OnInteractableChanged(bool interactable)
     {
+        if (!interactable && _dragStarted)
+        {
+            _placementSystem?.ReleaseObject();
+            BeingDrags = false;
+            _dragStarted = false;
+        }
+    }
+
+    public override void OnPointerDown(PointerEventData eventData)
+    {
+        if (!Interactable) return;
         if (eventData.button != PointerEventData.InputButton.Left) return;
+
         _dragStarted = false;
         _pointerDownScreenPos = eventData.position;
     }
 
-    public void OnDrag(PointerEventData eventData)
+    public override void OnDrag(PointerEventData eventData)
     {
+        if (!Interactable) return;
         if (_dragStarted) return;
 
-        float moved = Vector2.Distance(eventData.position, _pointerDownScreenPos);
-        if (moved >= _dragThreshold)
+        if (Vector2.Distance(eventData.position, _pointerDownScreenPos) >= _dragThreshold)
         {
             _dragStarted = true;
             _placementSystem.StartDrag(this);
         }
     }
 
-    public void OnPointerUp(PointerEventData eventData)
+    public override void OnPointerUp(PointerEventData eventData)
     {
+        if (!Interactable) return;
         if (eventData.button != PointerEventData.InputButton.Left) return;
 
         if (_dragStarted)
@@ -101,7 +119,7 @@ public class DragableObject : MonoBehaviour,
         _dragStarted = false;
     }
 
-    // ── Collision Check ───────────────────────────────────
+    // ── Collision Check ───────────────────────────────────────────────────────
 
     private void CheckForCollisions()
     {
@@ -113,7 +131,7 @@ public class DragableObject : MonoBehaviour,
         CanPlaced = NumbersObjectOverlaying <= 0;
     }
 
-    // ── Gizmos ────────────────────────────────────────────
+    // ── Gizmos ────────────────────────────────────────────────────────────────
 
     private void OnDrawGizmos()
     {
