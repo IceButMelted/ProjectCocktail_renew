@@ -137,7 +137,10 @@ public class CocktailSystemManager : MonoBehaviour
 
     public string GetTargetName() => _targetCocktail.Name;
 
-    /// <summary>Derive identity of whatever is currently in the shaker and update visuals.</summary>
+    /// <summary>
+    /// This Using Only Debug: Call this to force-update the cocktail in the shaker based on current ingredients,
+    /// Derive identity of whatever is currently in the shaker and update visuals.
+    /// </summary>
     public void UpdateCocktailInShaker()
     {
         S_Drink current = _cocktailShakerData.currentCocktail;

@@ -231,12 +231,30 @@ public class S_Drink
 
     /// <summary>
     /// Returns the CocktailSprite of the first recipe whose ingredients match this drink.
+    /// Match does not count ice and method, only ingredients.
+    /// or have same name as this drink.
+    /// or have minimal ingredient errors 
     /// Returns null if no recipe matches.
     /// </summary>
     public Sprite GetCocktailTexture(List<S_Drink> recipes)
     {
-        var match = recipes?.FirstOrDefault(r => r.IngredientsMatch(this));
-        return match?.CocktailSprite;
+        if (recipes == null || recipes.Count == 0) return null;
+
+        // 1. Exact ingredient match (ignores ice and method)
+        var exactMatch = recipes.FirstOrDefault(r => r.IngredientsMatch(this));
+        if (exactMatch != null) return exactMatch.CocktailSprite;
+
+        // 2. Same name
+        var nameMatch = recipes.FirstOrDefault(r => r.Name == Name);
+        if (nameMatch != null) return nameMatch.CocktailSprite;
+
+        // 3. Fewest ingredient errors
+        var closestMatch = recipes
+            .Select(r => (Recipe: r, Errors: CountIngredientErrors(r)))
+            .OrderBy(x => x.Errors)
+            .FirstOrDefault();
+
+        return closestMatch.Recipe?.CocktailSprite;
     }
 
     // ── Private Helpers ────────────────────────────────────
