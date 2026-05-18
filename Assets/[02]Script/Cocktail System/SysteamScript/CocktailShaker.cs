@@ -35,7 +35,6 @@ public class CocktailShaker : Interactable3DObject
     public void SetCanShowMethodUI(bool active) => _canShowMethodUI = active;
     public void SetCanClick(bool active) => _canClick = active;
 
-    // ── Unity Lifecycle ───────────────────────────────────────────────────────
     protected override void Awake()
     {
         base.Awake();

@@ -31,7 +31,7 @@ public class CocktailShakerData : MonoBehaviour
     public void SetMethod(Method method) => currentCocktail.PreparationMethod = method;
     public void SetMethodToShake() => currentCocktail.PreparationMethod = Method.Shaking;
     public void SetMethodToMixing() => currentCocktail.PreparationMethod = Method.Mixing;
-    public void SetIceAddIce() => currentCocktail.AddIce = true;
+    public void SetIceAddIce() => currentCocktail.AddIce = !currentCocktail.AddIce;
     public void TryToAddAlcohol(BaseSpirit a, int n = 1) => currentCocktail.TryToAddAlcohol(a, n);
     public void TryToAddLiqueur(Liqueur l, int n = 1) => currentCocktail.TryToAddLiqueur(l, n);
     public void TryToAddMixer(Mixer m, int n = 1) => currentCocktail.TryToAddMixer(m, n);
