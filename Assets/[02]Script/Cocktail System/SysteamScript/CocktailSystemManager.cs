@@ -148,7 +148,7 @@ public class CocktailSystemManager : MonoBehaviour
         current.UpdateName(_normalDrinks);
         current.UpdatePrice(_normalDrinks);
 
-        Sprite sprite = current.GetCocktailTexture(_normalDrinks) ?? _failCocktailSprite;
+        Sprite sprite = current.GetCocktailSprite(_normalDrinks) ?? _failCocktailSprite;
         //Sprite sprite = Sprite.Create(tex, new Rect(0, 0, tex.width, tex.height), new Vector2(.5f, 0));
         _cocktailShaker.SetBTNSprite(sprite, sprite, sprite);
     }

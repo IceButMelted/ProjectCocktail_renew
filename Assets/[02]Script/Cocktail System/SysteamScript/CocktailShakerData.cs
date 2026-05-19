@@ -44,7 +44,7 @@ public class CocktailShakerData : MonoBehaviour
         currentCocktail.UpdateName(normalDrinks);
         currentCocktail.UpdatePrice(normalDrinks);
 
-        Sprite sprite = currentCocktail.GetCocktailTexture(normalDrinks) ?? failCocktailSprite;
+        Sprite sprite = currentCocktail.GetCocktailSprite(normalDrinks) ?? failCocktailSprite;
         // SetBTNSprite(sprite, sprite, sprite); — handled by CocktailShaker / CocktailSystemManager
     }
 

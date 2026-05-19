@@ -230,31 +230,44 @@ public class S_Drink
            MixerListEquals(MixerList, other.MixerList);
 
     /// <summary>
-    /// Returns the CocktailSprite of the first recipe whose ingredients match this drink.
-    /// Match does not count ice and method, only ingredients.
-    /// or have same name as this drink.
-    /// or have minimal ingredient errors 
-    /// Returns null if no recipe matches.
+    /// Mirrors CalculateSatisfaction() but returns a Sprite instead of a Satisfaction value.
+    /// Finds the closest recipe by ingredient errors, then:
+    ///   Perfect    (methodMatch &amp;&amp; errors == 0) → returns that recipe's CocktailSprite
+    ///   Acceptable (errors &lt;= 2)               → returns that recipe's CocktailSprite
+    ///   Fail       (errors &gt; 2)                → returns null
     /// </summary>
-    public Sprite GetCocktailTexture(List<S_Drink> recipes)
+    public Sprite GetCocktailSprite(List<S_Drink> recipes)
     {
         if (recipes == null || recipes.Count == 0) return null;
 
-        // 1. Exact ingredient match (ignores ice and method)
-        var exactMatch = recipes.FirstOrDefault(r => r.IngredientsMatch(this));
-        if (exactMatch != null) return exactMatch.CocktailSprite;
+        // Find the closest recipe by ingredient error count
+        S_Drink bestRecipe = null;
+        int bestErrors = int.MaxValue;
 
-        // 2. Same name
-        var nameMatch = recipes.FirstOrDefault(r => r.Name == Name);
-        if (nameMatch != null) return nameMatch.CocktailSprite;
+        foreach (var r in recipes)
+        {
 
-        // 3. Fewest ingredient errors
-        var closestMatch = recipes
-            .Select(r => (Recipe: r, Errors: CountIngredientErrors(r)))
-            .OrderBy(x => x.Errors)
-            .FirstOrDefault();
+            int errors = CountIngredientErrors(r);
+            if (errors < bestErrors)
+            {
+                bestErrors = errors;
+                bestRecipe = r;
+            }
+        }
 
-        return closestMatch.Recipe?.CocktailSprite;
+        if (bestRecipe == null) return null;
+
+        bool methodMatch = AddIce == bestRecipe.AddIce &&
+                           PreparationMethod == bestRecipe.PreparationMethod;
+
+        // Perfect: exact ingredients AND method/ice match
+        if (methodMatch && bestErrors == 0) return bestRecipe.CocktailSprite;
+
+        // Acceptable: ingredients are close enough (regardless of method/ice)
+        if (bestErrors <= 2) return bestRecipe.CocktailSprite;
+
+        // Fail
+        return null;
     }
 
     // ── Private Helpers ────────────────────────────────────
