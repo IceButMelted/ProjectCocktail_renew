@@ -295,7 +295,8 @@ namespace YarnSpinner.Custom
                 timedBar.gameObject.SetActive(needsBar);
                 if (needsBar)
                 {
-                    timedBar.ResetBar();
+                    //timedBar.ResetBar();
+                    timedBar.gameObject.SetActive(true);
                     timedBar.transform.parent?.SetAsLastSibling();
                 }
             }

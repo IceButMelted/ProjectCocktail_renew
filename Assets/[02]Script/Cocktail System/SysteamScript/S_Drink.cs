@@ -230,44 +230,39 @@ public class S_Drink
            MixerListEquals(MixerList, other.MixerList);
 
     /// <summary>
-    /// Mirrors CalculateSatisfaction() but returns a Sprite instead of a Satisfaction value.
-    /// Finds the closest recipe by ingredient errors, then:
-    ///   Perfect    (methodMatch &amp;&amp; errors == 0) → returns that recipe's CocktailSprite
-    ///   Acceptable (errors &lt;= 2)               → returns that recipe's CocktailSprite
-    ///   Fail       (errors &gt; 2)                → returns null
+    /// Returns the CocktailSprite of the closest matching recipe using the
+    /// same categorisation as the brute-force tester (ingredient-only, no ice/method):
+    ///   Perfect       (0 errors)   → return sprite
+    ///   Acceptable T1 (1–2 errors) → return sprite
+    ///   Acceptable T2 (3–4 errors) → return sprite
+    ///   Fail          (5+ errors)  → return null
     /// </summary>
     public Sprite GetCocktailSprite(List<S_Drink> recipes)
     {
         if (recipes == null || recipes.Count == 0) return null;
 
-        // Find the closest recipe by ingredient error count
+        // Find the recipe with the fewest ingredient errors
         S_Drink bestRecipe = null;
         int bestErrors = int.MaxValue;
 
         foreach (var r in recipes)
         {
-
             int errors = CountIngredientErrors(r);
             if (errors < bestErrors)
             {
                 bestErrors = errors;
                 bestRecipe = r;
+                if (bestErrors == 0) break; // perfect — no need to check further
             }
         }
 
         if (bestRecipe == null) return null;
 
-        bool methodMatch = AddIce == bestRecipe.AddIce &&
-                           PreparationMethod == bestRecipe.PreparationMethod;
-
-        // Perfect: exact ingredients AND method/ice match
-        if (methodMatch && bestErrors == 0) return bestRecipe.CocktailSprite;
-
-        // Acceptable: ingredients are close enough (regardless of method/ice)
-        if (bestErrors <= 2) return bestRecipe.CocktailSprite;
-
-        // Fail
-        return null;
+        // Mirror brute-force category thresholds exactly
+        if (bestErrors == 0) return bestRecipe.CocktailSprite; // Perfect
+        if (bestErrors <= 2) return bestRecipe.CocktailSprite; // Acceptable T1
+        //if (bestErrors <= 4) return bestRecipe.CocktailSprite; // Acceptable T2
+        return null;                                           // Fail (5+)
     }
 
     // ── Private Helpers ────────────────────────────────────
