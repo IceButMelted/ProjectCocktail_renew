@@ -54,25 +54,25 @@ private void SetOrder(string type)
         _minigameComplete = false;
         _minigameSuccess  = false;
 
-        BaseMiniGame game = SelectMinigame(type);
-        if (game == null)
-        {
-            Debug.LogWarning($"[GameLoop] Unknown minigame type: '{type}'");
-            yield break;
-        }
+        //BaseMiniGame game = SelectMinigame(type);
+        //if (game == null)
+        //{
+        //    Debug.LogWarning($"[GameLoop] Unknown minigame type: '{type}'");
+        //    yield break;
+        //}
 
         // Subscribe BEFORE starting so we never miss the event
-        game.OnGameEnd += OnMinigameEnded;
+        //game.OnGameEnd += OnMinigameEnded;
 
-        if      (type == "Shaking") _minigameSystem.StartShakingMinigame();
-        else if (type == "Mixing")  _minigameSystem.StartMixingMinigame();
+        //if      (type == "Shaking") _minigameSystem.StartShakingMinigame();
+        //else if (type == "Mixing")  _minigameSystem.StartMixingMinigame();
 
         yield return new WaitUntil(() => _minigameComplete);
 
-        game.OnGameEnd -= OnMinigameEnded;
+        //game.OnGameEnd -= OnMinigameEnded;
 
-        _dialogueRunner.VariableStorage.SetValue(VAR_MINIGAME_WIN, _minigameSuccess);
-        Debug.Log($"[GameLoop] Minigame '{type}' ended — success: {_minigameSuccess}");
+        //_dialogueRunner.VariableStorage.SetValue(VAR_MINIGAME_WIN, _minigameSuccess);
+        //Debug.Log($"[GameLoop] Minigame '{type}' ended — success: {_minigameSuccess}");
     }
 
     /// <<serve_cocktail>> — evaluates and resets the shaker
@@ -98,10 +98,10 @@ private void SetOrder(string type)
         _minigameComplete = true;
     }
 
-    private BaseMiniGame SelectMinigame(string type) => type switch
-    {
-        "Shaking" => _minigameSystem.GetShakingMinigame(),
-        "Mixing"  => _minigameSystem.GetMixingMinigame(),
-        _          => null
-    };
+    //private BaseMiniGame SelectMinigame(string type) => type switch
+    //{
+    //    "Shaking" => _minigameSystem.GetShakingMinigame(),
+    //    "Mixing"  => _minigameSystem.GetMixingMinigame(),
+    //    _          => null
+    //};
 }

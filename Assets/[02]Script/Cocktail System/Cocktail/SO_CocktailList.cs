@@ -20,7 +20,7 @@ using System.Linq;
 using UnityEngine;
 using static E_Cocktail;
 
-[CreateAssetMenu(fileName = "CocktailList_New", menuName = "Scriptable Objects/SO_CocktailList")]
+[CreateAssetMenu(fileName = "CocktailList_New", menuName = "Bar410/Cocktails/CocktailList")]
 public class SO_CocktailList : ScriptableObject, IDrinkRepository
 {
     [Tooltip("Assign S_Drink ScriptableObject assets here.")]

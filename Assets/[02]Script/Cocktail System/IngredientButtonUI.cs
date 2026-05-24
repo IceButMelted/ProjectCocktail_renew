@@ -97,7 +97,7 @@ public class IngredientButtonUI : MonoBehaviour
 
     /// <summary>Set preparation method to Mixing.</summary>
     public void SetMixing()
-        => _shaker.SetMethod(Method.Mixing);
+        => _shaker.SetMethod(Method.Stirring);
 
     /// <summary>Add ice to the shaker.</summary>
     public void AddIce()

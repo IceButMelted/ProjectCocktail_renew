@@ -69,9 +69,7 @@ public class E_Cocktail
     {
         None = 0,
         Shaking,
-        Mixing,
-        SmashNShaking,
-        SmashNMixing
+        Stirring,
     }
 
     public enum TypeOfCocktail

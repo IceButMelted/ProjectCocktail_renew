@@ -1,28 +1,3 @@
-// ============================================================
-//  CocktailSystemManager.cs — Orchestrator for the cocktail game loop.
-//
-//  SOLID — S (Single Responsibility):
-//    Coordinates cocktail selection, satisfaction scoring,
-//    and Yarn variable synchronisation. Does not compute drinks.
-//
-//  SOLID — D (Dependency Inversion):
-//    Depends on IDrinkRepository (not SO_CocktailList).
-//    Swap the concrete repository in the Inspector at any time.
-//
-//  SOLID — O (Open / Closed):
-//    New cocktail list sources (server, procedural) implement
-//    IDrinkRepository — this class never changes to support them.
-//
-// ── KEY RULE: HOW YARN STORES ENUM VALUES ─────────────────
-//  Yarn enums are stored as INTEGERS (float) in VariableStorage.
-//  Always SetValue with (float)(int)enumValue.
-//
-// ── ENUM → INTEGER MAPPING (must match .yarn declaration) ──
-//  Satisfaction:   None=0  Fail=1  Acceptable=2  Perfect=3
-//  TypeOfCocktail: None=0  HighAlcohol=1  LowAlcohol=2
-//                  NoneAlcohol=3  NotMatch=4
-// ============================================================
-
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;

@@ -1,15 +1,42 @@
+// ============================================================
+//  BaseMiniGame.cs — Abstract base for all minigames.
+//
+//  SOLID — S (Single Responsibility):
+//    BaseMiniGame now owns exactly: state machine + event wiring.
+//    Panel sliding   → delegated to PanelSlider (plain C# class).
+//    Input polling   → delegated to IInputProvider.
+//    Camera / system → delegated to IMinigameContext.
+//
+//  SOLID — D (Dependency Inversion):
+//    Initialize() accepts IMinigameContext — an abstraction.
+//    BaseMiniGame never references CameraController,
+//    CocktailSystemManager, or MinigameSystemManager directly.
+//    IInputProvider defaults to UnityInputProvider; swap freely.
+//
+//  SOLID — O (Open / Closed):
+//    New minigames extend this class and override the hooks
+//    (OnProcessing, OnSuccess, OnStandby, ProcessedGame).
+//    The state machine and event wiring never change.
+//
+//  SOLID — L (Liskov Substitution):
+//    Every subclass is a valid IMinigame. The IsRunning guard
+//    lives HERE so subclasses don't each need to repeat it —
+//    they cannot accidentally break the contract.
+// ============================================================
+
 using System;
 using UnityEngine;
-using UnityEngine.Events;
 using static E_Cocktail;
 
-/// <summary>
-/// Abstract base for all minigames. Handles state, input polling, panel slide, and camera.
-/// Derived classes override ProcessedGame() for their specific gameplay loop.
-/// </summary>
 public abstract class BaseMiniGame : MonoBehaviour, IMinigame
 {
-    // ── Inspector ─────────────────────────────────────────
+    // ── Inspector ──────────────────────────────────────────
+
+    /// <summary>
+    /// Assign the matching SO_*Setting asset in the Inspector.
+    /// Kept on the base class (not on IMinigame) — it is an
+    /// implementation detail, not part of the public contract.
+    /// </summary>
     [field: SerializeField]
     public SO_MinigameSetting Setting { get; set; }
 
@@ -18,35 +45,57 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
     [Header("Slide Settings")]
     [SerializeField] private float _slidePanelSpeed = 800f;
 
-    // ── Public State ──────────────────────────────────────
-    public bool IsRunning { get; protected set; }
-    public MiniGameState CurrentState { get; protected set; } = MiniGameState.Standby;
+    // ── IMinigame — Public State ───────────────────────────
 
-    /// <summary>
-    /// Fired when the minigame ends. True = success, false = failure.
-    /// Use += / -= for subscription (safe across sessions).
-    /// </summary>
+    public bool IsRunning { get; protected set; }
+
+    /// <inheritdoc/>
     public event Action<bool> OnGameEnd;
 
-    // ── Protected State ───────────────────────────────────
-    /// <summary>True only on the frame the player left-clicked.</summary>
-    protected bool IsClickedThisFrame { get; private set; }
+    // ── State Machine ──────────────────────────────────────
 
-    // ── Private ───────────────────────────────────────────
-    private CameraController _camera;
-    private CocktailSystemManager _cocktailSystem;
-    private MinigameSystemManager _minigameSystemManager;
+    public MiniGameState CurrentState { get; protected set; } = MiniGameState.Standby;
 
-    // ── Initialization ────────────────────────────────────
-    public void Initialize(CameraController cam, CocktailSystemManager system, MinigameSystemManager minigameSystemManager)
+    // ── Abstract ───────────────────────────────────────────
+
+    /// <summary>
+    /// Identifies this game in the registry.
+    /// Drives OCP in MinigameSystemManager — no hardcoded fields.
+    /// </summary>
+    public abstract Enum_MiniGameType GameType { get; }
+
+    // ── Private Dependencies (injected, not hardcoded) ─────
+
+    private IMinigameContext _context;
+    protected IInputProvider Input { get; private set; }
+
+    // ── Extracted: panel + input ───────────────────────────
+
+    /// <summary>Slide helper — constructed after _minigamePanel is set.</summary>
+    protected PanelSlider PanelSlider { get; private set; }
+
+    // ── Unity Lifecycle ────────────────────────────────────
+
+    protected virtual void Awake()
     {
-        _camera = cam;
-        _cocktailSystem = system;
-        _minigameSystemManager = minigameSystemManager;
+        PanelSlider = new PanelSlider(_minigamePanel, _slidePanelSpeed);
+    }
+
+    // ── Initialization ─────────────────────────────────────
+
+    /// <summary>
+    /// Call from MinigameSystemManager.Awake() before any game starts.
+    /// <paramref name="inputProvider"/> defaults to UnityInputProvider when null.
+    /// </summary>
+    public void Initialize(IMinigameContext context, IInputProvider inputProvider = null)
+    {
+        _context = context;
+        Input = inputProvider ?? new UnityInputProvider();
         IsRunning = false;
     }
 
-    // ── State Machine ─────────────────────────────────────
+    // ── State Machine ──────────────────────────────────────
+
     public void SetState(MiniGameState newState)
     {
         if (CurrentState == newState) return;
@@ -60,118 +109,54 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
         }
     }
 
+    // ── Protected Hooks (override in subclasses) ───────────
+
     protected virtual void OnProcessing() { }
     protected virtual void OnSuccess() => FireEndEvent(true);
     protected virtual void OnStandby() => ResetGame();
 
-    // ── IMinigame ─────────────────────────────────────────
+    // ── IMinigame ──────────────────────────────────────────
+
     public virtual void StartGame()
     {
         IsRunning = true;
-        _camera?.ResetRotaionAndMovement();
+        _context?.ResetCamera();
         SetState(MiniGameState.Standby);
         SetState(MiniGameState.Processing);
     }
 
     /// <summary>
     /// Called every frame by MinigameSystemManager.
-    /// Base polls mouse input — call base.ProcessedGame() first in overrides.
+    /// Polls input and guards against running = false.
+    /// Subclasses call base.ProcessedGame() to get Input refreshed,
+    /// then read Input.IsClickedThisFrame.
+    /// The IsRunning guard lives here — subclasses do not repeat it.
     /// </summary>
     public virtual void ProcessedGame()
-        => IsClickedThisFrame = Input.GetMouseButtonDown(0);
+    {
+        if (!IsRunning) return;
+        Input.Poll();
+    }
 
     public virtual void UpdateUI() { }
 
     public virtual void EndGame()
     {
         IsRunning = false;
-        _minigameSystemManager?.OnEndedGame?.Invoke();
-       
+        _context?.NotifyGameEnded();
     }
 
     public virtual string GetGameState()
         => $"{GetType().Name} | State: {CurrentState} | Running: {IsRunning}";
 
-    // ── Helpers ───────────────────────────────────────────
+    // ── Helpers ────────────────────────────────────────────
+
+    /// <summary>Ends the game and fires OnGameEnd.</summary>
     protected void FireEndEvent(bool success)
     {
         EndGame();
         OnGameEnd?.Invoke(success);
     }
 
-    protected virtual void ResetGame()
-        => IsClickedThisFrame = false;
-
-    // ── Panel Slide ───────────────────────────────────────
-    protected enum FinishCondition { FullyIn, FullyOut }
-
-    private static Vector2 DirectionToVector(Direction dir) => dir switch
-    {
-        Direction.Left => Vector2.left,
-        Direction.Right => Vector2.right,
-        Direction.Up => Vector2.up,
-        Direction.Down => Vector2.down,
-        _ => Vector2.zero
-    };
-
-    private Rect GetPanelRectInParent()
-    {
-        Vector3[] corners = new Vector3[4];
-        _minigamePanel.GetWorldCorners(corners);
-
-        var parent = _minigamePanel.parent as RectTransform;
-        for (int i = 0; i < 4; i++)
-            corners[i] = parent.InverseTransformPoint(corners[i]);
-
-        return new Rect(corners[0].x, corners[0].y,
-                        corners[2].x - corners[0].x,
-                        corners[2].y - corners[0].y);
-    }
-
-    private Rect GetParentRect() => (_minigamePanel.parent as RectTransform).rect;
-
-    private (bool fullyIn, bool fullyOut) CheckBoundary()
-    {
-        Rect panel = GetPanelRectInParent();
-        Rect screen = GetParentRect();
-        bool fullyIn = panel.xMin >= screen.xMin && panel.xMax <= screen.xMax &&
-                         panel.yMin >= screen.yMin && panel.yMax <= screen.yMax;
-        bool fullyOut = !panel.Overlaps(screen);
-        return (fullyIn, fullyOut);
-    }
-
-    /// <summary>Moves the panel per frame; returns true once finish condition is met.</summary>
-    protected bool SlideMinigame(Direction dir, FinishCondition finishCondition)
-    {
-        _minigamePanel.anchoredPosition += DirectionToVector(dir) * _slidePanelSpeed * Time.deltaTime;
-        var (fullyIn, fullyOut) = CheckBoundary();
-        return finishCondition == FinishCondition.FullyIn ? fullyIn : fullyOut;
-    }
-
-    /// <summary>Moves the panel toward a target position; returns true when it crosses that point.</summary>
-    protected bool SlideMinigame(Direction dir, Vector2 targetPosition)
-    {
-        Vector2 before = _minigamePanel.anchoredPosition;
-        _minigamePanel.anchoredPosition += DirectionToVector(dir) * _slidePanelSpeed * Time.deltaTime;
-        Vector2 after = _minigamePanel.anchoredPosition;
-
-        bool crossed = dir switch
-        {
-            Direction.Left => before.x >= targetPosition.x && after.x <= targetPosition.x,
-            Direction.Right => before.x <= targetPosition.x && after.x >= targetPosition.x,
-            Direction.Up => before.y <= targetPosition.y && after.y >= targetPosition.y,
-            Direction.Down => before.y >= targetPosition.y && after.y <= targetPosition.y,
-            _ => false
-        };
-
-        if (crossed)
-        {
-            Vector2 snapped = after;
-            if (dir == Direction.Left || dir == Direction.Right) snapped.x = targetPosition.x;
-            if (dir == Direction.Up || dir == Direction.Down) snapped.y = targetPosition.y;
-            _minigamePanel.anchoredPosition = snapped;
-        }
-
-        return crossed;
-    }
+    protected virtual void ResetGame() { }
 }

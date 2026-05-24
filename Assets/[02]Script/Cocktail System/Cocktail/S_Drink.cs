@@ -22,7 +22,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using static E_Cocktail;
 
-[CreateAssetMenu(fileName = "Drink_New", menuName = "Scriptable Objects/S_Drink")]
+[CreateAssetMenu(fileName = "Drink_New", menuName = "Bar410/Cocktails/Drink")]
 public class S_Drink : ScriptableObject
 {
     // ── Identity ───────────────────────────────────────────
@@ -41,16 +41,6 @@ public class S_Drink : ScriptableObject
     /// </summary>
     public TypeOfCocktail AlcoholStrength;
 
-    public float Price;
-
-    // ── Visuals ────────────────────────────────────────────
-
-    /// <summary>Sprite shown in the UI when this drink is in play.</summary>
-    public Sprite CocktailSprite;
-
-    /// <summary>3-D game object spawned when this drink is served.</summary>
-    public GameObject CocktailGameObject;
-
     // ── Preparation ────────────────────────────────────────
 
     public Method PreparationMethod;
@@ -66,4 +56,14 @@ public class S_Drink : ScriptableObject
     // ── Serving ────────────────────────────────────────────
 
     public List<GlassType> CompatibleGlasses = new List<GlassType>();
+
+    // ── Visuals ────────────────────────────────────────────
+
+    /// <summary>Sprite shown in the UI when this drink is in play.</summary>
+    public Sprite CocktailSprite;
+
+    /// <summary>3-D game object spawned when this drink is served.</summary>
+    public GameObject CocktailGameObject;
+
+    public float Price;
 }
