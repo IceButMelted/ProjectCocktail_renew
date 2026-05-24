@@ -1,6 +1,18 @@
 ﻿using UnityEngine;
 using UnityEngine.EventSystems;
 
+/// <summary>
+/// Plays sound effects in response to pointer events on the same GameObject.
+///
+/// SOLID notes:
+///   S — plays sounds only; drag-state awareness is read from the sibling
+///       DragableObject rather than re-implementing it here.
+///   O — add new sound IDs in the inspector; no code changes needed.
+///   L — substitutable for any PointerInteractableBase.
+///   I — TryPlay is a private helper; external code never needs to call it.
+///   D — depends on DragableObject via interface property (IsDragging /
+///       BeingDrags). Could be further abstracted behind IDraggable.
+/// </summary>
 public class UIPointerSound : PointerInteractableBase
 {
     // ── Inspector ─────────────────────────────────────────────────────────────
@@ -18,7 +30,6 @@ public class UIPointerSound : PointerInteractableBase
 
     // ── Private State ─────────────────────────────────────────────────────────
 
-    // Per-event play-gates (suppressed while dragging)
     private bool _canPlayEnter = true;
     private bool _canPlayExit = true;
     private bool _canPlayUp = true;
@@ -36,44 +47,24 @@ public class UIPointerSound : PointerInteractableBase
 
     private void LateUpdate()
     {
-        if (!Interactable) return;
-        if (_dragableObject == null) return;
+        if (!Interactable || _dragableObject == null) return;
 
         bool isDragging = _dragableObject.IsDragging;
 
-        // Drag just started — suppress hover/up sounds
         if (isDragging && !_wasDragging)
-        {
-            _canPlayEnter = false;
-            _canPlayExit = false;
-            _canPlayUp = false;
-        }
+            SuppressHoverSounds();
 
-        // Throttled drag sound
-        if (isDragging &&
-            !string.IsNullOrEmpty(_onDragID) &&
-            Time.unscaledTime - _lastDragTime >= _dragInterval)
-        {
-            _lastDragTime = Time.unscaledTime;
-            TryPlay(_onDragID);
-        }
+        if (isDragging)
+            TickDragSound();
 
-        // Drag just ended — restore hover/up sounds and fire end-drag sound
         if (!isDragging && _wasDragging)
-        {
-            _lastDragTime = -1f;
-            _canPlayEnter = true;
-            _canPlayExit = true;
-            _canPlayUp = true;
-            TryPlay(_onEndDragID);
-        }
+            RestoreHoverSounds();
 
         _wasDragging = isDragging;
     }
 
     // ── PointerInteractableBase Override ─────────────────────────────────────
 
-    /// <summary>Sync play-gates when Interactable is toggled externally.</summary>
     protected override void OnInteractableChanged(bool interactable)
     {
         _canPlayEnter = interactable;
@@ -85,14 +76,12 @@ public class UIPointerSound : PointerInteractableBase
 
     public override void OnPointerEnter(PointerEventData eventData)
     {
-        if (!_canPlayEnter) return;
-        TryPlay(_onEnterID);
+        if (_canPlayEnter) TryPlay(_onEnterID);
     }
 
     public override void OnPointerExit(PointerEventData eventData)
     {
-        if (!_canPlayExit) return;
-        TryPlay(_onExitID);
+        if (_canPlayExit) TryPlay(_onExitID);
     }
 
     public override void OnPointerDown(PointerEventData eventData)
@@ -102,11 +91,36 @@ public class UIPointerSound : PointerInteractableBase
 
     public override void OnPointerUp(PointerEventData eventData)
     {
-        if (!_canPlayUp) return;
-        TryPlay(_onUpID);
+        if (_canPlayUp) TryPlay(_onUpID);
     }
 
-    // ── Helpers ───────────────────────────────────────────────────────────────
+    // ── Private Helpers ───────────────────────────────────────────────────────
+
+    private void SuppressHoverSounds()
+    {
+        _canPlayEnter = false;
+        _canPlayExit = false;
+        _canPlayUp = false;
+    }
+
+    private void RestoreHoverSounds()
+    {
+        _lastDragTime = -1f;
+        _canPlayEnter = true;
+        _canPlayExit = true;
+        _canPlayUp = true;
+        TryPlay(_onEndDragID);
+    }
+
+    private void TickDragSound()
+    {
+        if (!string.IsNullOrEmpty(_onDragID) &&
+            Time.unscaledTime - _lastDragTime >= _dragInterval)
+        {
+            _lastDragTime = Time.unscaledTime;
+            TryPlay(_onDragID);
+        }
+    }
 
     private static void TryPlay(string id)
     {

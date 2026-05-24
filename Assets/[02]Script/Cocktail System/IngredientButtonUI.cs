@@ -99,11 +99,11 @@ public class IngredientButtonUI : MonoBehaviour
     public void SetMixing()
         => _shaker.SetMethod(Method.Mixing);
 
-    /// <summary>Add ice to the shaker. Disables this button after use (one-shot).</summary>
+    /// <summary>Add ice to the shaker.</summary>
     public void AddIce()
     {
-        _shaker.SetIceAddIce();
-        GetComponent<UnityEngine.UI.Button>().interactable = false;
+        //_shaker.SetIceAddIce();
+        
     }
 
     /// <summary>Reset the shaker to empty state.</summary>

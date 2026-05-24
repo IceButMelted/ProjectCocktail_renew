@@ -3,13 +3,8 @@ using UnityEngine.Events;
 using UnityEngine.EventSystems;
 
 /// <summary>
-/// EventSystem-driven 3D interactable that behaves like a UI Button:
-///   - Interactable toggle inherited from <see cref="PointerInteractableBase"/>
-///   - Disabled colour tint when non-interactable
-///   - Hover / click sprite swap
-///   - Drag suppression (own threshold + optional DragableObject sibling)
+/// EventSystem-driven 3D interactable that behaves like a UI Button.
 ///
-/// Extend this class and override CanClick() / OnClick() for custom behaviour.
 /// </summary>
 [RequireComponent(typeof(Collider))]
 [RequireComponent(typeof(SpriteRenderer))]
@@ -21,14 +16,15 @@ public class Interactable3DObject : PointerInteractableBase
     [SerializeField] protected Sprite S_Default;
     [SerializeField] protected Sprite S_Hover;
     [SerializeField] protected Sprite S_Clicked;
-    [Tooltip("Sprite to show when Interactable is false. If null, falls back to S_Default with disabled colour.")]
+
+    [Tooltip("Sprite shown when Interactable is false. Falls back to S_Default + disabled colour.")]
     [SerializeField] private Sprite _disabledSprite;
-    [Tooltip("Sprite colour applied when Interactable is false (matches Unity Button behaviour).")]
+
+    [Tooltip("Colour tint when Interactable is false (mirrors Unity Button behaviour).")]
     [SerializeField] private Color _disabledColour = new Color(1f, 1f, 1f, 0.5f);
 
     [Header("Drag Detection")]
-    [Tooltip("Pixels the pointer must travel while held before the gesture is " +
-             "classified as a drag (suppresses the click).")]
+    [Tooltip("Pixels the pointer must travel before the gesture is classified as a drag.")]
     [SerializeField] private float _dragThreshold = 10f;
 
     [Space]
@@ -37,10 +33,10 @@ public class Interactable3DObject : PointerInteractableBase
     // ── Private State ─────────────────────────────────────────────────────────
 
     private SpriteRenderer _spriteRenderer;
+    private DragableObject _dragableObject;        // optional sibling
     private bool _isHovering;
     private bool _isDragging;
     private Vector2 _pointerDownScreenPos;
-    private DragableObject _dragableObject; // optional sibling — may be null
 
     // ── Unity Lifecycle ───────────────────────────────────────────────────────
 
@@ -54,18 +50,14 @@ public class Interactable3DObject : PointerInteractableBase
 
     // ── PointerInteractableBase Override ─────────────────────────────────────
 
-    /// <summary>Refresh sprite and tint whenever Interactable flips.</summary>
-    protected override void OnInteractableChanged(bool interactable)
-    {
+    protected override void OnInteractableChanged(bool interactable) =>
         ApplyInteractableVisual();
-    }
 
     // ── Pointer Handlers ──────────────────────────────────────────────────────
 
     public override void OnPointerEnter(PointerEventData eventData)
     {
-        if (_isDragging) return;
-        if (!Interactable) return;
+        if (_isDragging || !Interactable) return;
         _isHovering = true;
         _spriteRenderer.sprite = S_Hover;
     }
@@ -119,18 +111,18 @@ public class Interactable3DObject : PointerInteractableBase
     }
 
     /// <summary>
-    /// Override to add extra guard conditions (e.g. cooldowns, ingredient count).
-    /// Return false to block the click. Base always returns <see cref="PointerInteractableBase.Interactable"/>.
+    /// Override to add extra guard conditions (cooldowns, resource checks, etc.).
+    /// Base always returns <see cref="PointerInteractableBase.Interactable"/>.
     /// </summary>
     protected virtual bool CanClick() => Interactable;
 
     /// <summary>
     /// Override to run custom logic after a confirmed click.
-    /// OnClicked has already been invoked when this is called.
+    /// <see cref="OnClicked"/> has already fired when this is called.
     /// </summary>
     protected virtual void OnClick() { }
 
-    // ── Helpers ───────────────────────────────────────────────────────────────
+    // ── Public Helpers ────────────────────────────────────────────────────────
 
     /// <summary>Swap all three sprites and refresh the visual state.</summary>
     public void SetBTNSprite(Sprite defaultSprite, Sprite hoverSprite, Sprite clickedSprite)
@@ -141,8 +133,10 @@ public class Interactable3DObject : PointerInteractableBase
         ApplyInteractableVisual();
     }
 
+    // ── Private Helpers ───────────────────────────────────────────────────────
+
     /// <summary>
-    /// Applies colour tint based on current Interactable state,
+    /// Applies sprite and colour tint based on current Interactable state,
     /// mirroring how Unity's Button greys out when disabled.
     /// </summary>
     private void ApplyInteractableVisual()

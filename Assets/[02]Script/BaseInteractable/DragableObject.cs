@@ -10,8 +10,6 @@ using UnityEngine.UI;
 ///          => fires the sibling Button.onClick (if one exists).
 /// DRAG   — pointer moves past _dragThreshold while held
 ///          => calls N_PlacementSystem.StartDrag, moves object until pointer-up.
-///
-/// Inherits <see cref="Interactable"/> from <see cref="PointerInteractableBase"/>.
 /// </summary>
 public class DragableObject : PointerInteractableBase
 {
@@ -30,12 +28,14 @@ public class DragableObject : PointerInteractableBase
     [Header("Debug")]
     public bool DebugDraw = false;
 
-    // ── Public State (readable by N_PlacementSystem / siblings) ──────────────
+    // ── Public State ──────────────────────────────────────────────────────────
 
     public bool CanPlaced { get; set; } = false;
     public bool BeingDrags { get; set; } = false;
     public Vector3 PastLocation { get; set; }
     public int NumbersObjectOverlaying { get; private set; }
+
+    /// <summary>True only while an active drag gesture is in progress.</summary>
     public bool IsDragging => BeingDrags && _dragStarted;
 
     // ── Private State ─────────────────────────────────────────────────────────
@@ -72,11 +72,7 @@ public class DragableObject : PointerInteractableBase
     protected override void OnInteractableChanged(bool interactable)
     {
         if (!interactable && _dragStarted)
-        {
-            _placementSystem?.ReleaseObject();
-            BeingDrags = false;
-            _dragStarted = false;
-        }
+            CancelDrag();
     }
 
     public override void OnPointerDown(PointerEventData eventData)
@@ -90,8 +86,7 @@ public class DragableObject : PointerInteractableBase
 
     public override void OnDrag(PointerEventData eventData)
     {
-        if (!Interactable) return;
-        if (_dragStarted) return;
+        if (!Interactable || _dragStarted) return;
 
         if (Vector2.Distance(eventData.position, _pointerDownScreenPos) >= _dragThreshold)
         {
@@ -112,22 +107,28 @@ public class DragableObject : PointerInteractableBase
         }
         else
         {
-            // Clean click — fire Button if present
             _button?.onClick.Invoke();
         }
 
         _dragStarted = false;
     }
 
-    // ── Collision Check ───────────────────────────────────────────────────────
+    // ── Private Helpers ───────────────────────────────────────────────────────
+
+    private void CancelDrag()
+    {
+        _placementSystem?.ReleaseObject();
+        BeingDrags = false;
+        _dragStarted = false;
+    }
 
     private void CheckForCollisions()
     {
         if (_collider == null) return;
 
-        Bounds b = _collider.bounds;
-        Collider[] hits = Physics.OverlapBox(b.center, b.extents, transform.rotation, detectLayerMask);
-        NumbersObjectOverlaying = hits.Length - 1;
+        Bounds bounds = _collider.bounds;
+        Collider[] hits = Physics.OverlapBox(bounds.center, bounds.extents, transform.rotation, detectLayerMask);
+        NumbersObjectOverlaying = hits.Length - 1;          // subtract self
         CanPlaced = NumbersObjectOverlaying <= 0;
     }
 
@@ -138,6 +139,7 @@ public class DragableObject : PointerInteractableBase
         if (!DebugDraw) return;
         Collider col = _collider != null ? _collider : GetComponent<Collider>();
         if (col == null) return;
+
         Bounds b = col.bounds;
         Gizmos.color = CanPlaced ? Color.green : Color.red;
         Gizmos.DrawWireCube(b.center, b.size);

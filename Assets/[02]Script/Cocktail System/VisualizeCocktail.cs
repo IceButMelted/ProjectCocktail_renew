@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
+using static DrinkUtility;
 
 /// <summary>
 /// Updates fill bars to visually represent the current cocktail's alcohol / mixer ratio.
@@ -36,9 +37,9 @@ public class VisualizeCocktail : MonoBehaviour
     {
         gameObject.SetActive(true);
 
-        S_Drink d = _shaker.currentCocktail;
-        float alcoholRatio = d.GetTotalAlcohol() / MAX_PARTS;
-        float mixerRatio = d.GetTotalMixer() / MAX_PARTS;
+        S_Drink d = _shaker.CurrentCocktail;
+        float alcoholRatio = GetTotalAlcohol(d) / MAX_PARTS;
+        float mixerRatio = GetTotalMixer(d) / MAX_PARTS;
 
         alcoholFill.fillAmount = Mathf.Clamp01(alcoholRatio);
         mixerFill.fillAmount = Mathf.Clamp01(alcoholRatio + mixerRatio);

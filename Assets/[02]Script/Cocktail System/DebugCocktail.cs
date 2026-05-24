@@ -19,7 +19,7 @@ public class DebugCocktail : MonoBehaviour
     private void Update()
     {
         _targetText.text  = "Target: " + _system.GetTargetName();
-        _currentText.text = "Shaker:\n" + _shaker.currentCocktail.GetOfCocktailInfo();
+        _currentText.text = "Shaker:\n" + _shaker.CurrentCocktail;
     }
 
     public void UpdateSatisfaction()
