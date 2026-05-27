@@ -1,32 +1,4 @@
-﻿// ============================================================
-//  ShakingMinigame.cs — GDD 3.2.1
-//  Spam-click to keep the gauge inside the target zone for the
-//  full duration.
-//
-//  SOLID — S (Single Responsibility):
-//    Owns shaking gameplay logic only.
-//    Sliding   → PanelSlider (via base).
-//    Input     → IInputProvider (via base.Input).
-//    Config    → resolved once in Awake — no per-property
-//                null-checks scattered through the game loop.
-//
-//  SOLID — L (Liskov Substitution):
-//    ProcessedGame() calls base first (IsRunning guard + Input.Poll)
-//    so the base contract is never violated.
-//    IsRunning check is NOT duplicated here.
-//
-//  SOLID — O (Open / Closed):
-//    GameType property registers this game with the manager
-//    registry without any change to MinigameSystemManager.
-//
-//  Config fallback:
-//    If no SO_ShakingSetting is assigned in the Inspector,
-//    a default instance is created via ScriptableObject.CreateInstance.
-//    The SO's own field-initialisers supply the defaults —
-//    no duplicate "fallback" fields needed in this class.
-// ============================================================
-
-using UnityEngine;
+﻿using UnityEngine;
 using UnityEngine.UI;
 using static E_Cocktail;
 
@@ -62,18 +34,14 @@ public class ShakingMinigame : BaseMiniGame
     private float _zoneBorderMin;
     private float _zoneBorderMax;
 
-    private bool _isPanelSlidingIn = false;
-    private bool _isPanelSlidingOut = false;
-
     private float _handleOriginalWidth;
 
     // ── Unity Lifecycle ────────────────────────────────────
 
     protected override void Awake()
     {
-        base.Awake(); // creates PanelSlider
+        base.Awake();
 
-        // Resolve config once — avoids null checks in the hot path.
         _cfg = Setting as SO_ShakingSetting;
         if (_cfg == null)
         {
@@ -84,9 +52,13 @@ public class ShakingMinigame : BaseMiniGame
 
     private void OnDestroy()
     {
-        // Only destroy if it was runtime-created (not an asset reference).
+        // Only destroy if it was runtime-created (not a saved asset).
+#if UNITY_EDITOR
         if (_cfg != null && !UnityEditor.AssetDatabase.Contains(_cfg))
             Destroy(_cfg);
+#else
+        Destroy(_cfg);
+#endif
     }
 
     // ── IMinigame ──────────────────────────────────────────
@@ -107,24 +79,8 @@ public class ShakingMinigame : BaseMiniGame
     /// </summary>
     public override void ProcessedGame()
     {
-        base.ProcessedGame();        // IsRunning guard + Input.Poll()
-        if (!IsRunning) return;      // early-out after guard
-
-        // ── Panel slide in ────────────────────────────────
-        if (_isPanelSlidingIn)
-        {
-            if (!PanelSlider.Slide(Direction.Up, SlideFinishCondition.FullyIn)) return;
-            _isPanelSlidingIn = false;
-        }
-
-        // ── Panel slide out ───────────────────────────────
-        if (_isPanelSlidingOut)
-        {
-            if (!PanelSlider.Slide(Direction.Down, SlideFinishCondition.FullyOut)) return;
-            _isPanelSlidingOut = false;
-            SetState(MiniGameState.Success);
-            return;
-        }
+        base.ProcessedGame();   // IsRunning guard + Input.Poll()
+        if(!IsRunning) return;  
 
         float dt = Time.deltaTime;
 
@@ -146,7 +102,7 @@ public class ShakingMinigame : BaseMiniGame
 
         // ── Win condition ─────────────────────────────────
         if (TimeInZone >= _cfg.Duration)
-            _isPanelSlidingOut = true;
+            CurrentSlidePhase = SlidePhase.MinigameExiting;
 
         UpdateUI();
     }
@@ -171,15 +127,17 @@ public class ShakingMinigame : BaseMiniGame
         UpdateProgressBarColor();
     }
 
-    // ── Protected Hooks ────────────────────────────────────
+    // ── FSM Hooks ──────────────────────────────────────────
+
+    protected override void OnProcessing() => UpdateUI();
 
     protected override void ResetGame()
     {
         GaugeValue = 0f;
         TimeInZone = 0f;
 
-        _isPanelSlidingIn = !IsRunning; // slide in only on first start
-        _isPanelSlidingOut = false;
+        // Slide in only when starting fresh, not when replaying mid-session.
+        CurrentSlidePhase = IsRunning ? SlidePhase.None : SlidePhase.MinigameEntering;
 
         Debug.Log("[ShakingMinigame] Reset");
         base.ResetGame();

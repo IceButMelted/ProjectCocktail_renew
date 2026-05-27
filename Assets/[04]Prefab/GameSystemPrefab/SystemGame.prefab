@@ -786,6 +786,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6102873c730fa6445b33680b1e865215, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DragableObject
+  _interactable: 1
   _dragThreshold: 10
   detectLayerMask:
     serializedVersion: 2
@@ -804,6 +805,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb29c6328ada81c48a4f1ddd54af8b12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ScaleOnHover
+  _interactable: 1
   newScale: 1.1
   scaleDuration: 0.2
 --- !u!114 &16229850906155561
@@ -1060,6 +1062,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6102873c730fa6445b33680b1e865215, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DragableObject
+  _interactable: 1
   _dragThreshold: 10
   detectLayerMask:
     serializedVersion: 2
@@ -1078,6 +1081,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb29c6328ada81c48a4f1ddd54af8b12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ScaleOnHover
+  _interactable: 1
   newScale: 1.1
   scaleDuration: 0.2
 --- !u!114 &2209971745811880014
@@ -1180,6 +1184,9 @@ MonoBehaviour:
   _neutralSprite: {fileID: 21300000, guid: e50be93812e36ff449b573aa7a6f36b7, type: 3}
   _happySprite: {fileID: 21300000, guid: 025547a2bc5e126408fc7855d85a173f, type: 3}
   _upsetSprite: {fileID: 21300000, guid: 92ea74e49f105634eb569dc813374c9f, type: 3}
+  _lookLeftSprite: {fileID: 0}
+  _lookRightSprite: {fileID: 0}
+  _lookForwardSprite: {fileID: 0}
   Name: 3
   _waypoints:
   - {fileID: 8562012872351574430}
@@ -2134,6 +2141,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6102873c730fa6445b33680b1e865215, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DragableObject
+  _interactable: 1
   _dragThreshold: 10
   detectLayerMask:
     serializedVersion: 2
@@ -2152,6 +2160,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb29c6328ada81c48a4f1ddd54af8b12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ScaleOnHover
+  _interactable: 1
   newScale: 1.1
   scaleDuration: 0.2
 --- !u!114 &3800006160274551326
@@ -2483,6 +2492,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6102873c730fa6445b33680b1e865215, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DragableObject
+  _interactable: 1
   _dragThreshold: 10
   detectLayerMask:
     serializedVersion: 2
@@ -2501,6 +2511,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb29c6328ada81c48a4f1ddd54af8b12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ScaleOnHover
+  _interactable: 1
   newScale: 1.1
   scaleDuration: 0.2
 --- !u!114 &5103204322631893219
@@ -2631,9 +2642,10 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4fc40022cfeeeff45a895e08d156163e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  _normalCocktailList: {fileID: 11400000, guid: e64c41a62842fd54491c7e08deb2cd77, type: 2}
-  _specialCocktailList: {fileID: 0}
-  _failCocktailTexture: {fileID: 2800000, guid: 098ccd04d394f96479ed4a40fae4c482, type: 3}
+  _normalCocktailRepository: {fileID: 0}
+  _specialCocktailRepository: {fileID: 0}
+  _failCocktailSprite: {fileID: 0}
+  _endShiftBTN: {fileID: 0}
   _cocktailShakerData: {fileID: 4006334063014608498}
   _cocktailShaker: {fileID: 8135556712241269001}
   _dialogueRunner: {fileID: 0}
@@ -2760,7 +2772,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MinigameSystem
   _cocktailCamera: {fileID: 0}
-  _cocktailSystemManager: {fileID: 4095592095221217096}
   OnStartedMinigame:
     m_PersistentCalls:
       m_Calls:
@@ -2878,17 +2889,6 @@ MonoBehaviour:
   <Setting>k__BackingField: {fileID: 11400000, guid: 69be31c6794215c4aa2b30c35ee31c89, type: 2}
   _minigamePanel: {fileID: 6429402570229055959}
   _slidePanelSpeed: 800
-  _fallbackDuration: 1
-  _fallbackDifficultyMultiplier: 1
-  _fallbackTargetZoneMinSize: 0.4
-  _fallbackTargetZoneMaxSize: 0.7
-  _fallbackInitTargetZoneMinValue: 0.7
-  _fallbackTargetZoneShrinkPerProgress: 0.01
-  _fallbackGaugeDecayRate: 0.15
-  _fallbackGaugeIncreasePerClick: 0.08
-  _fallbackProgressIncreaseRate: 0.2
-  _fallbackProgressBarStartColor: {r: 0, g: 1, b: 0, a: 1}
-  _fallbackProgressBarEndColor: {r: 1, g: 0, b: 0, a: 1}
   _gaugeSlider: {fileID: 248727897685459552}
   _progressSlider: {fileID: 5578742201484923875}
   _targetZoneSlider: {fileID: 7878414289981021244}
@@ -2907,17 +2907,6 @@ MonoBehaviour:
   <Setting>k__BackingField: {fileID: 11400000, guid: 45c27c70917228d4caf8f135c6ddf856, type: 2}
   _minigamePanel: {fileID: 2542754169222054228}
   _slidePanelSpeed: 800
-  _fallbackDuration: 5
-  _fallbackDifficultyMultiplier: 1
-  _fallbackTargetZoneMinSize: 0.1
-  _fallbackTargetZoneMaxSize: 0.4
-  _fallbackTargetZoneShrinkPerHit: 0.05
-  _fallbackTargetZoneExtendPerMiss: 0.15
-  _fallbackNeedleInitSpeed: 1
-  _fallbackNeedleMaxSpeed: 2
-  _fallbackNeedleSpeedIncreasePerHit: 0.15
-  _fallbackNeedleSpeedDecreasePerMiss: 0.25
-  _fallbackRequiredHits: 5
   _needleSlider: {fileID: 2383656611305048988}
   _hitsProgressSlider: {fileID: 8638164656775892503}
   _targetZoneSlider: {fileID: 4291346845547450225}
@@ -3049,6 +3038,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6102873c730fa6445b33680b1e865215, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DragableObject
+  _interactable: 1
   _dragThreshold: 10
   detectLayerMask:
     serializedVersion: 2
@@ -3067,6 +3057,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb29c6328ada81c48a4f1ddd54af8b12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ScaleOnHover
+  _interactable: 1
   newScale: 1.1
   scaleDuration: 0.2
 --- !u!114 &1473075218165726839
@@ -3307,6 +3298,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6102873c730fa6445b33680b1e865215, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DragableObject
+  _interactable: 1
   _dragThreshold: 10
   detectLayerMask:
     serializedVersion: 2
@@ -3325,6 +3317,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb29c6328ada81c48a4f1ddd54af8b12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ScaleOnHover
+  _interactable: 1
   newScale: 1.1
   scaleDuration: 0.2
 --- !u!114 &2751183717889015247
@@ -3538,6 +3531,9 @@ MonoBehaviour:
   _neutralSprite: {fileID: 21300000, guid: 4bc3fb8f1916686419db5e4aafd587be, type: 3}
   _happySprite: {fileID: 21300000, guid: fdefc02c08ba06f43839fff18cbbcbc5, type: 3}
   _upsetSprite: {fileID: 21300000, guid: 1d537d7cd7bef1146a1b2b05a62dcb73, type: 3}
+  _lookLeftSprite: {fileID: 0}
+  _lookRightSprite: {fileID: 0}
+  _lookForwardSprite: {fileID: 0}
   Name: 2
   _waypoints:
   - {fileID: 8562012872351574430}
@@ -3674,6 +3670,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6102873c730fa6445b33680b1e865215, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DragableObject
+  _interactable: 1
   _dragThreshold: 10
   detectLayerMask:
     serializedVersion: 2
@@ -3692,6 +3689,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb29c6328ada81c48a4f1ddd54af8b12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ScaleOnHover
+  _interactable: 1
   newScale: 1.1
   scaleDuration: 0.2
 --- !u!114 &329191909565271807
@@ -3874,6 +3872,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6102873c730fa6445b33680b1e865215, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DragableObject
+  _interactable: 1
   _dragThreshold: 10
   detectLayerMask:
     serializedVersion: 2
@@ -3892,6 +3891,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb29c6328ada81c48a4f1ddd54af8b12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ScaleOnHover
+  _interactable: 1
   newScale: 1.1
   scaleDuration: 0.2
 --- !u!114 &9213385720222736280
@@ -3956,6 +3956,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ee06910ce988e544b4fe0ebca6cfcaf, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ObjectPlaySound
+  _interactable: 1
   _onEnterID: TMP_SFX_BottleClink
   _onExitID: TMP_SFX_BottleOnTable
   _onDownID: 
@@ -4216,6 +4217,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6102873c730fa6445b33680b1e865215, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DragableObject
+  _interactable: 1
   _dragThreshold: 10
   detectLayerMask:
     serializedVersion: 2
@@ -4234,6 +4236,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb29c6328ada81c48a4f1ddd54af8b12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ScaleOnHover
+  _interactable: 1
   newScale: 1.1
   scaleDuration: 0.2
 --- !u!114 &2814076209564284530
@@ -4637,6 +4640,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6102873c730fa6445b33680b1e865215, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DragableObject
+  _interactable: 1
   _dragThreshold: 10
   detectLayerMask:
     serializedVersion: 2
@@ -4655,6 +4659,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb29c6328ada81c48a4f1ddd54af8b12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ScaleOnHover
+  _interactable: 1
   newScale: 1.1
   scaleDuration: 0.2
 --- !u!114 &9198271472473039781
@@ -5376,6 +5381,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6102873c730fa6445b33680b1e865215, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DragableObject
+  _interactable: 1
   _dragThreshold: 10
   detectLayerMask:
     serializedVersion: 2
@@ -5394,6 +5400,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb29c6328ada81c48a4f1ddd54af8b12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ScaleOnHover
+  _interactable: 1
   newScale: 1.1
   scaleDuration: 0.2
 --- !u!114 &7996213877443148491
@@ -5477,8 +5484,8 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 2723981670216025344}
   - {fileID: 4006893674168578472}
+  - {fileID: 2723981670216025344}
   m_Father: {fileID: 8412537735169466993}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -5737,6 +5744,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6102873c730fa6445b33680b1e865215, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DragableObject
+  _interactable: 1
   _dragThreshold: 10
   detectLayerMask:
     serializedVersion: 2
@@ -5755,6 +5763,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb29c6328ada81c48a4f1ddd54af8b12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ScaleOnHover
+  _interactable: 1
   newScale: 1.1
   scaleDuration: 0.2
 --- !u!114 &1877901922538768934
@@ -5963,7 +5972,6 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
-  - {fileID: 8627479686271416671}
   - {fileID: 328536672163859802}
   - {fileID: 6912449865895949711}
   - {fileID: 2551169662907123292}
@@ -6134,6 +6142,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6102873c730fa6445b33680b1e865215, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DragableObject
+  _interactable: 1
   _dragThreshold: 10
   detectLayerMask:
     serializedVersion: 2
@@ -6152,6 +6161,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb29c6328ada81c48a4f1ddd54af8b12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ScaleOnHover
+  _interactable: 1
   newScale: 1.1
   scaleDuration: 0.2
 --- !u!114 &1257866922949543255
@@ -6709,6 +6719,7 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
+  - {fileID: 8627479686271416671}
   - {fileID: 971716400025155913}
   m_Father: {fileID: 8412537735169466993}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
@@ -6896,6 +6907,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6102873c730fa6445b33680b1e865215, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DragableObject
+  _interactable: 1
   _dragThreshold: 10
   detectLayerMask:
     serializedVersion: 2
@@ -6914,6 +6926,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb29c6328ada81c48a4f1ddd54af8b12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ScaleOnHover
+  _interactable: 1
   newScale: 1.1
   scaleDuration: 0.2
 --- !u!114 &7803391564330385649
@@ -7095,6 +7108,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6102873c730fa6445b33680b1e865215, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DragableObject
+  _interactable: 1
   _dragThreshold: 10
   detectLayerMask:
     serializedVersion: 2
@@ -7113,6 +7127,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb29c6328ada81c48a4f1ddd54af8b12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ScaleOnHover
+  _interactable: 1
   newScale: 1.1
   scaleDuration: 0.2
 --- !u!114 &7589098798188346201
@@ -7977,6 +7992,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6102873c730fa6445b33680b1e865215, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DragableObject
+  _interactable: 1
   _dragThreshold: 10
   detectLayerMask:
     serializedVersion: 2
@@ -7995,6 +8011,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb29c6328ada81c48a4f1ddd54af8b12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ScaleOnHover
+  _interactable: 1
   newScale: 1.1
   scaleDuration: 0.2
 --- !u!114 &2286901398362959160
@@ -8280,6 +8297,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6102873c730fa6445b33680b1e865215, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DragableObject
+  _interactable: 1
   _dragThreshold: 10
   detectLayerMask:
     serializedVersion: 2
@@ -8298,6 +8316,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb29c6328ada81c48a4f1ddd54af8b12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ScaleOnHover
+  _interactable: 1
   newScale: 1.1
   scaleDuration: 0.2
 --- !u!114 &2456304704230884243
@@ -8798,6 +8817,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6102873c730fa6445b33680b1e865215, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DragableObject
+  _interactable: 1
   _dragThreshold: 10
   detectLayerMask:
     serializedVersion: 2
@@ -8816,6 +8836,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb29c6328ada81c48a4f1ddd54af8b12, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ScaleOnHover
+  _interactable: 1
   newScale: 1.1
   scaleDuration: 0.2
 --- !u!114 &929816618935270345
@@ -9146,40 +9167,24 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-  currentCocktail:
-    Name: 
-    Description: 
-    AlcoholStrength: 0
-    PreparationMethod: 0
-    AddIce: 0
-    Price: 0
-    AlcoholList:
-    - Type: 0
-      Amount: 0
-    LiqueurList: []
-    MixerList:
-    - Type: 0
-      Amount: 0
-    CompatibleGlasses: 
-    CocktailSprite: {fileID: 0}
   ingredientButtons:
-  - {fileID: 9213385720222736280}
-  - {fileID: 16229850906155561}
-  - {fileID: 2286901398362959160}
-  - {fileID: 1257866922949543255}
-  - {fileID: 7803391564330385649}
-  - {fileID: 2814076209564284530}
-  - {fileID: 2209971745811880014}
-  - {fileID: 1877901922538768934}
-  - {fileID: 2456304704230884243}
-  - {fileID: 929816618935270345}
-  - {fileID: 329191909565271807}
-  - {fileID: 5103204322631893219}
-  - {fileID: 2751183717889015247}
-  - {fileID: 7589098798188346201}
-  - {fileID: 3800006160274551326}
-  - {fileID: 7996213877443148491}
-  - {fileID: 9198271472473039781}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
 --- !u!114 &6865847580548980446
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -9192,6 +9197,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6102873c730fa6445b33680b1e865215, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::DragableObject
+  _interactable: 1
   _dragThreshold: 10
   detectLayerMask:
     serializedVersion: 2
@@ -9758,11 +9764,11 @@ RectTransform:
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
-  m_Father: {fileID: 971716400025155913}
+  m_Father: {fileID: 2542754169222054228}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 1}
   m_AnchorMax: {x: 0, y: 1}
-  m_AnchoredPosition: {x: 400, y: -300.06824}
+  m_AnchoredPosition: {x: 400, y: -300.07318}
   m_SizeDelta: {x: 800, y: 600.1465}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!222 &335920754397405586

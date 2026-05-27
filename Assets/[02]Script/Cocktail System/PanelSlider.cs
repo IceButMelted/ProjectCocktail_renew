@@ -1,142 +1,279 @@
 // ============================================================
-//  PanelSlider.cs — Moves a UI panel in and out of the screen.
+//  PanelSlider.cs — Static utility for sliding UI panels.
 //
 //  SOLID — S (Single Responsibility):
-//    This class owns exactly one concern: sliding a RectTransform
-//    in a given direction and reporting when a finish condition
-//    is reached.  No game state, no MonoBehaviour lifecycle,
-//    no knowledge of what game is being played.
+//    Owns exactly one concern: sliding a RectTransform toward a
+//    pre-computed target and reporting when it arrives.
+//    No game state, no MonoBehaviour lifecycle.
 //
 //  SOLID — O (Open / Closed):
-//    New finish conditions (e.g. "stop at center") are added as
-//    a new Slide() overload — existing callers are never broken.
+//    New finish conditions → one new case in ComputeTarget.
+//    New easing modes     → one new case in EasingMath.Evaluate.
+//    Existing callers never change.
 //
-//  Usage:
-//    var slider = new PanelSlider(myRectTransform, 800f);
-//    // In Update:
-//    bool done = slider.Slide(Direction.Up, SlideFinishCondition.FullyIn);
+//  Session model:
+//    Every panel owns a SlideSession value.  BeginSession() fires
+//    geometry ONCE (GetWorldCorners / InverseTransformPoint) and
+//    stores start, end, direction, and easing.  Tick() runs every
+//    frame with zero geometry overhead.
+//
+//  Usage — Update loop:
+//    bool done = PanelSlider.Slide(ref _session, panel,
+//                    Direction.Up, SlideFinishCondition.FullyIn);
+//
+//  Usage — coroutine:
+//    yield return StartCoroutine(
+//        PanelSlider.SlideRoutine(panel, Direction.Up,
+//                    SlideFinishCondition.FullyIn,
+//                    EasingConfig.Bounce(0.5f)));
 // ============================================================
 
+using System.Collections;
 using UnityEngine;
 using static E_Cocktail;
 
-// ── Finish Condition ───────────────────────────────────────
-
-/// <summary>When to consider a slide operation complete.</summary>
-public enum SlideFinishCondition
+/// <summary>
+/// Mutable session state — one per animated panel.
+/// Callers declare a field of this type; PanelSlider reads and
+/// writes it via ref parameters.
+/// </summary>
+public struct SlideSession
 {
-    /// <summary>Panel is fully inside its parent bounds.</summary>
-    FullyIn,
-
-    /// <summary>Panel no longer overlaps its parent bounds.</summary>
-    FullyOut
+    internal bool Active;
+    internal Direction Dir;
+    internal Vector2 Start;
+    internal Vector2 End;
+    internal EasingConfig Easing;   // null → linear velocity
+    internal float Elapsed;         // only advanced by TickEased
 }
 
-// ── Slider ─────────────────────────────────────────────────
-
 /// <summary>
-/// Pure C# utility — no MonoBehaviour overhead.
-/// Construct once in Awake, call Slide() every frame.
+/// Pure static utility — no MonoBehaviour, no instance needed.
+/// Declare a <see cref="SlideSession"/> per panel and pass it by ref.
 /// </summary>
-public class PanelSlider
+public static class PanelSlider
 {
-    // ── State ──────────────────────────────────────────────
-
-    private readonly RectTransform _panel;
-    private readonly float _speed;
-
-    // ── Constructor ────────────────────────────────────────
-
-    /// <param name="panel">The UI panel to move.</param>
-    /// <param name="speed">Pixels per second.</param>
-    public PanelSlider(RectTransform panel, float speed)
-    {
-        _panel = panel;
-        _speed = speed;
-    }
-
-    // ── Public API ─────────────────────────────────────────
+    // ═══════════════════════════════════════════════════════
+    //  Public API
+    // ═══════════════════════════════════════════════════════
 
     /// <summary>
-    /// Moves the panel one step toward <paramref name="dir"/>.
-    /// Returns true once the <paramref name="finishCondition"/> is satisfied.
+    /// Call every frame. Starts a new session on the first call,
+    /// then ticks it until the target is reached.
+    /// Returns true on the frame the slide completes.
     /// </summary>
-    public bool Slide(Direction dir, SlideFinishCondition finishCondition)
+    public static bool Slide(ref SlideSession session, RectTransform panel,
+                             Direction dir, SlideFinishCondition condition,
+                             float speed, EasingConfig easing = null)
     {
-        _panel.anchoredPosition += ToVector(dir) * _speed * Time.deltaTime;
-        var (fullyIn, fullyOut) = CheckBoundary();
-        return finishCondition == SlideFinishCondition.FullyIn ? fullyIn : fullyOut;
+        if (!session.Active)
+            BeginSession(ref session, panel, dir, ComputeTarget(panel, dir, condition), easing);
+
+        return Tick(ref session, panel, speed);
     }
 
     /// <summary>
-    /// Moves the panel toward <paramref name="dir"/> until it crosses
-    /// <paramref name="targetPosition"/>, then snaps to it.
-    /// Returns true on the frame the target is crossed.
+    /// Call every frame with an explicit target position.
+    /// Restarts the session if the target changes mid-flight.
+    /// Returns true on the frame the slide completes.
     /// </summary>
-    public bool Slide(Direction dir, Vector2 targetPosition)
+    public static bool Slide(ref SlideSession session, RectTransform panel,
+                             Direction dir, Vector2 targetPosition,
+                             float speed, EasingConfig easing = null)
     {
-        Vector2 before = _panel.anchoredPosition;
-        _panel.anchoredPosition += ToVector(dir) * _speed * Time.deltaTime;
-        Vector2 after  = _panel.anchoredPosition;
+        if (!session.Active || session.End != targetPosition)
+            BeginSession(ref session, panel, dir, targetPosition, easing);
 
-        bool crossed = dir switch
+        return Tick(ref session, panel, speed);
+    }
+
+    /// <summary>
+    /// Coroutine version — begins a fresh session and yields until complete.
+    /// </summary>
+    public static IEnumerator SlideRoutine(SlideSession session, RectTransform panel,
+                                           Direction dir, SlideFinishCondition condition,
+                                           float speed, EasingConfig easing = null)
+    {
+        BeginSession(ref session, panel, dir, ComputeTarget(panel, dir, condition), easing);
+        while (!Tick(ref session, panel, speed)) yield return null;
+    }
+
+    /// <summary>Coroutine version with an explicit target position.</summary>
+    public static IEnumerator SlideRoutine(SlideSession session, RectTransform panel,
+                                           Direction dir, Vector2 targetPosition,
+                                           float speed, EasingConfig easing = null)
+    {
+        BeginSession(ref session, panel, dir, targetPosition, easing);
+        while (!Tick(ref session, panel, speed)) yield return null;
+    }
+
+    // ═══════════════════════════════════════════════════════
+    //  Session
+    // ═══════════════════════════════════════════════════════
+
+    private static void BeginSession(ref SlideSession session, RectTransform panel,
+                                     Direction dir, Vector2 target, EasingConfig easing)
+    {
+        session.Dir = dir;
+        session.Start = panel.anchoredPosition;
+        session.End = target;
+        session.Easing = easing;
+        session.Elapsed = 0f;
+        session.Active = true;
+    }
+
+    private static bool Tick(ref SlideSession session, RectTransform panel, float speed)
+        => session.Easing != null
+            ? TickEased(ref session, panel)
+            : TickLinear(ref session, panel, speed);
+
+    // ── Linear tick ────────────────────────────────────────
+
+    private static bool TickLinear(ref SlideSession session, RectTransform panel, float speed)
+    {
+        Vector2 before = panel.anchoredPosition;
+        panel.anchoredPosition += ToVector(session.Dir) * speed * Time.deltaTime;
+        Vector2 after = panel.anchoredPosition;
+
+        bool crossed = session.Dir switch
         {
-            Direction.Left  => before.x >= targetPosition.x && after.x <= targetPosition.x,
-            Direction.Right => before.x <= targetPosition.x && after.x >= targetPosition.x,
-            Direction.Up    => before.y <= targetPosition.y && after.y >= targetPosition.y,
-            Direction.Down  => before.y >= targetPosition.y && after.y <= targetPosition.y,
-            _               => false
+            Direction.Left => before.x >= session.End.x && after.x <= session.End.x,
+            Direction.Right => before.x <= session.End.x && after.x >= session.End.x,
+            Direction.Up => before.y <= session.End.y && after.y >= session.End.y,
+            Direction.Down => before.y >= session.End.y && after.y <= session.End.y,
+            _ => false,
         };
 
-        if (crossed)
-        {
-            Vector2 snapped = after;
-            if (dir is Direction.Left  or Direction.Right) snapped.x = targetPosition.x;
-            if (dir is Direction.Up    or Direction.Down)  snapped.y = targetPosition.y;
-            _panel.anchoredPosition = snapped;
-        }
+        if (!crossed) return false;
 
-        return crossed;
+        Vector2 snapped = after;
+        if (session.Dir is Direction.Left or Direction.Right) snapped.x = session.End.x;
+        else snapped.y = session.End.y;
+
+        panel.anchoredPosition = snapped;
+        session.Active = false;
+        return true;
     }
 
-    // ── Private Helpers ────────────────────────────────────
+    // ── Eased tick ─────────────────────────────────────────
+
+    private static bool TickEased(ref SlideSession session, RectTransform panel)
+    {
+        session.Elapsed += Time.deltaTime;
+
+        float t = Mathf.Clamp01(session.Elapsed / session.Easing.Duration);
+        float easedT = EasingMath.Evaluate(session.Easing, t);
+
+        panel.anchoredPosition = Vector2.LerpUnclamped(session.Start, session.End, easedT);
+
+        if (t < 1f) return false;
+
+        panel.anchoredPosition = session.End;
+        session.Active = false;
+        return true;
+    }
+
+    // ═══════════════════════════════════════════════════════
+    //  Target Computation
+    // ═══════════════════════════════════════════════════════
+
+    private static Vector2 ComputeTarget(RectTransform panel,
+                                         Direction dir, SlideFinishCondition condition)
+    {
+        if (!TryGetRects(panel, out Rect panelRect, out Rect screen))
+            return panel.anchoredPosition;
+
+        Vector2 pos = panel.anchoredPosition;
+
+        return condition switch
+        {
+            SlideFinishCondition.FullyIn => FullyInTarget(dir, panelRect, screen, pos),
+            SlideFinishCondition.FullyOut => FullyOutTarget(dir, panelRect, screen, pos),
+            _ => SnapTarget(condition, panelRect, screen, pos),
+        };
+    }
+
+    private static Vector2 FullyInTarget(Direction dir, Rect panel, Rect screen, Vector2 pos)
+        => dir switch
+        {
+            Direction.Up => new Vector2(pos.x, pos.y + (screen.yMin - panel.yMin)),
+            Direction.Down => new Vector2(pos.x, pos.y + (screen.yMax - panel.yMax)),
+            Direction.Left => new Vector2(pos.x + (screen.xMax - panel.xMax), pos.y),
+            Direction.Right => new Vector2(pos.x + (screen.xMin - panel.xMin), pos.y),
+            _ => pos,
+        };
+
+    private static Vector2 FullyOutTarget(Direction dir, Rect panel, Rect screen, Vector2 pos)
+        => dir switch
+        {
+            Direction.Up => new Vector2(pos.x, pos.y + (screen.yMax - panel.yMin)),
+            Direction.Down => new Vector2(pos.x, pos.y + (screen.yMin - panel.yMax)),
+            Direction.Left => new Vector2(pos.x + (screen.xMin - panel.xMax), pos.y),
+            Direction.Right => new Vector2(pos.x + (screen.xMax - panel.xMin), pos.y),
+            _ => pos,
+        };
+
+    private static Vector2 SnapTarget(SlideFinishCondition condition,
+                                      Rect panel, Rect screen, Vector2 pos)
+    {
+        float dx = 0f, dy = 0f;
+
+        switch (condition)
+        {
+            case SlideFinishCondition.LeftEdgeToLeftBound: dx = screen.xMin - panel.xMin; break;
+            case SlideFinishCondition.RightEdgeToRightBound: dx = screen.xMax - panel.xMax; break;
+            case SlideFinishCondition.TopEdgeToTopBound: dy = screen.yMax - panel.yMax; break;
+            case SlideFinishCondition.BottomEdgeToBottomBound: dy = screen.yMin - panel.yMin; break;
+
+            case SlideFinishCondition.CenterToCenter:
+                dx = screen.center.x - panel.center.x;
+                dy = screen.center.y - panel.center.y; break;
+            case SlideFinishCondition.LeftEdgeToCenter: dx = screen.center.x - panel.xMin; break;
+            case SlideFinishCondition.RightEdgeToCenter: dx = screen.center.x - panel.xMax; break;
+            case SlideFinishCondition.TopEdgeToCenter: dy = screen.center.y - panel.yMax; break;
+            case SlideFinishCondition.BottomEdgeToCenter: dy = screen.center.y - panel.yMin; break;
+
+            case SlideFinishCondition.BottomEdgeToTopBound: dy = screen.yMax - panel.yMin; break;
+            case SlideFinishCondition.TopEdgeToBottomBound: dy = screen.yMin - panel.yMax; break;
+            case SlideFinishCondition.LeftEdgeToRightBound: dx = screen.xMax - panel.xMin; break;
+            case SlideFinishCondition.RightEdgeToLeftBound: dx = screen.xMin - panel.xMax; break;
+        }
+
+        return new Vector2(pos.x + dx, pos.y + dy);
+    }
+
+    // ═══════════════════════════════════════════════════════
+    //  Geometry Helpers
+    // ═══════════════════════════════════════════════════════
+
+    private static bool TryGetRects(RectTransform panel, out Rect panelRect, out Rect screen)
+    {
+        panelRect = screen = Rect.zero;
+
+        if (panel.parent is not RectTransform parentRT)
+        {
+            Debug.LogError("[PanelSlider] Panel has no RectTransform parent.");
+            return false;
+        }
+
+        Vector3[] corners = new Vector3[4];
+        panel.GetWorldCorners(corners);
+        for (int i = 0; i < 4; i++)
+            corners[i] = parentRT.InverseTransformPoint(corners[i]);
+
+        panelRect = new Rect(corners[0].x, corners[0].y,
+                             corners[2].x - corners[0].x,
+                             corners[2].y - corners[0].y);
+        screen = parentRT.rect;
+        return true;
+    }
 
     private static Vector2 ToVector(Direction dir) => dir switch
     {
-        Direction.Left  => Vector2.left,
+        Direction.Left => Vector2.left,
         Direction.Right => Vector2.right,
-        Direction.Up    => Vector2.up,
-        Direction.Down  => Vector2.down,
-        _               => Vector2.zero
+        Direction.Up => Vector2.up,
+        Direction.Down => Vector2.down,
+        _ => Vector2.zero,
     };
-
-    private Rect GetPanelRectInParent()
-    {
-        Vector3[] corners = new Vector3[4];
-        _panel.GetWorldCorners(corners);
-
-        var parent = _panel.parent as RectTransform;
-        for (int i = 0; i < 4; i++)
-            corners[i] = parent.InverseTransformPoint(corners[i]);
-
-        return new Rect(
-            corners[0].x, corners[0].y,
-            corners[2].x - corners[0].x,
-            corners[2].y - corners[0].y);
-    }
-
-    private Rect GetParentRect()
-        => (_panel.parent as RectTransform).rect;
-
-    private (bool fullyIn, bool fullyOut) CheckBoundary()
-    {
-        Rect panel  = GetPanelRectInParent();
-        Rect screen = GetParentRect();
-
-        bool fullyIn  = panel.xMin >= screen.xMin && panel.xMax <= screen.xMax &&
-                        panel.yMin >= screen.yMin && panel.yMax <= screen.yMax;
-        bool fullyOut = !panel.Overlaps(screen);
-
-        return (fullyIn, fullyOut);
-    }
 }

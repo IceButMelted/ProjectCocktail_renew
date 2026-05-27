@@ -1,30 +1,3 @@
-// ============================================================
-//  MixingMinigame.cs — GDD 3.2.2
-//  Click to stop the needle inside the target zone the required
-//  number of times.
-//
-//  SOLID — S (Single Responsibility):
-//    Owns mixing gameplay logic only.
-//    Sliding   → PanelSlider (via base).
-//    Input     → IInputProvider (via base.Input).
-//    Config    → resolved once in Awake — no per-property
-//                null-checks scattered through the game loop.
-//
-//  SOLID — L (Liskov Substitution):
-//    ProcessedGame() calls base first (IsRunning guard + Input.Poll)
-//    so the base contract is never violated.
-//
-//  SOLID — O (Open / Closed):
-//    GameType property registers this game with the manager
-//    registry without any change to MinigameSystemManager.
-//
-//  Config fallback:
-//    If no SO_MixingSetting is assigned in the Inspector,
-//    a default instance is created via ScriptableObject.CreateInstance.
-//    The SO's own field-initialisers supply the defaults —
-//    no duplicate "fallback" fields needed here.
-// ============================================================
-
 using UnityEngine;
 using UnityEngine.UI;
 using static E_Cocktail;
@@ -66,16 +39,13 @@ public class MixingMinigame : BaseMiniGame
     private float ZoneMin => Mathf.Max(0f, _zoneCenter - _zoneHalfSize);
     private float ZoneMax => Mathf.Min(1f, _zoneCenter + _zoneHalfSize);
 
-    private bool _isPanelSlidingIn = false;
-    private bool _isPanelSlidingOut = false;
-
     private float _handleOriginalHeight;
 
     // ── Unity Lifecycle ────────────────────────────────────
 
     protected override void Awake()
     {
-        base.Awake(); // creates PanelSlider
+        base.Awake();
 
         _cfg = Setting as SO_MixingSetting;
         if (_cfg == null)
@@ -87,8 +57,13 @@ public class MixingMinigame : BaseMiniGame
 
     private void OnDestroy()
     {
+        // Only destroy if it was runtime-created (not a saved asset).
+#if UNITY_EDITOR
         if (_cfg != null && !UnityEditor.AssetDatabase.Contains(_cfg))
             Destroy(_cfg);
+#else
+        Destroy(_cfg);
+#endif
     }
 
     // ── IMinigame ──────────────────────────────────────────
@@ -109,24 +84,8 @@ public class MixingMinigame : BaseMiniGame
     /// </summary>
     public override void ProcessedGame()
     {
-        base.ProcessedGame();        // IsRunning guard + Input.Poll()
-        if (!IsRunning) return;
-
-        // ── Panel slide in ────────────────────────────────
-        if (_isPanelSlidingIn)
-        {
-            if (!PanelSlider.Slide(Direction.Up, SlideFinishCondition.FullyIn)) return;
-            _isPanelSlidingIn = false;
-        }
-
-        // ── Panel slide out ───────────────────────────────
-        if (_isPanelSlidingOut)
-        {
-            if (!PanelSlider.Slide(Direction.Down, SlideFinishCondition.FullyOut)) return;
-            _isPanelSlidingOut = false;
-            SetState(MiniGameState.Success);
-            return;
-        }
+        base.ProcessedGame();   // IsRunning guard + Input.Poll()
+        if(!IsRunning) return;
 
         float dt = Time.deltaTime;
 
@@ -151,7 +110,7 @@ public class MixingMinigame : BaseMiniGame
 
         // ── Win condition ─────────────────────────────────
         if (Hits >= _cfg.RequiredHits)
-            _isPanelSlidingOut = true;
+            CurrentSlidePhase = SlidePhase.MinigameExiting;
 
         UpdateUI();
     }
@@ -176,7 +135,7 @@ public class MixingMinigame : BaseMiniGame
         UpdateHitsProgressVisual();
     }
 
-    // ── Protected Hooks ────────────────────────────────────
+    // ── FSM Hooks ──────────────────────────────────────────
 
     protected override void OnProcessing() => UpdateUI();
 
@@ -191,8 +150,8 @@ public class MixingMinigame : BaseMiniGame
 
         RandomizeZonePosition();
 
-        _isPanelSlidingIn = !IsRunning;
-        _isPanelSlidingOut = false;
+        // Slide in only when starting fresh, not when replaying mid-session.
+        CurrentSlidePhase = IsRunning ? SlidePhase.None : SlidePhase.ClosingToResult;
 
         Debug.Log("[MixingMinigame] Reset");
         base.ResetGame();

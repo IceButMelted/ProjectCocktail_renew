@@ -268,23 +268,23 @@ title: ShowcaseMain
 <<MoveIn NPC_Name.Owen 2>>
 <<Switch_Camera CamController "CenterCam">>
 <<SetEmotion NPC_Name.Owen "happy">>
-Owen: Evening! Slow night?
+// Owen: Evening! Slow night?
 
-// ── [SHOWCASE: Basic Option — 4 ตัวเลือก] ───────────────
--> Pretty quiet yeah.
-    Player: Yeah, been pretty slow tonight.
-    Owen: Good. Means I get the good seat.
--> Just picking up actually.
-    Player: Actually just starting to get busy.
-    <<SetEmotion NPC_Name.Owen "neutral">>
-    Owen: Of course it is. I have that effect on places.
--> Depends who's asking.
-    Player: Depends who's asking.
-    <<SetEmotion NPC_Name.Owen "happy">>
-    Owen: Ha! Mysterious. I like it.
--> Not saying.
-    Player: ...
-    Owen: Fair enough.
+// // ── [SHOWCASE: Basic Option — 4 ตัวเลือก] ───────────────
+// -> Pretty quiet yeah.
+//     Player: Yeah, been pretty slow tonight.
+//     Owen: Good. Means I get the good seat.
+// -> Just picking up actually.
+//     Player: Actually just starting to get busy.
+//     <<SetEmotion NPC_Name.Owen "neutral">>
+//     Owen: Of course it is. I have that effect on places.
+// -> Depends who's asking.
+//     Player: Depends who's asking.
+//     <<SetEmotion NPC_Name.Owen "happy">>
+//     Owen: Ha! Mysterious. I like it.
+// -> Not saying.
+//     Player: ...
+//     Owen: Fair enough.
 
 // ── [SHOWCASE: MoveIn NPC ที่ 2 + NearLeftCam] ───────────
 // Isla arrives at position 1
@@ -292,32 +292,32 @@ Owen: Evening! Slow night?
 <<Switch_Camera CamController "NearLeftCam">>
 <<SetEmotion NPC_Name.Isla "happy">>
 <<SetLookDirection NPC_Name.Isla LookDirection.Right>>
-Isla: Oh! Owen! Didn't know you'd be here tonight.
-<<SetLookDirection NPC_Name.Owen LookDirection.Left>>
-Owen: Isla! Small world.
-Isla: Or small bar.
+// Isla: Oh! Owen! Didn't know you'd be here tonight.
+// <<SetLookDirection NPC_Name.Owen LookDirection.Left>>
+// Owen: Isla! Small world.
+// Isla: Or small bar.
 
-Isla: Bartender — can I get something? I'm not sure what I want though...
-<<SetLookDirection NPC_Name.Isla LookDirection.Forward>>
-// ── [SHOWCASE: Option Timeout — ? และ #fallback] ─────────
--> Any recommendations tonight? ?
-    Player: We've got some great specials on.
-    <<SetEmotion NPC_Name.Isla "happy">>
-    Isla: Ooh, surprise me then!
--> Something light maybe? ?
-    Player: I'd suggest something light and refreshing.
-    Isla: That sounds perfect actually.
--> Something strong? ?
-    Player: Or I could go stronger if you'd like.
-    <<SetEmotion NPC_Name.Isla "neutral">>
-    Isla: Hmm... maybe not tonight.
--> Whatever you think suits me. #fallback
-    Player: I'll pick what suits you best.
-    Isla: Love the confidence!
+// Isla: Bartender — can I get something? I'm not sure what I want though...
+// <<SetLookDirection NPC_Name.Isla LookDirection.Forward>>
+// // ── [SHOWCASE: Option Timeout — ? และ #fallback] ─────────
+// -> Any recommendations tonight? ?
+//     Player: We've got some great specials on.
+//     <<SetEmotion NPC_Name.Isla "happy">>
+//     Isla: Ooh, surprise me then!
+// -> Something light maybe? ?
+//     Player: I'd suggest something light and refreshing.
+//     Isla: That sounds perfect actually.
+// -> Something strong? ?
+//     Player: Or I could go stronger if you'd like.
+//     <<SetEmotion NPC_Name.Isla "neutral">>
+//     Isla: Hmm... maybe not tonight.
+// -> Whatever you think suits me. #fallback
+//     Player: I'll pick what suits you best.
+//     Isla: Love the confidence!
 
 // ── [SHOWCASE: Order_Cocktail_OutName + wait_for_task] ───
 <<SetLookDirection NPC_Name.Owen LookDirection.Forward>>
-Owen: Right, since we're here — I'll have {Order_Cocktail_OutName(NPC_Name.Owen)}, please.
+//Owen: Right, since we're here — I'll have {Order_Cocktail_OutName(NPC_Name.Owen)}, please.
 
 <<Reset_Camera CamController>>
 <<Switch_Camera CamController "MainCam">>

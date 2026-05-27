@@ -1,33 +1,4 @@
-﻿// ============================================================
-//  MinigameSystemManager.cs
-//
-//  SOLID — O (Open / Closed):
-//    Adding a new minigame type requires ONLY:
-//      1. Add a new BaseMiniGame component to this GameObject.
-//      2. Set its GameType property.
-//    This class never changes. No new fields, no new Start*()
-//    methods, no new switch cases.
-//    All games are discovered at runtime via GetComponents<BaseMiniGame>()
-//    and stored in a Dictionary<Enum_MiniGameType, BaseMiniGame>.
-//
-//  SOLID — D (Dependency Inversion):
-//    Implements IMinigameContext so BaseMiniGame can call
-//    ResetCamera() and NotifyGameEnded() without knowing this
-//    concrete type exists.
-//    External subscribers (GameLoopManager) get IMinigame via
-//    GetMinigame(type) — they never need a concrete cast.
-//
-//  SOLID — I (Interface Segregation):
-//    IMinigameContext is implemented explicitly (explicit interface
-//    members) so callers going through IMinigameContext only see
-//    those two methods — not the full manager surface.
-//
-//  SOLID — S (Single Responsibility):
-//    Orchestrates which game is active and routes the Update tick.
-//    Camera reset and end notification are forwarded — not owned.
-// ============================================================
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using static E_Cocktail;
@@ -86,13 +57,33 @@ public class MinigameSystemManager : MonoBehaviour, IMinigameContext
         _activeMinigame.ProcessedGame();
     }
 
-    // ── IMinigameContext (explicit — keeps the manager surface clean) ──
-
     void IMinigameContext.ResetCamera()
         => _cocktailCamera?.ResetRotaionAndMovement();
 
     void IMinigameContext.NotifyGameEnded()
         => OnEndedGame?.Invoke();
+    
+    public void NextPhase()
+    {
+        if (_activeMinigame == null)
+        {
+            Debug.LogWarning("[MinigameSystemManager] No active minigame to close.");
+            return;
+        }
+        _activeMinigame.ClosePanel();
+        OnEndedGame?.Invoke();
+    }
+
+    public void ClosePanelReset()
+    {
+        if (_activeMinigame == null)
+        {
+            Debug.LogWarning("[MinigameSystemManager] No active minigame to close.");
+            return;
+        }
+        _activeMinigame.ClosePanel();
+    }
+
 
     // ── Public API ─────────────────────────────────────────
 
