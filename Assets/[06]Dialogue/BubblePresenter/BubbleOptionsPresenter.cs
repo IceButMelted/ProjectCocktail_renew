@@ -109,6 +109,7 @@ namespace YarnSpinner.Custom
             return YarnTask.CompletedTask;
         }
 
+        [System.Obsolete]
         public override async YarnTask<DialogueOption> RunOptionsAsync(
             DialogueOption[] dialogueOptions,
             CancellationToken cancellationToken)

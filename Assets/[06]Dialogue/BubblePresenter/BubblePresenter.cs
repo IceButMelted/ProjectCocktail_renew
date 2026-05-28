@@ -103,9 +103,9 @@ namespace YarnSpinner.Custom
                  "Set its pivot to (0.5, 1) — top-centre.")]
         [SerializeField] private RectTransform tailImage;
 
-        [Tooltip("Horizontal inset from the bubble left/right edge for the tail base (canvas px).\n" +
-                 "e.g. 24 = tail base sits 24 px inside the corner.")]
-        [SerializeField] private float tailEdgeInset = 24f;
+        //[Tooltip("Horizontal inset from the bubble left/right edge for the tail base (canvas px).\n" +
+        //         "e.g. 24 = tail base sits 24 px inside the corner.")]
+        //[SerializeField] private float tailEdgeInset = 24f;
 
         [Header("Typewriter")]
         [SerializeField] private bool useTypewriterEffect = true;
@@ -374,7 +374,7 @@ namespace YarnSpinner.Custom
             while (!token.IsNextContentRequested)
             {
                 if (buttonHandler != null && buttonHandler.IsAdvanceRequested) break;
-                await YarnTask.Delay(TimeSpan.FromSeconds(0), token.NextLineToken)
+                await YarnTask.Delay(TimeSpan.FromSeconds(0), token.NextContentToken)
                               .SuppressCancellationThrow();
             }
 

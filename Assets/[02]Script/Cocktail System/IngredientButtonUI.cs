@@ -74,21 +74,18 @@ public class IngredientButtonUI : MonoBehaviour
     public void AddMixer()
     {
         _shaker.OnAddMixer?.Invoke(_mixer, 1);
-        _shaker.OnAddIngredient?.Invoke();
     }
 
     /// <summary>Add the assigned Alcohol to the shaker.</summary>
     public void AddAlcohol()
     {
         _shaker.OnAddAlcohol?.Invoke(_alcohol, 1);
-        _shaker.OnAddIngredient?.Invoke();
     }
 
     /// <summary>Add the assigned Liqueur to the shaker.</summary>
     public void AddLiqueur()
     {
         _shaker.OnAddLiqueur?.Invoke(_liqueur, 1);
-        _shaker.OnAddIngredient?.Invoke();
     }
 
     /// <summary>Set preparation method to Shaking.</summary>

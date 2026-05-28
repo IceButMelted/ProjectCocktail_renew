@@ -23,13 +23,10 @@ public class CocktailShaker : Interactable3DObject
 
     // ── Accessors ──────────────────────────────────────────
 
-    /// <summary>Direct access to the sibling data component.</summary>
+    /// <summary>Sibling data component.</summary>
     public CocktailShakerData Data => _data;
 
-    /// <summary>
-    /// Convenience passthrough — keeps external references unbroken.
-    /// Prefer <c>Data.CurrentCocktail</c> for new code.
-    /// </summary>
+    /// <summary>Passthrough to <c>Data.CurrentCocktail</c> for legacy references.</summary>
     public S_Drink CurrentCocktail => _data.CurrentCocktail;
 
     public void SetCanShowServeUI(bool active) => _canShowServeUI = active;
@@ -44,45 +41,27 @@ public class CocktailShaker : Interactable3DObject
         _data = GetComponent<CocktailShakerData>();
     }
 
-    // ── Click Override ─────────────────────────────────────
+    // ── Interaction ────────────────────────────────────────
 
-    /// <summary>Block the click if locked or the shaker is empty.</summary>
+    /// <summary>Block click when locked or shaker is empty.</summary>
     protected override bool CanClick()
         => _canClick && DrinkUtility.GetTotalIngredient(_data.CurrentCocktail) > 0;
 
     // ── UI ─────────────────────────────────────────────────
 
+    /// <summary>Show/hide the serve panel.</summary>
     public void SetActiveServe(bool active) => ServeUI.gameObject.SetActive(active);
 
+    /// <summary>Toggle whichever panels are currently permitted.</summary>
     public void ToggleUI()
     {
-        Debug.Log($"Toggling UI: MethodUI active={MethodUI.gameObject.activeSelf}");
-        if (_canShowMethodUI) MethodUI.ToggleAtiveGameObject();
-        if (_canShowServeUI) ServeUI.ToggleAtiveGameObject();
-    }
-
-    public void DebugClicked()
-        => Debug.Log("Shaker clicked!\n" + DrinkUtility.GetCocktailInfo(_data.CurrentCocktail));
-
-    // ── Passthrough ────────────────────────────────────────
-
-    /// <summary>
-    /// Derives cocktail identity, updates visuals.
-    /// Accepts the abstracted repository so this component
-    /// has no direct dependency on SO_CocktailList.
-    /// </summary>
-    public void UpdateCocktailInShaker(IDrinkRepository repository, Sprite failCocktailSprite)
-    {
-        var recipes = repository.GetDrinks();
-        _data.UpdateCocktailInShaker(recipes, failCocktailSprite);
-
-        Sprite sprite = _data.GetCurrentSprite(recipes, failCocktailSprite);
-        SetBTNSprite(sprite, sprite, sprite);
+        if (_canShowMethodUI) MethodUI.ToggleActiveGameObject();
+        if (_canShowServeUI) ServeUI.ToggleActiveGameObject();
     }
 
     // ── Reset ──────────────────────────────────────────────
 
-    /// <summary>Resets UI state back to defaults without touching cocktail data.</summary>
+    /// <summary>Reset UI flags and sprite only — cocktail data untouched.</summary>
     public void ResetShakerUI()
     {
         SetCanShowMethodUI(true);
@@ -91,10 +70,15 @@ public class CocktailShaker : Interactable3DObject
         SetBTNSprite(ShakerSprite, ShakerSprite, ShakerSprite);
     }
 
-    /// <summary>Full reset — cocktail data AND UI.</summary>
+    /// <summary>Full reset — cocktail data and UI.</summary>
     public void InternalResetShaker()
     {
         _data.ResetCocktailData();
         ResetShakerUI();
     }
+
+    // ── Debug ──────────────────────────────────────────────
+    [ContextMenu("Debug Clicked")]
+    public void DebugClicked()
+        => Debug.Log("Shaker clicked!\n" + DrinkUtility.GetCocktailInfo(_data.CurrentCocktail));
 }

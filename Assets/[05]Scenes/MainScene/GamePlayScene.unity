@@ -6407,9 +6407,9 @@ MonoBehaviour:
   OnClicked:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2973298058747354724}
+      - m_Target: {fileID: 2383532671741888067}
         m_TargetAssemblyTypeName: IngredientButtonUI, Assembly-CSharp
-        m_MethodName: AddAlcohol
+        m_MethodName: Invoke
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -6458,7 +6458,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 2383532671741888067}
         m_TargetAssemblyTypeName: IngredientButtonUI, Assembly-CSharp
-        m_MethodName: AddAlcohol
+        m_MethodName: Invoke
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -6642,9 +6642,9 @@ MonoBehaviour:
   OnClicked:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1225734158270639769}
+      - m_Target: {fileID: 9073333309803274920}
         m_TargetAssemblyTypeName: IngredientButtonUI, Assembly-CSharp
-        m_MethodName: AddMixer
+        m_MethodName: Invoke
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -6691,7 +6691,7 @@ RectTransform:
   m_Father: {fileID: 9208657695454819490}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -6710,7 +6710,7 @@ RectTransform:
   m_Father: {fileID: 8433922986245708824}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 0.463}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -7739,9 +7739,9 @@ MonoBehaviour:
   OnClicked:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 2288351157979033707}
+      - m_Target: {fileID: 2383532671741888067}
         m_TargetAssemblyTypeName: IngredientButtonUI, Assembly-CSharp
-        m_MethodName: AddAlcohol
+        m_MethodName: Invoke
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -7773,9 +7773,9 @@ MonoBehaviour:
   OnClicked:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 5846322313658519982}
+      - m_Target: {fileID: 9073333309803274920}
         m_TargetAssemblyTypeName: IngredientButtonUI, Assembly-CSharp
-        m_MethodName: AddMixer
+        m_MethodName: Invoke
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -7927,23 +7927,23 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3023370869331208435, guid: 74dc30c4f63e65b4cafd605906b67635, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -0.8800001
+      value: 0.07364988
       objectReference: {fileID: 0}
     - target: {fileID: 3023370869331208435, guid: 74dc30c4f63e65b4cafd605906b67635, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.6389999
+      value: 1.22
       objectReference: {fileID: 0}
     - target: {fileID: 3023370869331208435, guid: 74dc30c4f63e65b4cafd605906b67635, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: 0.049899578
       objectReference: {fileID: 0}
     - target: {fileID: 3023370869331208435, guid: 74dc30c4f63e65b4cafd605906b67635, type: 3}
       propertyPath: m_LocalRotation.w
-      value: 1
+      value: 0.9944357
       objectReference: {fileID: 0}
     - target: {fileID: 3023370869331208435, guid: 74dc30c4f63e65b4cafd605906b67635, type: 3}
       propertyPath: m_LocalRotation.x
-      value: 0
+      value: 0.10534529
       objectReference: {fileID: 0}
     - target: {fileID: 3202601125926392399, guid: 74dc30c4f63e65b4cafd605906b67635, type: 3}
       propertyPath: Lens.FieldOfView
@@ -8097,6 +8097,10 @@ MonoBehaviour:
   _needleSlider: {fileID: 5443366241719607567}
   _hitsProgressSlider: {fileID: 2125179177335497860}
   _targetZoneSlider: {fileID: 5842055981974742498}
+  _zoneHideAfterInputDuration: 0.6
+  _missFreezeNeedleDuration: 0.6
+  _hitProgressAnimDuration: 0.35
+  _overshootStrength: 2
 --- !u!212 &1708458301179174336
 SpriteRenderer:
   serializedVersion: 2
@@ -9012,7 +9016,7 @@ MonoBehaviour:
     m_SelectOnRight: {fileID: 0}
   m_Transition: 1
   m_Colors:
-    m_NormalColor: {r: 1, g: 1, b: 1, a: 1}
+    m_NormalColor: {r: 0.8018868, g: 0.11725702, b: 0.11725702, a: 1}
     m_HighlightedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
     m_PressedColor: {r: 0.78431374, g: 0.78431374, b: 0.78431374, a: 1}
     m_SelectedColor: {r: 0.9607843, g: 0.9607843, b: 0.9607843, a: 1}
@@ -10155,9 +10159,9 @@ MonoBehaviour:
   OnClicked:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 8371773923753360455}
+      - m_Target: {fileID: 1832720707050622246}
         m_TargetAssemblyTypeName: IngredientButtonUI, Assembly-CSharp
-        m_MethodName: AddAlcohol
+        m_MethodName: Invoke
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -10484,7 +10488,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!108 &3538080663233694379
 Light:
   m_ObjectHideFlags: 0
@@ -12874,7 +12878,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 1832720707050622246}
         m_TargetAssemblyTypeName: IngredientButtonUI, Assembly-CSharp
-        m_MethodName: AddAlcohol
+        m_MethodName: Invoke
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -13282,9 +13286,9 @@ MonoBehaviour:
   OnClicked:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 254010648202577503}
+      - m_Target: {fileID: 2383532671741888067}
         m_TargetAssemblyTypeName: IngredientButtonUI, Assembly-CSharp
-        m_MethodName: AddAlcohol
+        m_MethodName: Invoke
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -13441,9 +13445,9 @@ MonoBehaviour:
   OnClicked:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 4265629580960733414}
+      - m_Target: {fileID: 9073333309803274920}
         m_TargetAssemblyTypeName: IngredientButtonUI, Assembly-CSharp
-        m_MethodName: AddMixer
+        m_MethodName: Invoke
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -15056,9 +15060,9 @@ MonoBehaviour:
   OnClicked:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 6053277334475175286}
+      - m_Target: {fileID: 2383532671741888067}
         m_TargetAssemblyTypeName: IngredientButtonUI, Assembly-CSharp
-        m_MethodName: AddAlcohol
+        m_MethodName: Invoke
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -15800,9 +15804,9 @@ MonoBehaviour:
   OnClicked:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 4139080015444221981}
+      - m_Target: {fileID: 1832720707050622246}
         m_TargetAssemblyTypeName: IngredientButtonUI, Assembly-CSharp
-        m_MethodName: AddAlcohol
+        m_MethodName: Invoke
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -16069,7 +16073,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.Image
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.40109497, g: 0.764151, b: 0.3135903, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -16286,9 +16290,9 @@ MonoBehaviour:
   OnClicked:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 6453280554187339630}
+      - m_Target: {fileID: 9073333309803274920}
         m_TargetAssemblyTypeName: IngredientButtonUI, Assembly-CSharp
-        m_MethodName: AddMixer
+        m_MethodName: Invoke
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -16464,9 +16468,9 @@ MonoBehaviour:
   OnClicked:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 8354249119157067105}
+      - m_Target: {fileID: 1832720707050622246}
         m_TargetAssemblyTypeName: IngredientButtonUI, Assembly-CSharp
-        m_MethodName: AddAlcohol
+        m_MethodName: Invoke
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -16814,9 +16818,9 @@ MonoBehaviour:
   OnClicked:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 3486431076059026295}
+      - m_Target: {fileID: 9073333309803274920}
         m_TargetAssemblyTypeName: IngredientButtonUI, Assembly-CSharp
-        m_MethodName: AddMixer
+        m_MethodName: Invoke
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -16882,7 +16886,7 @@ RectTransform:
   m_Father: {fileID: 476612924528594474}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 0, y: 1}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 20, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -17270,9 +17274,9 @@ MonoBehaviour:
   OnClicked:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 5033741230620458839}
+      - m_Target: {fileID: 9073333309803274920}
         m_TargetAssemblyTypeName: IngredientButtonUI, Assembly-CSharp
-        m_MethodName: AddMixer
+        m_MethodName: Invoke
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -17356,7 +17360,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 9073333309803274920}
         m_TargetAssemblyTypeName: IngredientButtonUI, Assembly-CSharp
-        m_MethodName: AddMixer
+        m_MethodName: Invoke
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -17885,9 +17889,9 @@ MonoBehaviour:
   OnClicked:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 446522777619773797}
+      - m_Target: {fileID: 9073333309803274920}
         m_TargetAssemblyTypeName: IngredientButtonUI, Assembly-CSharp
-        m_MethodName: AddMixer
+        m_MethodName: Invoke
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}

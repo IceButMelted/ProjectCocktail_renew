@@ -27,14 +27,11 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
     [Header("Art Works")]
     [SerializeField] protected RectTransform _minigamePanel;
     [SerializeField] protected List<RectTransform> OpenPanel;
-    private int _currentOpenPanelIndex;
     private int openPanelDoneCount = 0;
     [SerializeField] protected RectTransform BackgroundPanelgame;
     [SerializeField] protected List<RectTransform> ArtWorks;
     private int _currentArtIndex;
-    private int artDoneCount = 0;
     [SerializeField] protected RectTransform ButtonPanel;
-    private int _currentButtonIndex;
 
     // ── Slide Phase ────────────────────────────────────────
 
@@ -243,11 +240,13 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
                 SlideFinishCondition.TopEdgeToBottomBound);
 
         CurrentSlidePhase = SlidePhase.None;
+        IsRunning = true; // now that the minigame panel is fully in, we can start processing input
     }
 
     // ── Phase: RemoveMinigame ──────────────────────────────────
     private void SlidePhase_RemoveMinigame()
     {
+        SetState(MiniGameState.Success);
         bool minigameDone = PanelSlider.Slide(ref MinigamePanelSession, _minigamePanel,
                 Direction.Left, SlideFinishCondition.LeftEdgeToLeftBound,
                 _slidePanelSpeed, EasingConfig.EaseInOut(EasingConfigTimer));
@@ -258,7 +257,7 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
             SlideFinishCondition.TopEdgeToBottomBound);
 
         CurrentSlidePhase = SlidePhase.None;
-        SetState(MiniGameState.Success); 
+        
     }
 
     // ── Phase: Closing ─────────────────────────────────────────
@@ -310,7 +309,7 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
 
     public virtual void StartGame()
     {
-        IsRunning = true;
+        //IsRunning = true; >> move to OnProcessing to ensure it happens after slide-in completes
         _context?.ResetCamera();
         CurrentSlidePhase = SlidePhase.InitPanel;
         SetState(MiniGameState.Standby);
@@ -320,7 +319,6 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
     public virtual void ProcessedGame()
     {
         SlidePanelMinigame();
-
 
         if (!IsRunning) return;
         Input.Poll();

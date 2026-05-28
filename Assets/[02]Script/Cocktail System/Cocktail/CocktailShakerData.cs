@@ -1,28 +1,10 @@
-﻿// ============================================================
-//  CocktailShakerData.cs — Cocktail state component.
-//
-//  SOLID — S (Single Responsibility):
-//    Owns only the live shaker state (current cocktail) and
-//    ingredient-addition routing.  No UI, no interaction logic.
-//
-//  SOLID — I (Interface Segregation):
-//    Implements IIngredientReceiver so any ingredient button
-//    only needs that narrow contract — not the full component.
-//
-//  SOLID — D (Dependency Inversion):
-//    All computation is delegated to the stateless DrinkUtility,
-//    keeping this component free of algorithm details.
-//
-//  Runtime cocktail instance:
-//    currentCocktail is created via ScriptableObject.CreateInstance
-//    in Awake so it is a fresh, mutable, in-memory object that
-//    never modifies an asset on disk.
-// ============================================================
-
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using static E_Cocktail;
+
+// Runtime cocktail instance is created via ScriptableObject.CreateInstance in Awake —
+// a fresh in-memory object that never modifies a disk asset.
 
 [System.Serializable] public class AlcoholEvent : UnityEvent<BaseSpirit, int> { }
 [System.Serializable] public class LiqueurEvent : UnityEvent<Liqueur, int> { }
@@ -44,25 +26,20 @@ public class CocktailShakerData : MonoBehaviour, IIngredientReceiver
 
     // ── Runtime State ──────────────────────────────────────
 
-    /// <summary>
-    /// The live drink currently in the shaker.
-    /// Created as a fresh ScriptableObject instance in Awake —
-    /// never a reference to a recipe asset.
-    /// </summary>
+    /// <summary>Live drink in the shaker. Fresh instance, never an asset reference.</summary>
     public S_Drink CurrentCocktail { get; private set; }
 
     // ── Unity Lifecycle ────────────────────────────────────
 
     private void Awake()
     {
-        // Create an in-memory, mutable S_Drink with empty lists.
         CurrentCocktail = ScriptableObject.CreateInstance<S_Drink>();
         ResetCocktailData();
     }
 
     private void OnDestroy()
     {
-        // Prevent memory leaks — runtime instances must be manually destroyed.
+        // Runtime ScriptableObject instances must be explicitly destroyed.
         if (CurrentCocktail != null)
             Destroy(CurrentCocktail);
     }
@@ -77,35 +54,37 @@ public class CocktailShakerData : MonoBehaviour, IIngredientReceiver
     // ── IIngredientReceiver ────────────────────────────────
 
     public void TryToAddAlcohol(BaseSpirit alcohol, int amount = 1)
-        => DrinkUtility.TryToAddAlcohol(CurrentCocktail, alcohol, amount);
+    {
+        DrinkUtility.TryToAddAlcohol(CurrentCocktail, alcohol, amount);
+        
+        OnAddIngredient?.Invoke();
+    }
 
     public void TryToAddLiqueur(Liqueur liqueur, int amount = 1)
-        => DrinkUtility.TryToAddLiqueur(CurrentCocktail, liqueur, amount);
+    {
+        DrinkUtility.TryToAddLiqueur(CurrentCocktail, liqueur, amount);
+        
+        OnAddIngredient?.Invoke();
+    }
 
     public void TryToAddMixer(Mixer mixer, int amount = 1)
-        => DrinkUtility.TryToAddMixer(CurrentCocktail, mixer, amount);
+    {
+        DrinkUtility.TryToAddMixer(CurrentCocktail, mixer, amount);
+        
+        OnAddIngredient?.Invoke();
+    }
 
     // ── Cocktail Identity Update ───────────────────────────
 
-    /// <summary>
-    /// Derives name, price, and strength from the current ingredients
-    /// by comparing against the provided recipe list.
-    /// </summary>
+    /// <summary>Derives name, price, and strength from current ingredients vs recipe list.</summary>
     public void UpdateCocktailInShaker(IReadOnlyList<S_Drink> recipes, Sprite failCocktailSprite)
     {
         DrinkUtility.UpdateTypeOfAlcohol(CurrentCocktail, recipes);
         DrinkUtility.UpdateName(CurrentCocktail, recipes);
         DrinkUtility.UpdatePrice(CurrentCocktail, recipes);
-
-        // Sprite resolution is returned to the caller (CocktailShaker / CocktailSystemManager)
-        // so this component stays free of UI dependencies.
-        // Use GetCurrentSprite() when you need it externally.
     }
 
-    /// <summary>
-    /// Returns the best-matching sprite for the current cocktail,
-    /// or <paramref name="fallback"/> if nothing is close enough.
-    /// </summary>
+    /// <summary>Returns the best-matching sprite, or <paramref name="fallback"/> if none found.</summary>
     public Sprite GetCurrentSprite(IReadOnlyList<S_Drink> recipes, Sprite fallback)
         => DrinkUtility.GetCocktailSprite(CurrentCocktail, recipes) ?? fallback;
 
@@ -114,7 +93,7 @@ public class CocktailShakerData : MonoBehaviour, IIngredientReceiver
     /// <summary>Fires OnResetedCocktail for Inspector-wired listeners.</summary>
     public void ResetShaker() => OnResetedCocktail?.Invoke();
 
-    /// <summary>Clears all cocktail data back to defaults (no UI side-effects).</summary>
+    /// <summary>Clears all cocktail data to defaults. No UI side-effects.</summary>
     public void ResetCocktailData()
     {
         CurrentCocktail.Name = string.Empty;
@@ -131,11 +110,11 @@ public class CocktailShakerData : MonoBehaviour, IIngredientReceiver
 
     // ── Ingredient Button Helpers ──────────────────────────
 
-    /// <summary>Enables ingredient buttons only while under the parts cap.</summary>
+    /// <summary>Disable all ingredient buttons once the 10-part cap is reached.</summary>
     public void CanIngredientActive()
         => SetIngredientActive(DrinkUtility.GetTotalIngredient(CurrentCocktail) < 10);
 
-    /// <summary>Activates or deactivates every ingredient button uniformly.</summary>
+    /// <summary>Enable or disable every ingredient button uniformly.</summary>
     public void SetIngredientActive(bool active)
     {
         foreach (var btn in ingredientButtons)
