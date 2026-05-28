@@ -7927,7 +7927,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3023370869331208435, guid: 74dc30c4f63e65b4cafd605906b67635, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.30100012
+      value: -0.8800001
       objectReference: {fileID: 0}
     - target: {fileID: 3023370869331208435, guid: 74dc30c4f63e65b4cafd605906b67635, type: 3}
       propertyPath: m_LocalPosition.y
@@ -8803,6 +8803,30 @@ MonoBehaviour:
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+      - m_Target: {fileID: 1907703764714398618}
+        m_TargetAssemblyTypeName: CocktailShaker, Assembly-CSharp
+        m_MethodName: set_Interactable
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: ResultCam
+          m_BoolArgument: 1
+        m_CallState: 2
+      - m_Target: {fileID: 5929196172070313435}
+        m_TargetAssemblyTypeName: CocktailSystemManager, Assembly-CSharp
+        m_MethodName: UpdateCocktailInShaker
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: ResultCam
           m_BoolArgument: 1
         m_CallState: 2
       - m_Target: {fileID: 1496199013}
