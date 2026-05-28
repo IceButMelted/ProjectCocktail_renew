@@ -317,7 +317,9 @@ title: ShowcaseMain
 
 // ── [SHOWCASE: Order_Cocktail_OutName + wait_for_task] ───
 <<SetLookDirection NPC_Name.Owen LookDirection.Forward>>
-Owen: Right, since we're here — I'll have {Order_Cocktail_OutName(NPC_Name.Owen)}, please.
+Owen: This is [b]my line[/b] with [b][i]some[/i] markup within[/b] of it.
+Owen: this is [s]stringk[/s] 
+Owen: Right, since we're here — I'll have  [oreder]{Order_Cocktail_OutName(NPC_Name.Owen)}[/oreder], please.
 
 <<Reset_Camera CamController>>
 <<Switch_Camera CamController "MainCam">>
