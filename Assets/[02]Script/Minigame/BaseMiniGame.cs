@@ -2,6 +2,7 @@ using System;
 using UnityEngine;
 using System.Collections.Generic;
 using static E_Cocktail;
+using System.Linq;
 
 public abstract class BaseMiniGame : MonoBehaviour, IMinigame
 {
@@ -10,7 +11,7 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
     [field: SerializeField]
     public SO_MinigameSetting Setting { get; set; }
 
-    [SerializeField] protected RectTransform _minigamePanel;
+    
 
     [Header("Slide Settings")]
     [SerializeField] private float _slidePanelSpeed = 800f;
@@ -24,17 +25,22 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
     [SerializeField] protected float EasingConfigTimer = 1.2f;
 
     [Header("Art Works")]
-    [SerializeField] protected RectTransform BackgroundMinigame;
+    [SerializeField] protected RectTransform _minigamePanel;
+    [SerializeField] protected List<RectTransform> OpenPanel;
+    private int _currentOpenPanelIndex;
+    private int openPanelDoneCount = 0;
+    [SerializeField] protected RectTransform BackgroundPanelgame;
     [SerializeField] protected List<RectTransform> ArtWorks;
     private int _currentArtIndex;
-    [SerializeField] protected List<RectTransform> ArtButton;
+    private int artDoneCount = 0;
+    [SerializeField] protected RectTransform ButtonPanel;
     private int _currentButtonIndex;
 
     // ── Slide Phase ────────────────────────────────────────
 
-    protected enum SlidePhase { None, BackgroundEntering, ArtEntering, MinigameEntering, MinigameExiting, ArtBTNEntering, ClosingToResult }
+    protected enum SlidePhase { None, InitPanel, InitBackground, InitArt, InitMinigame, RemoveMinigame, Closing }
     protected SlidePhase CurrentSlidePhase = SlidePhase.None;
-    public void ClosePanel() => CurrentSlidePhase = SlidePhase.ClosingToResult;
+    public void ClosePanel() => CurrentSlidePhase = SlidePhase.Closing;
 
     // Store initial panel position for reset after slide-out.
     protected RectTransform InitPanelRectTransform;
@@ -42,10 +48,17 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
     // ── Slide Sessions (one per independently-animated panel) ─
 
     /// <summary>Session for the main minigame panel.</summary>
-    protected SlideSession PanelSession;
-    private SlideSession BackgroundSession;
+    protected SlideSession[] OpenPanelSession;
+    protected SlideSession MinigamePanelSession;
+    protected SlideSession BackgroundSession;
     protected SlideSession[] ArtWorkSessions;
-    protected SlideSession[] ArtButtonSessions;
+    protected SlideSession ButtonPanelSessions;
+
+    private bool _backgroundSnapped = false;
+    private bool _closingSnapApplied = false;
+
+
+
 
     // ── State Machine ──────────────────────────────────────
 
@@ -79,7 +92,7 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
 
         // Pre-allocate session arrays to match list sizes.
         ArtWorkSessions = new SlideSession[ArtWorks?.Count ?? 0];
-        ArtButtonSessions = new SlideSession[ArtButton?.Count ?? 0];
+        OpenPanelSession = new SlideSession[OpenPanel?.Count ?? 0];
     }
 
     // ── Initialization ─────────────────────────────────────
@@ -147,123 +160,150 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
     // ── Slide Panel ────────────────────────────────────────
 
     /// <summary>
-    /// Sequences the slide-in and slide-out animations based on the current SlidePhase.
-    /// start with BackgroundEntering to slide in the background, then ArtEntering for the artwork,
-    /// MinigameEntering for the minigame panel, MinigameExiting to slide out the minigame panel,
-    /// and ClosingToResult to slide down and reset the panel position.
+    /// Routes each frame to the correct phase handler.
+    /// Each handler is self-contained: reads state, mutates only what it owns,
+    /// and advances CurrentSlidePhase when its work is done.
     /// </summary>
     protected virtual void SlidePanelMinigame()
     {
         switch (CurrentSlidePhase)
         {
-            case SlidePhase.BackgroundEntering:
-                Debug.Log("Sliding in background...");
-                if (!PanelSlider.Slide(ref BackgroundSession, BackgroundMinigame,
-                        Direction.Up, SlideFinishCondition.BottomEdgeToBottomBound,
-                        _slidePanelSpeed, EasingConfig.EaseOut(EasingConfigTimer / 2))) return;
-                CurrentSlidePhase = SlidePhase.ArtEntering;
-                break;
-
-            case SlidePhase.ArtEntering:
-                Debug.Log($"Sliding in art");
-                if (!PanelSlider.Slide(ref ArtWorkSessions[_currentArtIndex], ArtWorks[_currentArtIndex],
-                        Direction.Up, SlideFinishCondition.BottomEdgeToBottomBound,
-                        _slidePanelSpeed, EasingConfig.EaseInOut(EasingConfigTimer / 2))) return;
-
-                _currentArtIndex++;
-
-                if (_currentArtIndex < ArtWorks.Count) return; // wait for next frame to slide next art
-
-                _currentArtIndex = 0; // reset for next time
-                CurrentSlidePhase = SlidePhase.MinigameEntering;
-                break;
-
-            // ── MinigameEntering: slide in from below ─────────────
-            case SlidePhase.MinigameEntering:
-                Debug.Log("Sliding in minigame panel...");
-                if (!PanelSlider.Slide(ref PanelSession, _minigamePanel,
-                        Direction.Up, SlideFinishCondition.BottomEdgeToBottomBound,
-                        _slidePanelSpeed, EasingConfig.EaseInOut(EasingConfigTimer))) return;
-                CurrentSlidePhase = SlidePhase.None;
-                break;
-
-            // ── MinigameExiting: slide left, then fire Success ─────
-            case SlidePhase.MinigameExiting:
-                Debug.Log("Sliding out minigame panel...");
-
-                bool minigameDone = PanelSlider.Slide(ref PanelSession, _minigamePanel,
-                        Direction.Left, SlideFinishCondition.LeftEdgeToLeftBound,
-                        _slidePanelSpeed, EasingConfig.EaseInOut(EasingConfigTimer));
-                if (!minigameDone) return;
-
-                CurrentSlidePhase = SlidePhase.ArtBTNEntering;
-                SetState(MiniGameState.Success);
-                break;
-
-
-             case SlidePhase.ArtBTNEntering:
-                Debug.Log($"Sliding in art buttons");
-
-                if (!PanelSlider.Slide(ref ArtButtonSessions[_currentButtonIndex], ArtButton[_currentButtonIndex],
-                        Direction.Up, SlideFinishCondition.BottomEdgeToBottomBound,
-                        _slidePanelSpeed, EasingConfig.EaseInOut(EasingConfigTimer / 2))) return;
-
-                _currentButtonIndex++;
-                if (_currentButtonIndex < ArtButton.Count) return; // wait for next frame to slide next button
-
-                _currentButtonIndex = 0; // reset for next time
-
-                CurrentSlidePhase = SlidePhase.None;
-
-                //SetState(MiniGameState.Success);
-                break;
-
-            // ── ClosingToResult: slide down, then reset position ───
-            case SlidePhase.ClosingToResult:
-                Debug.Log("Closing panel...");
-                bool panelDone = PanelSlider.Slide(ref PanelSession, _minigamePanel,
-                        Direction.Down, SlideFinishCondition.TopEdgeToBottomBound,
-                        _slidePanelSpeed, EasingConfig.EaseIn(EasingConfigTimer / 2));
-
-                bool backgroundDone = PanelSlider.Slide(ref BackgroundSession, BackgroundMinigame,
-                        Direction.Down, SlideFinishCondition.TopEdgeToBottomBound,
-                        _slidePanelSpeed, EasingConfig.EaseIn(EasingConfigTimer / 2));
-
-                int artDoneCount = 0;
-                for (int i = 0; i < ArtWorks.Count; i++)
-                {
-                    bool done = PanelSlider.Slide(
-                        ref ArtWorkSessions[i], ArtWorks[i],
-                        Direction.Down, SlideFinishCondition.TopEdgeToBottomBound,
-                        _slidePanelSpeed, EasingConfig.EaseIn(EasingConfigTimer / 2));
-                    if (done) artDoneCount++;
-                }
-
-                int btnDoneCount = 0;
-                for (int i = 0; i < ArtButton.Count; i++)
-                {
-                    bool done = PanelSlider.Slide(
-                        ref ArtButtonSessions[i], ArtButton[i],
-                        Direction.Down, SlideFinishCondition.TopEdgeToBottomBound,
-                        _slidePanelSpeed, EasingConfig.EaseIn(EasingConfigTimer / 2));
-                    if (done) btnDoneCount++;
-                }
-
-                if (!panelDone || !backgroundDone) return;
-                if (artDoneCount < ArtWorks.Count) return;
-                if (btnDoneCount < ArtButton.Count) return;
-
-
-                CurrentSlidePhase = SlidePhase.None;
-                
-                _minigamePanel.anchoredPosition = InitPanelRectTransform.anchoredPosition;
-                break;
-
+            case SlidePhase.InitPanel: SlidePhase_InitPanel(); break;
+            case SlidePhase.InitArt: SlidePhase_InitArt(); break;
+            case SlidePhase.InitMinigame: SlidePhase_InitMinigame(); break;
+            case SlidePhase.RemoveMinigame: SlidePhase_RemoveMinigame(); break;
+            case SlidePhase.Closing: SlidePhase_Closing(); break;
             case SlidePhase.None:
-                break;
             default:
                 break;
         }
+    }
+
+    // ── Phase: InitPanel ───────────────────────────────────────
+    private void SlidePhase_InitPanel()
+    {
+        int count = OpenPanel.Count;
+        int doneCount = 0;
+        var easing = EasingConfig.EaseIn(EasingConfigTimer); 
+
+        for (int i = 0; i < count; i++)
+        {
+            if (PanelSlider.Slide(ref OpenPanelSession[i], OpenPanel[i],
+                    Direction.Up, SlideFinishCondition.BottomEdgeToTopBound,
+                    _slidePanelSpeed, easing))
+                doneCount++;
+        }
+
+        // One-shot background snap — avoid calling SnapTo every frame
+        if (!_backgroundSnapped &&
+            PanelSlider.Progress(OpenPanelSession[count - 1], OpenPanel[count - 1]) > 0.5f)
+        {
+            PanelSlider.SnapTo(ref BackgroundSession, BackgroundPanelgame,
+                SlideFinishCondition.BottomEdgeToBottomBound);
+            _backgroundSnapped = true;
+        }
+
+        if (doneCount < count) return;
+
+        _backgroundSnapped = false; // reset for next run
+        openPanelDoneCount = 0;
+        CurrentSlidePhase = SlidePhase.InitArt;
+    }
+
+    // ── Phase: InitArt ─────────────────────────────────────────
+    private void SlidePhase_InitArt()
+    {
+        if (!PanelSlider.Slide(ref ArtWorkSessions[_currentArtIndex], ArtWorks[_currentArtIndex],
+                Direction.Up, SlideFinishCondition.BottomEdgeToBottomBound,
+                _slidePanelSpeed, EasingConfig.EaseInOut(EasingConfigTimer / 2)))
+            return; // current artwork still animating
+
+        _currentArtIndex++;
+
+        if (_currentArtIndex < ArtWorks.Count) return; // wait for next frame
+
+        _currentArtIndex = 0; // reset for next run
+        CurrentSlidePhase = SlidePhase.InitMinigame;
+    }
+
+    // ── Phase: InitMinigame ────────────────────────────────────
+    private void SlidePhase_InitMinigame()
+    {
+        if (!PanelSlider.Slide(ref MinigamePanelSession, _minigamePanel,
+                Direction.Up, SlideFinishCondition.BottomEdgeToBottomBound,
+                _slidePanelSpeed, EasingConfig.EaseInOut(EasingConfigTimer)))
+            return;
+
+        PanelSlider.SnapTo(ref ButtonPanelSessions, ButtonPanel,
+            SlideFinishCondition.BottomEdgeToBottomBound);
+
+        int count = OpenPanel.Count;
+        for (int i = 0; i < count; i++)
+            PanelSlider.SnapTo(ref OpenPanelSession[i], OpenPanel[i],
+                SlideFinishCondition.TopEdgeToBottomBound);
+
+        CurrentSlidePhase = SlidePhase.None;
+    }
+
+    // ── Phase: RemoveMinigame ──────────────────────────────────
+    private void SlidePhase_RemoveMinigame()
+    {
+        bool minigameDone = PanelSlider.Slide(ref MinigamePanelSession, _minigamePanel,
+                Direction.Left, SlideFinishCondition.LeftEdgeToLeftBound,
+                _slidePanelSpeed, EasingConfig.EaseInOut(EasingConfigTimer));
+
+        if (!minigameDone) return; // wait for animation
+
+        PanelSlider.SnapTo(ref BackgroundSession, BackgroundPanelgame,
+            SlideFinishCondition.TopEdgeToBottomBound);
+
+        CurrentSlidePhase = SlidePhase.None;
+        SetState(MiniGameState.Success); 
+    }
+
+    // ── Phase: Closing ─────────────────────────────────────────
+    private void SlidePhase_Closing()
+    {
+        // One-shot: remove artworks before the slide-out begins
+        if (!_closingSnapApplied)
+        {
+            int artCount = ArtWorks.Count;
+            for (int i = 0; i < artCount; i++)
+                PanelSlider.SnapTo(ref ArtWorkSessions[i], ArtWorks[i],
+                    SlideFinishCondition.TopEdgeToBottomBound);
+
+            _closingSnapApplied = true;
+        }
+
+        var closingEase = EasingConfig.EaseIn(EasingConfigTimer / 2); // cache — used twice
+
+        bool minigameDone = PanelSlider.Slide(ref MinigamePanelSession, _minigamePanel,
+                Direction.Left, SlideFinishCondition.RightEdgeToLeftBound,
+                _slidePanelSpeed, closingEase);
+
+        bool buttonDone = PanelSlider.Slide(ref ButtonPanelSessions, ButtonPanel,
+                Direction.Left, SlideFinishCondition.RightEdgeToLeftBound,
+                _slidePanelSpeed, closingEase);
+
+        if (!minigameDone || !buttonDone) return; // wait for both
+
+        // Reset vertical position (off-screen above)
+        PanelSlider.SnapTo(ref MinigamePanelSession, _minigamePanel,
+            SlideFinishCondition.TopEdgeToBottomBound);
+        PanelSlider.SnapTo(ref ButtonPanelSessions, ButtonPanel,
+            SlideFinishCondition.TopEdgeToBottomBound);
+
+        // Restore horizontal position so panels are ready for next run
+        PanelSlider.SnapTo(ref MinigamePanelSession, _minigamePanel,
+            SlideFinishCondition.RightEdgeToRightBound);
+        PanelSlider.SnapTo(ref ButtonPanelSessions, ButtonPanel,
+            SlideFinishCondition.RightEdgeToRightBound);
+
+        // Full position restore from Inspector snapshot
+        _minigamePanel.anchoredPosition = InitPanelRectTransform.anchoredPosition;
+
+        _closingSnapApplied = false;
+        CurrentSlidePhase = SlidePhase.None;
     }
 
     // ── IMinigame ──────────────────────────────────────────
@@ -272,7 +312,7 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
     {
         IsRunning = true;
         _context?.ResetCamera();
-        CurrentSlidePhase = SlidePhase.BackgroundEntering;
+        CurrentSlidePhase = SlidePhase.InitPanel;
         SetState(MiniGameState.Standby);
         SetState(MiniGameState.Processing);
     }

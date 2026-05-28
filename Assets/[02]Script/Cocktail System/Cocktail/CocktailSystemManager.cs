@@ -59,9 +59,9 @@ public class CocktailSystemManager : MonoBehaviour
 
     private void Awake()
     {
-        _characterData = FindAnyObjectByType<CharacterData>();
+        _characterData = GetComponent<CharacterData>();
         if (_characterData == null)
-            Debug.LogError("[CocktailSystemManager] CharacterData not found in scene.");
+            Debug.LogError("[CocktailSystemManager] CharacterData not found in Component.");
 
         // Depend on the interface, not the concrete type.
         _normalRepository = _normalCocktailRepository;
@@ -146,8 +146,8 @@ public class CocktailSystemManager : MonoBehaviour
     public static string RandomOrderCocktail_OutName(int NPC)
     {
         var csm = FindAnyObjectByType<CocktailSystemManager>();
-        var data = FindAnyObjectByType<CharacterData>();
-        return csm.ResolveOrderCocktail(NPC, data, out var drink) ? drink.Name : string.Empty;
+        //var data = FindAnyObjectByType<CharacterData>();
+        return csm.ResolveOrderCocktail(NPC, out var drink) ? drink.Name : string.Empty;
     }
 
     /// <summary>Returns the description of a random cocktail suited to the given NPC.</summary>
@@ -155,15 +155,15 @@ public class CocktailSystemManager : MonoBehaviour
     public static string RandomOrderCocktail_OutDescription(int NPC)
     {
         var csm = FindAnyObjectByType<CocktailSystemManager>();
-        var data = FindAnyObjectByType<CharacterData>();
-        return csm.ResolveOrderCocktail(NPC, data, out var drink) ? drink.Description : string.Empty;
+        //var data = FindAnyObjectByType<CharacterData>();
+        return csm.ResolveOrderCocktail(NPC, out var drink) ? drink.Description : string.Empty;
     }
 
     /// <summary>
     /// Shared helper used by both Yarn functions above.
     /// Picks a cocktail for the NPC and returns it via <paramref name="drink"/>.
     /// </summary>
-    private bool ResolveOrderCocktail(int NPC, CharacterData data, out S_Drink drink)
+    private bool ResolveOrderCocktail(int NPC, out S_Drink drink)
     {
         drink = default;
         var defaultOptions = new List<TypeOfCocktail>
@@ -171,8 +171,8 @@ public class CocktailSystemManager : MonoBehaviour
 
         NPC_Name npcName = (NPC_Name)NPC;
 
-        if (data == null
-            || !data.NPC_Favorite_Drink.TryGetValue(npcName, out List<TypeOfCocktail> cocktailOptions)
+        if (_characterData == null
+            || !_characterData.NPC_Favorite_Drink.TryGetValue(npcName, out List<TypeOfCocktail> cocktailOptions)
             || cocktailOptions.Count == 0)
         {
             Debug.LogWarning($"[CocktailSystemManager] No favorites for {npcName}, using defaults.");

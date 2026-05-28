@@ -110,7 +110,7 @@ public class MixingMinigame : BaseMiniGame
 
         // ── Win condition ─────────────────────────────────
         if (Hits >= _cfg.RequiredHits)
-            CurrentSlidePhase = SlidePhase.MinigameExiting;
+            CurrentSlidePhase = SlidePhase.RemoveMinigame;
 
         UpdateUI();
     }
@@ -151,7 +151,7 @@ public class MixingMinigame : BaseMiniGame
         RandomizeZonePosition();
 
         // Slide in only when starting fresh, not when replaying mid-session.
-        CurrentSlidePhase = IsRunning ? SlidePhase.None : SlidePhase.ClosingToResult;
+        CurrentSlidePhase = IsRunning ? SlidePhase.None : SlidePhase.Closing;
 
         Debug.Log("[MixingMinigame] Reset");
         base.ResetGame();

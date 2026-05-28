@@ -1,16 +1,3 @@
-// ============================================================
-//  CocktailShaker.cs — Interaction + UI shell for the shaker.
-//
-//  SOLID — S (Single Responsibility):
-//    Owns interaction guarding (CanClick) and UI state only.
-//    All cocktail data and ingredient logic live in the sibling
-//    CocktailShakerData component.
-//
-//  SOLID — D (Dependency Inversion):
-//    UpdateCocktailInShaker accepts IDrinkRepository so this
-//    component never couples to SO_CocktailList directly.
-// ============================================================
-
 using System.Collections.Generic;
 using UnityEngine;
 using static E_Cocktail;

@@ -107,6 +107,93 @@ public static class PanelSlider
         while (!Tick(ref session, panel, speed)) yield return null;
     }
 
+    /// <summary>
+    /// Instantly snaps the panel to the position defined by <paramref name="condition"/>
+    /// without requiring a <see cref="Direction"/>. The condition name already encodes
+    /// which edge moves where (e.g. <c>LeftEdgeToCenter</c>, <c>TopEdgeToTopBound</c>).
+    /// <para>
+    /// <b>Not supported:</b> <see cref="SlideFinishCondition.FullyIn"/> and
+    /// <see cref="SlideFinishCondition.FullyOut"/> are inherently directional —
+    /// use <see cref="SnapTo(RectTransform, Direction, SlideFinishCondition)"/> for those.
+    /// </para>
+    /// </summary>
+    public static void SnapTo(RectTransform panel, SlideFinishCondition condition)
+    {
+        if (condition is SlideFinishCondition.FullyIn or SlideFinishCondition.FullyOut)
+        {
+            Debug.LogError($"[PanelSlider] SnapTo({condition}) requires a Direction — " +
+                           "FullyIn/FullyOut are ambiguous without one. " +
+                           "Use SnapTo(panel, dir, condition) instead.");
+            return;
+        }
+
+        if (!TryGetRects(panel, out Rect panelRect, out Rect screen))
+            return;
+
+        panel.anchoredPosition = SnapTarget(condition, panelRect, screen, panel.anchoredPosition);
+    }
+
+    /// <inheritdoc cref="SnapTo(RectTransform, SlideFinishCondition)"/>
+    /// <param name="session">In-flight session to reset alongside the snap.</param>
+    public static void SnapTo(ref SlideSession session,
+                               RectTransform panel, SlideFinishCondition condition)
+    {
+        SnapTo(panel, condition);
+        session = default;
+    }
+
+    // ═══════════════════════════════════════════════════════
+    //  Progress Queries
+    // ═══════════════════════════════════════════════════════
+
+    /// <summary>
+    /// Returns how far the slide has progressed as a 0–1 value.
+    /// <para>• Eased sessions  → based on <see cref="SlideSession.Elapsed"/> / Duration.</para>
+    /// <para>• Linear sessions → based on distance travelled vs total distance.</para>
+    /// <para>Returns 1 when the session is inactive (already finished or never started).</para>
+    /// </summary>
+    public static float Progress(in SlideSession session, RectTransform panel)
+    {
+        if (!session.Active) return 1f;
+
+        if (session.Easing != null)
+        {
+            // Eased: time-based progress (pre-easing curve)
+            return Mathf.Clamp01(session.Elapsed / session.Easing.Duration);
+        }
+
+        // Linear: spatial progress along the dominant axis
+        float total = Vector2.Distance(session.Start, session.End);
+        if (total < Mathf.Epsilon) return 1f;
+
+        float travelled = Vector2.Distance(session.Start, panel.anchoredPosition);
+        return Mathf.Clamp01(travelled / total);
+    }
+
+    /// <summary>
+    /// Returns seconds remaining in the slide.
+    /// <para>• Eased sessions  → exact: <c>Duration - Elapsed</c>.</para>
+    /// <para>• Linear sessions → estimated from current speed (<paramref name="speed"/> required).</para>
+    /// <para>Returns 0 when the session is inactive.</para>
+    /// </summary>
+    public static float TimeRemaining(in SlideSession session, RectTransform panel, float speed = 0f)
+    {
+        if (!session.Active) return 0f;
+
+        if (session.Easing != null)
+            return Mathf.Max(0f, session.Easing.Duration - session.Elapsed);
+
+        // Linear: distance left / speed
+        if (speed <= 0f)
+        {
+            Debug.LogWarning("[PanelSlider] TimeRemaining for a linear session requires speed > 0.");
+            return 0f;
+        }
+
+        float remaining = Vector2.Distance(panel.anchoredPosition, session.End);
+        return remaining / speed;
+    }
+
     // ═══════════════════════════════════════════════════════
     //  Session
     // ═══════════════════════════════════════════════════════

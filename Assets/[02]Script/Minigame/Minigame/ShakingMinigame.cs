@@ -102,7 +102,7 @@ public class ShakingMinigame : BaseMiniGame
 
         // ── Win condition ─────────────────────────────────
         if (TimeInZone >= _cfg.Duration)
-            CurrentSlidePhase = SlidePhase.MinigameExiting;
+            CurrentSlidePhase = SlidePhase.RemoveMinigame;
 
         UpdateUI();
     }
@@ -137,7 +137,7 @@ public class ShakingMinigame : BaseMiniGame
         TimeInZone = 0f;
 
         // Slide in only when starting fresh, not when replaying mid-session.
-        CurrentSlidePhase = IsRunning ? SlidePhase.None : SlidePhase.MinigameEntering;
+        CurrentSlidePhase = IsRunning ? SlidePhase.None : SlidePhase.InitMinigame;
 
         Debug.Log("[ShakingMinigame] Reset");
         base.ResetGame();
