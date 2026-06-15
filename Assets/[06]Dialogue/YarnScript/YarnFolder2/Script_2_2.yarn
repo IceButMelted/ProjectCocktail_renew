@@ -69,9 +69,9 @@ title: TestLoopPart
 <<Switch_Camera CamController "CenterCam">>
 <<SetEmotion NPC_Name.Owen "happy">>
 <<SetLookDirection NPC_Name.Owen LookDirection.Right>>
-<<wait 0.6>>
+<<wait 1>>
 <<SetLookDirection NPC_Name.Owen LookDirection.Left>>
-<<wait 0.6>>
+<<wait 1>>
 <<SetLookDirection NPC_Name.Owen LookDirection.Forward>>
 Owen: Hey! You must be the new bartender everyone's been talking about.
 Owen: Place looks good. Someone's been busy.
@@ -92,6 +92,10 @@ Owen: Place looks good. Someone's been busy.
 
 // ── Owen's Order ──────────────────────────────────────────
 Owen: Anyway — could you make me something? I'm thinking {Order_Cocktail_OutName(NPC_Name.Owen)}.
+<<wait 5>>
+Owen: Anyway — could you make me something? I'm thinking {Order_Cocktail_OutDescription(NPC_Name.Owen)}.
+<<wait 5>>
+
 
 <<Reset_Camera CamController>>
 <<Switch_Camera CamController "MainCam">>
@@ -223,6 +227,7 @@ Walter: I'm after {Order_Cocktail_OutDescription(NPC_Name.Walter)}.
 // ── Wrap Up ───────────────────────────────────────────────
 <<SetEmotion NPC_Name.Walter "neutral">>
 <<SetEmotion NPC_Name.Owen "neutral">>
+<<SetLookDirection NPC_Name.Isla>>
 <<Reset_Variable SystemGame>>
 
 Walter: You know, I used to come to this place years ago. Before your time.
@@ -292,6 +297,10 @@ title: ShowcaseMain
 <<Switch_Camera CamController "NearLeftCam">>
 <<SetEmotion NPC_Name.Isla "happy">>
 <<SetLookDirection NPC_Name.Isla LookDirection.Right>>
+<<SetLookDirection NPC_Name.Isla LookDirection.Left>>
+<<SetLookDirection NPC_Name.Isla LookDirection.Forward>>
+<<SetLookDirection NPC_Name.Isla LookDirection.Left>>
+
 // Isla: Oh! Owen! Didn't know you'd be here tonight.
 // <<SetLookDirection NPC_Name.Owen LookDirection.Left>>
 // Owen: Isla! Small world.
@@ -319,7 +328,7 @@ title: ShowcaseMain
 <<SetLookDirection NPC_Name.Owen LookDirection.Forward>>
 Owen: This is [b]my line[/b] with [b][i]some[/i] markup within[/b] of it.
 Owen: this is [s]stringk[/s] 
-Owen: Right, since we're here — I'll have  [oreder]{Order_Cocktail_OutName(NPC_Name.Owen)}[/oreder], please.
+Owen: Right, since we're here — I'll have  [oreder]{Order_Cocktail_ByName_OutName("John Collins")}[/oreder], please.
 
 <<Reset_Camera CamController>>
 <<Switch_Camera CamController "MainCam">>
