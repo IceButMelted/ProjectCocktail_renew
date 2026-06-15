@@ -19,7 +19,7 @@ public class YarnVariableDebugger : MonoBehaviour
     [Tooltip("Variables to watch — include the $ prefix, e.g. $player_health")]
     [SerializeField] private List<string> watchedVariables = new();
 
-    // ─────────────────────────────────────────────
+    // ---------------------------------------
     private VariableStorageBehaviour _storage;
     private Yarn.Program _program;   // cached via reflection
 
@@ -54,16 +54,16 @@ public class YarnVariableDebugger : MonoBehaviour
             Debug.LogWarning("[YarnDebugger] ⚠️ Could not cache Yarn Program via reflection.");
     }
 
-    // ─────────────────────────────────────────────
+    // ---------------------------------------
     private void Update()
     {
         if (Input.GetKeyDown(dumpAllKey)) DumpAllVariables();
         if (Input.GetKeyDown(watchedKey)) LogWatchedVariables();
     }
 
-    // ─────────────────────────────────────────────
+    // ---------------------------------------
     // PUBLIC API
-    // ─────────────────────────────────────────────
+    //  ---------------------------------------
 
     public void DumpAllVariables()
     {
@@ -84,7 +84,7 @@ public class YarnVariableDebugger : MonoBehaviour
         sb.AppendLine("╚══════════════════════════════════════╝");
 
         if (keys.Count == 0)
-        {
+        { 
             sb.AppendLine("  (no <<declare>> statements found in .yarn files)");
         }
         else
@@ -131,9 +131,33 @@ public class YarnVariableDebugger : MonoBehaviour
     public bool TryGetBool(string n, out bool v) => _storage.TryGetValue(n, out v);
     public bool TryGetString(string n, out string v) => _storage.TryGetValue(n, out v);
 
-    // ─────────────────────────────────────────────
+    /// ---------------------------------------
+    /// CONTEXTMENU
+    /// ---------------------------------------
+    [ContextMenu("Change Variable In Yarn Manual")]
+    public void ChangeVariableinYarnManual() { 
+        dialogueRunner.VariableStorage.SetValue("$player_name", "Monster"); 
+        dialogueRunner.VariableStorage.SetValue("$quest_stage", 123f);
+
+    }
+    
+    [ContextMenu("Debug Variable Type")]
+    public void DebugVariableType() {
+        
+        string varName = "$quest_stage";
+
+        if (_program != null &&
+            _program.InitialValues.TryGetValue(varName, out var operand))
+        { 
+        
+            Debug.Log($"Variable '{varName}' declared as: {operand.ValueCase}");
+            Debug.Log(operand.GetType());
+        }
+    }
+
+    // ---------------------------------------
     // HELPERS
-    // ─────────────────────────────────────────────
+    // ---------------------------------------
 
     /// <summary>
     /// Uses Operand.ValueCase to pick the EXACT type before calling TryGetValue.

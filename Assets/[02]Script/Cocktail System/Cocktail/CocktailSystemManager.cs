@@ -147,6 +147,7 @@ public class CocktailSystemManager : MonoBehaviour
     {
         var csm = FindAnyObjectByType<CocktailSystemManager>();
         //var data = FindAnyObjectByType<CharacterData>();
+        
         return csm.ResolveOrderCocktail(NPC, out var drink) ? drink.Name : string.Empty;
     }
 

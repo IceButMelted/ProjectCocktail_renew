@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 
-// ── SoundEntry — 1 รายการเสียง ────────────────────────
+// ── SoundEntry — 1 sound entry ────────────────────────────────────────────────
 [Serializable]
 public class SoundEntry
 {
@@ -10,31 +10,38 @@ public class SoundEntry
     public AudioClip clip;
 
     [Range(0f, 1f)]
-    public float volume = 1f;  // volume เฉพาะของ clip นี้
+    public float volume = 1f;   // Per-clip volume (multiplied with channel + master)
 }
 
-// ── SoundData — ScriptableObject ─────────────────────
-// Create → Sound → SoundData แล้วลาก clip ใน Inspector
-[CreateAssetMenu(fileName = "SoundData",
-                 menuName = "Sound/SoundData")]
+// ── SoundData — ScriptableObject ─────────────────────────────────────────────
+// Create → Sound → SoundData  then drag clips in Inspector
+[CreateAssetMenu(fileName = "SoundData", menuName = "Sound/SoundData")]
 public class SoundData : ScriptableObject
 {
-    [Header("Ambient (loop)")]
+    [Header("Ambient  (loop)")]
     public List<SoundEntry> ambients = new();
 
-    [Header("BGM (loop)")]
+    [Header("BGM  (loop)")]
     public List<SoundEntry> bgms = new();
 
-    [Header("Effect (one-shot)")]
+    [Header("SFX  (one-shot / loop)")]
     public List<SoundEntry> effects = new();
 
-    // ── Editor helper: ตรวจ id ซ้ำ ──────────────────────
+    [Header("UI SFX  (one-shot)")]
+    public List<SoundEntry> uiSfx = new();
+
+    [Header("Voice  (one-shot)")]
+    public List<SoundEntry> voices = new();
+
+    // ── Editor: warn on duplicate ids ────────────────────────────────────────
 #if UNITY_EDITOR
     void OnValidate()
     {
         CheckDuplicates(ambients, "Ambient");
         CheckDuplicates(bgms, "BGM");
-        CheckDuplicates(effects, "Effect");
+        CheckDuplicates(effects, "SFX");
+        CheckDuplicates(uiSfx, "UiSFX");
+        CheckDuplicates(voices, "Voice");
     }
 
     void CheckDuplicates(List<SoundEntry> list, string label)

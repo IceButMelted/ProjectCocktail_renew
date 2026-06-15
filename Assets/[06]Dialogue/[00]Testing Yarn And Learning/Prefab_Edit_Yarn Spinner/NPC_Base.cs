@@ -3,7 +3,7 @@ using UnityEngine;
 using Yarn.Unity;
 using static E_Cocktail;
 
-public class Test_NPCGetIn : MonoBehaviour
+public class NPC_Base : MonoBehaviour
 {
     [Header("Sprite Emotional")]
     public SpriteRenderer SpriteRenderer;
@@ -17,6 +17,8 @@ public class Test_NPCGetIn : MonoBehaviour
     [SerializeField] private Sprite _lookForwardSprite;
 
     public NPC_Name Name;
+    private Direction _currentLookDirection;
+    
 
     [Header("Waypoints")]
     [SerializeField] private Transform[] _waypoints;
@@ -27,6 +29,9 @@ public class Test_NPCGetIn : MonoBehaviour
     private bool _isMoving = false;
     private bool _arrived = false;
     private int _currentIndex = -1;
+
+    public int CurrentWaypointIndex { get => _currentIndex; set => _currentIndex = value; }
+    public Direction CurrentLookDirection { get => _currentLookDirection; set => _currentLookDirection = value; }
 
     private void Start()
     {
@@ -62,14 +67,14 @@ public class Test_NPCGetIn : MonoBehaviour
     [YarnCommand("SetEmotion")]
     public static void SetEmotion(string npcNameStr, string emotion)
     {
-        Test_NPCGetIn npc = FindNPC(npcNameStr);
+        NPC_Base npc = FindNPC(npcNameStr);
         if (npc == null) return;
         npc.DoSetEmotion(emotion);
     }
     [YarnCommand("SetLookDirection")]
     public static void SetLookDirection(string npcNameStr, string direction)
     {
-        Test_NPCGetIn npc = FindNPC(npcNameStr);
+        NPC_Base npc = FindNPC(npcNameStr);
         if (npc == null) return;
         Debug.Log($"{npc.name} now looking {direction}");
         npc.DoLookDirection(direction);
@@ -78,7 +83,7 @@ public class Test_NPCGetIn : MonoBehaviour
     [YarnCommand("MoveIn")]
     public static IEnumerator MoveIn(string npcNameStr, int waypointIndex)
     {
-        Test_NPCGetIn npc = FindNPC(npcNameStr);
+        NPC_Base npc = FindNPC(npcNameStr);
         if (npc == null) yield break;
         yield return npc.StartCoroutine(npc.DoMoveTo(waypointIndex));
     }
@@ -90,7 +95,7 @@ public class Test_NPCGetIn : MonoBehaviour
     }
 
     // ─── Helper Methods ─────────────────────────────────────────────────────
-    private static Test_NPCGetIn FindNPC(string npcNameStr)
+    private static NPC_Base FindNPC(string npcNameStr)
     {
         // Yarn passes "NPC_Name.Owen" — strip the prefix if present
         string rawName = npcNameStr.Contains(".")
@@ -104,7 +109,7 @@ public class Test_NPCGetIn : MonoBehaviour
             return null;
         }
 
-        foreach (Test_NPCGetIn npc in FindObjectsByType<Test_NPCGetIn>(FindObjectsSortMode.None))
+        foreach (NPC_Base npc in FindObjectsByType<NPC_Base>(FindObjectsSortMode.None))
         {
             if (npc.Name == targetName)
                 return npc;

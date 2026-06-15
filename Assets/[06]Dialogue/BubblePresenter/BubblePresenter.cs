@@ -211,6 +211,20 @@ namespace YarnSpinner.Custom
                          : Camera.main;
         }
 
+        private void Start()
+        {
+            if (SceneLoaderBridge.ChapterNodeName != null && SceneLoaderBridge.ChapterNodeName != string.Empty)
+            {
+                DialogueRunner runner = FindObjectOfType<DialogueRunner>();
+                if (runner != null)
+                {
+                    //runner.startNode = SceneLoaderBridge.ChapterNodeName;
+                    runner.StartDialogue(SceneLoaderBridge.ChapterNodeName);
+                }
+            }
+        }
+
+
         // ─────────────────────────────────────────────────────────────────────
         // DialoguePresenterBase
         // ─────────────────────────────────────────────────────────────────────
