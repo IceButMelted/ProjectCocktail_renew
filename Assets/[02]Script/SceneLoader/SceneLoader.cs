@@ -18,4 +18,10 @@ public class SceneLoader : MonoBehaviour
 
         SceneManager.LoadScene("LoadingScene");
     }
+
+    public void ReloadCurrentScene()
+    {
+        SceneLoaderBridge.TargetScene = SceneManager.GetActiveScene().name;
+        SceneManager.LoadScene("LoadingScene");
+    }
 }

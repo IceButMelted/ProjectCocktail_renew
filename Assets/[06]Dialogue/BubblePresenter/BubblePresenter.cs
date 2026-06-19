@@ -211,6 +211,22 @@ namespace YarnSpinner.Custom
                          : Camera.main;
         }
 
+        private void Start()
+        {
+            if (!string.IsNullOrEmpty(SceneLoaderBridge.ChapterNodeName))
+            {
+                DialogueRunner runner = FindObjectOfType<DialogueRunner>();
+                if (runner != null)
+                {
+                    // Clear here — covers both fresh starts and loads
+                    SceneLoaderBridge.DialogueRootNode = SceneLoaderBridge.ChapterNodeName;
+                    SceneLoaderBridge.SessionOptionChoices.Clear();
+                    runner.StartDialogue(SceneLoaderBridge.ChapterNodeName);
+                }
+            }
+        }
+
+
         // ─────────────────────────────────────────────────────────────────────
         // DialoguePresenterBase
         // ─────────────────────────────────────────────────────────────────────
@@ -225,7 +241,33 @@ namespace YarnSpinner.Custom
 
         public override async YarnTask RunLineAsync(LocalizedLine line, LineCancellationToken token)
         {
-            buttonHandler?.OnLineBegin();
+            // ── SAVE/LOAD ─────────────────────────────────────────────────────────────
+
+            // Track current line for save
+            SceneLoaderBridge.CurrentLineId = line.TextID;
+
+            // Track last #save_checkpoint line — used when saving during wait_for_task
+            if (line.Metadata != null)
+                foreach (var tag in line.Metadata)
+                    if (tag == "save_checkpoint") { SceneLoaderBridge.CheckpointLineId = line.TextID; break; }
+
+            // Silent replay: auto-advance until target line reached
+            if (SceneLoaderBridge.IsSilentReplay)
+            {
+                if (line.TextID == SceneLoaderBridge.TargetLineId)
+                {
+                    SceneLoaderBridge.IsSilentReplay = false;   // reached save point
+                    SceneLoaderBridge.TargetLineId = null;
+                    // fall through → render this line normally
+                }
+                else
+                {
+                    return;                                      // skip, advance to next line
+                }
+            }
+            // ── END SAVE/LOAD ─────────────────────────────────────────────────────────
+
+            buttonHandler?.OnLineBegin();                     
 
             string characterName = line.CharacterName ?? string.Empty;
 

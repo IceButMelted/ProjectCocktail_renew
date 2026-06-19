@@ -1,14 +1,102 @@
-title: Script_1_1
+title: Day1
 ---
-Narrator: hi, this is Script_1_1
-Narrator: this is not good to see.
-<<jump WaitLoop>>
-//<<jump Script_1_2>>
+<<declare $player_name = "Hero" as string>>
+<<declare $player_health = 100 as number>>
+<<declare $has_key = false as bool>>
+<<declare $quest_stage = 0 as number>>
+
+Alex: Hey, are you two ready for the project meeting?
+Maya: I am. I spent most of last night organizing our notes.
+Leo: Same here. I also prepared a rough prototype to show everyone.
+Alex: Great. Let's see how far we can take this idea.
+
+<<jump Day2>>
 ===
 
-title: Start
-position: -7,-192
+title: Day2
 ---
-Start on visual
-<<jump Script_1_1>>
+<<set $player_health to 10>>
+Maya: The professors seemed interested in our concept.
+Leo: Yeah, but they want a clearer gameplay loop.
+Alex: That's fair. We still have a lot of details to figure out.
+Maya: At least we're moving in the right direction.
+
+===
+
+title: Day3
+---
+Leo: I finished the first playable version today.
+Alex: Already? That's faster than I expected.
+Maya: Let me try it.
+Maya: The controls feel good, but the objectives are unclear.
+Leo: I'll work on improving the tutorial.
+
+===
+
+title: Day4
+---
+Alex: We received feedback from the test players.
+Maya: Mostly positive feedback, which is encouraging.
+Leo: They also found several bugs.
+Alex: Then our next priority is stability before adding new features.
+
+===
+
+title: Day5
+---
+Maya: I started creating concept art for the environment.
+Leo: The sketches look amazing.
+Alex: They really help define the game's atmosphere.
+Maya: I'll prepare more variations tomorrow.
+
+===
+
+title: Day6
+---
+Leo: Bad news. The inventory system broke after the latest update.
+Alex: How serious is it?
+Leo: Players can't pick up items anymore.
+Maya: Let's focus on fixing that before anything else.
+Leo: Agreed.
+
+===
+
+title: Day7
+---
+Alex: The inventory issue is finally resolved.
+Leo: Thankfully. That bug was harder than expected.
+Maya: At least we learned a lot while fixing it.
+Alex: Progress is progress.
+
+===
+
+title: Day8
+---
+Maya: We have a presentation next week.
+Leo: Then we should prepare a polished demo.
+Alex: I'll handle the slides.
+Maya: I'll collect screenshots and artwork.
+Leo: And I'll make sure the build is stable.
+
+===
+
+title: Day9
+---
+Leo: The demo build is complete.
+Maya: Nice work.
+Alex: Let's do one final test session.
+Leo: Hopefully we won't discover any new issues.
+Maya: Don't jinx it.
+
+===
+
+title: Day10
+---
+Alex: Presentation day has finally arrived.
+Maya: I'm nervous, but excited.
+Leo: We've worked hard for this.
+Alex: No matter the outcome, we built something together.
+Maya: Let's give it our best.
+Leo: Let's go.
+
 ===

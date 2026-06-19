@@ -29,6 +29,8 @@ public class CinimachineCameraSwitcher : MonoBehaviour
         }
 
         Instance = this;
+
+        
     }
 
     private void OnDestroy()
@@ -217,7 +219,7 @@ public class CinimachineCameraSwitcher : MonoBehaviour
         // Disable the previously active camera
         if (activeCameraId != null && vcamRegistry.TryGetValue(activeCameraId, out var previousVcam))
         {
-            previousVcam.enabled = false;
+            previousVcam.enabled = true;
         }
 
         // Apply the blend override on the brain
