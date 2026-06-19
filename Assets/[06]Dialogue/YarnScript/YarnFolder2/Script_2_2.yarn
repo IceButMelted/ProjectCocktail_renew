@@ -28,7 +28,6 @@ title: Script_2_2
     <<case Forward>>
 <<endenum>>
 // Declare the variable (set false by default)
-<<declare $task_done = false>>
 <<declare $type_of_cocktail = TypeOfCocktail.None>>
 <<declare $satisfaction = Satisfaction.None>>
 
@@ -36,229 +35,152 @@ title: Script_2_2
 <<Fix_Camera CamController true>>
 <<Reset_Camera CamController>>
 <<Switch_Camera CamController "MainCam">>
-
 <<jump ShowcaseMain>>
-
-
 ===
 
-title: TestLoopPart
+title: TestSaveLoad
 ---
-// <<SetEmotion NPC_Name.Owen "happy">>
-// <<SetEmotion NPC_Name.Cole "upset">>
-// <<SetEmotion NPC_Name.Owen "neutral">>
-
-// Test part Cole {Order_Cocktail_OutName(NPC_Name.Cole)}
-// Test part Owen {Order_Cocktail_OutName(NPC_Name.Owen)}
-// Test part Walter {Order_Cocktail_OutName(NPC_Name.Walter)}
-// Test part Freya {Order_Cocktail_OutName(NPC_Name.Freya)}
-// Test part Isla {Order_Cocktail_OutName(NPC_Name.Isla)}
-
-// Test part Cole {Order_Cocktail_OutDescription(NPC_Name.Cole)}
-// Test part Owen {Order_Cocktail_OutDescription(NPC_Name.Owen)}
-// Test part Walter {Order_Cocktail_OutDescription(NPC_Name.Walter)}
-// Test part Freya {Order_Cocktail_OutDescription(NPC_Name.Freya)}
-// Test part Isla {Order_Cocktail_OutDescription(NPC_Name.Isla)}
-
-// ── Owen Arrives ──────────────────────────────────────────
+// ── [Setup Camera] ────────────────────────────────────────
+<<Enable_InteractableObject SystemGame false>>
 <<Fix_Camera CamController true>>
 <<Reset_Camera CamController>>
 <<Switch_Camera CamController "MainCam">>
 
+// Owen arrives at position 2 → CenterCam
 <<MoveIn NPC_Name.Owen 2>>
 <<Switch_Camera CamController "CenterCam">>
 <<SetEmotion NPC_Name.Owen "happy">>
-<<SetLookDirection NPC_Name.Owen LookDirection.Right>>
-<<wait 1>>
-<<SetLookDirection NPC_Name.Owen LookDirection.Left>>
-<<wait 1>>
+
+// Isla arrives at position 1
+<<MoveIn NPC_Name.Isla 1>>
+<<Switch_Camera CamController "NearLeftCam">>
+<<SetEmotion NPC_Name.Isla "happy">>
+<<SetLookDirection NPC_Name.Isla LookDirection.Right>>
+<<wait_scene 1>>
+<<SetLookDirection NPC_Name.Isla LookDirection.Left>>
+<<wait_scene 1>>
+<<SetLookDirection NPC_Name.Isla LookDirection.Forward>>
+
+// ── [SHOWCASE: Order_Cocktail_OutName + wait_for_task] ───
 <<SetLookDirection NPC_Name.Owen LookDirection.Forward>>
-Owen: Hey! You must be the new bartender everyone's been talking about.
-Owen: Place looks good. Someone's been busy.
 
--> Thanks, still getting used to it.
-    Player: Thanks, still finding my feet honestly.
-    <<SetEmotion NPC_Name.Owen "happy">>
-    Owen: Ha! You'll be fine. First week's always the hardest.
--> I've been here a while actually.
-    Player: I've been here longer than you'd think.
-    Owen: Oh! My bad, you just look fresh. Good thing I didn't say anything rude then, eh?
--> Option 3
-    Player: I've been here longer than you'd think.
-    Owen: Oh! My bad, you just look fresh. Good thing I didn't say anything rude then, eh?
--> Option 4
-    Player: I've been here longer than you'd think.
-    Owen: Oh! My bad, you just look fresh. Good thing I didn't say anything rude then, eh?
+<<detour TestSaveLoadDetour>>
 
-// ── Owen's Order ──────────────────────────────────────────
-Owen: Anyway — could you make me something? I'm thinking {Order_Cocktail_OutName(NPC_Name.Owen)}.
-<<wait 5>>
-Owen: Anyway — could you make me something? I'm thinking {Order_Cocktail_OutDescription(NPC_Name.Owen)}.
-<<wait 5>>
+Owen: This is going to be on Save While in Phase Making cocktails. #line:TSL_Owen_003
 
-
+Owen: Right, since we're here — I'll have  [oreder]{Order_Cocktail_ByName_OutName("John Collins")}[/oreder], please. #line:TSL_Owen_004
 <<Reset_Camera CamController>>
 <<Switch_Camera CamController "MainCam">>
 <<Fix_Camera CamController false>>
+
 <<wait_for_task SystemGame>>
+
 <<Fix_Camera CamController true>>
-<<Switch_Camera CamController "CenterCam">>
 
-<<if $satisfaction == Satisfaction.Perfect>>
-    <<SetEmotion NPC_Name.Owen "happy">>
-    Owen: Wow. NOW that is a drink. You're good at this.
-    Owen: Seriously, where did you learn that?
-    -> Just picked it up.
-        Player: Honestly just picked it up as I went.
-        Owen: Natural talent. Love to see it.
-    -> Had a good teacher.
-        Player: I had someone show me the ropes early on.
-        Owen: Smart. Always learn from the best.
-<<elseif $satisfaction == Satisfaction.Acceptable>>
-    <<SetEmotion NPC_Name.Owen "neutral">>
-    Owen: Hmm... not bad. I've had better, but I've had worse.
-    Owen: Maybe a little less of the mixer next time?
-    -> I'll keep that in mind.
-        Player: Noted, I'll adjust next time.
-        Owen: That's the spirit. Don't let it get to you.
-    -> You're a tough crowd.
-        Player: Wow, tough crowd.
-        <<SetEmotion NPC_Name.Owen "happy">>
-        Owen: Ha! You have no idea, mate.
-<<elseif $satisfaction == Satisfaction.Fail>>
-    <<SetEmotion NPC_Name.Owen "upset">>
-    Owen: Ugh... that's rough, mate. Really rough.
-    Owen: What did you even put in there?
-    -> I might have overdone it.
-        Player: Yeah... I think I overdid something.
-        <<SetEmotion NPC_Name.Owen "neutral">>
-        Owen: A little, yeah. Try again sometime — I don't give up easy.
-    -> Sorry, still learning.
-        Player: Sorry, still learning the recipes.
-        <<SetEmotion NPC_Name.Owen "neutral">>
-        Owen: It's fine. Just maybe don't serve that one to Walter.
-<<endif>>
+Owen: after this will be show you a satisfaction of cocktails you make #line:TSL_Owen_Suggest
 
-<<SetEmotion NPC_Name.Owen "neutral">>
-<<Reset_Variable SystemGame>>
+Isla: I Think you save right? then go next to that part. #line:TSL_Isla_Suggest
 
-// ── Walter Arrives ────────────────────────────────────────
-Owen: Oh, looks like someone's coming in.
-
--> Who is it?
-    Owen: See for yourself...
--> A new customer?
-    Owen: Nah, it's just Walter. The old man himself.
-
-<<MoveIn NPC_Name.Walter 1>>
-<<SetLookDirection NPC_Name.Walter LookDirection.Right>>
-<<Switch_Camera CamController "NearLeftCam">>
-<<SetEmotion NPC_Name.Walter "happy">>
-Walter: Well, well — Owen! Didn't expect to see you here on a weekday.
-<<SetEmotion NPC_Name.Owen "happy">>
-Owen: Walter! You look terrible, old man.
-Walter: Ha! And you look like you haven't changed since high school.
-Owen: I'll take that as a compliment.
-Walter: It wasn't one.
-
-<<SetLookDirection NPC_Name.Walter LookDirection.Forward>>
-Walter: And you must be the new bartender. Good to meet you, kid.
-
--> Nice to meet you too.
-    Player: Nice to meet you, sir.
-    <<SetEmotion NPC_Name.Walter "happy">>
-    Walter: "Sir"! Oh I like this one, Owen. Very respectful.
-    <<SetEmotion NPC_Name.Owen "happy">>
-    Owen: Don't let it go to your head, Walter.
--> I've heard a lot about you.
-    Player: I've actually heard a lot about you.
-    Walter: Oh? Good things I hope.
-    <<SetEmotion NPC_Name.Owen "happy">>
-    Owen: Absolutely not.
-    <<SetEmotion NPC_Name.Walter "happy">>
-    Walter: Ha! Sounds about right.
-
-// ── Walter's Order ────────────────────────────────────────
-Walter: Right then — I'll have something, and make it better than whatever you gave Owen. Ha!
-<<SetEmotion NPC_Name.Owen "neutral">>
-Owen: Hey, mine was fine.
-Walter: Sure it was, son.
-Walter: I'm after {Order_Cocktail_OutDescription(NPC_Name.Walter)}.
-
-<<Reset_Camera CamController>>
-<<Switch_Camera CamController "MainCam">>
-<<Fix_Camera CamController false>>
-<<wait_for_task SystemGame>>
-<<Fix_Camera CamController true>>
-<<Switch_Camera CamController "NearLeftCam">>
-
-<<if $satisfaction == Satisfaction.Perfect>>
-    <<SetEmotion NPC_Name.Walter "happy">>
-    Walter: Now THAT takes me back. Just like the old days. Well done, kid.
-    Owen: Okay... I'll admit that looks better than mine.
-    Walter: It IS better than yours, Owen.
-    <<SetEmotion NPC_Name.Owen "upset">>
-    Owen: I didn't ask, Walter.
-    <<SetEmotion NPC_Name.Walter "happy">>
-    Walter: Ha! That's the spirit. Don't let an old man get to you.
-    <<SetEmotion NPC_Name.Owen "neutral">>
-    Owen: You're insufferable, you know that?
-    Walter: And yet here you are, still talking to me.
-<<elseif $satisfaction == Satisfaction.Acceptable>>
-    <<SetEmotion NPC_Name.Walter "neutral">>
-    Walter: Decent enough. A little more practice and you'll get there.
-    Owen: See? He's tough to please.
-    Walter: I'm not tough, I just have standards.
-    <<SetEmotion NPC_Name.Owen "happy">>
-    Owen: Same thing, old man.
-    Walter: You'd know nothing about standards, Owen.
-    Owen: ...Rude.
-<<elseif $satisfaction == Satisfaction.Fail>>
-    <<SetEmotion NPC_Name.Walter "upset">>
-    Walter: Oh dear... that's not quite it, is it.
-    <<SetEmotion NPC_Name.Owen "happy">>
-    Owen: Ha! So mine wasn't that bad after all.
-    <<SetEmotion NPC_Name.Walter "neutral">>
-    Walter: Don't get smug, Owen. Yours wasn't great either.
-    Owen: I'll take a partial win.
-    Walter: Keep at it, kid. You'll get there.
-<<endif>>
-
-// ── Wrap Up ───────────────────────────────────────────────
-<<SetEmotion NPC_Name.Walter "neutral">>
-<<SetEmotion NPC_Name.Owen "neutral">>
-<<SetLookDirection NPC_Name.Isla>>
-<<Reset_Variable SystemGame>>
-
-Walter: You know, I used to come to this place years ago. Before your time.
-Owen: What was it like back then?
-Walter: Quieter. Simpler. Different bartender obviously.
-Owen: Better or worse?
-Walter: ...Different.
-
--> Will you come back?
-    Player: Will you be coming back?
-    <<SetEmotion NPC_Name.Walter "happy">>
-    Walter: If the drinks keep improving? Absolutely.
-    Owen: I'll be back tomorrow. Assuming Walter doesn't scare you off.
-    Walter: When have I ever scared anyone off?
-    <<SetEmotion NPC_Name.Owen "happy">>
-    Owen: Should I get the list?
--> Glad you both stopped by.
-    Player: Well, glad you both came in today.
-    <<SetEmotion NPC_Name.Walter "happy">>
-    Walter: Likewise, kid. You've got potential.
-    <<SetEmotion NPC_Name.Owen "happy">>
-    Owen: Don't let him fool you — that's basically a standing ovation from Walter.
-    Walter: ...Don't push it, Owen.
-
-<<Switch_Camera CamController "MainCam">>
-<<MoveOut NPC_Name.Walter>>
-<<MoveOut NPC_Name.Owen>>
-
-NOW IT WILL LOOP
-<<jump TestLoopPart>>
+<<jump TestSaveLoad_Jump>>
 ===
+
+title: TestSaveLoad_Jump
+---
+<<if $satisfaction == Satisfaction.Perfect>>    
+    <<SetEmotion NPC_Name.Owen "happy">>
+    Owen: Now THAT is exactly what I wanted. Spot on. #line:TSL_Owen_104
+    <<SetEmotion NPC_Name.Isla "happy">>
+    Isla: Ooh, that looks good. Mine better be just as good. #line:TSL_Isla_101
+    Owen: No pressure. #line:TSL_Owen_105
+    -> I've been practising. #line:TSL_OP_101
+        Player: Been working on that one. #line:TSL_AN_001
+        Owen: It shows. Seriously. #line:TSL_Owen_006
+    -> Lucky guess. #line:TSL_OP_002
+        Player: Honestly? Lucky guess. #line:TSL_AN_002
+        <<SetEmotion NPC_Name.Owen "happy">>
+        Owen: Ha! I'll take it either way. #line:TSL_Owen_007
+<<elseif $satisfaction == Satisfaction.Acceptable>>
+    <<SetEmotion NPC_Name.Owen "neutral">>
+    Owen: Not bad. Could be a touch stronger but I won't complain. #line:TSL_Owen_208
+    <<SetEmotion NPC_Name.Isla "neutral">>
+    Isla: He's being generous, trust me. #line:TSL_Isla_202
+    Owen: I heard that, Isla. #line:TSL_Owen_209
+    -> I'll dial it up next time. #line:TSL_OP_203
+        Player: Noted — stronger next round. #line:TSL_AN_203
+        Owen: That's what I like to hear. #line:TSL_Owen_210
+    -> This is how it's meant to be. #line:TSL_OP_204
+        Player: Actually that's the correct recipe. #line:TSL_AN_204
+        <<SetEmotion NPC_Name.Owen "happy">>
+        Owen: ...Fair point. I'll allow it. #line:TSL_Owen_211
+<<elseif $satisfaction == Satisfaction.Fail>>
+    <<SetEmotion NPC_Name.Owen "upset">>
+    Owen: Oh. Oh no. What... what is this? #line:TSL_Owen_312
+    <<SetEmotion NPC_Name.Isla "neutral">>
+    Isla: Should I be worried about my order? #line:TSL_Isla_303
+    Owen: Very. #line:TSL_Owen_313
+    -> Sorry, let me redo it. #line:TSL_OP_305
+        Player: That one's on me. Let me fix it. #line:TSL_AN_305
+        <<SetEmotion NPC_Name.Owen "neutral">>
+        Owen: Please. Quickly. #line:TSL_Owen_314
+    -> It's an acquired taste. #line:TSL_OP_306
+        Player: It's a bold flavour profile. #line:TSL_AN_306
+        <<SetEmotion NPC_Name.Owen "upset">>
+        Owen: It's a crime against cocktails is what it is. #line:TSL_Owen_315
+<<endif>>
+<<Reset_Variable SystemGame>>
+<<Switch_Camera CamController "CenterCam">>
+===
+
+title:TestSaveLoadDetour
+---
+Owen: This is on Option without timeout. #line:TSL_Owen_001
+-> Option1 #line:TSL_Player_Option_001
+    Owen: Answer 1_1 #line:TSL_Owen_Ans_001
+    Isla: Answer 1_1 #line:TSL_Isla_Ans_001
+    <<MoveIn NPC_Name.Isla 2>>
+    <<MoveIn NPC_Name.Owen 1>>
+    Owen: Answer 1_2 #line:TSL_Owen_Ans_002
+    Isla: Answer 1_2 #line:TSL_Isla_Ans_002
+-> Option2 #line:TSL_Player_Option_002
+    Owen: Answer 2_1 #line:TSL_Owen_Ans_004
+    Isla: Answer 2_1 #line:TSL_Isla_Ans_004
+    <<MoveIn NPC_Name.Owen 1>>
+    Owen: Answer 2_2 #line:TSL_Owen_Ans_005
+    Isla: Answer 2_2 #line:TSL_Isla_Ans_005
+-> Option3 #line:TSL_Player_Option_003
+    Owen: Answer 3_1 #line:TSL_Owen_Ans_006
+    Isla: Answer 3_1 #line:TSL_Isla_Ans_006
+    Owen: Answer 3_2 #line:TSL_Owen_Ans_007
+    Isla: Answer 3_2 #line:TSL_Isla_Ans_007
+-> Option4 #line:TSL_Player_Option_004
+    Owen: Answer 4_1 #line:TSL_Owen_Ans_008
+    Isla: Answer 4_1 #line:TSL_Isla_Ans_008
+    Owen: Answer 4_2 #line:TSL_Owen_Ans_009
+    Isla: Answer 4_2 #line:TSL_Isla_Ans_009
+
+Owen: This is on Option with Timeout. #line:TSL_Owen_002
+-> Option1? #line:TSL_Player_Option_011
+    Owen: Answer 1_1 #line:TSL_Owen_Ans_011
+    Isla: Answer 1_1 #line:TSL_Isla_Ans_011
+    Owen: Answer 1_2 #line:TSL_Owen_Ans_012
+    Isla: Answer 1_2 #line:TSL_Isla_Ans_012
+-> Option2? #line:TSL_Player_Option_012
+    Owen: Answer 2_1 #line:TSL_Owen_Ans_014
+    Isla: Answer 2_1 #line:TSL_Isla_Ans_014
+    Owen: Answer 2_2 #line:TSL_Owen_Ans_015
+    Isla: Answer 2_2 #line:TSL_Isla_Ans_015
+-> Option3? #line:TSL_Player_Option_013
+    Owen: Answer 3_1 #line:TSL_Owen_Ans_016
+    Isla: Answer 3_1 #line:TSL_Isla_Ans_016
+    Owen: Answer 3_2 #line:TSL_Owen_Ans_017
+    Isla: Answer 3_2 #line:TSL_Isla_Ans_017
+-> Option4? #fallback #line:TSL_Player_Option_014
+    Owen: Answer 4_1 #line:TSL_Owen_Ans_018
+    Isla: Answer 4_1 #line:TSL_Isla_Ans_018
+    Owen: Answer 4_2 #line:TSL_Owen_Ans_019
+    Isla: Answer 4_2 #line:TSL_Isla_Ans_019
+===
+
 
 title: ShowcaseMain
 ---
@@ -273,23 +195,7 @@ title: ShowcaseMain
 <<MoveIn NPC_Name.Owen 2>>
 <<Switch_Camera CamController "CenterCam">>
 <<SetEmotion NPC_Name.Owen "happy">>
-// Owen: Evening! Slow night?
 
-// // ── [SHOWCASE: Basic Option — 4 ตัวเลือก] ───────────────
-// -> Pretty quiet yeah.
-//     Player: Yeah, been pretty slow tonight.
-//     Owen: Good. Means I get the good seat.
-// -> Just picking up actually.
-//     Player: Actually just starting to get busy.
-//     <<SetEmotion NPC_Name.Owen "neutral">>
-//     Owen: Of course it is. I have that effect on places.
-// -> Depends who's asking.
-//     Player: Depends who's asking.
-//     <<SetEmotion NPC_Name.Owen "happy">>
-//     Owen: Ha! Mysterious. I like it.
-// -> Not saying.
-//     Player: ...
-//     Owen: Fair enough.
 
 // ── [SHOWCASE: MoveIn NPC ที่ 2 + NearLeftCam] ───────────
 // Isla arrives at position 1
@@ -301,34 +207,11 @@ title: ShowcaseMain
 <<SetLookDirection NPC_Name.Isla LookDirection.Forward>>
 <<SetLookDirection NPC_Name.Isla LookDirection.Left>>
 
-// Isla: Oh! Owen! Didn't know you'd be here tonight.
-// <<SetLookDirection NPC_Name.Owen LookDirection.Left>>
-// Owen: Isla! Small world.
-// Isla: Or small bar.
-
-// Isla: Bartender — can I get something? I'm not sure what I want though...
-// <<SetLookDirection NPC_Name.Isla LookDirection.Forward>>
-// // ── [SHOWCASE: Option Timeout — ? และ #fallback] ─────────
-// -> Any recommendations tonight? ?
-//     Player: We've got some great specials on.
-//     <<SetEmotion NPC_Name.Isla "happy">>
-//     Isla: Ooh, surprise me then!
-// -> Something light maybe? ?
-//     Player: I'd suggest something light and refreshing.
-//     Isla: That sounds perfect actually.
-// -> Something strong? ?
-//     Player: Or I could go stronger if you'd like.
-//     <<SetEmotion NPC_Name.Isla "neutral">>
-//     Isla: Hmm... maybe not tonight.
-// -> Whatever you think suits me. #fallback
-//     Player: I'll pick what suits you best.
-//     Isla: Love the confidence!
-
 // ── [SHOWCASE: Order_Cocktail_OutName + wait_for_task] ───
 <<SetLookDirection NPC_Name.Owen LookDirection.Forward>>
-Owen: This is [b]my line[/b] with [b][i]some[/i] markup within[/b] of it.
-Owen: this is [s]stringk[/s] 
-Owen: Right, since we're here — I'll have  [oreder]{Order_Cocktail_ByName_OutName("John Collins")}[/oreder], please.
+Owen: This is [b]my line[/b] with [b][i]some[/i] markup within[/b] of it. #line:SC_Owen_001
+Owen: this is [s]stringk[/s] #line:SC_Owen_002
+Owen: Right, since we're here — I'll have  [oreder]{Order_Cocktail_ByName_OutName("John Collins")}[/oreder], please. #line:SC_Owen_003
 
 <<Reset_Camera CamController>>
 <<Switch_Camera CamController "MainCam">>
@@ -340,51 +223,51 @@ Owen: Right, since we're here — I'll have  [oreder]{Order_Cocktail_ByName_OutN
 // ── [SHOWCASE: Satisfaction If/Else — Owen] ───────────────
 <<if $satisfaction == Satisfaction.Perfect>>
     <<SetEmotion NPC_Name.Owen "happy">>
-    Owen: Now THAT is exactly what I wanted. Spot on.
+    Owen: Now THAT is exactly what I wanted. Spot on. #line:SC_Owen_004
     <<SetEmotion NPC_Name.Isla "happy">>
-    Isla: Ooh, that looks good. Mine better be just as good.
-    Owen: No pressure.
-    -> I've been practising.
-        Player: Been working on that one.
-        Owen: It shows. Seriously.
-    -> Lucky guess.
-        Player: Honestly? Lucky guess.
+    Isla: Ooh, that looks good. Mine better be just as good. #line:SC_Isla_001
+    Owen: No pressure. #line:SC_Owen_005
+    -> I've been practising. #line:SC_OP_001
+        Player: Been working on that one. #line:SC_AN_001
+        Owen: It shows. Seriously. #line:SC_Owen_006
+    -> Lucky guess. #line:SC_OP_002
+        Player: Honestly? Lucky guess. #line:SC_AN_002
         <<SetEmotion NPC_Name.Owen "happy">>
-        Owen: Ha! I'll take it either way.
+        Owen: Ha! I'll take it either way. #line:SC_Owen_007
 <<elseif $satisfaction == Satisfaction.Acceptable>>
     <<SetEmotion NPC_Name.Owen "neutral">>
-    Owen: Not bad. Could be a touch stronger but I won't complain.
+    Owen: Not bad. Could be a touch stronger but I won't complain. #line:SC_Owen_008
     <<SetEmotion NPC_Name.Isla "neutral">>
-    Isla: He's being generous, trust me.
-    Owen: I heard that, Isla.
-    -> I'll dial it up next time.
-        Player: Noted — stronger next round.
-        Owen: That's what I like to hear.
-    -> This is how it's meant to be.
-        Player: Actually that's the correct recipe.
+    Isla: He's being generous, trust me. #line:SC_Isla_002
+    Owen: I heard that, Isla. #line:SC_Owen_009
+    -> I'll dial it up next time. #line:SC_OP_003
+        Player: Noted — stronger next round. #line:SC_AN_003
+        Owen: That's what I like to hear. #line:SC_Owen_010
+    -> This is how it's meant to be. #line:SC_OP_004
+        Player: Actually that's the correct recipe. #line:SC_AN_004
         <<SetEmotion NPC_Name.Owen "happy">>
-        Owen: ...Fair point. I'll allow it.
+        Owen: ...Fair point. I'll allow it. #line:SC_Owen_011
 <<elseif $satisfaction == Satisfaction.Fail>>
     <<SetEmotion NPC_Name.Owen "upset">>
-    Owen: Oh. Oh no. What... what is this?
+    Owen: Oh. Oh no. What... what is this? #line:SC_Owen_012
     <<SetEmotion NPC_Name.Isla "neutral">>
-    Isla: Should I be worried about my order?
-    Owen: Very.
-    -> Sorry, let me redo it.
-        Player: That one's on me. Let me fix it.
+    Isla: Should I be worried about my order? #line:SC_Isla_003
+    Owen: Very. #line:SC_Owen_013
+    -> Sorry, let me redo it. #line:SC_OP_005
+        Player: That one's on me. Let me fix it. #line:SC_AN_005
         <<SetEmotion NPC_Name.Owen "neutral">>
-        Owen: Please. Quickly.
-    -> It's an acquired taste.
-        Player: It's a bold flavour profile.
+        Owen: Please. Quickly. #line:SC_Owen_014
+    -> It's an acquired taste. #line:SC_OP_006
+        Player: It's a bold flavour profile. #line:SC_AN_006
         <<SetEmotion NPC_Name.Owen "upset">>
-        Owen: It's a crime against cocktails is what it is.
+        Owen: It's a crime against cocktails is what it is. #line:SC_Owen_015
 <<endif>>
 
 <<SetEmotion NPC_Name.Owen "neutral">>
 <<Reset_Variable SystemGame>>
 
 // ── [SHOWCASE: Order_Cocktail_OutDescription] ────────────
-Isla: Okay my turn! Something {Order_Cocktail_OutDescription(NPC_Name.Isla)}, please!
+Isla: Okay my turn! Something {Order_Cocktail_OutDescription(NPC_Name.Isla)}, please! #line:SC_Isla_004
 <<SetEmotion NPC_Name.Isla "happy">>
 
 <<Reset_Camera CamController>>
@@ -397,52 +280,52 @@ Isla: Okay my turn! Something {Order_Cocktail_OutDescription(NPC_Name.Isla)}, pl
 // ── [SHOWCASE: Satisfaction If/Else — Isla] ───────────────
 <<if $satisfaction == Satisfaction.Perfect>>
     <<SetEmotion NPC_Name.Isla "happy">>
-    Isla: This is AMAZING. Owen, try this!
+    Isla: This is AMAZING. Owen, try this! #line:SC_Isla_005
     <<SetLookDirection NPC_Name.Isla LookDirection.Right>>
     <<SetLookDirection NPC_Name.Owen LookDirection.Left>>
-    Owen: ...Okay fine. *sip* ...Yeah. That's actually good.
-    Isla: Right?!
-    -> Really glad that hit the mark.
-        Player: Really glad that hit the mark.
-        Isla: Hit the mark? It hit a bullseye!
-    -> Owen's reaction says it all.
-        Player: Owen's face said everything I needed to know.
+    Owen: ...Okay fine. *sip* ...Yeah. That's actually good. #line:SC_Owen_016
+    Isla: Right?! #line:SC_Isla_006
+    -> Really glad that hit the mark. #line:SC_OP_007
+        Player: Really glad that hit the mark. #line:SC_AN_007
+        Isla: Hit the mark? It hit a bullseye! #line:SC_Isla_007
+    -> Owen's reaction says it all. #line:SC_OP_008
+        Player: Owen's face said everything I needed to know. #line:SC_AN_008
         <<SetEmotion NPC_Name.Owen "neutral">>
-        Owen: I said nothing.
+        Owen: I said nothing. #line:SC_Owen_017
         <<SetEmotion NPC_Name.Isla "happy">>
-        Isla: Your eyes said everything, Owen.
+        Isla: Your eyes said everything, Owen. #line:SC_Isla_008
 <<elseif $satisfaction == Satisfaction.Acceptable>>
     <<SetEmotion NPC_Name.Isla "neutral">>
-    Isla: Mmm... it's nice! Just a little sweet for me.
+    Isla: Mmm... it's nice! Just a little sweet for me. #line:SC_Isla_009
     <<SetEmotion NPC_Name.Owen "happy">>
-    Owen: She hates sweet things by the way.
+    Owen: She hates sweet things by the way. #line:SC_Owen_018
     <<SetEmotion NPC_Name.Isla "neutral">>
-    Isla: Owen!
-    Owen: What? It's true!
-    -> I'll remember that — less sweet next time.
-        Player: Noted. Less sweet next round.
+    Isla: Owen! #line:SC_Isla_010
+    Owen: What? It's true! #line:SC_Owen_019
+    -> I'll remember that — less sweet next time. #line:SC_OP_009
+        Player: Noted. Less sweet next round. #line:SC_AN_009
         <<SetEmotion NPC_Name.Isla "happy">>
-        Isla: You're very thoughtful, thank you.
-    -> Round two on me.
-        Player: Let me make it up to you.
-        Isla: Now we're talking.
+        Isla: You're very thoughtful, thank you. #line:SC_Isla_011
+    -> Round two on me. #line:SC_OP_010
+        Player: Let me make it up to you. #line:SC_AN_010
+        Isla: Now we're talking. #line:SC_Isla_012
 <<elseif $satisfaction == Satisfaction.Fail>>
     <<SetEmotion NPC_Name.Isla "upset">>
-    Isla: Um... this is... interesting.
+    Isla: Um... this is... interesting. #line:SC_Isla_013
     <<SetEmotion NPC_Name.Owen "happy">>
-    Owen: Ha! Welcome to my world, Isla.
+    Owen: Ha! Welcome to my world, Isla. #line:SC_Owen_020
     <<SetEmotion NPC_Name.Isla "neutral">>
-    Isla: Is it always like this?
-    Owen: First round jitters. Probably.
-    -> I'm really sorry about that.
-        Player: I'm really sorry about that one.
+    Isla: Is it always like this? #line:SC_Isla_014
+    Owen: First round jitters. Probably. #line:SC_Owen_021
+    -> I'm really sorry about that. #line:SC_OP_011
+        Player: I'm really sorry about that one. #line:SC_AN_011
         <<SetEmotion NPC_Name.Isla "happy">>
-        Isla: It's okay! Everyone has off days.
-    -> The next one will be better.
-        Player: Trust me, the next one will be better.
-        Isla: It can only go up from here, right?
+        Isla: It's okay! Everyone has off days. #line:SC_Isla_015
+    -> The next one will be better. #line:SC_OP_012
+        Player: Trust me, the next one will be better. #line:SC_AN_012
+        Isla: It can only go up from here, right? #line:SC_Isla_016
         <<SetEmotion NPC_Name.Owen "happy">>
-        Owen: Statistically yes.
+        Owen: Statistically yes. #line:SC_Owen_022
 <<endif>>
 
 <<SetEmotion NPC_Name.Isla "neutral">>
@@ -450,39 +333,39 @@ Isla: Okay my turn! Something {Order_Cocktail_OutDescription(NPC_Name.Isla)}, pl
 
 // ── [SHOWCASE: MoveIn NPC ที่ 3 + SetLookDirection] ──────
 // Walter arrives at position 3
-Isla: Oh — someone just walked in.
+Isla: Oh — someone just walked in. #line:SC_Isla_017
 
 <<MoveIn NPC_Name.Walter 3>>
 <<Switch_Camera CamController "CenterCam">>
 <<SetEmotion NPC_Name.Walter "neutral">>
-Walter: Evening all. Don't mind me.
+Walter: Evening all. Don't mind me. #line:SC_Walter_001
 
 <<SetLookDirection NPC_Name.Owen LookDirection.Right>>
 <<SetLookDirection NPC_Name.Isla LookDirection.Right>>
 <<wait 1>>
-Owen: Walter! Didn't have you pegged as a Tuesday night man.
+Owen: Walter! Didn't have you pegged as a Tuesday night man. #line:SC_Owen_023
 <<SetLookDirection NPC_Name.Walter LookDirection.Left>>
-Walter: Every night's a Tuesday when you're my age, son.
-Isla: That's either very wise or very sad.
-Walter: Both, probably.
+Walter: Every night's a Tuesday when you're my age, son. #line:SC_Walter_002
+Isla: That's either very wise or very sad. #line:SC_Isla_018
+Walter: Both, probably. #line:SC_Walter_003
 
 // ── [SHOWCASE: Switch_Camera FarRightCam — focus Walter] ─
 <<Switch_Camera CamController "FarRightCam">>
 <<SetLookDirection NPC_Name.Walter LookDirection.Forward>>
 
-Walter: And you — you're the new one. I'll have something {Order_Cocktail_OutDescription(NPC_Name.Walter)}.
+Walter: And you — you're the new one. I'll have something {Order_Cocktail_OutDescription(NPC_Name.Walter)}. #line:SC_Walter_004
 
--> Of course, coming right up.
-    Player: Right away, sir.
+-> Of course, coming right up. #line:SC_OP_013
+    Player: Right away, sir. #line:SC_AN_013
     <<SetEmotion NPC_Name.Walter "neutral">>
-    Walter: "Sir." I could get used to that.
--> Any more details?
-    Player: Anything more specific you're after?
-    Walter: That IS specific. Get to work.
--> I'll see what I can do.
-    Player: I'll do my best.
+    Walter: "Sir." I could get used to that. #line:SC_Walter_005
+-> Any more details? #line:SC_OP_014
+    Player: Anything more specific you're after? #line:SC_AN_014
+    Walter: That IS specific. Get to work. #line:SC_Walter_006
+-> I'll see what I can do. #line:SC_OP_015
+    Player: I'll do my best. #line:SC_AN_015
     <<SetEmotion NPC_Name.Walter "neutral">>
-    Walter: See that you do.
+    Walter: See that you do. #line:SC_Walter_007
 
 <<Reset_Camera CamController>>
 <<Switch_Camera CamController "MainCam">>
@@ -494,51 +377,51 @@ Walter: And you — you're the new one. I'll have something {Order_Cocktail_OutD
 // ── [SHOWCASE: Satisfaction If/Else — Walter + multi-NPC reactions] ──
 <<if $satisfaction == Satisfaction.Perfect>>
     <<SetEmotion NPC_Name.Walter "happy">>
-    Walter: ...Well. That is exactly right.
+    Walter: ...Well. That is exactly right. #line:SC_Walter_008
     <<SetEmotion NPC_Name.Owen "happy">>
-    Owen: High praise from Walter. Rarer than the drink itself.
+    Owen: High praise from Walter. Rarer than the drink itself. #line:SC_Owen_024
     <<SetEmotion NPC_Name.Isla "happy">>
-    Isla: We're witnessing history!
+    Isla: We're witnessing history! #line:SC_Isla_019
     <<SetEmotion NPC_Name.Walter "neutral">>
-    Walter: Don't push it.
-    -> That means a lot coming from you.
-        Player: That means a lot coming from you, sir.
+    Walter: Don't push it. #line:SC_Walter_009
+    -> That means a lot coming from you. #line:SC_OP_016
+        Player: That means a lot coming from you, sir. #line:SC_AN_016
         <<SetEmotion NPC_Name.Walter "happy">>
-        Walter: Don't let it go to your head. ...Good work.
-    -> Just doing my job.
-        Player: Just doing my job.
-        Walter: And doing it well. Don't stop.
+        Walter: Don't let it go to your head. ...Good work. #line:SC_Walter_010
+    -> Just doing my job. #line:SC_OP_017
+        Player: Just doing my job. #line:SC_AN_017
+        Walter: And doing it well. Don't stop. #line:SC_Walter_011
 <<elseif $satisfaction == Satisfaction.Acceptable>>
     <<SetEmotion NPC_Name.Walter "neutral">>
-    Walter: Mm. Passable.
+    Walter: Mm. Passable. #line:SC_Walter_012
     <<SetEmotion NPC_Name.Owen "neutral">>
-    Owen: Coming from Walter, that's basically a five-star review.
-    Walter: It is not.
+    Owen: Coming from Walter, that's basically a five-star review. #line:SC_Owen_025
+    Walter: It is not. #line:SC_Walter_013
     <<SetEmotion NPC_Name.Isla "happy">>
-    Isla: It kind of is though.
-    Walter: ...Drink your cocktails, both of you.
-    -> I'll keep improving.
-        Player: I'll keep working on it.
+    Isla: It kind of is though. #line:SC_Isla_020
+    Walter: ...Drink your cocktails, both of you. #line:SC_Walter_014
+    -> I'll keep improving. #line:SC_OP_018
+        Player: I'll keep working on it. #line:SC_AN_018
         <<SetEmotion NPC_Name.Walter "neutral">>
-        Walter: See that you do. There's potential here.
-    -> Appreciate the honesty.
-        Player: Thanks for the honest feedback.
-        Walter: Always. It's the only kind worth giving.
+        Walter: See that you do. There's potential here. #line:SC_Walter_015
+    -> Appreciate the honesty. #line:SC_OP_019
+        Player: Thanks for the honest feedback. #line:SC_AN_019
+        Walter: Always. It's the only kind worth giving. #line:SC_Walter_016
 <<elseif $satisfaction == Satisfaction.Fail>>
     <<SetEmotion NPC_Name.Walter "upset">>
-    Walter: ...No. No, that's not right at all.
+    Walter: ...No. No, that's not right at all. #line:SC_Walter_017
     <<SetEmotion NPC_Name.Owen "neutral">>
-    Owen: He sort of warned you.
+    Owen: He sort of warned you. #line:SC_Owen_026
     <<SetEmotion NPC_Name.Isla "neutral">>
-    Isla: To be fair, mine wasn't perfect either.
-    Walter: Standards, people. Standards.
-    -> Let me try again.
-        Player: Let me make you another.
+    Isla: To be fair, mine wasn't perfect either. #line:SC_Isla_021
+    Walter: Standards, people. Standards. #line:SC_Walter_018
+    -> Let me try again. #line:SC_OP_020
+        Player: Let me make you another. #line:SC_AN_020
         <<SetEmotion NPC_Name.Walter "neutral">>
-        Walter: Please. And take your time this round.
-    -> What specifically went wrong?
-        Player: What should I fix?
-        Walter: Everything. But start with the basics.
+        Walter: Please. And take your time this round. #line:SC_Walter_019
+    -> What specifically went wrong? #line:SC_OP_021
+        Player: What should I fix? #line:SC_AN_021
+        Walter: Everything. But start with the basics. #line:SC_Walter_020
 <<endif>>
 
 <<SetEmotion NPC_Name.Walter "neutral">>
@@ -547,56 +430,56 @@ Walter: And you — you're the new one. I'll have something {Order_Cocktail_OutD
 // ── [SHOWCASE: SetLookDirection ทุกตัวพร้อมกัน + Wrap Up] 
 <<Switch_Camera CamController "CenterCam">>
 
-Walter: You know, I've been coming to bars like this for forty years.
+Walter: You know, I've been coming to bars like this for forty years. #line:SC_Walter_021
 <<SetLookDirection NPC_Name.Walter LookDirection.Left>>
 <<wait 0.4>>
 <<SetLookDirection NPC_Name.Owen LookDirection.Left>>
 <<SetLookDirection NPC_Name.Isla LookDirection.Left>>
 <<wait 0.8>>
-Walter: Seen good bartenders, bad ones. Everything in between.
+Walter: Seen good bartenders, bad ones. Everything in between. #line:SC_Walter_022
 <<SetLookDirection NPC_Name.Walter LookDirection.Forward>>
 <<SetLookDirection NPC_Name.Owen LookDirection.Forward>>
 <<SetLookDirection NPC_Name.Isla LookDirection.Forward>>
 
-Owen: And where do we rank so far?
-Walter: ...Ask me again in a few months.
+Owen: And where do we rank so far? #line:SC_Owen_027
+Walter: ...Ask me again in a few months. #line:SC_Walter_023
 
 // ── [SHOWCASE: Option Timeout ในฉาก Wrap Up] ─────────────
--> Hope to see you all again soon. ?
-    Player: Hope to see you all again soon.
+-> Hope to see you all again soon. ? #line:SC_OP_022
+    Player: Hope to see you all again soon. #line:SC_AN_022
     <<SetEmotion NPC_Name.Walter "happy">>
-    Walter: If the drinks keep improving — certainly.
+    Walter: If the drinks keep improving — certainly. #line:SC_Walter_024
     <<SetEmotion NPC_Name.Owen "happy">>
-    Owen: I'll be back tomorrow. This place grows on you.
+    Owen: I'll be back tomorrow. This place grows on you. #line:SC_Owen_028
     <<SetEmotion NPC_Name.Isla "happy">>
-    Isla: Same! This was really fun.
--> Really glad you all came in tonight. ?
-    Player: Really glad you all came in tonight.
+    Isla: Same! This was really fun. #line:SC_Isla_022
+-> Really glad you all came in tonight. ? #line:SC_OP_023
+    Player: Really glad you all came in tonight. #line:SC_AN_023
     <<SetEmotion NPC_Name.Isla "happy">>
-    Isla: Us too! Right, Walter?
+    Isla: Us too! Right, Walter? #line:SC_Isla_023
     <<SetEmotion NPC_Name.Walter "happy">>
-    Walter: ...Sure. Right.
--> You know where to find me. ?
-    Player: You know where to find me.
+    Walter: ...Sure. Right. #line:SC_Walter_025
+-> You know where to find me. ? #line:SC_OP_024
+    Player: You know where to find me. #line:SC_AN_024
     <<SetEmotion NPC_Name.Owen "happy">>
-    Owen: Ha! Confidence. Good.
--> No rush — take your time. #fallback
-    Player: No rush, stay as long as you like.
+    Owen: Ha! Confidence. Good. #line:SC_Owen_029
+-> No rush — take your time. #fallback #line:SC_OP_025
+    Player: No rush, stay as long as you like. #line:SC_AN_025
     <<SetEmotion NPC_Name.Walter "neutral">>
-    Walter: Don't mind if I do.
+    Walter: Don't mind if I do. #line:SC_Walter_026
 
 // ── [SHOWCASE: MoveOut ทุกตัวละคร] ──────────────────────
 <<SetEmotion NPC_Name.Owen "neutral">>
 <<SetEmotion NPC_Name.Isla "neutral">>
 <<SetEmotion NPC_Name.Walter "neutral">>
 
-Owen: Right then. Night.
+Owen: Right then. Night. #line:SC_Owen_030
 <<MoveOut NPC_Name.Owen>>
 
-Isla: Byeee! See you next time!
+Isla: Byeee! See you next time! #line:SC_Isla_024
 <<MoveOut NPC_Name.Isla>>
 
-Walter: Mm. Not bad.
+Walter: Mm. Not bad. #line:SC_Walter_027
 <<MoveOut NPC_Name.Walter>>
 
 <<Switch_Camera CamController "MainCam">>

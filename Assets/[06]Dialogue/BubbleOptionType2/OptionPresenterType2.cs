@@ -154,10 +154,29 @@ namespace YarnSpinner.Custom
 
         [System.Obsolete]
         public override async YarnTask<DialogueOption> RunOptionsAsync(
-            DialogueOption[] dialogueOptions,
-            CancellationToken cancellationToken)
+                                    DialogueOption[] dialogueOptions,
+                                    CancellationToken cancellationToken)
         {
-            // ── Guards ────────────────────────────────────────────────────────
+            // ── SAVE/LOAD: silent replay — auto-select without showing UI 
+            // Must be the very first thing in the method, before any guard checks.
+            if (SceneLoaderBridge.IsSilentReplay)
+            {
+                // Dequeue the saved choice for this option block
+                if (SceneLoaderBridge.ReplayOptionQueue.Count > 0)
+                {
+                    int savedId = SceneLoaderBridge.ReplayOptionQueue.Dequeue();
+                    foreach (var opt in dialogueOptions)
+                        if (opt.DialogueOptionID == savedId && opt.IsAvailable)
+                            return opt;
+                }
+                // Fallback: first available option (saves from older versions without choice data)
+                foreach (var opt in dialogueOptions)
+                    if (opt.IsAvailable) return opt;
+                return await DialogueRunner.NoOptionSelected;
+            }
+            // ── END SAVE/LOAD
+
+            // ── Guards 
             if (optionItemPrefab == null)
             {
                 Debug.LogWarning("[OptionPresenterType2] optionItemPrefab is not assigned.");
@@ -321,7 +340,14 @@ namespace YarnSpinner.Custom
             // ── Wait for selection ────────────────────────────────────────────
             var selected = await selectionSource.Task;
 
-            // ── Clean up ──────────────────────────────────────────────────────
+            // ── SAVE/LOAD: record the choice for potential save
+            // Stored in SessionOptionChoices so SaveLoadManager can snapshot it on save.
+            // SessionOptionChoices is cleared automatically on every node start.
+            if (selected != null)
+                SceneLoaderBridge.SessionOptionChoices.Add(selected.DialogueOptionID);
+            // ── END SAVE/LOAD 
+
+            // ── Clean up 
             completionCancelSrc.Cancel();
 
             optionPresenterCanvasGroup.interactable = false;

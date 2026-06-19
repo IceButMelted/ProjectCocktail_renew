@@ -9,6 +9,8 @@ using Yarn.Unity;
 using System;
 using System.Collections;
 using System.Linq;
+using UnityEditor.UIElements;
+
 
 #if UNITY_EDITOR
 using UnityEditor.Overlays;
@@ -114,6 +116,67 @@ public class SaveLoadManager : MonoBehaviour
 
         _storage = dialogueRunner.VariableStorage;
         CacheProgram();
+
+        // Track node transitions to distinguish <<jump>> (new root) from <<detour>> (sub-node).
+        // See OnNodeStart / OnNodeComplete / OnDialogueComplete for the logic.
+        dialogueRunner.onNodeStart.AddListener(OnNodeStart);
+        dialogueRunner.onNodeComplete.AddListener(OnNodeComplete);
+        dialogueRunner.onDialogueComplete.AddListener(OnDialogueComplete);
+
+        // Reset tracking state for the new scene's runner instance.
+        _lastNodeCompleted = true;
+        _detourDepth = 0;
+    }
+
+    // ── Node tracking: jump vs detour ──────────────────────────────────────────
+    // With <<jump>>:   onNodeComplete(A) fires → onNodeStart(B) fires.  A completed first.
+    // With <<detour>>: onNodeStart(B) fires while A is still running.   A has NOT completed.
+    // The _lastNodeCompleted flag captures exactly this difference.
+
+    private bool _lastNodeCompleted = true; // true at startup = "no previous node"
+    private int _detourDepth = 0;
+
+    private void OnNodeStart(string nodeName)
+    {
+        if (_lastNodeCompleted)
+        {
+            // <<jump>> or fresh StartDialogue — this is a new root segment.
+            _detourDepth = 0;
+            SceneLoaderBridge.DialogueRootNode = nodeName;
+            SceneLoaderBridge.SessionOptionChoices.Clear(); // choices reset per root, not per detour
+            SceneLoaderBridge.IsInDetour = false;
+        }
+        else
+        {
+            // <<detour>> — parent node is still running; don't update root or clear choices.
+            _detourDepth++;
+            SceneLoaderBridge.IsInDetour = true;
+        }
+        _lastNodeCompleted = false;
+    }
+
+    private void OnNodeComplete(string nodeName)
+    {
+        if (_detourDepth > 0)
+        {
+            // Returning from a detour — parent node resumes, depth decreases.
+            _detourDepth--;
+            SceneLoaderBridge.IsInDetour = _detourDepth > 0;
+            // Do NOT set _lastNodeCompleted — the parent is still running.
+        }
+        else
+        {
+            // Normal node end (or root node end after all detours returned).
+            _lastNodeCompleted = true;
+        }
+    }
+
+    private void OnDialogueComplete()
+    {
+        // Dialogue ended cleanly — reset for the next StartDialogue call.
+        _lastNodeCompleted = true;
+        _detourDepth = 0;
+        SceneLoaderBridge.IsInDetour = false;
     }
 
     #endregion
@@ -131,7 +194,11 @@ public class SaveLoadManager : MonoBehaviour
         _saveData.MetaData.Timestamp = DateTime.Now.ToString("MMM d, yyyy  HH:mm");
         _saveData.MetaData.PlaytimeSeconds = PlaytimeTracker.TotalSeconds;
         _saveData.MetaData.PlaytimeFormatted = PlaytimeTracker.Formatted();
-        _saveData.MetaData.ChapterName = dialogueRunner.Dialogue.CurrentNode;
+        _saveData.MetaData.ChapterName = SceneLoaderBridge.DialogueRootNode; // root, not CurrentNode — survives <<detour>>
+        _saveData.MetaData.LastLineId = CocktailSystemManager.IsWaitingForTask
+            ? SceneLoaderBridge.CheckpointLineId   // rewind before task on load
+            : SceneLoaderBridge.CurrentLineId;
+        _saveData.MetaData.ReplayOptionChoices = new List<int>(SceneLoaderBridge.SessionOptionChoices);
         _saveData.MetaData.IsEmpty = false;
 
         StartCoroutine(CaptureAndSave(_saveData, slot));
@@ -249,6 +316,7 @@ public class SaveLoadManager : MonoBehaviour
             npc.transform.rotation = item.Value.rotation;
             npc.CurrentWaypointIndex = item.Value.CurrentWayPointIndex;
             npc.CurrentLookDirection = item.Value.CurrentLookDirection;
+            npc.TeleportToWaypoint(npc.CurrentWaypointIndex);
         }
     }
 
@@ -288,7 +356,24 @@ public class SaveLoadManager : MonoBehaviour
         foreach (var item in _saveData.YarnData.StringVariableInYarn)
             _storage.SetValue(item.Key, item.Value);
 
-        dialogueRunner.Dialogue.SetNode(SceneLoaderBridge.ChapterNodeName);
+        // ── Arm silent-replay BEFORE BubblePresenter.Start() fires ────────────
+        // BubblePresenter.Start() calls StartDialogue(ChapterNodeName) — it runs
+        // AFTER OnSceneLoaded, so these flags are already set when RunLineAsync
+        // receives its first line.
+        string targetLineId = _saveData.MetaData.LastLineId;
+        if (!string.IsNullOrEmpty(targetLineId))
+        {
+            SceneLoaderBridge.TargetLineId = targetLineId;
+            SceneLoaderBridge.IsSilentReplay = true;
+
+            // Populate the option queue so OptionPresenterType2 can auto-select
+            // the correct option at each branch point during replay.
+            var choices = _saveData.MetaData.ReplayOptionChoices;
+            SceneLoaderBridge.ReplayOptionQueue = choices != null && choices.Count > 0
+                ? new Queue<int>(choices)
+                : new Queue<int>();
+        }
+        // Do NOT call StartDialogue here — BubblePresenter.Start() owns that call.
 
         Debug.Log("[SaveLoadManager] Yarn data applied.");
     }
@@ -353,10 +438,17 @@ public class SaveLoadManager : MonoBehaviour
     [ContextMenu("Debug Save to Slot 1")] public void DebugSaveToFile() => SaveToFile(0);
     [ContextMenu("Debug Save to Slot 2")] public void DebugSaveToFile2() => SaveToFile(1);
     [ContextMenu("Debug Save to Slot 3")] public void DebugSaveToFile3() => SaveToFile(2);
+    [ContextMenu("Debug Save to Slot 4")] public void DebugSaveToFile4() => SaveToFile(3);
+    [ContextMenu("Debug Save to Slot 5")] public void DebugSaveToFile5() => SaveToFile(4);
+    [ContextMenu("Debug Save to Slot 6")] public void DebugSaveToFile6() => SaveToFile(5);
 
     [ContextMenu("Debug Load from Slot 1")] public void DebugLoadFromFile() => LoadFromFile(0);
     [ContextMenu("Debug Load from Slot 2")] public void DebugLoadFromFile2() => LoadFromFile(1);
     [ContextMenu("Debug Load from Slot 3")] public void DebugLoadFromFile3() => LoadFromFile(2);
+    [ContextMenu("Debug Load from Slot 4")] public void DebugLoadFromFile4() => LoadFromFile(3);
+    [ContextMenu("Debug Load from Slot 5")] public void DebugLoadFromFile5() => LoadFromFile(4);
+    [ContextMenu("Debug Load from Slot 6")] public void DebugLoadFromFile6() => LoadFromFile(5);
+
 
     [ContextMenu("Debug Collect Yarn Data")] public void DebugSaveYarnData() => CollectYarnData();
     [ContextMenu("Debug Apply Yarn Data")] public void DebugLoadYarnData() => ApplyYarnData();

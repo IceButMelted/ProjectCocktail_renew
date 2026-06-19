@@ -13,6 +13,8 @@ using static E_Cocktail;
 /// </summary>
 public partial class CocktailSystemManager
 {
+    public static bool IsWaitingForTask { get; private set; }
+
     // Inspector Fields
 
     [Header("BTN End Shift")]
@@ -23,7 +25,7 @@ public partial class CocktailSystemManager
 
     // ── Task / Yarn ──
     private CharacterData _characterData;
-    private bool _myGameCondition = false;
+    private bool _TaskDone = false;
     private TypeOfCocktail _cocktailType = TypeOfCocktail.None;
     private Satisfaction _satisfaction = Satisfaction.None;
 
@@ -36,7 +38,7 @@ public partial class CocktailSystemManager
 
     public void CompleteTask()
     {
-        _myGameCondition = true;
+        _TaskDone = true;
         _dialogueRunner.VariableStorage.SetValue(TaskDoneVariableName, true);
     }
 
@@ -62,10 +64,12 @@ public partial class CocktailSystemManager
     {
         var csm = FindAnyObjectByType<CocktailSystemManager>();
         //var data = FindAnyObjectByType<CharacterData>();
-        if (csm.ResolveOrderCocktail(NPC, out var drink)) {
+        if (csm.ResolveOrderCocktail(NPC, out var drink))
+        {
             return drink.Name;
         }
-        else {
+        else
+        {
             Debug.Log($"Can't find cocktail for NPC with ID '{NPC}'");
             csm.TargetCocktail = null;
             return string.Empty;
@@ -78,11 +82,13 @@ public partial class CocktailSystemManager
     {
         var csm = FindAnyObjectByType<CocktailSystemManager>();
 
-        if (csm.ResolveOrderCocktail(NPC, out var drink)) {
+        if (csm.ResolveOrderCocktail(NPC, out var drink))
+        {
             csm.TargetCocktail = drink; // Store the resolved cocktail for later reference (e.g. when serving)
             return drink.Description;
         }
-        else {
+        else
+        {
             Debug.Log($"Can't find cocktail for NPC with ID '{NPC}'");
             csm.TargetCocktail = null;
             return string.Empty;
@@ -91,14 +97,17 @@ public partial class CocktailSystemManager
 
     /// <summary>Returns the name of a specific cocktail by its name.</summary>
     [YarnFunction("Order_Cocktail_ByName_OutName")]
-    public static string OrderCocktail_OutSpecificName(string Name) {
+    public static string OrderCocktail_OutSpecificName(string Name)
+    {
         var csm = FindAnyObjectByType<CocktailSystemManager>();
 
-        if (csm.ResolveOrderCocktail(Name, out var drink)){
+        if (csm.ResolveOrderCocktail(Name, out var drink))
+        {
             csm.TargetCocktail = drink; // Store the resolved cocktail for later reference (e.g. when serving)
             return drink.Name;
         }
-        else {
+        else
+        {
             Debug.Log($"Can't find cocktail with name '{Name}'");
             csm.TargetCocktail = null;
             return string.Empty;
@@ -106,13 +115,16 @@ public partial class CocktailSystemManager
     }
 
     [YarnFunction("Order_Cocktail_ByName_OutDescription")]
-    public static string OrderCocktail_OutSpecificDescription(string Name) {
+    public static string OrderCocktail_OutSpecificDescription(string Name)
+    {
         var csm = FindAnyObjectByType<CocktailSystemManager>();
-        if (csm.ResolveOrderCocktail(Name, out var drink)){
+        if (csm.ResolveOrderCocktail(Name, out var drink))
+        {
             csm.TargetCocktail = drink; // Store the resolved cocktail for later reference (e.g. when serving)
             return drink.Description;
         }
-        else {
+        else
+        {
             Debug.Log($"Can't find cocktail with name '{Name}'");
             csm.TargetCocktail = null;
             return string.Empty;
@@ -170,13 +182,24 @@ public partial class CocktailSystemManager
     [YarnCommand("wait_for_task")]
     public IEnumerator WaitForTask()
     {
+        if (SceneLoaderBridge.IsSilentReplay) yield break;
+        IsWaitingForTask = true;
         EnableButtonInYarn(true);
         yield return new WaitUntil(() => UpdateVariableInYarn());
+        IsWaitingForTask = false;
+    }
+
+    [YarnCommand("wait_scene")]         // use <<wait_scene 1>> in .yarn instead of <<wait 1>>
+    public static IEnumerator WaitScene(float seconds)
+    {
+        if (SceneLoaderBridge.IsSilentReplay) yield break;
+        yield return new WaitForSeconds(seconds);
     }
 
     [YarnCommand("Can_End_Shift")]
     public void CanEndShift()
     {
+        if (SceneLoaderBridge.IsSilentReplay) return; // ponytail: skip — UI side effect
         EnableButtonInYarn(false);
         _endShiftBTN.gameObject.SetActive(true);
         Debug.Log("[CocktailSystemManager] CanEndShift called.");
@@ -185,6 +208,7 @@ public partial class CocktailSystemManager
     [YarnCommand("Enable_InteractableObject")]
     public void EnableButtonInYarn(bool enable)
     {
+        if (SceneLoaderBridge.IsSilentReplay) return; // ponytail: skip — UI side effect
         _cocktailShaker.Interactable = enable;
         _cocktailShakerData.SetIngredientActive(enable);
 
@@ -205,7 +229,8 @@ public partial class CocktailSystemManager
     [YarnCommand("Reset_Variable")]
     public void ResetVariableInYarn()
     {
-        _myGameCondition = false;
+        if (SceneLoaderBridge.IsSilentReplay) return; // ponytail: skip — vars already restored from save
+        _TaskDone = false;
         _satisfaction = Satisfaction.None;
         _cocktailType = TypeOfCocktail.None;
 
@@ -219,7 +244,7 @@ public partial class CocktailSystemManager
     // Private Yarn Helpers
     private void UpdateVariableInYarnTrigger()
     {
-        _myGameCondition = true;
+        _TaskDone = true;
         SetSatisfaction(CalculateSatisfaction());
         Debug.Log($"[CocktailSystemManager] Satisfaction → {_satisfaction}");
         DebugVariableFromYarn();
@@ -229,7 +254,7 @@ public partial class CocktailSystemManager
 
     private void DebugUpdateVariableInYarnTrigger()
     {
-        _myGameCondition = true;
+        _TaskDone = true;
         Debug.Log($"[CocktailSystemManager] (Debug) Satisfaction → {_satisfaction}");
         DebugVariableFromYarn();
         UpdateVariableInYarn();
@@ -243,7 +268,7 @@ public partial class CocktailSystemManager
     /// </summary>
     private bool UpdateVariableInYarn()
     {
-        if (_myGameCondition && _satisfaction != Satisfaction.None)
+        if (_TaskDone && _satisfaction != Satisfaction.None)
         {
             EnableButtonInYarn(false);
             _dialogueRunner.VariableStorage.SetValue(SatisfactionVariableName, (int)_satisfaction);
@@ -310,7 +335,7 @@ public partial class CocktailSystemManager
             + "\n" + sep
             + string.Format("\n  {0,-26} {1,-20} {2,-8} {3,-20} {4}", "Variable", "C# Value", "Yarn Raw", "Yarn Enum", "Match?")
             + "\n" + sep
-            + FormatEnumRow(TaskDoneVariableName, _myGameCondition.ToString(), yarnTaskDone.ToString(), yarnTaskDone.ToString())
+            //+ FormatEnumRow(TaskDoneVariableName, _TaskDone.ToString(), yarnTaskDone.ToString(), yarnTaskDone.ToString())
             + FormatEnumRow(SatisfactionVariableName, _satisfaction.ToString(), yarnSatisfactionRaw.ToString("0"), yarnSatisfactionName)
             + FormatEnumRow(TypeOfCocktailVariableName, _cocktailType.ToString(), yarnCocktailRaw.ToString("0"), yarnCocktailName)
             + "\n" + sep;
