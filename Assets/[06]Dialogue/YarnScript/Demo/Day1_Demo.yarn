@@ -1,0 +1,471 @@
+title: D1_00_Start
+---
+// Set cam
+<<Enable_InteractableObject SystemGame false>>
+<<Fix_Camera CamController true>>
+<<Reset_Camera CamController>>
+<<Switch_Camera CamController "MainCam">>
+
+<<enum TypeOfCocktail>>
+    <<case None>>
+    <<case HighAlcohol>>
+    <<case LowAlcohol>>
+    <<case NoneAlcohol>>
+    <<case NotMatch>>
+<<endenum>>
+<<enum Satisfaction>>
+    <<case None>>
+    <<case Fail>>
+    <<case Acceptable>>
+    <<case Perfect>>
+<<endenum>>
+<<enum NPC_Name>>
+    <<case None>>
+    <<case Cole>>
+    <<case Owen>>
+    <<case Walter>>
+    <<case Freya>>
+    <<case Isla>>
+<<endenum>>
+<<enum LookDirection>>
+    <<case None>>
+    <<case Right>>
+    <<case Left>>
+    <<case Forward>>
+<<endenum>>
+// Declare the variable (set false by default)
+<<declare $type_of_cocktail = TypeOfCocktail.None>>
+<<declare $satisfaction = Satisfaction.None>>
+
+
+<<jump D1_01_Walter_Arrive>>>>
+===
+
+title: D1_01_Walter_Arrive
+---
+<<MoveIn NPC_Name.Walter 1>>
+<<Switch_Camera CamController NearLeftCam>>
+<<SetEmotion NPC_Name.Walter "happy">>
+
+
+//Walter greeting
+Walter: Good evening. It's been a long time since I last saw someone open something new in this town. #line:0
+Walter: You must be the new face in town. #line:1
+-> Welcome #line:2
+    Player: Good evening, welcome to the bar. #line:3
+    Player: Please, take your time and make yourself comfortable. #line:4
+-> Honest #line:5
+    Player: Yes, I just opened tonight. #line:6
+    Player: Still trying to get used to how quiet this town is. #line:7
+-> Friendly #line:8
+    Player: Really? I thought I've been running this place since the 20th century. #line:9
+    Walter: Haha... quite a talker. #line:A
+-> Formal #line:B
+    Player: Welcome. It's a pleasure to have you as my first guest. #line:C
+
+Walter: I'm Walter, by the way. #line:D
+Player: Nice to meet you Mr. Walter. #line:E
+Player: You can call me bartender. #line:F
+Walter: Normally at this hour, I'd just be sitting in front of the TV. #line:10
+Walter: Old habits, I suppose. #line:11
+Walter: But I saw a new place opening up, so I thought I'd drop by. #line:12
+Walter: Wanted to see the new face in town for myself. #line:13
+Player: Well, glad I opened the doors tonight. #line:14
+Player: I'm sure this place will be better than TV. #line:15
+Player: So, what will it be tonight? #line:16
+<<jump D1_02_Walter_Order>>>>
+
+===
+
+title: D1_02_Walter_Order
+---
+//Walter's Order
+Walter: Just keep it simple, son. #line:17
+Walter: {Order_Cocktail_OutName(NPC_Name.Walter)} should be enough for tonight. #line:18
+Player: Coming right up. #line:19
+<<SetEmotion NPC_Name.Owen "neutral">>
+
+
+<<Reset_Camera CamController>>
+<<Switch_Camera CamController "MainCam">>
+<<Fix_Camera CamController false>>
+<<wait_for_task SystemGame>>
+
+//After Walter's order
+<<Enable_InteractableObject SystemGame false>>
+<<Fix_Camera CamController true>>
+<<Reset_Camera CamController>>
+<<Switch_Camera CamController NearLeftCam>>
+
+<<if $satisfaction == Satisfaction.Perfect>>
+    <<SetEmotion NPC_Name.Walter "happy">>
+    Walter: Spot on, son. #line:1A
+    Walter: Balanced and clean. You've got a steady hand for a new face. #line:1B
+    Player: Thank you. #line:1C
+<<elseif $satisfaction == Satisfaction.Acceptable>>
+    Walter: A bit off, but it's alright. #line:1D
+<<elseif $satisfaction == Satisfaction.Fail>>
+    <<SetEmotion NPC_Name.Walter "upset">>
+    Walter: I don't think this is what I asked for. #line:1E
+    Walter: My memory might be fading, but my tongue still works. #line:1F
+<<endif>>
+
+<<SetEmotion NPC_Name.Walter "neutral">>
+<<jump D1_03_Walter_Talk>>>>
+===
+
+title: D1_03_Walter_Talk
+---
+//Town topic
+Walter: Anyway, officially... welcome to our little valley, Bartender. #line:20
+Walter: We don't get many newcomers around here. #line:21
+Walter: So, tell me. What's your first impression? #line:22
+Walter: How do you like our quiet town so far? #line:23
+
+-> It feels cozy. #line:24
+-> A bit too quiet. #line:25
+-> Good for sleeping. #line:26
+-> Peaceful. #line:27
+
+Walter: Fair enough.  #line:28
+Walter: But don't worry, people will start trickling in once word gets out. #line:29
+<<jump D1_04_Isla_Arrive>>>>
+===
+
+title: D1_04_Isla_Arrive
+---
+//Isla come in 
+<<Enable_InteractableObject SystemGame false>>
+<<Fix_Camera CamController true>>
+<<Reset_Camera CamController>>
+<<Switch_Camera CamController "MainCam">>
+
+<<MoveIn NPC_Name.Isla 2>>
+<<Switch_Camera CamController NearLeftCam>>
+<<SetEmotion NPC_Name.Walter "happy">>
+<<SetEmotion NPC_Name.Isla "happy">>
+
+Isla: Good evening. #line:2A
+Player: Good evening. #line:2B
+Isla: Wow, you've really done a wonderful job with this place. #line:2C
+Walter: Good evening Isla. How's work treating you? #line:2D
+Isla: Same as always. Busy enough to forget what day it is. #line:2E
+<<SetEmotion NPC_Name.Isla "neutral">>
+Isla: More importantly, how is that back pain of yours doing, Mr. Walter? #line:2F
+Walter: Ah, don't worry about it, dear. #line:30
+Walter: I'll just take a pill or two, and it'll clear right up. #line:31
+Isla: Take care of yourself. Taking medicine alone won't help. #line:32
+-> Get well soon. #line:33
+    Player: Take it easy, Walter. I need my favorite regular staying healthy. #line:34
+    Walter: Thank you, Mr. Bartender. #line:35
+-> She's right. #line:36
+    Player: She's right, Walter. #line:37
+    Player: Medicine only masks the pain, it doesn't fix it. #line:38
+    Walter: Alright, alright, I'm surrounded by caretakers tonight, I see. #line:39
+-> I feel your pain. #line:3A
+    Player: Just standing behind this counter all night is already killing my back. #line:3B
+    Isla: Are you Ok?  #line:3C
+    Isla: You can let me check for you. #line:3D
+    Player: Nah, it's ok. #line:3E
+-> A toast to health. #line:3F
+    Player: Well, they say the right drink can comfort any ache. #line:40
+    Isla: Hey, but don't drink too much either. #line:41
+
+<<SetEmotion NPC_Name.Isla "happy">>
+Isla: Oh by the way. my name is Isla. #line:42
+Isla: I'm a nurse at the local clinic. #line:43
+Player: I'm Bartender. Nice to meet you. #line:44
+Isla: Yeah nice to meet you too. #line:45
+Player: Would you like anything to drink? #line:46
+Isla: Um... Let me see. #line:47
+Isla: I have a morning shift tomorrow... #line:48
+Isla: Do you have anything to recommend? #line:49
+<<jump D1_05_Isla_Order>>>>
+===
+
+title: D1_05_Isla_Order
+---
+//-> Gin Fizz.
+//-> Sea Breeze.
+//-> Cranberry Fizz.
+//-> Everything is recommended here.
+Player: Everything is recommended here. #line:4A
+Isla: Umm... #line:4B
+Isla: Okay, I'll have {Order_Cocktail_OutName(NPC_Name.Isla)}. #line:4C
+Player: Got it. #line:4D
+
+<<SetEmotion NPC_Name.Isla "neutral">>
+
+<<Reset_Camera CamController>>
+<<Switch_Camera CamController "MainCam">>
+<<Fix_Camera CamController false>>
+<<wait_for_task SystemGame>>
+
+//After Isla's order
+<<Enable_InteractableObject SystemGame false>>
+<<Fix_Camera CamController true>>
+<<Reset_Camera CamController>>
+<<Switch_Camera CamController NearLeftCam>>
+
+<<if $satisfaction == Satisfaction.Perfect>>
+    <<SetEmotion NPC_Name.Isla "happy">>
+    Isla: Oh, wow... this is incredible. #line:4E
+    Isla: Seriously, you have magic hands. #line:4F
+
+<<elseif $satisfaction == Satisfaction.Acceptable>>
+    Isla: Oh, it tastes... a bit different from what I expected. #line:50
+    Isla: But it's fine. #line:51
+
+<<elseif $satisfaction == Satisfaction.Fail>>
+    <<SetEmotion NPC_Name.Isla "upset">>
+    Isla: Uh... Bartender? #line:52
+    Isla: I think you might have grabbed the wrong bottle. #line:53
+    Isla: It's definitely not what I asked for. #line:54
+
+<<endif>>
+<<SetEmotion NPC_Name.Isla "neutral">>
+<<jump D1_06_Isla_Talk>>>>
+===
+
+title: D1_06_Isla_Talk
+---
+Isla: Did you just move here? #line:55
+Player: Yes, just a few days ago. #line:56
+Isla: It's a nice little town, once you get used to the quiet. #line:57
+Isla: Actually, I'm not from around here. #line:58
+Isla: I was transferred here for work. #line:59
+Walter: But she's become a part of the town now. #line:5A
+Isla: You're exaggerating, Mr. Walter. #line:5B
+Isla: I just... ended up staying longer than I planned. #line:5C
+<<jump D1_07_Owen_Arrive>>>>
+===
+
+
+title: D1_07_Owen_Arrive
+---
+//Owen come in 
+<<Enable_InteractableObject SystemGame false>>
+<<Fix_Camera CamController true>>
+<<Reset_Camera CamController>>
+<<Switch_Camera CamController "MainCam">>
+
+<<MoveIn NPC_Name.Owen 3>>
+<<Switch_Camera CamController CenterCam>>
+<<SetEmotion NPC_Name.Walter "happy">>
+<<SetEmotion NPC_Name.Owen "happy">>
+
+Owen: Hey! hey!! Owen here! #line:5D
+Isla: Ugh keep your voice down Owen. #line:5E
+Owen: My bad, Isla. Nice to see you. #line:5F
+Owen: Oh and good evening Mr. Walter. How's your back? #line:60
+Walter: Isla already asked. I'm fine, Owen. #line:61
+<<SetEmotion NPC_Name.Walter "neutral">>
+Owen: Wait, wait, wait — new face behind the bar? #line:62
+Owen: I thought I knew everyone in town. #line:63
+Owen: Since when did this place have a bartender? #line:64
+-> Hello! #line:65
+    Player: Hello. I'm a Bartender. #line:66
+    Player: I just opened a few days ago. #line:67
+    Owen: Newcomer? Glad to see you. #line:68
+-> Just the bartender. #line:69
+    Player: Just the bartender. #line:6A
+    Owen: Just the bartender? No name, no story? #line:6B
+    Owen: Mysterious. I like it. #line:6C
+-> Hey! Hey!! #line:6D
+    Player: hey! Hey!! Bartender here! #line:6E
+    Owen: Now that's the spirit! #line:6F
+-> Good evening. #line:70
+    Player: Good evening. I'm Bartender, nice to meet you. #line:71
+    Owen: Whoa, so formal. I'm speechless. #line:72
+    Owen: Nice to meet you. #line:73
+
+Owen: Well, you picked the right town to open a bar. #line:74
+Owen: Looks like I've finally got a regular spot. #line:75
+Isla: You show up everywhere, Owen. #line:76
+Owen: I'm easy-going. I'm fine with anywhere. #line:77
+<<jump D1_08_Owen_Order>>>>
+===
+
+title: D1_08_Owen_Order
+---
+Owen: Oh right, I should probably order before the bartender kicks me out. #line:78
+Owen: I'll have {Order_Cocktail_OutName(NPC_Name.Owen)}. #line:79
+Player: One moment. #line:7A
+<<SetEmotion NPC_Name.Owen "neutral">>
+
+<<Reset_Camera CamController>>
+<<Switch_Camera CamController "MainCam">>
+<<Fix_Camera CamController false>>
+<<wait_for_task SystemGame>>
+
+//After Owen's order
+<<Enable_InteractableObject SystemGame false>>
+<<Fix_Camera CamController true>>
+<<Reset_Camera CamController>>
+<<Switch_Camera CamController CenterCam>>
+
+<<if $satisfaction == Satisfaction.Perfect>>
+    <<SetEmotion NPC_Name.Owen "happy">>
+    Owen: Unbelievable! This is amazing. #line:7B
+    Owen: I should have gone to bartender school instead. #line:7C
+
+<<elseif $satisfaction == Satisfaction.Acceptable>>
+    Owen: I'm not sure, but it feels like something's missing. #line:7D
+    Owen: But it's better than not being able to drink. #line:7E
+
+<<elseif $satisfaction == Satisfaction.Fail>>
+    <<SetEmotion NPC_Name.Owen "upset">>
+    Owen: Hmm... I hate to say it, but I think something went sideways here. #line:7F
+<<endif>>
+<<SetEmotion NPC_Name.Owen "neutral">>
+<<jump D1_09_Owen_Talk>>>>
+===
+
+title: D1_09_Owen_Talk
+---
+Owen: Anyway. #line:80
+Owen: I didn't tell you what I do for a living, did I? #line:81
+Owen: Guess what I do for a living. #line:82
+Owen: The hint is nature. #line:83
+-> Gardener #line:84
+    Owen: Nope. Do I look like that? #line:85
+-> Lumberjack #line:86
+    Owen: The opposite! #line:87
+-> Wildlife conservationist #line:88
+    Owen: Close! You're actually the first person to get that close. #line:89
+-> You have a job? #line:8A
+    Owen: Hey! What's that supposed to mean? #line:8B
+
+Owen: I'm a forest ranger. #line:8C
+Owen: I take care of the forests and the wildlife. #line:8D
+Owen: You got closer than Isla ever did. #line:8E
+Owen: First time we met, she thought I was homeless. #line:8F
+Isla: It's because you were climbing a tree behind my dorm! #line:90
+Isla: And you looked all scruffy. #line:91
+Owen: Because I climbed up to catch the raccoon. #line:92
+Isla: Then you fell off the tree. I was shocked. #line:93
+Owen: Luckily, it wasn't anything serious. #line:94
+<<SetEmotion NPC_Name.Owen "happy">>
+Isla: Your ankle sprained. #line:95
+Owen: At least it's not broken. #line:96
+Player: And what about the raccoon? #line:97
+<<SetEmotion NPC_Name.Owen "neutral">>
+Owen: It ran away before we could catch it. #line:98
+Owen: It was rummaging through the trash at Cole's house. #line:99
+Isla: That poor raccoon probably didn't know what hit him. #line:9A
+Owen: Hey, I was very gentle. #line:9B
+<<jump D1_10_Walter_Leave>>>>
+===
+
+title: D1_10_Walter_Leave
+---
+Walter: I think I should go now. #line:9C
+Owen: Already? But I just got here. #line:9D
+Walter: It's late now, Owen. #line:9E
+Walter: I'm not as young as I used to be. #line:9F
+Walter: I guess I'll have to let the young people continue the conversation. #line:A0
+Owen: You're still a youth. #line:A1
+<<SetEmotion NPC_Name.Owen "neutral">>
+Walter: Ha. Nice try, Owen. But flattery won't keep me up past my bedtime. #line:A2
+Isla: Take care of yourself, Mr. Walter. #line:A3
+Player: Get home safely, Mr. Walter. #line:A4
+Walter: Thank you. You guys take care too. #line:A5
+Owen: Take care, old man. #line:A6
+<<MoveOut NPC_Name.Walter>>
+<<jump D1_11_Bar_Talk>>>>
+===
+
+title: D1_11_Bar_Talk
+---
+//After Walter leave
+Isla: Hey, Mr. Bartender. #line:A7
+Player: Yes. #line:A8
+Isla: Do you mind if I ask why you moved here? #line:A9
+Player: Of course not. #line:AA
+-> I needed a change of pace. #line:AB
+    Player: You know, I just want to find something new in my life. #line:AC
+    Isla: Did you find it? #line:AD
+    Player: Nope, still looking. #line:AE
+-> I'm bored with the city. #line:AF
+    Player: The bright lights of the city aren't really my thing. #line:B0
+    Isla: I get that. #line:B1
+    Owen: Don't worry, it's so quiet here you can hear the leaves falling. #line:B2
+    Owen: Some people find it peaceful. Others last two weeks. #line:B3
+-> Someone recommended this place. #line:B4
+    Player: They said this is the perfect place to unwind. #line:B5
+    Isla: May I ask who? #line:B6
+    Player: It doesn't matter. I'm here now. #line:B7
+-> I Don't know. #line:B8
+    Player: I just want to come here. #line:B9
+    Isla: That's... actually kind of freeing to hear. #line:BA
+    Owen: Honestly? Respect. That takes guts. #line:BB
+
+<<SetEmotion NPC_Name.Isla "happy">>
+Isla: Anyway, welcome to town. #line:BC
+Isla: You'll get used to it soon. #line:BD
+Player: Thank you. #line:BE
+<<SetEmotion NPC_Name.Isla "neutral">>
+Owen: Just don't provoke Cole, okay? #line:BF
+Player: Who's Cole? #line:C0
+Owen: He's our local officer. #line:C1
+Owen: I don't talk to him much, but he's incredibly scary. #line:C2
+Isla: Not quite that bad. He's a good person. #line:C3
+Owen: Maybe, but it's still scary. #line:C4
+Isla: You talk as if you're not terrifying yourself, climbing trees in people's yards. #line:C5
+Owen: It's a job! #line:C6
+Player: If I find a raccoon, I'll call. #line:C7
+Owen: Anytime, except when sleeping. #line:C8
+<<jump D1_12_Isla_Leave>>>>
+===
+
+title: D1_12_Isla_Leave
+---
+Isla: I think it's already late. #line:C9
+Isla: I should probably go. #line:CA
+Owen: Come on, I was enjoying the conversation. #line:CB
+Isla: I have an early shift tomorrow. #line:CC
+Owen: Fine... #line:CD
+Player: Get home safe! #line:CE
+<<SetEmotion NPC_Name.Isla "happy">>
+Isla: Thanks! See you guys. #line:CF
+<<SetEmotion NPC_Name.Owen "happy">>
+Owen: Yup, see you. #line:D0
+<<MoveOut NPC_Name.isla>>
+<<jump D1_13_Owen_Talk_Outro>>>>
+===
+
+title: D1_13_Owen_Talk_Outro
+---
+//After isla leave
+<<SetEmotion NPC_Name.Owen "neutral">>
+Owen: ... #line:D1
+Owen: It's become a lot quieter. #line:D2
+Player: At least you still have me. #line:D3
+Owen: Yeah, you're right. #line:D4
+Player: So how's the job? #line:D5
+Owen: Mine? Oh, it's alright. #line:D6
+Player: What do you usually do? #line:D7
+Owen: sometimes I explore on foot, or I give educational presentations to tourists. #line:D8
+Player: And also chase raccoons. #line:D9
+Owen: Ha, that too. #line:DA
+Owen: But I mostly stay on the observation tower. #line:DB
+Owen: Keep an eye out for signs of stray animals or watch out for wildfires. #line:DC
+Owen: Mostly quiet. Nothing much ever happens up there. #line:DD
+Player: Sounds peaceful. #line:DE
+Owen: Yeah. #line:DF
+Owen: ...It is. #line:E0
+<<jump D1_14_Owen_Leave>>>>
+===
+
+title: D1_14_Owen_Leave
+---
+Owen: Anyway, I should head out. #line:E1
+Owen: Early morning tomorrow. #line:E2
+Owen: The work never has a day off. #line:E3
+Player: Good luck, see you again. #line:E4
+Owen: Thanks, see you later.  #line:E5
+Owen: Owen, signing out. #line:E6
+<<MoveOut NPC_Name.Owen>>
+
+<<Can_End_Shift SystemGame>>
+===
