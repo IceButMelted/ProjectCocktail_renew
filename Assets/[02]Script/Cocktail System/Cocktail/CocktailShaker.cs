@@ -3,7 +3,7 @@ using UnityEngine;
 using static E_Cocktail;
 
 [RequireComponent(typeof(CocktailShakerData))]
-public class CocktailShaker : Interactable3DObject
+public class CocktailShaker : Interactable_2_5DObject
 {
     // ── Inspector ──────────────────────────────────────────
 

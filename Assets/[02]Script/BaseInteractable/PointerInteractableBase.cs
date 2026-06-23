@@ -11,7 +11,7 @@ using UnityEngine.EventSystems;
 ///   I — IPointerInteractable is the thin interface outsiders depend on.
 ///   D — InteractableController depends on IPointerInteractable, not this concrete type.
 ///
-/// Subclasses: Interactable3DObject, DragableObject, UIPointerSound
+/// Subclasses: Interactable_2_5DObject, DragableObject, UIPointerSound
 /// </summary>
 public interface IPointerInteractable
 {

@@ -120,7 +120,7 @@ public class CocktailShakerData : MonoBehaviour, IIngredientReceiver
         foreach (var btn in ingredientButtons)
         {
             if (btn == null) continue;
-            if (btn.TryGetComponent<Interactable3DObject>(out var interactable)) interactable.Interactable = active;
+            if (btn.TryGetComponent<Interactable_2_5DObject>(out var interactable)) interactable.Interactable = active;
             if (btn.TryGetComponent<UIPointerSound>(out var sound)) sound.Interactable = active;
             if (btn.TryGetComponent<DragableObject>(out var drag)) drag.Interactable = active;
         }

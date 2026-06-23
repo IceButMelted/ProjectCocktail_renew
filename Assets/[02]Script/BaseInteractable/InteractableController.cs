@@ -13,7 +13,7 @@ using UnityEngine.EventSystems;
 ///   L — depends on IPointerInteractable, not any concrete subclass.
 ///   I — exposes only the operations callers actually need.
 ///   D — all dependencies injected through the interface; no hard coupling to
-///       Interactable3DObject / DragableObject / UIPointerSound.
+///       Interactable_2_5DObject / DragableObject / UIPointerSound.
 ///
 /// Usage
 /// ─────
