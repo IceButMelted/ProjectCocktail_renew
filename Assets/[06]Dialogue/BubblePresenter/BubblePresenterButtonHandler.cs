@@ -5,19 +5,18 @@
  * Attach to the same GameObject (or any child) as your BubblePresenter.
  * Wire a UI Button (or any clickable area) to OnContinueClicked() via the Inspector.
  *
- * Behaviour mirrors LinePresenterButtonHandler:
- *   • While the typewriter is running → first click HURRIES it (skips to full text).
- *   • Once text is fully displayed    → click ADVANCES to the next line.
+ * Behaviour:
+ *   • While the typewriter is running → click calls LineAdvancer.RequestLineHurryUp()
+ *     (skips to full text).
+ *   • Once text is fully displayed    → click calls LineAdvancer.RequestNextLine()
+ *     (advances to the next line).
  *
- * BubblePresenter polls IsAdvanceRequested each frame to know when to proceed.
- *
- * SETUP
- * ─────
- * 1. Add this component to your bubble/dialogue GameObject.
- * 2. In your bubble prefab, add a transparent Button that covers the screen
- *    (or a dedicated "tap to continue" button) and wire its OnClick → OnContinueClicked().
- * 3. In BubblePresenter's Inspector, drag this component into the "Button Handler" slot.
- */
+ * These calls go through the LineAdvancer rather than being handled locally, so
+ * keyboard / gamepad / Input Action bindings configured on the LineAdvancer work
+ * the same way a button tap does — both end up calling DialogueRunner.RequestHurryUpLine()
+ * / RequestNextLine(), which BubblePresenter already observes via
+ * LineCancellationToken.IsHurryUpRequested / IsNextContentRequested.
+*/
 
 using UnityEngine;
 using UnityEngine.UI;
@@ -36,6 +35,16 @@ namespace YarnSpinner.Custom
         [Tooltip("(Optional) GameObject shown as a 'tap to continue' indicator " +
                  "once the typewriter has finished. Hidden while text is still typing.")]
         [SerializeField] private GameObject continueIndicator;
+
+        [Tooltip("(Optional) The LineAdvancer that hurry-up / next-line requests are " +
+                 "forwarded to, in addition to the local IsHurryUpRequested / " +
+                 "IsAdvanceRequested flags. If left empty, BubblePresenter will assign " +
+                 "one automatically on Awake if it can find one (see SetLineAdvancer). " +
+                 "Set the LineAdvancer's 'Separate Hurry Up And Advance Controls' to " +
+                 "true, since BubblePresenter doesn't expose a Typewriter for it to " +
+                 "track line-completion itself — this script does that tracking " +
+                 "instead via IsWaitingForInput.")]
+        [SerializeField] private LineAdvancer lineAdvancer;
 
         // ── State ─────────────────────────────────────────────────────────────
 
@@ -83,14 +92,26 @@ namespace YarnSpinner.Custom
         // ── Public API called by BubblePresenter ──────────────────────────────
 
         /// <summary>
+        /// Called by BubblePresenter (typically from its own Awake) to supply a
+        /// LineAdvancer reference if one wasn't already assigned in the
+        /// Inspector. Existing Inspector assignments take priority and are not
+        /// overwritten.
+        /// </summary>
+        public void SetLineAdvancer(LineAdvancer advancer)
+        {
+            if (lineAdvancer == null)
+                lineAdvancer = advancer;
+        }
+
+        /// <summary>
         /// Called by BubblePresenter at the start of each line, before the
         /// typewriter begins. Resets state and hides the continue indicator.
         /// </summary>
         public void OnLineBegin()
         {
-            IsWaitingForInput   = false;
-            IsAdvanceRequested  = false;
-            IsHurryUpRequested  = false;
+            IsWaitingForInput = false;
+            IsAdvanceRequested = false;
+            IsHurryUpRequested = false;
             SetWaitingVisuals(false);
         }
 
@@ -110,7 +131,7 @@ namespace YarnSpinner.Custom
         /// </summary>
         public void OnLineDismiss()
         {
-            IsWaitingForInput  = false;
+            IsWaitingForInput = false;
             IsAdvanceRequested = false;
             SetWaitingVisuals(false);
         }
@@ -119,8 +140,14 @@ namespace YarnSpinner.Custom
 
         /// <summary>
         /// Wire this to your UI Button's OnClick event.
-        /// • If the typewriter is still running → sets IsHurryUpRequested for one frame.
-        /// • If the typewriter is done          → sets IsAdvanceRequested for one frame.
+        /// • If the typewriter is still running → sets IsHurryUpRequested for one frame,
+        ///   and (if assigned) calls LineAdvancer.RequestLineHurryUp().
+        /// • If the typewriter is done          → sets IsAdvanceRequested for one frame,
+        ///   and (if assigned) calls LineAdvancer.RequestNextLine().
+        /// Routing through LineAdvancer means BubblePresenter's RunLineAsync sees the
+        /// request via LineCancellationToken.IsHurryUpRequested / IsNextContentRequested,
+        /// the same channel that keyboard/gamepad input on the LineAdvancer uses — so a
+        /// click and a key press behave identically.
         /// </summary>
         public void OnContinueClicked()
         {
@@ -128,11 +155,13 @@ namespace YarnSpinner.Custom
             {
                 // Text is fully visible — advance to the next line
                 IsAdvanceRequested = true;
+                if (lineAdvancer != null) lineAdvancer.RequestNextLine();
             }
             else
             {
                 // Text is still typing — hurry it up
                 IsHurryUpRequested = true;
+                if (lineAdvancer != null) lineAdvancer.RequestLineHurryUp();
             }
         }
 

@@ -13,7 +13,6 @@
  *           └── Tail              (default sprite points DOWN)
  */
 
-using NUnit.Framework.Interfaces;
 using System;
 using System.Collections.Generic;
 using TMPro;
@@ -71,9 +70,29 @@ namespace YarnSpinner.Custom
         [SerializeField] private bool useTypewriterEffect = true;
         [SerializeField] private float typewriterSpeed = 60f;
 
+        /// <summary>
+        /// The typewriter used to display this line's text, implementing the
+        /// same <see cref="IAsyncTypewriter"/> interface that the built-in
+        /// LinePresenter uses (LetterTypewriter / InstantTypewriter / your
+        /// own custom typewriter component all conform to it).
+        /// Exposing this is what lets a LineAdvancer-aware button handler
+        /// (or anything else) know "is the line fully shown yet" the same
+        /// way LinePresenterButtonHandler does for LinePresenter — by
+        /// checking IAsyncTypewriter completion rather than BubblePresenter
+        /// having to track typing progress itself.
+        /// </summary>
+        public IAsyncTypewriter Typewriter { get; private set; }
+
         [Header("Input Handler")]
         [Tooltip("Auto-found in children if left empty.")]
         [SerializeField] private BubblePresenterButtonHandler buttonHandler;
+
+        [Tooltip("(Optional) The Yarn Spinner LineAdvancer that drives hurry-up / next-line " +
+                 "requests (keyboard, gamepad, or Input Actions). Auto-found in children/parent " +
+                 "if left empty, then handed to buttonHandler so its button clicks route " +
+                 "through it as well. Configure its DialogueRunner field and set " +
+                 "'Separate Hurry Up And Advance Controls' to true.")]
+        [SerializeField] private LineAdvancer lineAdvancer;
 
         [Header("World Target Mapping")]
         [SerializeField] private List<CharacterTarget> characterTargets = new();
@@ -115,6 +134,44 @@ namespace YarnSpinner.Custom
             if (buttonHandler == null)
                 buttonHandler = GetComponentInChildren<BubblePresenterButtonHandler>();
 
+            // Build the IAsyncTypewriter that will run this presenter's
+            // typewriter effect. This mirrors LinePresenter's "Letter By
+            // Letter" typewriter mode (see LetterTypewriter in YarnSpinner-
+            // Unity). Speed of 0 / disabled means deliver everything
+            // instantly via CharactersPerSecond = 0f.
+            Typewriter = new LetterTypewriter
+            {
+                TextElement = lineText,
+                CharactersPerSecond = useTypewriterEffect ? typewriterSpeed : 0f,
+            };
+
+            if (lineAdvancer == null)
+                lineAdvancer = GetComponentInChildren<LineAdvancer>();
+            if (lineAdvancer == null)
+                lineAdvancer = GetComponentInParent<LineAdvancer>();
+
+            buttonHandler?.SetLineAdvancer(lineAdvancer);
+
+            // ── Replicate LineAdvancer.Start()'s own self-registration ───────
+            // The stock LineAdvancer only knows "is the line fully shown yet"
+            // because it adds itself as an IActionMarkupHandler directly onto
+            // the presenter's Typewriter (see LineAdvancer.Start():
+            // `presenter.Typewriter?.ActionMarkupHandlers.Add(this);`).
+            // That's what lets ONE button/key hurry up a line, then advance
+            // to the next line on a second press — LineAdvancer's internal
+            // PresentationStatus flips to LineWaiting via its own
+            // OnLineDisplayComplete() callback, which only fires if it's
+            // registered as a handler on the typewriter that's actually
+            // running. BubblePresenter builds its own Typewriter though, so
+            // LineAdvancer never normally gets added to it — we do that here.
+            //
+            // Only do this when NOT using separate hurry-up/advance controls,
+            // matching LineAdvancer's own condition: if separate controls are
+            // configured, hurry-up and advance are meant to stay on distinct
+            // inputs, so we leave LineAdvancer's self-tracking disabled.
+            if (lineAdvancer != null && !lineAdvancer.separateHurryUpAndAdvanceControls)
+                Typewriter.ActionMarkupHandlers.Add(lineAdvancer);
+
             _targetLookup.Clear();
             foreach (var e in characterTargets)
                 if (!string.IsNullOrEmpty(e.characterName) && e.worldTarget != null)
@@ -140,7 +197,7 @@ namespace YarnSpinner.Custom
             }
         }
 
-        private void Update()
+        private void LateUpdate()
         {
             if (_lastTargetPos != null)
             {
@@ -187,8 +244,27 @@ namespace YarnSpinner.Custom
             return YarnTask.CompletedTask;
         }
 
+        /// <summary>
+        /// Requests that the current line be hurried up (skip the typewriter
+        /// straight to full text). Forwards to the assigned LineAdvancer, which
+        /// in turn tells the DialogueRunner; this presenter's RunLineAsync loop
+        /// observes that via LineCancellationToken.IsHurryUpRequested.
+        /// </summary>
+        public void RequestHurryUpLine() => lineAdvancer?.RequestLineHurryUp();
+
+        /// <summary>
+        /// Requests that dialogue advance to the next line. Forwards to the
+        /// assigned LineAdvancer, which in turn tells the DialogueRunner; this
+        /// presenter's RunLineAsync loop observes that via
+        /// LineCancellationToken.IsNextContentRequested.
+        /// </summary>
+        public void RequestNextDialogueLine() => lineAdvancer?.RequestNextLine();
+
         public override async YarnTask RunLineAsync(LocalizedLine line, LineCancellationToken token)
         {
+
+
+
             // ── SAVE/LOAD ────────────────────────────────────────────────────
             SceneLoaderBridge.CurrentLineId = line.TextID;
 
@@ -209,20 +285,27 @@ namespace YarnSpinner.Custom
 
             buttonHandler?.OnLineBegin();
 
-            // init vairables Zone
 
+
+
+
+            // init vairables Zone
             //check for last character name to use as indicator for bubble animation
             bool IsNewCharacter = _lastCharacterName != line.CharacterName;
 
             string currentCharacterName = line.CharacterName ?? string.Empty;
-            if(_lastCharacterName != currentCharacterName)
+            if (_lastCharacterName != currentCharacterName)
                 _lastCharacterName = currentCharacterName;
+
+            //Reset Line Text Preventing Ghost Text
+            lineText.text = string.Empty;
+
 
             // ── Resolve position & tail ───────────────────────────────────────
             bool foundTarget = _targetLookup.TryGetValue(currentCharacterName, out Transform worldTarget)
                                 && worldTarget != null;
 
-            if(foundTarget)
+            if (foundTarget)
                 _lastTargetPos = worldTarget;
             else
                 _lastTargetPos = null;
@@ -294,32 +377,28 @@ namespace YarnSpinner.Custom
             }
 
             // ── Typewriter ────────────────────────────────────────────────────
-            if (useTypewriterEffect && lineText != null)
+            // Mirrors LinePresenter.RunLineAsync in YarnSpinner-Unity: hand the
+            // line off to an IAsyncTypewriter and await it, instead of hand-
+            // rolling a char-by-char loop. token.HurryUpToken is the same
+            // CancellationToken that LineAdvancer.RequestLineHurryUp() (and
+            // therefore BubblePresenterButtonHandler's click-while-typing
+            // case) cancels — so RunTypewriter below returns the moment a
+            // hurry-up is requested from ANY source (button, keyboard,
+            // gamepad), and just falls through to showing full text.
+            if (Typewriter != null && lineText != null)
             {
-                lineText.text = lineBody;
-                lineText.maxVisibleCharacters = 0;
-                int total = lineBody.Length;
+                Typewriter.PrepareForContent(line.TextWithoutCharacterName);
 
-                for (int i = 0; i <= total; i++)
+                if (useTypewriterEffect)
                 {
-                    if (token.IsNextContentRequested)
-                    {
-                        lineText.maxVisibleCharacters = total;
-                        Dismiss(); return;
-                    }
-
-                    if (token.IsHurryUpRequested ||
-                        (buttonHandler != null && buttonHandler.IsHurryUpRequested))
-                        break;
-
-                    lineText.maxVisibleCharacters = i;
-                    //delay for typewriter effect, but skip if speed is 0 or negative (instant)
-                    float delay = typewriterSpeed > 0f ? 1f / typewriterSpeed : 0f;
-
-                    await YarnTask.Delay(TimeSpan.FromSeconds(delay), token.HurryUpToken)
-                                  .SuppressCancellationThrow();
+                    await Typewriter
+                        .RunTypewriter(line.TextWithoutCharacterName, token.HurryUpToken)
+                        .SuppressCancellationThrow();
                 }
-                lineText.maxVisibleCharacters = total;
+
+                // Whether we finished normally or were hurried up, make sure
+                // every character is visible before we move on.
+                lineText.maxVisibleCharacters = int.MaxValue;
             }
             else if (lineText != null)
             {
@@ -327,7 +406,21 @@ namespace YarnSpinner.Custom
                 lineText.text = lineBody;
             }
 
+            // If the player already requested "next" while the typewriter
+            // was running (e.g. a fast double-tap), skip straight out.
+            // Dismiss() below already calls buttonHandler.OnLineDismiss().
+            if (token.IsNextContentRequested)
+            {
+                Dismiss();
+                return;
+            }
+
             // ── Wait for input ────────────────────────────────────────────────
+            // The typewriter has finished (or was hurried up to completion) —
+            // this is the "is the line fully shown yet" moment that
+            // BubblePresenterButtonHandler.IsWaitingForInput tracks, and that
+            // a LineAdvancer with "Separate Hurry Up And Advance Controls"
+            // needs in order to choose RequestLineHurryUp() vs RequestNextLine().
             buttonHandler?.OnTypewriterComplete();
 
             while (!token.IsNextContentRequested)
@@ -346,7 +439,7 @@ namespace YarnSpinner.Custom
                     bubbleCanvasGroup.alpha = 0f;
             }
 
-            if(IsNewCharacter)
+            if (IsNewCharacter)
                 Dismiss();
         }
 
@@ -467,12 +560,16 @@ namespace YarnSpinner.Custom
 
         private void Dismiss()
         {
+            Typewriter?.ContentWillDismiss();
+
             if (bubbleCanvasGroup != null)
                 bubbleCanvasGroup.alpha = 0f;
 
             buttonHandler?.OnLineDismiss();
             SetBubbleVisible(false);
             SetTailVisible(false);
+
+            Typewriter?.ContentDidDismiss();
         }
     }
 }

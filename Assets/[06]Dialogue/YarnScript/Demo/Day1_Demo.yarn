@@ -38,7 +38,7 @@ title: D1_00_Start
 <<declare $satisfaction = Satisfaction.None>>
 
 
-<<jump D1_01_Walter_Arrive>>>>
+<<jump D1_01_Walter_Arrive>>
 ===
 
 title: D1_01_Walter_Arrive
@@ -73,7 +73,7 @@ Walter: Wanted to see the new face in town for myself. #line:13
 Player: Well, glad I opened the doors tonight. #line:14
 Player: I'm sure this place will be better than TV. #line:15
 Player: So, what will it be tonight? #line:16
-<<jump D1_02_Walter_Order>>>>
+<<jump D1_02_Walter_Order>>
 
 ===
 
@@ -110,8 +110,10 @@ Player: Coming right up. #line:19
     Walter: My memory might be fading, but my tongue still works. #line:1F
 <<endif>>
 
+
+
 <<SetEmotion NPC_Name.Walter "neutral">>
-<<jump D1_03_Walter_Talk>>>>
+<<jump D1_03_Walter_Talk>>
 ===
 
 title: D1_03_Walter_Talk
@@ -129,7 +131,7 @@ Walter: How do you like our quiet town so far? #line:23
 
 Walter: Fair enough.  #line:28
 Walter: But don't worry, people will start trickling in once word gets out. #line:29
-<<jump D1_04_Isla_Arrive>>>>
+<<jump D1_04_Isla_Arrive>>
 ===
 
 title: D1_04_Isla_Arrive
@@ -180,7 +182,7 @@ Player: Would you like anything to drink? #line:46
 Isla: Um... Let me see. #line:47
 Isla: I have a morning shift tomorrow... #line:48
 Isla: Do you have anything to recommend? #line:49
-<<jump D1_05_Isla_Order>>>>
+<<jump D1_05_Isla_Order>>
 ===
 
 title: D1_05_Isla_Order
@@ -223,8 +225,11 @@ Player: Got it. #line:4D
     Isla: It's definitely not what I asked for. #line:54
 
 <<endif>>
+
+
+
 <<SetEmotion NPC_Name.Isla "neutral">>
-<<jump D1_06_Isla_Talk>>>>
+<<jump D1_06_Isla_Talk>>
 ===
 
 title: D1_06_Isla_Talk
@@ -237,7 +242,7 @@ Isla: I was transferred here for work. #line:59
 Walter: But she's become a part of the town now. #line:5A
 Isla: You're exaggerating, Mr. Walter. #line:5B
 Isla: I just... ended up staying longer than I planned. #line:5C
-<<jump D1_07_Owen_Arrive>>>>
+<<jump D1_07_Owen_Arrive>>
 ===
 
 
@@ -283,7 +288,7 @@ Owen: Well, you picked the right town to open a bar. #line:74
 Owen: Looks like I've finally got a regular spot. #line:75
 Isla: You show up everywhere, Owen. #line:76
 Owen: I'm easy-going. I'm fine with anywhere. #line:77
-<<jump D1_08_Owen_Order>>>>
+<<jump D1_08_Owen_Order>>
 ===
 
 title: D1_08_Owen_Order
@@ -317,8 +322,10 @@ Player: One moment. #line:7A
     <<SetEmotion NPC_Name.Owen "upset">>
     Owen: Hmm... I hate to say it, but I think something went sideways here. #line:7F
 <<endif>>
+
+
 <<SetEmotion NPC_Name.Owen "neutral">>
-<<jump D1_09_Owen_Talk>>>>
+<<jump D1_09_Owen_Talk>>
 ===
 
 title: D1_09_Owen_Talk
@@ -354,7 +361,7 @@ Owen: It ran away before we could catch it. #line:98
 Owen: It was rummaging through the trash at Cole's house. #line:99
 Isla: That poor raccoon probably didn't know what hit him. #line:9A
 Owen: Hey, I was very gentle. #line:9B
-<<jump D1_10_Walter_Leave>>>>
+<<jump D1_10_Walter_Leave>>
 ===
 
 title: D1_10_Walter_Leave
@@ -372,7 +379,7 @@ Player: Get home safely, Mr. Walter. #line:A4
 Walter: Thank you. You guys take care too. #line:A5
 Owen: Take care, old man. #line:A6
 <<MoveOut NPC_Name.Walter>>
-<<jump D1_11_Bar_Talk>>>>
+<<jump D1_11_Bar_Talk>>
 ===
 
 title: D1_11_Bar_Talk
@@ -415,7 +422,7 @@ Isla: You talk as if you're not terrifying yourself, climbing trees in people's 
 Owen: It's a job! #line:C6
 Player: If I find a raccoon, I'll call. #line:C7
 Owen: Anytime, except when sleeping. #line:C8
-<<jump D1_12_Isla_Leave>>>>
+<<jump D1_12_Isla_Leave>>
 ===
 
 title: D1_12_Isla_Leave
@@ -431,7 +438,7 @@ Isla: Thanks! See you guys. #line:CF
 <<SetEmotion NPC_Name.Owen "happy">>
 Owen: Yup, see you. #line:D0
 <<MoveOut NPC_Name.isla>>
-<<jump D1_13_Owen_Talk_Outro>>>>
+<<jump D1_13_Owen_Talk_Outro>>
 ===
 
 title: D1_13_Owen_Talk_Outro
@@ -454,7 +461,7 @@ Owen: Mostly quiet. Nothing much ever happens up there. #line:DD
 Player: Sounds peaceful. #line:DE
 Owen: Yeah. #line:DF
 Owen: ...It is. #line:E0
-<<jump D1_14_Owen_Leave>>>>
+<<jump D1_14_Owen_Leave>>
 ===
 
 title: D1_14_Owen_Leave
