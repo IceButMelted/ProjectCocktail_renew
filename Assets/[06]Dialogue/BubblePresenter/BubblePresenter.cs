@@ -152,23 +152,6 @@ namespace YarnSpinner.Custom
 
             buttonHandler?.SetLineAdvancer(lineAdvancer);
 
-            // ── Replicate LineAdvancer.Start()'s own self-registration ───────
-            // The stock LineAdvancer only knows "is the line fully shown yet"
-            // because it adds itself as an IActionMarkupHandler directly onto
-            // the presenter's Typewriter (see LineAdvancer.Start():
-            // `presenter.Typewriter?.ActionMarkupHandlers.Add(this);`).
-            // That's what lets ONE button/key hurry up a line, then advance
-            // to the next line on a second press — LineAdvancer's internal
-            // PresentationStatus flips to LineWaiting via its own
-            // OnLineDisplayComplete() callback, which only fires if it's
-            // registered as a handler on the typewriter that's actually
-            // running. BubblePresenter builds its own Typewriter though, so
-            // LineAdvancer never normally gets added to it — we do that here.
-            //
-            // Only do this when NOT using separate hurry-up/advance controls,
-            // matching LineAdvancer's own condition: if separate controls are
-            // configured, hurry-up and advance are meant to stay on distinct
-            // inputs, so we leave LineAdvancer's self-tracking disabled.
             if (lineAdvancer != null && !lineAdvancer.separateHurryUpAndAdvanceControls)
                 Typewriter.ActionMarkupHandlers.Add(lineAdvancer);
 

@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.UI;
 using Yarn.Unity;
@@ -22,6 +23,9 @@ public partial class CocktailSystemManager
 
     [Header("Yarn / Task References")]
     [SerializeField] private DialogueRunner _dialogueRunner;
+
+    [Header("UI Post-It Order")]
+    [SerializeField] private Post_It_Order _postItOrder;
 
     // ── Task / Yarn ──
     private CharacterData _characterData;
@@ -182,6 +186,7 @@ public partial class CocktailSystemManager
     [YarnCommand("wait_for_task")]
     public IEnumerator WaitForTask()
     {
+        _postItOrder.ShowPostItForDefaultDuration();
         if (SceneLoaderBridge.IsSilentReplay) yield break;
         IsWaitingForTask = true;
         EnableButtonInYarn(true);
@@ -274,6 +279,10 @@ public partial class CocktailSystemManager
             _dialogueRunner.VariableStorage.SetValue(SatisfactionVariableName, (int)_satisfaction);
             _dialogueRunner.VariableStorage.SetValue(TypeOfCocktailVariableName, (int)_cocktailType);
             _dialogueRunner.VariableStorage.SetValue(TaskDoneVariableName, true);
+
+            //disable UI Post-it
+            _postItOrder.SetOutScreen(true);
+
             return true;
         }
         return false;
