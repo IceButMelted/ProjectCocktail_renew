@@ -110,7 +110,7 @@ Player: Coming right up. #line:19
     Walter: My memory might be fading, but my tongue still works. #line:1F
 <<endif>>
 
-
+<<Reset_Variable target (CocktailSystemManager)>>
 
 <<SetEmotion NPC_Name.Walter "neutral">>
 <<jump D1_03_Walter_Talk>>
@@ -131,6 +131,7 @@ Walter: How do you like our quiet town so far? #line:23
 
 Walter: Fair enough.  #line:28
 Walter: But don't worry, people will start trickling in once word gets out. #line:29
+
 <<jump D1_04_Isla_Arrive>>
 ===
 
@@ -226,7 +227,7 @@ Player: Got it. #line:4D
 
 <<endif>>
 
-
+<<Reset_Variable target (CocktailSystemManager)>>
 
 <<SetEmotion NPC_Name.Isla "neutral">>
 <<jump D1_06_Isla_Talk>>
@@ -323,6 +324,7 @@ Player: One moment. #line:7A
     Owen: Hmm... I hate to say it, but I think something went sideways here. #line:7F
 <<endif>>
 
+<<Reset_Variable target (CocktailSystemManager)>>
 
 <<SetEmotion NPC_Name.Owen "neutral">>
 <<jump D1_09_Owen_Talk>>
@@ -466,6 +468,9 @@ Owen: ...It is. #line:E0
 
 title: D1_14_Owen_Leave
 ---
+
+<<Panel_FadeIn Panel_Transition>>
+
 Owen: Anyway, I should head out. #line:E1
 Owen: Early morning tomorrow. #line:E2
 Owen: The work never has a day off. #line:E3
@@ -473,6 +478,14 @@ Player: Good luck, see you again. #line:E4
 Owen: Thanks, see you later.  #line:E5
 Owen: Owen, signing out. #line:E6
 <<MoveOut NPC_Name.Owen>>
+
+<<Fix_Camera CamController true>>
+
+<<Fade_To_Summmary Panel_Transition>>
+<<Switch_Camera CamController "SummaryCam">>
+<<wait_scene 2>>
+<<Panel_FadeIn Panel_Transition>>
+
 
 <<Can_End_Shift SystemGame>>
 ===

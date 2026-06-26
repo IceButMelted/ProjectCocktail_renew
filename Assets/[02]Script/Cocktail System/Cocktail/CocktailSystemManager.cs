@@ -108,4 +108,11 @@ public partial class CocktailSystemManager : MonoBehaviour
 
     /// <summary>Editor / debug helper — picks a random target without returning it.</summary>
     public void RandomCocktailForDebug() => RandomCocktail();
+
+
+
+    [ContextMenu("DebugTargetCocktail")]
+    public void DebugTargetCocktail() => Debug.Log(DrinkUtility.GetCocktailInfo(TargetCocktail));
+    [ContextMenu("DebugCurrentCocktail")]
+    public void DebugCurrentCocktail() => Debug.Log(DrinkUtility.GetCocktailInfo(_cocktailShakerData.CurrentCocktail));
 }

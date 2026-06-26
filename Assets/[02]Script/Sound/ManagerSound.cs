@@ -38,14 +38,18 @@ public static class ManagerSound
     // ── Audio Sources ─────────────────────────────────────────────────────────
     private static AudioSource _ambientSrc;
     private static AudioSource _bgmSrc;
-    private static AudioSource _sfxSrc;      // 2D one-shot SFX
     private static AudioSource _uiSfxSrc;    // 2D one-shot UI SFX
     private static AudioSource _voiceSrc;    // 2D one-shot / interruptible voice
     private static SoundRunner _runner;
 
-    
+    // ── SFX Pool ──────────────────────────────────────────────────────────────
+    public static int MaxSFXCount = 5;       // adjust freely at runtime
+    private static AudioSource[] _sfxPool;
+    private static int _sfxOldest = 0;       // ponytail: ring-buffer index, oldest = next to evict
+
+
     //  Init  — call once at game start, pass SoundData in
-    
+
     public static void Init(SoundData data)
     {
         if (_runner != null) return;
@@ -56,12 +60,20 @@ public static class ManagerSound
         _runner = go.AddComponent<SoundRunner>();
         _ambientSrc = go.AddComponent<AudioSource>();
         _bgmSrc = go.AddComponent<AudioSource>();
-        _sfxSrc = go.AddComponent<AudioSource>();
         _uiSfxSrc = go.AddComponent<AudioSource>();
         _voiceSrc = go.AddComponent<AudioSource>();
 
-        // All sources are 2D
-        foreach (var src in new[] { _ambientSrc, _bgmSrc, _sfxSrc, _uiSfxSrc, _voiceSrc })
+        // Build SFX pool
+        _sfxPool = new AudioSource[MaxSFXCount];
+        for (int i = 0; i < MaxSFXCount; i++)
+        {
+            _sfxPool[i] = go.AddComponent<AudioSource>();
+            _sfxPool[i].spatialBlend = 0f;
+        }
+        _sfxOldest = 0;
+
+        // All non-pool sources are 2D
+        foreach (var src in new[] { _ambientSrc, _bgmSrc, _uiSfxSrc, _voiceSrc })
             src.spatialBlend = 0f;
 
         _ambientSrc.loop = true;
@@ -146,7 +158,7 @@ public static class ManagerSound
     }
 
 
-    
+
     //  Ambient
     public static void PlayAmbient(string id, float fade = 1f)
     {
@@ -161,7 +173,7 @@ public static class ManagerSound
         _runner.FadeOut(_ambientSrc, fade);
     }
 
-    
+
     //  BGM
     public static void PlayBGM(string id, float fade = 1f)
     {
@@ -179,19 +191,33 @@ public static class ManagerSound
     public static void PauseBGM() => _bgmSrc?.Pause();
     public static void ResumeBGM() => _bgmSrc?.UnPause();
 
-    
-    //  SFX  — 2D one-shot
+
+    //  SFX  — 2D one-shot, capped at MaxSFXCount voices
     public static void PlaySFX(string id)
     {
         if (!CheckInit("PlaySFX")) return;
         if (!_sfx.TryGetValue(id, out var e)) return;
-        _sfxSrc.PlayOneShot(e.clip, FinalSFX(e.volume));
+
+        // Find a free slot; if none, evict the oldest (ring buffer)
+        AudioSource slot = null;
+        for (int i = 0; i < _sfxPool.Length; i++)
+        {
+            if (!_sfxPool[i].isPlaying) { slot = _sfxPool[i]; break; }
+        }
+        if (slot == null)
+        {
+            slot = _sfxPool[_sfxOldest];
+            slot.Stop();
+            _sfxOldest = (_sfxOldest + 1) % _sfxPool.Length;
+        }
+
+        slot.PlayOneShot(e.clip, FinalSFX(e.volume));
     }
 
     // Backward-compat alias
     public static void PlayEffect(string id) => PlaySFX(id);
 
-    
+
     //  Loop SFX  — 2D looping (creates own GameObject)
     public static void LoopSFX(string id)
     {
@@ -230,7 +256,7 @@ public static class ManagerSound
     public static void StopLoopEffect(string id) => StopLoopSFX(id);
     public static void StopAllLoopEffect() => StopAllLoopSFX();
 
-    
+
     //  UI SFX  — 2D one-shot (button clicks, menu sounds, etc.)
     public static void PlayUiSFX(string id)
     {
@@ -250,7 +276,7 @@ public static class ManagerSound
     /// <summary>Interrupt the current voice line.</summary>
     public static void StopVoice() => _voiceSrc?.Stop();
 
-    
+
     //  Global Mute  (toggles AudioListener — affects everything)
     public static void SetMute(bool mute)
         => AudioListener.volume = mute ? 0f : 1f;

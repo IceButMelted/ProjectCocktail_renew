@@ -51,7 +51,7 @@ public class SoundData : ScriptableObject
         {
             if (string.IsNullOrEmpty(e.id)) continue;
             if (!seen.Add(e.id))
-                Debug.LogWarning($"[SoundData] {label} id '{e.id}' ซ้ำ!");
+                Debug.LogWarning($"[SoundData] {label} id '{e.id}' Dup!");
         }
     }
 #endif

@@ -70,12 +70,14 @@ public partial class CocktailSystemManager
         //var data = FindAnyObjectByType<CharacterData>();
         if (csm.ResolveOrderCocktail(NPC, out var drink))
         {
+            csm.ResolvePostItText(drink.Name); // Update the Post-It text with the cocktail name
             return drink.Name;
         }
         else
         {
             Debug.Log($"Can't find cocktail for NPC with ID '{NPC}'");
             csm.TargetCocktail = null;
+            csm.ResolvePostItText("None");
             return string.Empty;
         }
     }
@@ -89,12 +91,14 @@ public partial class CocktailSystemManager
         if (csm.ResolveOrderCocktail(NPC, out var drink))
         {
             csm.TargetCocktail = drink; // Store the resolved cocktail for later reference (e.g. when serving)
+            csm.ResolvePostItText(drink.Description); // Update the Post-It text with the cocktail description
             return drink.Description;
         }
         else
         {
             Debug.Log($"Can't find cocktail for NPC with ID '{NPC}'");
             csm.TargetCocktail = null;
+            csm.ResolvePostItText("None");
             return string.Empty;
         }
     }
@@ -108,12 +112,14 @@ public partial class CocktailSystemManager
         if (csm.ResolveOrderCocktail(Name, out var drink))
         {
             csm.TargetCocktail = drink; // Store the resolved cocktail for later reference (e.g. when serving)
+            csm.ResolvePostItText(drink.Name); // Update the Post-It text with the cocktail name 
             return drink.Name;
         }
         else
         {
             Debug.Log($"Can't find cocktail with name '{Name}'");
             csm.TargetCocktail = null;
+            csm.ResolvePostItText("None");
             return string.Empty;
         }
     }
@@ -125,12 +131,14 @@ public partial class CocktailSystemManager
         if (csm.ResolveOrderCocktail(Name, out var drink))
         {
             csm.TargetCocktail = drink; // Store the resolved cocktail for later reference (e.g. when serving)
+            csm.ResolvePostItText(drink.Description); // Update the Post-It text with the cocktail description
             return drink.Description;
         }
         else
         {
             Debug.Log($"Can't find cocktail with name '{Name}'");
             csm.TargetCocktail = null;
+            csm.ResolvePostItText("None");
             return string.Empty;
         }
     }
@@ -173,6 +181,16 @@ public partial class CocktailSystemManager
             return false;
         }
         drink = match;
+        return true;
+    }
+    private bool ResolvePostItText(string text)
+    {
+        if (string.IsNullOrEmpty(text))
+        {
+            Debug.LogWarning("[CocktailSystemManager] Empty text provided to SetPostItText.");
+            return false;
+        }
+        FindFirstObjectByType<Post_It_Order>()?.SetPostItOrderText("Order : "+text);
         return true;
     }
 
@@ -360,4 +378,9 @@ public partial class CocktailSystemManager
     }
 
     public void YarnDebugVariables() => DebugVariableFromYarn();
+
+    //private void SetPostItText( string ordering) {
+    //    string CharacterName = _dialogueRunner;
+    //}
+
 }

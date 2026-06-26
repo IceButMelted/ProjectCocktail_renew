@@ -259,6 +259,7 @@ namespace YarnSpinner.Custom
             {
                 if (line.TextID == SceneLoaderBridge.TargetLineId)
                 {
+                    
                     SceneLoaderBridge.IsSilentReplay = false;
                     SceneLoaderBridge.TargetLineId = null;
                 }
@@ -267,9 +268,6 @@ namespace YarnSpinner.Custom
             // ── END SAVE/LOAD ─────────────────────────────────────────────────
 
             buttonHandler?.OnLineBegin();
-
-
-
 
 
             // init vairables Zone

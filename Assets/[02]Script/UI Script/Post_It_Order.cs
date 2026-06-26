@@ -1,10 +1,17 @@
 ﻿using System.Collections;
+using TMPro;
 using UnityEngine;
+using Yarn.Unity;
+using YarnSpinner.Custom;
 
 public class Post_It_Order : MonoBehaviour
 {
+    [SerializeField] TextMeshProUGUI OrderText;
+    [SerializeField] BubblePresenter presenter;
+
     [SerializeField] private Animator animator;
     [SerializeField] private float autoHideDuration = 3f;
+
 
     private bool _isPostItVisible = false;
     private bool _isOutScreen = true;
@@ -13,7 +20,24 @@ public class Post_It_Order : MonoBehaviour
     public bool IsPostItVisible => _isPostItVisible;
     public bool IsOutScreen => _isOutScreen;
 
+    private void Awake()
+    {
+        if (animator == null)
+        {
+            animator = GetComponent<Animator>();
+        }
+        if(presenter != null)
+            presenter = FindAnyObjectByType<BubblePresenter>();
+    }
+
     // ─── Core Visibility (Open / Close) ───────────────────────────────────────
+    public void SetPostItOrderText() {
+        //OrderText.text = presenter.CurrentLine.TextWithoutCharacterName.ToString();
+    }
+
+    public void SetPostItOrderText(string Order) { 
+        OrderText.text = Order;
+    }
 
     public void SetPostItVisible(bool visible)
     {

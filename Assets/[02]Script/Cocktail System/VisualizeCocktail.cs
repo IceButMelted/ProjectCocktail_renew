@@ -38,7 +38,7 @@ public class VisualizeCocktail : MonoBehaviour
         gameObject.SetActive(true);
 
         S_Drink d = _shaker.CurrentCocktail;
-        float alcoholRatio = GetTotalAlcohol(d) / MAX_PARTS;
+        float alcoholRatio = (GetTotalAlcohol(d) + GetTotalLiqueur(d)) / MAX_PARTS;
         float mixerRatio = GetTotalMixer(d) / MAX_PARTS;
 
         alcoholFill.fillAmount = Mathf.Clamp01(alcoholRatio);
