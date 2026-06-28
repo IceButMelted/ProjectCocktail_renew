@@ -152,19 +152,24 @@ public class MixingMinigame : BaseMiniGame
             float zMax = ZoneMax;
 
             bool inZone = NeedlePosition >= zMin && NeedlePosition <= zMax;
-            if (inZone) OnHit();
+            if (inZone) {
+                //amc = Animation Minagame Controller
+                amc.PlayAnimation();
+                OnHit(); 
+            }
             else OnMiss();
 
-            Debug.Log($"[MixingMinigame] {(inZone ? "HIT" : "MISS")} | " +
-                      $"Needle: {NeedlePosition:P0} | Zone: [{zMin:F2}–{zMax:F2}] | " +
-                      $"Hits: {Hits}/{_cfg.RequiredHits} | Speed: {_needleSpeed:F2}");
+            //Debug.Log($"[MixingMinigame] {(inZone ? "HIT" : "MISS")} | " +
+            //          $"Needle: {NeedlePosition:P0} | Zone: [{zMin:F2}–{zMax:F2}] | " +
+            //          $"Hits: {Hits}/{_cfg.RequiredHits} | Speed: {_needleSpeed:F2}");
         }
 
         // ── Win condition ─────────────────────────────────
         if (Hits >= _cfg.RequiredHits)
         {
             CurrentSlidePhase = SlidePhase.RemoveMinigame;
-            
+            amc.StopAnimation();
+            IsRunning = false;
         }
 
         

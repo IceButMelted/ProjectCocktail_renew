@@ -3,12 +3,14 @@ using UnityEngine;
 using System.Collections.Generic;
 using static E_Cocktail;
 using System.Linq;
+using UnityEngine.TestTools;
 
 public abstract class BaseMiniGame : MonoBehaviour, IMinigame
 {
     // ── Inspector ──────────────────────────────────────────
 
     [SerializeField]private MinigameSystemManager m_systemManager;
+    [SerializeField]protected AnimationMinigameController amc; //<<Anim Minigame Controller
 
     [field: SerializeField]
     public SO_MinigameSetting Setting { get; set; }
@@ -396,6 +398,7 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
     public virtual void EndGame()
     {
         IsRunning = false;
+        amc.StopAllCoroutines();
         //_context?.NotifyGameEnded();
     }
 
@@ -408,6 +411,8 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
     {
         EndGame();
         OnGameEnd?.Invoke(success);
+        //ani Minigamme Controller
+        amc.StopAllCoroutines();
     }
 
     protected virtual void ResetGame() { }

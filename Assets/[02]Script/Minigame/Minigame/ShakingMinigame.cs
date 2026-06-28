@@ -80,14 +80,20 @@ public class ShakingMinigame : BaseMiniGame
     public override void ProcessedGame()
     {
         base.ProcessedGame();   // IsRunning guard + Input.Poll()
-        if(!IsRunning) return;  
+        if(!IsRunning) return;
+
+        
+        
 
         float dt = Time.deltaTime;
 
         // ── Click → raise gauge ───────────────────────────
         if (Input.IsClickedThisFrame)
+        {
             GaugeValue = Mathf.Clamp01(GaugeValue + _cfg.GaugeIncreasePerClick * _cfg.DifficultyMultiplier);
-
+            //Animation Minigame Controller
+            amc.PlayAnimation();
+        }
         // ── Decay gauge ───────────────────────────────────
         GaugeValue = Mathf.Clamp01(GaugeValue - _cfg.GaugeDecayRate * dt);
 
@@ -95,6 +101,7 @@ public class ShakingMinigame : BaseMiniGame
         bool inZone = GaugeValue >= _zoneBorderMin && GaugeValue <= _zoneBorderMax;
         if (inZone)
         {
+
             float gained = _cfg.ProgressIncreaseRate * dt;
             TimeInZone += gained;
             ShrinkTargetZone(gained);
@@ -102,7 +109,11 @@ public class ShakingMinigame : BaseMiniGame
 
         // ── Win condition ─────────────────────────────────
         if (TimeInZone >= _cfg.Duration)
+        {
+            amc.StopAnimation();
             CurrentSlidePhase = SlidePhase.RemoveMinigame;
+            IsRunning = false;
+        }
 
         UpdateUI();
     }
