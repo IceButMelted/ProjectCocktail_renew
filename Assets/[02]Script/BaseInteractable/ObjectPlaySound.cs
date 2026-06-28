@@ -76,11 +76,13 @@ public class UIPointerSound : PointerInteractableBase
 
     public override void OnPointerEnter(PointerEventData eventData)
     {
+        if (DragableObject.IsAnyDragging) return; //graud if anything was dragged
         if (_canPlayEnter) TryPlay(_onEnterID);
     }
 
     public override void OnPointerExit(PointerEventData eventData)
     {
+        if (DragableObject.IsAnyDragging) return; //graud if anything was dragged
         if (_canPlayExit) TryPlay(_onExitID);
     }
 

@@ -34,15 +34,12 @@ public class WaterSlosh : MonoBehaviour
     {
         rb = GetComponent<Rigidbody2D>();
         lastPosition = transform.position;
-
-        matInstance = waterSprite.GetComponent<Renderer>().material;
-
-        matInstance.SetFloat("_WaterLevel", waterLevel);
-        matInstance.SetFloat("_Speed", speed);
-        matInstance.SetFloat("_Frequency", frequency);
-        matInstance.SetColor("_WaterColorTop", waterColorTop);
-        matInstance.SetColor("_WaterColorBottom", waterColorBottom);
-
+        // GetMat() will assign matInstance here too
+        GetMat().SetFloat("_WaterLevel", waterLevel);
+        GetMat().SetFloat("_Speed", speed);
+        GetMat().SetFloat("_Frequency", frequency);
+        GetMat().SetColor("_WaterColorTop", waterColorTop);
+        GetMat().SetColor("_WaterColorBottom", waterColorBottom);
         waterSprite.SetActive(true);
         iceSprite.SetActive(withIce);
     }
@@ -57,29 +54,40 @@ public class WaterSlosh : MonoBehaviour
         currentAmplitude = Mathf.Max(currentAmplitude, impact * sloshAmount);
         currentAmplitude = Mathf.Lerp(currentAmplitude, 0f, Time.deltaTime * sloshDecay);
 
-        matInstance.SetFloat("_Amplitude", currentAmplitude);
-
+        GetMat()?.SetFloat("_Amplitude", currentAmplitude);
     }
 
+#if UNITY_EDITOR
     private void OnValidate()
     {
-        matInstance = waterSprite.GetComponent<Renderer>().material;
-
-        if (matInstance != null)
+        if (waterSprite == null) return;
+        var mat = GetMat();
+        if (mat != null)
         {
             UpdateMatVariable();
-            iceSprite.SetActive(withIce);
+            if (iceSprite != null) iceSprite.SetActive(withIce);
         }
     }
+#endif
 
     public void StartFilling()
     { 
         _fillCoroutine = StartCoroutine(FillWater());
     }
 
-    public void UpdateColor() {
-        matInstance.SetColor("_WaterColorTop", waterColorTop);
-        matInstance.SetColor("_WaterColorBottom", waterColorBottom);
+    public void UpdateColor()
+    {
+        var mat = GetMat();
+        if (mat == null) return; // safe guard
+        mat.SetColor("_WaterColorTop", waterColorTop);
+        mat.SetColor("_WaterColorBottom", waterColorBottom);
+    }
+
+    private Material GetMat()
+    {
+        if (matInstance == null && waterSprite != null)
+            matInstance = waterSprite.GetComponent<Renderer>().material;
+        return matInstance;
     }
 
     private IEnumerator FillWater()
@@ -119,11 +127,14 @@ public class WaterSlosh : MonoBehaviour
         iceSprite.SetActive (active);
     }
 
-    public void UpdateMatVariable() {
-        matInstance.SetFloat("_WaterLevel", waterLevel);
-        matInstance.SetFloat("_Speed", speed);
-        matInstance.SetFloat("_Frequency", frequency);
-        matInstance.SetColor("_WaterColorTop", waterColorTop);
-        matInstance.SetColor("_WaterColorBottom", waterColorBottom);
+    public void UpdateMatVariable()
+    {
+        var mat = GetMat();
+        if (mat == null) return;
+        mat.SetFloat("_WaterLevel", waterLevel);
+        mat.SetFloat("_Speed", speed);
+        mat.SetFloat("_Frequency", frequency);
+        mat.SetColor("_WaterColorTop", waterColorTop);
+        mat.SetColor("_WaterColorBottom", waterColorBottom);
     }
 }

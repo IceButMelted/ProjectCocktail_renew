@@ -39,7 +39,10 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
 
     // ── Slide Phase ────────────────────────────────────────
 
-    protected enum SlidePhase { None, InitPanel, InitBackground, InitArt, InitMinigame, RemoveMinigame, Closing }
+    protected enum SlidePhase
+    {
+        None, InitPanel, InitPanelExit, InitBackground, InitArt, InitMinigame, RemoveMinigame, Closing
+    }
     protected SlidePhase CurrentSlidePhase = SlidePhase.None;
     public void ClosePanel() => CurrentSlidePhase = SlidePhase.Closing;
 
@@ -172,6 +175,7 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
             case SlidePhase.InitPanel: SlidePhase_InitPanel(); break;
             case SlidePhase.InitArt: SlidePhase_InitArt(); break;
             case SlidePhase.InitMinigame: SlidePhase_InitMinigame(); break;
+            case SlidePhase.InitPanelExit: SlidePhase_InitPanelExit(); break;
             case SlidePhase.RemoveMinigame: SlidePhase_RemoveMinigame(); break;
             case SlidePhase.Closing: SlidePhase_Closing(); break;
             case SlidePhase.None:
@@ -181,33 +185,56 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
     }
 
     // ── Phase: InitPanel ───────────────────────────────────────
+    // Phase 1: Slide panels up to center (visible to user)
     private void SlidePhase_InitPanel()
     {
         int count = OpenPanel.Count;
         int doneCount = 0;
-        var easing = EasingConfig.EaseIn(EasingConfigTimer); 
+        var easing = EasingConfig.EaseIn(EasingConfigTimer);
 
         for (int i = 0; i < count; i++)
         {
             if (PanelSlider.Slide(ref OpenPanelSession[i], OpenPanel[i],
-                    Direction.Up, SlideFinishCondition.BottomEdgeToTopBound,
+                    Direction.Up, SlideFinishCondition.TopEdgeToCenter,
                     _slidePanelSpeed, easing))
                 doneCount++;
         }
 
-        // One-shot background snap — avoid calling SnapTo every frame
-        if (!_backgroundSnapped &&
-            PanelSlider.Progress(OpenPanelSession[count - 1], OpenPanel[count - 1]) > 0.5f)
-        {
-            PanelSlider.SnapTo(ref BackgroundSession, BackgroundPanelgame,
+        // Trigger background snap at 75% — now this actually fires mid-animation
+
+            
+
+
+        if (doneCount < count) return; // wait until all reach center
+
+        PanelSlider.SnapTo(ref BackgroundSession, BackgroundPanelgame,
                 SlideFinishCondition.BottomEdgeToBottomBound);
-            _backgroundSnapped = true;
+
+        CurrentSlidePhase = SlidePhase.InitPanelExit; // ← hand off to next phase
+    }
+
+    // Phase 2: Slide panels out the top, snap background
+    private void SlidePhase_InitPanelExit()
+    {
+        int count = OpenPanel.Count;
+        int doneCount = 0;
+        var easing = EasingConfig.EaseIn(EasingConfigTimer);
+
+        for (int i = 0; i < count; i++)
+        {
+            if (PanelSlider.Slide(ref OpenPanelSession[i], OpenPanel[i],
+                    Direction.Up, SlideFinishCondition.TopEdgeToBottomBound,
+                    _slidePanelSpeed, easing))
+                doneCount++;
         }
 
-        if (doneCount < count) return;
+        
 
-        _backgroundSnapped = false; // reset for next run
+        if (doneCount < count) return; // wait until all exit
+
+        _backgroundSnapped = false;
         openPanelDoneCount = 0;
+        Debug.Log("Got in art init");
         CurrentSlidePhase = SlidePhase.InitArt;
     }
 

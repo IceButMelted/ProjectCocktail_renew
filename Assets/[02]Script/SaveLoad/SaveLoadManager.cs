@@ -9,7 +9,6 @@ using Yarn.Unity;
 using System;
 using System.Collections;
 using System.Linq;
-using UnityEditor.UIElements;
 
 
 #if UNITY_EDITOR

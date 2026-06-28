@@ -58,6 +58,7 @@ public class Interactable_2_5DObject : PointerInteractableBase
     public override void OnPointerEnter(PointerEventData eventData)
     {
         if (_isDragging || !Interactable) return;
+        if (DragableObject.IsAnyDragging) return; //graud if anything was dragged
         _isHovering = true;
         _spriteRenderer.sprite = S_Hover;
     }
@@ -66,6 +67,7 @@ public class Interactable_2_5DObject : PointerInteractableBase
     {
         _isHovering = false;
         if (!Interactable) return;
+        if (DragableObject.IsAnyDragging) return; //graud if anything was dragged
         _spriteRenderer.sprite = S_Default;
     }
 

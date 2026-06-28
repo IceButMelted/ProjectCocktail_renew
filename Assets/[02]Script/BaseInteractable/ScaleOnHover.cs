@@ -53,11 +53,13 @@ public class ScaleOnHover : PointerInteractableBase
     public override void OnPointerEnter(PointerEventData eventData)
     {
         if (!Interactable) return;
+        if (DragableObject.IsAnyDragging) return;
         ChangeScale(true);
     }
 
     public override void OnPointerExit(PointerEventData eventData)
     {
+        if (DragableObject.IsAnyDragging) return;
         ChangeScale(false);
     }
 

@@ -10,7 +10,7 @@ using static E_Cocktail;
 [System.Serializable] public class LiqueurEvent : UnityEvent<Liqueur, int> { }
 [System.Serializable] public class MixerEvent : UnityEvent<Mixer, int> { }
 
-public class CocktailShakerData : MonoBehaviour, IIngredientReceiver
+public class CocktailShakerData : MonoBehaviour, IIngredientReceiver, ITooltipProvider
 {
     // ── Inspector ──────────────────────────────────────────
     [Header("Glass Cocktail")]
@@ -128,8 +128,6 @@ public class CocktailShakerData : MonoBehaviour, IIngredientReceiver
         
         glassWaterSlosh.waterLevel = 0f;
 
-
-
         SetIngredientActive(true);
     }
 
@@ -150,13 +148,21 @@ public class CocktailShakerData : MonoBehaviour, IIngredientReceiver
             if (btn.TryGetComponent<DragableObject>(out var drag)) drag.Interactable = active;
             if (btn.TryGetComponent<ScaleOnHover>(out var hover)) hover.Interactable = active;
             if (btn.TryGetComponent<Interactable_3DObject>(out var objec)) objec.Interactable = active;
+            if (btn.TryGetComponent<HoverTooltip>(out var tooltip)) tooltip.Interactable = active;
         }
     }
 
-    public void SetColorInGlass(WaterSlosh d, S_Drink r) { 
+    public void SetColorInGlass(WaterSlosh d, S_Drink r) {
+        if (d == null) { Debug.LogWarning("WaterSlosh ref is null"); return; }
+
         d.waterColorTop = r.waterColorTop;
         d.waterColorBottom = r.waterColorBottom;
 
         glassWaterSlosh.UpdateColor();
+    }
+
+    public string GetTooltipText()
+    {
+        return DrinkUtility.GetCocktailIngredient(CurrentCocktail);
     }
 }

@@ -28,6 +28,10 @@ public class DragableObject : PointerInteractableBase
     [Header("Debug")]
     public bool DebugDraw = false;
 
+    /// <summary>True while ANY DragableObject is being dragged.
+    /// Used by other interactables to suppress hover effects.</summary>
+    public static bool IsAnyDragging { get; private set; }
+
     // ── Public State ──────────────────────────────────────────────────────────
 
     public bool CanPlaced { get; set; } = false;
@@ -91,6 +95,7 @@ public class DragableObject : PointerInteractableBase
         if (Vector2.Distance(eventData.position, _pointerDownScreenPos) >= _dragThreshold)
         {
             _dragStarted = true;
+            IsAnyDragging = true;
             _placementSystem.StartDrag(this);
         }
     }
@@ -104,6 +109,7 @@ public class DragableObject : PointerInteractableBase
         {
             _placementSystem.ReleaseObject();
             BeingDrags = false;
+            IsAnyDragging = false;
         }
         else
         {
@@ -120,6 +126,7 @@ public class DragableObject : PointerInteractableBase
         _placementSystem?.ReleaseObject();
         BeingDrags = false;
         _dragStarted = false;
+        IsAnyDragging = false;
     }
 
     private void CheckForCollisions()

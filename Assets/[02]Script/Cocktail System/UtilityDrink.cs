@@ -267,6 +267,20 @@ public static class DrinkUtility
         sb.Append("Color btm:"); sb.AppendLine(string.Join(", ", d.waterColorBottom));
         return sb.ToString();
     }
+    public static string GetCocktailIngredient(S_Drink d)
+    {
+        var sb = new System.Text.StringBuilder();
+
+        if (d.AlcoholList.Count > 0)
+            sb.AppendLine(string.Join("\n", d.AlcoholList.Select(a => $"{a.Type} x {a.Amount}")));
+        if (d.LiqueurList.Count > 0)
+            sb.AppendLine(string.Join("\n", d.LiqueurList.Select(l => $"{l.Type} x {l.Amount}")));
+        if (d.MixerList.Count > 0)
+            sb.AppendLine(string.Join("\n", d.MixerList.Select(m => $"{m.Type} x {m.Amount}")));
+
+        return sb.ToString();
+    }
+
 
     // ══════════════════════════════════════════════════════
     // Private Helpers
