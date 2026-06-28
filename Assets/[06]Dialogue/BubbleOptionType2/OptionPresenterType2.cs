@@ -84,12 +84,15 @@ namespace YarnSpinner.Custom
         [Header("Last Line Display")]
         [Tooltip("Show the last spoken line while the player chooses.")]
         [SerializeField] private bool showsLastLine = true;
+        
 
         [SerializeField] private TMP_Text lastLineText;
         [SerializeField] private GameObject lastLineContainer;
         [SerializeField] private TMP_Text lastLineCharacterNameText;
         [SerializeField] private GameObject lastLineCharacterNameContainer;
 
+        [Header("Target")]
+        [SerializeField] private CanvasGroup bubblePresneter;
         // ── Constants ─────────────────────────────────────────────────────────
 
         /// <summary>Yarn metadata tag that marks the hidden fallback option.</summary>
@@ -135,6 +138,9 @@ namespace YarnSpinner.Custom
 
         public override YarnTask OnDialogueCompleteAsync()
         {
+            _lastLineBody = string.Empty;          
+            _lastLineCharacterName = string.Empty;
+
             DeactivateAllOptions();
             ResetCanvasGroup();
             HideLastLine();
@@ -144,11 +150,10 @@ namespace YarnSpinner.Custom
 
         public override YarnTask RunLineAsync(LocalizedLine line, LineCancellationToken token)
         {
-            if (showsLastLine)
-            {
-                _lastLineCharacterName = line.CharacterName ?? string.Empty;
-                _lastLineBody = line.TextWithoutCharacterName.Text ?? string.Empty;
-            }
+            _lastLineCharacterName = line.CharacterName ?? string.Empty;
+            
+            _lastLineBody = line.TextWithoutCharacterName.Text ?? string.Empty;
+
             return YarnTask.CompletedTask;
         }
 
@@ -260,7 +265,7 @@ namespace YarnSpinner.Custom
             }
 
             // ── Last line ─────────────────────────────────────────────────────
-            if (showsLastLine)
+            if (showsLastLine && _lastLineCharacterName.ToLower() != "Player".ToLower())
                 ShowLastLine(_lastLineCharacterName, _lastLineBody);
             else
                 HideLastLine();
@@ -413,7 +418,11 @@ namespace YarnSpinner.Custom
         private void ShowLastLine(string characterName, string body)
         {
             if (lastLineText != null) lastLineText.text = body;
-            if (lastLineContainer != null) lastLineContainer.SetActive(true);
+            if (lastLineContainer != null)
+            {
+                lastLineContainer.SetActive(true);
+                lastLineCharacterNameContainer.GetComponent<RectTransform>().position = bubblePresneter.GetComponent<RectTransform>().position;
+            }
 
             bool hasName = !string.IsNullOrEmpty(characterName);
             if (lastLineCharacterNameText != null)

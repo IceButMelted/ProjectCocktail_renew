@@ -129,6 +129,7 @@ public class CocktailShakerData : MonoBehaviour, IIngredientReceiver
         glassWaterSlosh.waterLevel = 0f;
 
 
+
         SetIngredientActive(true);
     }
 
@@ -147,6 +148,8 @@ public class CocktailShakerData : MonoBehaviour, IIngredientReceiver
             if (btn.TryGetComponent<Interactable_2_5DObject>(out var interactable)) interactable.Interactable = active;
             if (btn.TryGetComponent<UIPointerSound>(out var sound)) sound.Interactable = active;
             if (btn.TryGetComponent<DragableObject>(out var drag)) drag.Interactable = active;
+            if (btn.TryGetComponent<ScaleOnHover>(out var hover)) hover.Interactable = active;
+            if (btn.TryGetComponent<Interactable_3DObject>(out var objec)) objec.Interactable = active;
         }
     }
 

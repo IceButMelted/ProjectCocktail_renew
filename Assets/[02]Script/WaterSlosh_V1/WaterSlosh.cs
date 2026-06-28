@@ -67,11 +67,7 @@ public class WaterSlosh : MonoBehaviour
 
         if (matInstance != null)
         {
-            matInstance.SetFloat("_WaterLevel", waterLevel);
-            matInstance.SetFloat("_Speed", speed);
-            matInstance.SetFloat("_Frequency", frequency);
-            matInstance.SetColor("_WaterColorTop", waterColorTop);
-            matInstance.SetColor("_WaterColorBottom", waterColorBottom);
+            UpdateMatVariable();
             iceSprite.SetActive(withIce);
         }
     }
@@ -92,11 +88,11 @@ public class WaterSlosh : MonoBehaviour
         {
             waterLevel += Time.deltaTime;
             waterLevel = Mathf.Clamp(waterLevel, 0f, 0.95f);
-            matInstance.SetFloat("_WaterLevel", waterLevel);
+            UpdateMatVariable();
             yield return null;
         }
         waterLevel = 0.94f;
-        matInstance.SetFloat("_WaterLevel", waterLevel);
+        UpdateMatVariable();
     }
 
     public void StopFilling()
@@ -114,11 +110,20 @@ public class WaterSlosh : MonoBehaviour
 
     public void ResetGlass() {
         waterLevel = 0f;
+        UpdateMatVariable();
         iceSprite.SetActive(false);
     }
 
     public void AddIce(bool active)
     {
         iceSprite.SetActive (active);
+    }
+
+    public void UpdateMatVariable() {
+        matInstance.SetFloat("_WaterLevel", waterLevel);
+        matInstance.SetFloat("_Speed", speed);
+        matInstance.SetFloat("_Frequency", frequency);
+        matInstance.SetColor("_WaterColorTop", waterColorTop);
+        matInstance.SetColor("_WaterColorBottom", waterColorBottom);
     }
 }

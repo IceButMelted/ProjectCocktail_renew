@@ -5,13 +5,7 @@ using Yarn.Unity;
 
 public class PanelTransition : MonoBehaviour
 {
-   
     [SerializeField] private Animator animator;
-    [SerializeField] private float FadeInSpeed = 1f;
-    [SerializeField] private float FadeOutSpeed = 1f;
-
-    private bool isPanelShouldVisible = false;
-
     private Coroutine CurrentControlCoroutine;
 
     [YarnCommand("Panel_FadeIn")]
@@ -19,7 +13,7 @@ public class PanelTransition : MonoBehaviour
     {
         yield return null;
         animator.SetTrigger("FadeIn");
-        yield return new WaitForSeconds(FadeInSpeed);
+        yield return WaitForAnimation("Transition_FadeIn");
     }
 
     [YarnCommand("Panel_FadeOut")]
@@ -27,7 +21,7 @@ public class PanelTransition : MonoBehaviour
     {
         yield return null;
         animator.SetTrigger("FadeOut");
-        yield return new WaitForSeconds(FadeOutSpeed);
+        yield return WaitForAnimation("Transition_FadeOut");
     }
 
     [YarnCommand("Fade_To_Summmary")]
@@ -35,6 +29,22 @@ public class PanelTransition : MonoBehaviour
     {
         yield return null;
         animator.SetTrigger("FadeToSummary");
-        yield return new WaitForSeconds(FadeOutSpeed);
+        yield return WaitForAnimation("Transition_ToSummary");
+    }
+
+    // Waits one frame for the transition to start, then waits until the
+    // named state finishes playing on layer 0.
+    private IEnumerator WaitForAnimation(string stateName)
+    {
+        // Wait for the Animator to transition INTO the target state
+        yield return new WaitUntil(() =>
+            animator.GetCurrentAnimatorStateInfo(0).IsName(stateName));
+
+        // Wait until that state has finished playing (normalizedTime >= 1)
+        yield return new WaitUntil(() =>
+        {
+            var info = animator.GetCurrentAnimatorStateInfo(0);
+            return info.IsName(stateName) && info.normalizedTime >= 1f;
+        });
     }
 }

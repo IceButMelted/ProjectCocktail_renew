@@ -141,9 +141,11 @@ title: D1_04_Isla_Arrive
 <<Enable_InteractableObject SystemGame false>>
 <<Fix_Camera CamController true>>
 
+
 <<Panel_FadeOut Panel_Transition>>
-<<wait 1.6>>
 <<Panel_FadeIn Panel_Transition>>
+<<wait 2>>
+
 
 <<MoveIn NPC_Name.Isla 2>>
 <<Switch_Camera CamController NearLeftCam>>
@@ -327,7 +329,7 @@ Player: One moment. #line:7A
     Owen: Hmm... I hate to say it, but I think something went sideways here. #line:7F
 <<endif>>
 
-<<Reset_Variable System>>
+<<Reset_Variable SystemGame>>
 
 <<SetEmotion NPC_Name.Owen "neutral">>
 <<jump D1_09_Owen_Talk>>
@@ -398,6 +400,7 @@ Isla: Hey, Mr. Bartender. #line:A7
 Player: Yes. #line:A8
 Isla: Do you mind if I ask why you moved here? #line:A9
 Player: Of course not. #line:AA
+
 -> I needed a change of pace. #line:AB
     Player: You know, I just want to find something new in my life. #line:AC
     Isla: Did you find it? #line:AD
@@ -476,8 +479,6 @@ Owen: ...It is. #line:E0
 title: D1_14_Owen_Leave
 ---
 
-<<Panel_FadeIn Panel_Transition>>
-
 Owen: Anyway, I should head out. #line:E1
 Owen: Early morning tomorrow. #line:E2
 Owen: The work never has a day off. #line:E3
@@ -489,7 +490,7 @@ Owen: Owen, signing out. #line:E6
 <<Fix_Camera CamController true>>
 
 <<Fade_To_Summmary Panel_Transition>>
-<<Switch_Camera CamController "SummaryCam">>
+<<Switch_Camera CamController SummaryCam>>
 <<wait_scene 2>>
 <<Panel_FadeIn Panel_Transition>>
 
