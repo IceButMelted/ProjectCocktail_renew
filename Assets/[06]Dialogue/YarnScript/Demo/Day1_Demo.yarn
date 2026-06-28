@@ -81,7 +81,7 @@ title: D1_02_Walter_Order
 ---
 //Walter's Order
 Walter: Just keep it simple, son. #line:17
-Walter: {Order_Cocktail_OutName(NPC_Name.Walter)} should be enough for tonight. #line:18
+Walter: {Order_Cocktail_ByName_OutName("Sea Breeze")} should be enough for tonight. #line:18
 Player: Coming right up. #line:19
 <<SetEmotion NPC_Name.Owen "neutral">>
 
@@ -110,7 +110,7 @@ Player: Coming right up. #line:19
     Walter: My memory might be fading, but my tongue still works. #line:1F
 <<endif>>
 
-<<Reset_Variable target (CocktailSystemManager)>>
+<<Reset_Variable SystemGame>>
 
 <<SetEmotion NPC_Name.Walter "neutral">>
 <<jump D1_03_Walter_Talk>>
@@ -140,8 +140,10 @@ title: D1_04_Isla_Arrive
 //Isla come in 
 <<Enable_InteractableObject SystemGame false>>
 <<Fix_Camera CamController true>>
-<<Reset_Camera CamController>>
-<<Switch_Camera CamController "MainCam">>
+
+<<Panel_FadeOut Panel_Transition>>
+<<wait 1.6>>
+<<Panel_FadeIn Panel_Transition>>
 
 <<MoveIn NPC_Name.Isla 2>>
 <<Switch_Camera CamController NearLeftCam>>
@@ -227,7 +229,7 @@ Player: Got it. #line:4D
 
 <<endif>>
 
-<<Reset_Variable target (CocktailSystemManager)>>
+<<Reset_Variable SystemGame>>
 
 <<SetEmotion NPC_Name.Isla "neutral">>
 <<jump D1_06_Isla_Talk>>
@@ -252,8 +254,9 @@ title: D1_07_Owen_Arrive
 //Owen come in 
 <<Enable_InteractableObject SystemGame false>>
 <<Fix_Camera CamController true>>
-<<Reset_Camera CamController>>
-<<Switch_Camera CamController "MainCam">>
+<<Panel_FadeOut Panel_Transition>>
+<<Panel_FadeIn Panel_Transition>>
+
 
 <<MoveIn NPC_Name.Owen 3>>
 <<Switch_Camera CamController CenterCam>>
@@ -324,7 +327,7 @@ Player: One moment. #line:7A
     Owen: Hmm... I hate to say it, but I think something went sideways here. #line:7F
 <<endif>>
 
-<<Reset_Variable target (CocktailSystemManager)>>
+<<Reset_Variable System>>
 
 <<SetEmotion NPC_Name.Owen "neutral">>
 <<jump D1_09_Owen_Talk>>
@@ -368,6 +371,10 @@ Owen: Hey, I was very gentle. #line:9B
 
 title: D1_10_Walter_Leave
 ---
+<<Panel_FadeOut Panel_Transition>>
+<<wait 1.6>>
+<<Panel_FadeIn Panel_Transition>>
+
 Walter: I think I should go now. #line:9C
 Owen: Already? But I just got here. #line:9D
 Walter: It's late now, Owen. #line:9E
@@ -485,7 +492,6 @@ Owen: Owen, signing out. #line:E6
 <<Switch_Camera CamController "SummaryCam">>
 <<wait_scene 2>>
 <<Panel_FadeIn Panel_Transition>>
-
 
 <<Can_End_Shift SystemGame>>
 ===

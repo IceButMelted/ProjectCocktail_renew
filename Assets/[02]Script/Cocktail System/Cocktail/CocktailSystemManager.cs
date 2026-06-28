@@ -51,17 +51,41 @@ public partial class CocktailSystemManager : MonoBehaviour
 
     private void Update()
     {
-#if UNITY_EDITOR
-        if (Input.GetKeyDown(KeyCode.P))
+//#if UNITY_EDITOR
+//        if (Input.GetKeyDown(KeyCode.P))
+//        {
+//            UpdateCocktailInShaker();
+//            Debug.Log(DrinkUtility.GetCocktailInfo(_cocktailShakerData.CurrentCocktail));
+//        }
+//        if (Input.GetKeyDown(KeyCode.E)) { ServeDrink(); Debug.Log("[CocktailSystemManager] Served via E key."); }
+//        if (Input.GetKeyDown(KeyCode.A)) SetSatisfactionPerfect();
+//        if (Input.GetKeyDown(KeyCode.S)) SetSatisfactionAcceptable();
+//        if (Input.GetKeyDown(KeyCode.D)) SetSatisfactionFail();
+//#endif
+    }
+
+    /// <summary>
+    /// This method is USE ON BUTTON
+    /// Serve the drink to the customer and update the Yarn variable with the result
+    /// </summary>
+    public void ServeDrink()
+    {
+        if (_targetCocktail == null)
         {
-            UpdateCocktailInShaker();
-            Debug.Log(DrinkUtility.GetCocktailInfo(_cocktailShakerData.CurrentCocktail));
+            Debug.LogWarning("[CocktailSystemManager] ServeDrink called with no target cocktail set.");
+            return;
         }
-        if (Input.GetKeyDown(KeyCode.E)) { ServeDrink(); Debug.Log("[CocktailSystemManager] Served via E key."); }
-        if (Input.GetKeyDown(KeyCode.A)) SetSatisfactionPerfect();
-        if (Input.GetKeyDown(KeyCode.S)) SetSatisfactionAcceptable();
-        if (Input.GetKeyDown(KeyCode.D)) SetSatisfactionFail();
-#endif
+
+        UpdateVariableInYarnTrigger();
+    }
+
+    /// <summary>
+    /// This method is USE ON BUTTON
+    /// This method use to reset the cocktail in shaker.
+    /// </summary>
+    public void ResetCocktail() {
+        _cocktailShakerData.ResetShaker();
+        _cocktailShakerData.ResetCocktailData();
     }
 
     // Cocktail — Public API
@@ -96,14 +120,16 @@ public partial class CocktailSystemManager : MonoBehaviour
     /// </summary>
     public void UpdateCocktailInShaker()
     {
-        S_Drink current = _cocktailShakerData.CurrentCocktail;
-        DrinkUtility.UpdateTypeOfAlcohol(current, _normalDrinks);
-        DrinkUtility.UpdateName(current, _normalDrinks);
-        DrinkUtility.UpdatePrice(current, _normalDrinks);
+        //S_Drink current = _cocktailShakerData.CurrentCocktail;
+        //DrinkUtility.UpdateTypeOfAlcohol(current, _normalDrinks);
+        //DrinkUtility.UpdateName(current, _normalDrinks);
+        //DrinkUtility.UpdatePrice(current, _normalDrinks);
+        //DrinkUtility.UpdateColorInGlass(current, _normalDrinks);
 
-        Sprite sprite = DrinkUtility.GetCocktailSprite(current, _normalDrinks)
-                        ?? _failCocktailSprite;
-        _cocktailShaker.SetBTNSprite(sprite, sprite, sprite);
+        _cocktailShakerData.UpdateCocktailInShaker(_normalDrinks);
+        //Sprite sprite = DrinkUtility.GetCocktailSprite(current, _normalDrinks)
+        //                ?? _failCocktailSprite;
+        //_cocktailShaker.SetBTNSprite(sprite, sprite, sprite);
     }
 
     /// <summary>Editor / debug helper — picks a random target without returning it.</summary>

@@ -13,6 +13,13 @@ using static E_Cocktail;
 public class CocktailShakerData : MonoBehaviour, IIngredientReceiver
 {
     // ── Inspector ──────────────────────────────────────────
+    [Header("Glass Cocktail")]
+    public WaterSlosh glassWaterSlosh;
+    public void StartFill() => glassWaterSlosh.StartFilling();
+    public void StopFill() => glassWaterSlosh.StopFilling();
+    public void FinishFill() => glassWaterSlosh.FinishFilling(); 
+    
+
 
     [Header("Ingredient Events")]
     public AlcoholEvent OnAddAlcohol;
@@ -23,6 +30,7 @@ public class CocktailShakerData : MonoBehaviour, IIngredientReceiver
 
     [Header("Ingredient Buttons")]
     public List<GameObject> ingredientButtons = new List<GameObject>();
+    
 
     // ── Runtime State ──────────────────────────────────────
 
@@ -35,6 +43,11 @@ public class CocktailShakerData : MonoBehaviour, IIngredientReceiver
     {
         CurrentCocktail = ScriptableObject.CreateInstance<S_Drink>();
         ResetCocktailData();
+    }
+
+    private void Update()
+    {
+
     }
 
     private void OnDestroy()
@@ -50,6 +63,8 @@ public class CocktailShakerData : MonoBehaviour, IIngredientReceiver
     public void SetMethodToShake() => CurrentCocktail.PreparationMethod = Method.Shaking;
     public void SetMethodToMixing() => CurrentCocktail.PreparationMethod = Method.Stirring;
     public void ToggleIce() => CurrentCocktail.AddIce = !CurrentCocktail.AddIce;
+
+    
 
     // ── IIngredientReceiver ────────────────────────────────
 
@@ -77,11 +92,13 @@ public class CocktailShakerData : MonoBehaviour, IIngredientReceiver
     // ── Cocktail Identity Update ───────────────────────────
 
     /// <summary>Derives name, price, and strength from current ingredients vs recipe list.</summary>
-    public void UpdateCocktailInShaker(IReadOnlyList<S_Drink> recipes, Sprite failCocktailSprite)
+    public void UpdateCocktailInShaker(IReadOnlyList<S_Drink> recipes)
     {
         DrinkUtility.UpdateTypeOfAlcohol(CurrentCocktail, recipes);
         DrinkUtility.UpdateName(CurrentCocktail, recipes);
         DrinkUtility.UpdatePrice(CurrentCocktail, recipes);
+        DrinkUtility.UpdateColorInGlass(CurrentCocktail, recipes);
+        SetColorInGlass(glassWaterSlosh, CurrentCocktail);
     }
 
     /// <summary>Returns the best-matching sprite, or <paramref name="fallback"/> if none found.</summary>
@@ -105,6 +122,13 @@ public class CocktailShakerData : MonoBehaviour, IIngredientReceiver
         CurrentCocktail.LiqueurList = new List<LiqueurIngredient>();
         CurrentCocktail.MixerList = new List<MixerIngredient>();
         CurrentCocktail.CompatibleGlasses = new List<GlassType>();
+
+        CurrentCocktail.waterColorTop = Color.clear;
+        CurrentCocktail.waterColorBottom = Color.clear;
+        
+        glassWaterSlosh.waterLevel = 0f;
+
+
         SetIngredientActive(true);
     }
 
@@ -124,5 +148,12 @@ public class CocktailShakerData : MonoBehaviour, IIngredientReceiver
             if (btn.TryGetComponent<UIPointerSound>(out var sound)) sound.Interactable = active;
             if (btn.TryGetComponent<DragableObject>(out var drag)) drag.Interactable = active;
         }
+    }
+
+    public void SetColorInGlass(WaterSlosh d, S_Drink r) { 
+        d.waterColorTop = r.waterColorTop;
+        d.waterColorBottom = r.waterColorBottom;
+
+        glassWaterSlosh.UpdateColor();
     }
 }

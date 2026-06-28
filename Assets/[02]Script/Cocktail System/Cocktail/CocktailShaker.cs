@@ -5,21 +5,23 @@ using static E_Cocktail;
 [RequireComponent(typeof(CocktailShakerData))]
 public class CocktailShaker : Interactable_2_5DObject
 {
-    // ── Inspector ──────────────────────────────────────────
-
+    // ── Inspector ─────────────────────────────────────────-
     [Header("Default Sprite")]
     public Sprite ShakerSprite;
 
     [Header("UI Panels")]
     public ToggleActive MethodUI;
     public ToggleActive ServeUI;
+    public ToggleActive AddIceUI;
 
     // ── Private State ──────────────────────────────────────
 
     private CocktailShakerData _data;
     private bool _canClick = true;
     private bool _canShowMethodUI = true;
+    private bool _canShowAddIceUI = false;
     private bool _canShowServeUI = false;
+
 
     // ── Accessors ──────────────────────────────────────────
 
@@ -31,6 +33,7 @@ public class CocktailShaker : Interactable_2_5DObject
 
     public void SetCanShowServeUI(bool active) => _canShowServeUI = active;
     public void SetCanShowMethodUI(bool active) => _canShowMethodUI = active;
+    public void SetCanShowAddIceUI(bool active) => _canShowAddIceUI = active;
     public void SetCanClick(bool active) => _canClick = active;
 
     // ── Unity Lifecycle ────────────────────────────────────
@@ -56,6 +59,7 @@ public class CocktailShaker : Interactable_2_5DObject
     public void ToggleUI()
     {
         if (_canShowMethodUI) MethodUI.ToggleActiveGameObject();
+        if (_canShowAddIceUI) AddIceUI.ToggleActiveGameObject();
         if (_canShowServeUI) ServeUI.ToggleActiveGameObject();
     }
 
@@ -65,6 +69,7 @@ public class CocktailShaker : Interactable_2_5DObject
     public void ResetShakerUI()
     {
         SetCanShowMethodUI(true);
+        SetCanShowAddIceUI(false);
         SetCanShowServeUI(false);
         SetCanClick(true);
         SetBTNSprite(ShakerSprite, ShakerSprite, ShakerSprite);

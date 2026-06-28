@@ -8,6 +8,8 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
 {
     // ── Inspector ──────────────────────────────────────────
 
+    [SerializeField]private MinigameSystemManager m_systemManager;
+
     [field: SerializeField]
     public SO_MinigameSetting Setting { get; set; }
 
@@ -212,7 +214,7 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
     {
         if (!PanelSlider.Slide(ref ArtWorkSessions[_currentArtIndex], ArtWorks[_currentArtIndex],
                 Direction.Up, SlideFinishCondition.BottomEdgeToBottomBound,
-                _slidePanelSpeed, EasingConfig.EaseInOut(EasingConfigTimer / 2)))
+                _slidePanelSpeed, EasingConfig.Bounce(EasingConfigTimer / 2)))
             return; // current artwork still animating
 
         _currentArtIndex++;
@@ -228,11 +230,12 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
     {
         if (!PanelSlider.Slide(ref MinigamePanelSession, _minigamePanel,
                 Direction.Up, SlideFinishCondition.BottomEdgeToBottomBound,
-                _slidePanelSpeed, EasingConfig.EaseInOut(EasingConfigTimer)))
+                _slidePanelSpeed, EasingConfig.Bounce(EasingConfigTimer)))
             return;
 
-        PanelSlider.SnapTo(ref ButtonPanelSessions, ButtonPanel,
-            SlideFinishCondition.BottomEdgeToBottomBound);
+        //--- Remove Button from minbigame---
+        //PanelSlider.SnapTo(ref ButtonPanelSessions, ButtonPanel,
+        //    SlideFinishCondition.BottomEdgeToBottomBound);
 
         int count = OpenPanel.Count;
         for (int i = 0; i < count; i++)
@@ -248,16 +251,32 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
     {
         SetState(MiniGameState.Success);
         bool minigameDone = PanelSlider.Slide(ref MinigamePanelSession, _minigamePanel,
-                Direction.Left, SlideFinishCondition.LeftEdgeToLeftBound,
+                Direction.Down, SlideFinishCondition.TopEdgeToBottomBound,
                 _slidePanelSpeed, EasingConfig.EaseInOut(EasingConfigTimer));
 
-        if (!minigameDone) return; // wait for animation
+        int artCount = ArtWorks.Count;
+        for (int i = 0; i < artCount; i++)
+            PanelSlider.SnapTo(ref ArtWorkSessions[i], ArtWorks[i],
+                SlideFinishCondition.TopEdgeToBottomBound);
 
-        PanelSlider.SnapTo(ref BackgroundSession, BackgroundPanelgame,
-            SlideFinishCondition.TopEdgeToBottomBound);
+        //bool minigameRemoving = PanelSlider.Slide(ref MinigamePanelSession, _minigamePanel,
+        //        Direction.Down, SlideFinishCondition.LeftEdgeToLeftBound,
+        //        _slidePanelSpeed, EasingConfig.Bounce(EasingConfigTimer));
+
+        bool RemoveBG = PanelSlider.Slide(ref BackgroundSession, BackgroundPanelgame,
+                Direction.Down, SlideFinishCondition.TopEdgeToBottomBound, _slidePanelSpeed,
+                    EasingConfig.Bounce(EasingConfigTimer));
+
+        if (!minigameDone || !RemoveBG) return; // wait for animation
+
+        //PanelSlider.SnapTo(ref BackgroundSession, BackgroundPanelgame,
+        //    SlideFinishCondition.TopEdgeToBottomBound);
+
+        
 
         CurrentSlidePhase = SlidePhase.None;
-        
+        m_systemManager.OnEndedGame?.Invoke();
+
     }
 
     // ── Phase: Closing ─────────────────────────────────────────
@@ -266,25 +285,71 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
         // One-shot: remove artworks before the slide-out begins
         if (!_closingSnapApplied)
         {
-            int artCount = ArtWorks.Count;
-            for (int i = 0; i < artCount; i++)
-                PanelSlider.SnapTo(ref ArtWorkSessions[i], ArtWorks[i],
-                    SlideFinishCondition.TopEdgeToBottomBound);
+            //int artCount = ArtWorks.Count;
+            ////--- OldCode ---
+            ////for (int i = 0; i < artCount; i++)
+            ////    PanelSlider.SnapTo(ref ArtWorkSessions[i], ArtWorks[i],
+            ////        SlideFinishCondition.TopEdgeToBottomBound);
 
-            _closingSnapApplied = true;
+
+            //for (int i = 0; i < artCount; i++)
+            //    PanelSlider.SnapTo(ref ArtWorkSessions[i], ArtWorks[i],
+            //        SlideFinishCondition.TopEdgeToBottomBound);
+
+            //SetState(MiniGameState.Success);
+            //bool minigameRemoving = PanelSlider.Slide(ref MinigamePanelSession, _minigamePanel,
+            //        Direction.Left, SlideFinishCondition.LeftEdgeToLeftBound,
+            //        _slidePanelSpeed, EasingConfig.Bounce(EasingConfigTimer));
+
+            //bool RemoveBG = PanelSlider.Slide(ref BackgroundSession, BackgroundPanelgame, 
+            //        Direction.Down, SlideFinishCondition.TopEdgeToBottomBound, _slidePanelSpeed, 
+            //            EasingConfig.Bounce(EasingConfigTimer));
+
+
+            //if(RemoveBG && minigameRemoving)
+            //    _closingSnapApplied = true;
+            //else
+            //    return;
         }
 
         var closingEase = EasingConfig.EaseIn(EasingConfigTimer / 2); // cache — used twice
 
-        bool minigameDone = PanelSlider.Slide(ref MinigamePanelSession, _minigamePanel,
-                Direction.Left, SlideFinishCondition.RightEdgeToLeftBound,
-                _slidePanelSpeed, closingEase);
+        //bool minigameDone = PanelSlider.Slide(ref MinigamePanelSession, _minigamePanel,
+        //        Direction.Left, SlideFinishCondition.RightEdgeToLeftBound,
+        //        _slidePanelSpeed, closingEase);
 
-        bool buttonDone = PanelSlider.Slide(ref ButtonPanelSessions, ButtonPanel,
-                Direction.Left, SlideFinishCondition.RightEdgeToLeftBound,
-                _slidePanelSpeed, closingEase);
+        //bool buttonDone = PanelSlider.Slide(ref ButtonPanelSessions, ButtonPanel,
+        //        Direction.Left, SlideFinishCondition.RightEdgeToLeftBound,
+        //        _slidePanelSpeed, closingEase);
 
-        if (!minigameDone || !buttonDone) return; // wait for both
+        //if (!minigameDone || !buttonDone) return; // wait for both
+
+        int artCount = ArtWorks.Count;
+        //--- OldCode ---
+        //for (int i = 0; i < artCount; i++)
+        //    PanelSlider.SnapTo(ref ArtWorkSessions[i], ArtWorks[i],
+        //        SlideFinishCondition.TopEdgeToBottomBound);
+
+
+        for (int i = 0; i < artCount; i++)
+            PanelSlider.SnapTo(ref ArtWorkSessions[i], ArtWorks[i],
+                SlideFinishCondition.TopEdgeToBottomBound);
+
+        bool minigameRemoving = PanelSlider.Slide(ref MinigamePanelSession, _minigamePanel,
+                Direction.Down, SlideFinishCondition.LeftEdgeToLeftBound,
+                _slidePanelSpeed, EasingConfig.Bounce(EasingConfigTimer));
+
+        bool RemoveBG = PanelSlider.Slide(ref BackgroundSession, BackgroundPanelgame,
+                Direction.Down, SlideFinishCondition.TopEdgeToBottomBound, _slidePanelSpeed,
+                    EasingConfig.Bounce(EasingConfigTimer));
+
+
+        //if (RemoveBG && minigameRemoving)
+        //    _closingSnapApplied = true;
+        //else
+        //    return;
+
+        if (!minigameRemoving || !RemoveBG) return;
 
         // Reset vertical position (off-screen above)
         PanelSlider.SnapTo(ref MinigamePanelSession, _minigamePanel,
@@ -303,6 +368,8 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
 
         _closingSnapApplied = false;
         CurrentSlidePhase = SlidePhase.None;
+
+        m_systemManager.OnEndedGame?.Invoke();
     }
 
     // ── IMinigame ──────────────────────────────────────────

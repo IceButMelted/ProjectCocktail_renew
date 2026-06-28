@@ -16,6 +16,7 @@
 
 using System.Collections.Generic;
 using System.Linq;
+using Unity.VisualScripting;
 using UnityEngine;
 using static E_Cocktail;
 
@@ -83,19 +84,31 @@ public static class DrinkUtility
     /// <summary>Writes the derived name onto <paramref name="d"/>.</summary>
     public static void UpdateName(S_Drink d, IReadOnlyList<S_Drink> recipes)
     {
-        var match = recipes?.FirstOrDefault(r => IngredientsMatch(r, d));
-        d.Name = match != null ? match.Name : NO_MATCH_NAME;
+        var (match, errors) = FindBestIngredientMatch(d, recipes);
+
+        d.Name = (match != null && errors <= 2) ? match.Name : NO_MATCH_NAME;
     }
 
     /// <summary>Writes the derived price onto <paramref name="d"/>.</summary>
     public static void UpdatePrice(S_Drink d, IReadOnlyList<S_Drink> recipes)
     {
-        var match = recipes?.FirstOrDefault(r =>
-            IngredientsMatch(r, d) &&
-            r.PreparationMethod == d.PreparationMethod &&
-            r.AddIce == d.AddIce);
+        var (match, errors) = FindBestIngredientMatch(d, recipes);
 
-        d.Price = match != null ? match.Price : DEFAULT_PRICE;
+        d.Price = (match != null && errors <= 2) ? match.Price : DEFAULT_PRICE;
+    }
+
+    /// <summary>
+    /// Writes the derived top and bottom colors onto <paramref name="d"/>.
+    /// </summary>
+    public static void UpdateColorInGlass(S_Drink d, IReadOnlyList<S_Drink> recipes)
+    {
+        var (match, errors) = FindBestIngredientMatch(d, recipes);
+
+        bool hasMatch = match != null && errors <= 2;
+        d.waterColorTop = hasMatch ? match.waterColorTop : Color.black;
+        d.waterColorBottom = hasMatch ? match.waterColorBottom : Color.black;
+
+        Debug.Log("Update Color");
     }
 
     /// <summary>Writes the derived alcohol strength onto <paramref name="d"/>.</summary>
@@ -227,6 +240,19 @@ public static class DrinkUtility
         return null;                                                  // Fail
     }
 
+    public static Color[] GetCocktailColors(S_Drink d)
+    {
+        return new Color[] { d.waterColorTop, d.waterColorBottom };
+    }
+
+    public static Color GetCocktailTopColor(S_Drink d) { 
+        return d.waterColorTop;
+    }
+    public static Color GetCocktailBottomColor(S_Drink d)
+    {
+        return d.waterColorBottom;
+    }
+
     // ── Debug ──────────────────────────────────────────────
 
     public static string GetCocktailInfo(S_Drink d)
@@ -237,6 +263,8 @@ public static class DrinkUtility
         sb.Append("Alcohol: "); sb.AppendLine(string.Join(", ", d.AlcoholList.Select(a => $"{a.Type}x{a.Amount}")));
         sb.Append("Liqueur: "); sb.AppendLine(string.Join(", ", d.LiqueurList.Select(l => $"{l.Type}x{l.Amount}")));
         sb.Append("Mixer:   "); sb.AppendLine(string.Join(", ", d.MixerList  .Select(m => $"{m.Type}x{m.Amount}")));
+        sb.Append("Color top:"); sb.AppendLine(string.Join(", ", d.waterColorTop));
+        sb.Append("Color btm:"); sb.AppendLine(string.Join(", ", d.waterColorBottom));
         return sb.ToString();
     }
 
@@ -330,4 +358,33 @@ public static class DrinkUtility
             return p != r;
         });
     }
+
+    /// <summary>
+    /// Scans <paramref name="recipes"/> and returns the recipe with the fewest
+    /// ingredient errors versus <paramref name="d"/>, together with that error count.
+    /// Ice and preparation method are intentionally ignored — only ingredients matter.
+    /// A result with errors > 2 is a Fail (mirrors <see cref="CalculateSatisfaction"/>).
+    /// </summary>
+    private static (S_Drink recipe, int errors) FindBestIngredientMatch(
+        S_Drink d, IReadOnlyList<S_Drink> recipes)
+    {
+        if (recipes == null || recipes.Count == 0)
+            return (null, int.MaxValue);
+
+        S_Drink bestRecipe = null;
+        int bestErrors = int.MaxValue;
+
+        foreach (var r in recipes)
+        {
+            int errors = CountIngredientErrors(d, r);
+            if (errors >= bestErrors) continue;
+
+            bestErrors = errors;
+            bestRecipe = r;
+            if (bestErrors == 0) break; // Perfect — no need to keep searching
+        }
+
+        return (bestRecipe, bestErrors);
+    }
+
 }

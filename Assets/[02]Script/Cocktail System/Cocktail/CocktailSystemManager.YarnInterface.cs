@@ -48,16 +48,6 @@ public partial class CocktailSystemManager
 
     public void SetSatisfaction(Satisfaction satisfaction) => _satisfaction = satisfaction;
 
-    public void ServeDrink()
-    {
-        if (_targetCocktail == null)
-        {
-            Debug.LogWarning("[CocktailSystemManager] ServeDrink called with no target cocktail set.");
-            return;
-        }
-        UpdateVariableInYarnTrigger();
-    }
-
     private void DebugServeDrink() => DebugUpdateVariableInYarnTrigger();
 
     // Yarn Functions 

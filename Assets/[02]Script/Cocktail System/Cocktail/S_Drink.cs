@@ -53,6 +53,10 @@ public class S_Drink : ScriptableObject
     public List<LiqueurIngredient> LiqueurList = new List<LiqueurIngredient>();
     public List<MixerIngredient> MixerList = new List<MixerIngredient>();
 
+    [Header("Cocktail Color")]
+    public Color waterColorTop;
+    public Color waterColorBottom;
+
     // ── Serving ────────────────────────────────────────────
 
     public List<GlassType> CompatibleGlasses = new List<GlassType>();
