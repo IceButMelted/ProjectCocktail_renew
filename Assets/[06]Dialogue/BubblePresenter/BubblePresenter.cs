@@ -86,12 +86,9 @@ namespace YarnSpinner.Custom
         [Header("Input Handler")]
         [Tooltip("Auto-found in children if left empty.")]
         [SerializeField] private BubblePresenterButtonHandler buttonHandler;
+        [SerializeField] private bool useLineAdvancer = true;
+        private LineAdvancer _activeLineAdvancer;
 
-        [Tooltip("(Optional) The Yarn Spinner LineAdvancer that drives hurry-up / next-line " +
-                 "requests (keyboard, gamepad, or Input Actions). Auto-found in children/parent " +
-                 "if left empty, then handed to buttonHandler so its button clicks route " +
-                 "through it as well. Configure its DialogueRunner field and set " +
-                 "'Separate Hurry Up And Advance Controls' to true.")]
         [SerializeField] private LineAdvancer lineAdvancer;
 
         [Header("World Target Mapping")]
@@ -145,14 +142,16 @@ namespace YarnSpinner.Custom
                 CharactersPerSecond = useTypewriterEffect ? typewriterSpeed : 0f,
             };
 
-            if (lineAdvancer == null)
-                lineAdvancer = GetComponentInChildren<LineAdvancer>();
-            if (lineAdvancer == null)
-                lineAdvancer = GetComponentInParent<LineAdvancer>();
+            ApplyLineAdvancerState();
 
             buttonHandler?.SetLineAdvancer(lineAdvancer);
 
-            if (lineAdvancer != null && !lineAdvancer.separateHurryUpAndAdvanceControls)
+            if (lineAdvancer != null && !GetSeparateHurryUpAndAdvanceControls(lineAdvancer))
+                Typewriter.ActionMarkupHandlers.Add(lineAdvancer);
+
+            buttonHandler?.SetLineAdvancer(lineAdvancer);
+
+            if (lineAdvancer != null && !GetSeparateHurryUpAndAdvanceControls(lineAdvancer))
                 Typewriter.ActionMarkupHandlers.Add(lineAdvancer);
 
             _targetLookup.Clear();
@@ -170,7 +169,7 @@ namespace YarnSpinner.Custom
         {
             if (!string.IsNullOrEmpty(SceneLoaderBridge.ChapterNodeName))
             {
-                DialogueRunner runner = FindObjectOfType<DialogueRunner>();
+                DialogueRunner runner = FindFirstObjectByType<DialogueRunner>();
                 if (runner != null)
                 {
                     SceneLoaderBridge.DialogueRootNode = SceneLoaderBridge.ChapterNodeName;
@@ -425,7 +424,7 @@ namespace YarnSpinner.Custom
         }
 
         // ─────────────────────────────────────────────────────────────────────
-        // New helpers — the three requested methods
+        // helpler
         // ─────────────────────────────────────────────────────────────────────
 
         /// <summary>Returns true if the screen-pixel point is within screen bounds.</summary>
@@ -551,6 +550,99 @@ namespace YarnSpinner.Custom
             SetTailVisible(false);
 
             Typewriter?.ContentDidDismiss();
+        }
+
+        /// <summary>
+        /// LineAdvancer's `separateHurryUpAndAdvanceControls` field is private with
+        /// no public accessor, and LineAdvancer.cs cannot be modified. Reflection
+        /// is used here purely to read that flag at Awake() time.
+        /// </summary>
+        private static bool GetSeparateHurryUpAndAdvanceControls(LineAdvancer advancer)
+        {
+            var field = typeof(LineAdvancer).GetField(
+                "separateHurryUpAndAdvanceControls",
+                System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+            if (field == null)
+            {
+                Debug.LogWarning($"{nameof(BubblePresenter)}: could not find LineAdvancer's " +
+                    $"'separateHurryUpAndAdvanceControls' field via reflection; assuming false.");
+                return false;
+            }
+
+            return (bool)field.GetValue(advancer);
+        }
+
+
+        /// ─────────────────────────────────────────────────────────────────────
+        /// Helpes for line advancer
+        // / ─────────────────────────────────────────────────────────────────────
+        // ─────────────────────────────────────────────────────────────────────
+        // Runtime LineAdvancer enable/disable
+        // ─────────────────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Enables this presenter's use of a LineAdvancer at runtime. If no
+        /// LineAdvancer is assigned in the Inspector, one will be auto-found in
+        /// children/parent, same as at startup.
+        /// </summary>
+        public void EnableLineAdvancer() => SetLineAdvancerEnabled(true);
+
+        /// <summary>
+        /// Disables this presenter's use of a LineAdvancer at runtime. The
+        /// assigned LineAdvancer reference is kept (not cleared) so it can be
+        /// re-enabled later; it is simply unhooked from the typewriter and the
+        /// button handler, and RequestHurryUpLine()/RequestNextDialogueLine()
+        /// become no-ops until re-enabled.
+        /// </summary>
+        public void DisableLineAdvancer() => SetLineAdvancerEnabled(false);
+
+        /// <summary>
+        /// Sets whether this presenter uses a LineAdvancer at runtime.
+        /// Safe to call at any time, including mid-line.
+        /// </summary>
+        public void SetLineAdvancerEnabled(bool enabled)
+        {
+            useLineAdvancer = enabled;
+            ApplyLineAdvancerState();
+        }
+
+        /// <summary>Current runtime enabled state.</summary>
+        public bool IsLineAdvancerEnabled => useLineAdvancer;
+
+        /// <summary>
+        /// Resolves, wires, or unwires the LineAdvancer based on the current
+        /// value of useLineAdvancer. Called from Awake() and whenever
+        /// SetLineAdvancerEnabled() is used at runtime.
+        /// </summary>
+        private void ApplyLineAdvancerState()
+        {
+            // Unhook whatever was previously active first, to avoid double-adding
+            // or leaving a stale handler on the typewriter.
+            if (_activeLineAdvancer != null)
+            {
+                Typewriter?.ActionMarkupHandlers.Remove(_activeLineAdvancer);
+                _activeLineAdvancer = null;
+            }
+
+            if (!useLineAdvancer)
+            {
+                buttonHandler?.SetLineAdvancer(null);
+                return;
+            }
+
+            // Auto-find only if nothing was assigned in the Inspector.
+            if (lineAdvancer == null)
+                lineAdvancer = GetComponentInChildren<LineAdvancer>();
+            if (lineAdvancer == null)
+                lineAdvancer = GetComponentInParent<LineAdvancer>();
+
+            _activeLineAdvancer = lineAdvancer;
+
+            buttonHandler?.SetLineAdvancer(_activeLineAdvancer);
+
+            if (_activeLineAdvancer != null && !GetSeparateHurryUpAndAdvanceControls(_activeLineAdvancer))
+                Typewriter?.ActionMarkupHandlers.Add(_activeLineAdvancer);
         }
     }
 }
