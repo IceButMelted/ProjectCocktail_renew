@@ -4332,7 +4332,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 1497398276877998885, guid: 5728bb0f6d221f0489cec6e8dab5d683, type: 3}
   m_PrefabInstance: {fileID: 5732725779332928158}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 5732725779332928160}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 61503eb6a998a4af68e0dcbec4aad8cb, type: 3}
@@ -4569,61 +4569,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 1892581843}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!21 &1007011970
-Material:
-  serializedVersion: 8
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: Mat_Water_Lit (Instance) (Instance) (Instance) (Instance)
-  m_Shader: {fileID: -6465566751694194690, guid: e88f42718e96b6245a5881a8b4791a81, type: 3}
-  m_Parent: {fileID: 0}
-  m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
-  m_InvalidKeywords: []
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses:
-  - MOTIONVECTORS
-  m_LockedProperties: 
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _BaseMap:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - unity_Lightmaps:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - unity_LightmapsInd:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - unity_ShadowMasks:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Ints: []
-    m_Floats:
-    - _Amplitude: 0.015732927
-    - _EmissionStrength: 1.25
-    - _Frequency: 15
-    - _QueueControl: 0
-    - _QueueOffset: 0
-    - _Speed: 10
-    - _WaterLevel: 0
-    m_Colors:
-    - _WaterColorBottom: {r: 0, g: 1, b: 0, a: 1}
-    - _WaterColorButtom: {r: 0.40204328, g: 1, b: 0, a: 0.39607844}
-    - _WaterColorTop: {r: 1, g: 0, b: 1, a: 1}
-  m_BuildTextureStacks: []
-  m_AllowLocking: 1
 --- !u!1 &1040557579
 GameObject:
   m_ObjectHideFlags: 0
@@ -6705,6 +6650,61 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1460337633}
   m_CullTransparentMesh: 1
+--- !u!21 &1486032979
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Mat_Water_Lit (Instance) (Instance) (Instance) (Instance)
+  m_Shader: {fileID: -6465566751694194690, guid: e88f42718e96b6245a5881a8b4791a81, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses:
+  - MOTIONVECTORS
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BaseMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_Lightmaps:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_LightmapsInd:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_ShadowMasks:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _Amplitude: 0.015732927
+    - _EmissionStrength: 1.25
+    - _Frequency: 15
+    - _QueueControl: 0
+    - _QueueOffset: 0
+    - _Speed: 10
+    - _WaterLevel: 0
+    m_Colors:
+    - _WaterColorBottom: {r: 0, g: 1, b: 0, a: 1}
+    - _WaterColorButtom: {r: 0.40204328, g: 1, b: 0, a: 0.39607844}
+    - _WaterColorTop: {r: 1, g: 0, b: 1, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1
 --- !u!114 &1487455296
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16746,6 +16746,10 @@ PrefabInstance:
       value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 1497398276877998885, guid: 5728bb0f6d221f0489cec6e8dab5d683, type: 3}
+      propertyPath: hasTransferredLegacyMapping
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1497398276877998885, guid: 5728bb0f6d221f0489cec6e8dab5d683, type: 3}
       propertyPath: separateHurryUpAndAdvanceControls
       value: 0
       objectReference: {fileID: 0}
@@ -16835,12 +16839,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3458619378161505199, guid: 5728bb0f6d221f0489cec6e8dab5d683, type: 3}
       propertyPath: startNode
-      value: D1_00_Start
+      value: Bubble_Sample
       objectReference: {fileID: 0}
     - target: {fileID: 3458619378161505199, guid: 5728bb0f6d221f0489cec6e8dab5d683, type: 3}
       propertyPath: yarnProject
       value: 
-      objectReference: {fileID: 7545569452688597077, guid: d6c7f29ec67568a49ae2638d17c354f9, type: 3}
+      objectReference: {fileID: 7545569452688597077, guid: 026b722b7d91591459a05239d6d41353, type: 3}
     - target: {fileID: 3458619378161505199, guid: 5728bb0f6d221f0489cec6e8dab5d683, type: 3}
       propertyPath: allowOptionFallthrough
       value: 0
@@ -16990,6 +16994,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 842451814}
     - target: {fileID: 6015314527823841331, guid: 5728bb0f6d221f0489cec6e8dab5d683, type: 3}
+      propertyPath: typewriterStyle
+      value: 3
+      objectReference: {fileID: 0}
+    - target: {fileID: 6015314527823841331, guid: 5728bb0f6d221f0489cec6e8dab5d683, type: 3}
       propertyPath: fadeDownDuration
       value: 0.1
       objectReference: {fileID: 0}
@@ -17012,6 +17020,14 @@ PrefabInstance:
     - target: {fileID: 6015314527823841331, guid: 5728bb0f6d221f0489cec6e8dab5d683, type: 3}
       propertyPath: screenBorderPadding
       value: 50
+      objectReference: {fileID: 0}
+    - target: {fileID: 6015314527823841331, guid: 5728bb0f6d221f0489cec6e8dab5d683, type: 3}
+      propertyPath: useTypewriterEffect
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 6015314527823841331, guid: 5728bb0f6d221f0489cec6e8dab5d683, type: 3}
+      propertyPath: textAnimatorTypewriter
+      value: 
       objectReference: {fileID: 0}
     - target: {fileID: 6015314527823841331, guid: 5728bb0f6d221f0489cec6e8dab5d683, type: 3}
       propertyPath: bubbleAboveTargetOffset
@@ -17124,6 +17140,10 @@ PrefabInstance:
     - target: {fileID: 6311457998715211805, guid: 5728bb0f6d221f0489cec6e8dab5d683, type: 3}
       propertyPath: m_AnchoredPosition.y
       value: 192
+      objectReference: {fileID: 0}
+    - target: {fileID: 6607189813456878639, guid: 5728bb0f6d221f0489cec6e8dab5d683, type: 3}
+      propertyPath: m_Name
+      value: Current Text Line
       objectReference: {fileID: 0}
     - target: {fileID: 6613778095534249123, guid: 5728bb0f6d221f0489cec6e8dab5d683, type: 3}
       propertyPath: m_Name
@@ -17260,9 +17280,18 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 3103444433269626784, guid: 5728bb0f6d221f0489cec6e8dab5d683, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1930725753}
+    - targetCorrespondingSourceObject: {fileID: 6607189813456878639, guid: 5728bb0f6d221f0489cec6e8dab5d683, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5732725779332928164}
+    - targetCorrespondingSourceObject: {fileID: 6607189813456878639, guid: 5728bb0f6d221f0489cec6e8dab5d683, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5732725779332928163}
     - targetCorrespondingSourceObject: {fileID: 3573812413334486407, guid: 5728bb0f6d221f0489cec6e8dab5d683, type: 3}
       insertIndex: -1
       addedObject: {fileID: 482701009}
+    - targetCorrespondingSourceObject: {fileID: 1076701111651020220, guid: 5728bb0f6d221f0489cec6e8dab5d683, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5732725779332928161}
     - targetCorrespondingSourceObject: {fileID: 1452388702613167092, guid: 5728bb0f6d221f0489cec6e8dab5d683, type: 3}
       insertIndex: -1
       addedObject: {fileID: 2087138769}
@@ -17278,6 +17307,108 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4470bef099060f04499f1c2de4c4f4e3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::YarnSpinner.Custom.BubblePresenter
+--- !u!1 &5732725779332928160 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 1076701111651020220, guid: 5728bb0f6d221f0489cec6e8dab5d683, type: 3}
+  m_PrefabInstance: {fileID: 5732725779332928158}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5732725779332928161
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5732725779332928160}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ad15240c88dde41159620e5f27277386, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: YarnSpinner.Unity::Yarn.Unity.LineAdvancerInput.KeyCodes
+  lineAdvancer: {fileID: 970592944}
+  hurryUpLineKeyCode: 323
+  nextLineKeyCode: 32
+  hurryUpOptionsKeyCode: 9
+  cancelDialogueKeyCode: 280
+--- !u!1 &5732725779332928162 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6607189813456878639, guid: 5728bb0f6d221f0489cec6e8dab5d683, type: 3}
+  m_PrefabInstance: {fileID: 5732725779332928158}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &5732725779332928163
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5732725779332928162}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 26ef910a7482f4ce9bbf4cd80ef5e3c5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: YarnSpinner.Addons.TextAnimatorIntegration::Yarn.Unity.Addons.TextAnimatorIntegration.TextAnimatorYarnTypewriter
+  timingsScriptableBase: {fileID: 11400000, guid: 050beadfacde12f4eb99a26fa0bdd280, type: 2}
+  actionsDatabase: {fileID: 11400000, guid: 1b2cf8f7a6cae46a6972f7ccec187814, type: 2}
+  localSettings:
+    useTypeWriter: 1
+    startTypewriterMode: 3
+    hideAppearancesOnSkip: 0
+    hideDisappearancesOnSkip: 0
+    triggerEventsOnSkip: 0
+    resetTypingSpeedAtStartup: 1
+    disappearanceOrientation: 0
+    triggerShowedAfterEffectsEnd: 0
+    triggerDisappearedAfterEffectsEnd: 0
+  sharedSettings: {fileID: 11400000, guid: e5ebec8b825794584aa9434d686fed6f, type: 2}
+  onTextShowed:
+    m_PersistentCalls:
+      m_Calls: []
+  onTypewriterStart:
+    m_PersistentCalls:
+      m_Calls: []
+  onTextDisappeared:
+    m_PersistentCalls:
+      m_Calls: []
+  onCharacterVisible:
+    m_PersistentCalls:
+      m_Calls: []
+  onCharacterWaitStarted:
+    m_PersistentCalls:
+      m_Calls: []
+  onCharacterWaitFinished:
+    m_PersistentCalls:
+      m_Calls: []
+  onMessage:
+    m_PersistentCalls:
+      m_Calls: []
+  Animator: {fileID: 5732725779332928164}
+--- !u!114 &5732725779332928164
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5732725779332928162}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8ace8ced0e81c847968cdca0aeda757, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Febucci.TextAnimatorForUnity.TMP.Runtime::Febucci.TextAnimatorForUnity.TextMeshPro.TextAnimator_TMP
+  localSettings:
+    isResettingTimeOnNewText: 1
+    defaultEffectsMode: 1
+    timeScale: 0
+    defaultBehaviorTags: []
+    defaultAppearanceTags: []
+    defaultDisappearanceTags: []
+    isAnimatingBehaviors: 1
+    isAnimatingAppearances: 1
+    isAnimatingDisappearances: 1
+    useDynamicScaling: 1
+    referenceFontSize: 12
+  sharedSettings: {fileID: 11400000, guid: 503730955ff7ed9468949780cdcb9806, type: 2}
+  animationLoop: 0
+  databaseEffects: {fileID: 0}
+  styleSheet: {fileID: 0}
 --- !u!1 &5778413623369431676
 GameObject:
   m_ObjectHideFlags: 0

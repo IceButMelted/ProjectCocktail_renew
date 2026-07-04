@@ -1,32 +1,53 @@
-title: Main
+title: Bubble_Sample
 ---
+Guard: Halt! Who goes there? #save_checkpoint
 
-<<jump WaitLoop>>
+Guard: AD[shake]This place gives me the creeps.[/shake]
+
+Player: Just passing through.
+
+Guard: Suuure you are...Fine, go ahead.
+-> Thanks.
+    Guard: Don't make me regret it.
+-> None of your business.
+    Guard: [shake]Watch your tone.[/shake]
 ===
 
-title: WaitLoop
+title: TextAnimatorShowcase
 ---
-Narrator: I'm waiting for you to finish the task...
-<<wait_for_task SystemGame>>
-<<if $task_done == true>>
-    Narrator : Task finish
-    
-<<endif>>
+Walter: Suuure you are...[waitfor=0.3][/waitfor]that's the mid-line pause, waitfor.
 
-<<if $satisfaction == Satisfaction.Perfect>>
-    Narrator: WOW! this Great
-    <<Reset_Variable SystemGame>>
-<<elseif $satisfaction == Satisfaction.Acceptable>>
-    Narrator: Hmmm..... it's Ok
-    <<Reset_Variable SystemGame>>
-<<elseif $satisfaction == Satisfaction.Fail>>
-    Narrator: Unacceptable YUCK
-    <<Reset_Variable SystemGame>>
-<<endif>>
-<<jump WaitLoop>>
-===
+Owen: Alright, let's test every effect Text Animator's got. #save_checkpoint
 
-title: NextDialogue
----
-Narrator: This is the dialogue after the wait.
+Owen: [shake]This one's the classic — shake.[/shake]
+
+Isla: [wiggle]And this is wiggle, a little looser than shake.[/wiggle]
+
+Walter: [wave]Wave rolls up and down, letter by letter.[/wave]
+
+Player: [bounce]Bounce hops each letter up and back down.[/bounce]
+
+Owen: [swing]Swing rocks side to side, like a pendulum.[/swing]
+
+Isla: [pend]This is the actual pendulum effect, pend.[/pend]
+
+Walter: [dangle]Dangle lets letters droop and sway loosely.[/dangle]
+
+Player: [rot]Rotate spins each letter slightly, called rot.[/rot]
+
+Owen: [slideh]Slide moves letters in from the side — slideh.[/slideh]
+
+Isla: [incr]Increase Size makes letters grow, tagged incr, not size.[/incr]
+
+Walter: [rainb]Rainbow cycles color across the text.[/rainb]
+
+Player: [fade]Fade eases letters in and out of visibility.[/fade]
+
+Owen: You can stack effects too, like [shake][rainb]this shaking rainbow[/rainb][/shake].
+
+Isla: Amplitude and speed are tunable — try [shake a=5]a strong shake[/shake] or [wave s=3]a fast wave[/wave].
+
+
+
+Owen: That's the full built-in set. Mix, match, and stack away. #save_checkpoint
 ===

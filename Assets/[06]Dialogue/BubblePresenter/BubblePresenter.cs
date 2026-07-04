@@ -11,6 +11,31 @@
  *           ├── Button Container
  *           │   └── Continue Button
  *           └── Tail              (default sprite points DOWN)
+ *
+ * ── Yarn Spinner Plus ───────────────────────────────────────────────────
+ * No code changes needed. Plus uses the same runtime API (DialogueRunner,
+ * DialoguePresenterBase, LocalizedLine) as the free package — it only adds
+ * editor-side tooling (visual graph, saliency, etc). Just make sure the
+ * free package is removed from the project before importing Plus.
+ *
+ * ── Text Animator ───────────────────────────────────────────────────────
+ * 1. On the `lineText` GameObject: add `TextAnimator_TMP` + Yarn Spinner's
+ *    `Text Animator Yarn Typewriter` component (ships with the Text
+ *    Animator add-on package).
+ * 2. Set Typewriter → Style to "Custom" and drag that component into
+ *    `customTypewriter` below. Switch back to Instant/ByLetter/ByWord to
+ *    fall back to Yarn Spinner's built-in typewriters.
+ * 3. Only ONE `TextAnimatorYarnTypewriter` may exist per DialogueRunner —
+ *    it registers a shared "speed" markup processor on the line provider.
+ *    Two instances (e.g. this one + the sample dialogue prefab's) throws
+ *    `InvalidOperationException: marker processor already registered`.
+ * 4. Text Animator tags use Yarn's [square brackets]: [shake]hi[/shake].
+ *    For mid-line pauses use [waitfor=0.3], not <<wait>> (that's a
+ *    standalone Yarn command, can't be embedded inside a line's text).
+ *    Make sure "waitfor" is in the typewriter's actionTags list.
+ * 5. Text Animator tags + inline [action] markup can't combine in the same
+ *    line (Yarn Spinner limitation) — use Text Animator's own event system
+ *    for in-line triggers instead.
  */
 
 using System;
@@ -18,6 +43,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using Yarn.Unity;
+using Yarn.Unity.Attributes;
 
 namespace YarnSpinner.Custom
 {
@@ -44,67 +70,118 @@ namespace YarnSpinner.Custom
             TopCenter, TopLeft, TopRight
         }
 
+        // Mirrors LinePresenter.TypewriterType — "Custom" is the slot Text Animator's
+        // TextAnimatorYarnTypewriter plugs into via customTypewriter below.
+        internal enum TypewriterType
+        {
+            Instant, ByLetter, ByWord, Custom,
+        }
+
         // ─────────────────────────────────────────────────────────────────────
         // Inspector
         // ─────────────────────────────────────────────────────────────────────
 
-        [Header("Bubble References")]
+        [Group("Bubble References")]
+        [MustNotBeNull]
         [SerializeField] private RectTransform bubbleRect;
+
+        [Group("Bubble References")]
         [Tooltip("Background GameObject to calculate Size")]
         [SerializeField] private RectTransform backGroundText;
+
+        [Group("Bubble References")]
+        [MustNotBeNull]
         [SerializeField] private TMP_Text lineText;
+
+        [Group("Bubble References")]
         [SerializeField] private TMP_Text characterNameText;
         private string _lastCharacterName;
+
+        [Group("Bubble References")]
+        [MustNotBeNull]
         [SerializeField] private GameObject bubbleContainer;
 
-        [Header("Fade")]
-        [SerializeField] private CanvasGroup bubbleCanvasGroup;
+        [Group("Fade")]
+        [Label("Fade UI")]
         [SerializeField] private bool useFadeEffect = true;
+
+        [Group("Fade")]
+        [SerializeField] private CanvasGroup bubbleCanvasGroup;
+
+        [Group("Fade")]
+        [ShowIf(nameof(useFadeEffect))]
         [SerializeField] private float fadeUpDuration = 0.25f;
+
+        [Group("Fade")]
+        [ShowIf(nameof(useFadeEffect))]
         [SerializeField] private float fadeDownDuration = 0.1f;
 
-        [Header("Tail / Pointer")]
+        [Group("Tail / Pointer")]
         [SerializeField] private RectTransform tailImage;
 
-        [Header("Typewriter")]
-        [SerializeField] private bool useTypewriterEffect = true;
-        [SerializeField] private float typewriterSpeed = 60f;
+        // ── Typewriter ──────────────────────────────────────────────────────
+        // Same shape as LinePresenter's typewriter block: pick a style, and
+        // for Custom, drag in anything that implements IAsyncTypewriter —
+        // including Text Animator's Text Animator Yarn Typewriter component.
+
+        [Group("Typewriter")]
+        [SerializeField] internal TypewriterType typewriterStyle = TypewriterType.ByLetter;
+
+        [Group("Typewriter")]
+        [ShowIf(nameof(typewriterStyle), TypewriterType.ByLetter)]
+        [Label("Letters per Second")]
+        [Min(0)]
+        [SerializeField] private int lettersPerSecond = 60;
+
+        [Group("Typewriter")]
+        [ShowIf(nameof(typewriterStyle), TypewriterType.ByWord)]
+        [Label("Words per Second")]
+        [Min(0)]
+        [SerializeField] private int wordsPerSecond = 10;
+
+        [Group("Typewriter")]
+        [ShowIf(nameof(typewriterStyle), TypewriterType.Custom)]
+        [Tooltip("Assign a component implementing IAsyncTypewriter, e.g. Text Animator's Text Animator Yarn Typewriter.")]
+        [SerializeField] private InterfaceContainer<IAsyncTypewriter> customTypewriter;
 
         /// <summary>
-        /// The typewriter used to display this line's text, implementing the
-        /// same <see cref="IAsyncTypewriter"/> interface that the built-in
-        /// LinePresenter uses (LetterTypewriter / InstantTypewriter / your
-        /// own custom typewriter component all conform to it).
-        /// Exposing this is what lets a LineAdvancer-aware button handler
-        /// (or anything else) know "is the line fully shown yet" the same
-        /// way LinePresenterButtonHandler does for LinePresenter — by
-        /// checking IAsyncTypewriter completion rather than BubblePresenter
-        /// having to track typing progress itself.
+        /// The typewriter used to display this line's text (same IAsyncTypewriter
+        /// interface LinePresenter uses), so a LineAdvancer/button handler can
+        /// check "is the line fully shown yet" the same way.
         /// </summary>
         public IAsyncTypewriter Typewriter { get; private set; }
 
-        [Header("Input Handler")]
+        [Group("Input Handler")]
         [Tooltip("Auto-found in children if left empty.")]
         [SerializeField] private BubblePresenterButtonHandler buttonHandler;
+
+        [Group("Input Handler")]
         [SerializeField] private bool useLineAdvancer = true;
         private LineAdvancer _activeLineAdvancer;
 
+        [Group("Input Handler")]
+        [ShowIf(nameof(useLineAdvancer))]
         [SerializeField] private LineAdvancer lineAdvancer;
 
-        [Header("World Target Mapping")]
+        [Group("World Target Mapping")]
         [SerializeField] private List<CharacterTarget> characterTargets = new();
+
+        [Group("World Target Mapping")]
         [SerializeField] private float bubbleAboveTargetOffset = 20f;
+
+        [Group("World Target Mapping")]
         [SerializeField] private float bubbleBelowTargetOffset = 20f;
 
-        [Header("Screen Boundary Clamping")]
+        [Group("Screen Boundary Clamping")]
         [SerializeField] private float screenBorderPadding = 50f;
 
-        [Header("Fallback Canvas Anchor  (no target found)")]
+        [Group("Fallback Canvas Anchor")]
+        [Label("Anchor (no target found)")]
         [SerializeField] private RectTransform fallbackCanvasAnchor;
+
+        [Group("Fallback Canvas Anchor")]
         [SerializeField] private float fallbackScreenBorderPadding = 50f;
 
-
-        private bool _targetFound;
         private Transform _lastTargetPos;
 
         // ─────────────────────────────────────────────────────────────────────
@@ -124,35 +201,40 @@ namespace YarnSpinner.Custom
             SetBubbleVisible(false);
             SetTailVisible(false);
 
-            // Initialise alpha so first fade-in starts from zero
             if (bubbleCanvasGroup != null)
-                bubbleCanvasGroup.alpha = 0f;
+                bubbleCanvasGroup.alpha = 0f; // start transparent so first fade-in reads correctly
 
             if (buttonHandler == null)
                 buttonHandler = GetComponentInChildren<BubblePresenterButtonHandler>();
 
-            // Build the IAsyncTypewriter that will run this presenter's
-            // typewriter effect. This mirrors LinePresenter's "Letter By
-            // Letter" typewriter mode (see LetterTypewriter in YarnSpinner-
-            // Unity). Speed of 0 / disabled means deliver everything
-            // instantly via CharactersPerSecond = 0f.
-            Typewriter = new LetterTypewriter
+            // Mirrors LinePresenter.Awake()'s typewriter switch. Text Animator's
+            // TextAnimatorYarnTypewriter implements IAsyncTypewriter, so it plugs
+            // into the Custom slot exactly like any other custom typewriter would.
+            switch (typewriterStyle)
             {
-                TextElement = lineText,
-                CharactersPerSecond = useTypewriterEffect ? typewriterSpeed : 0f,
-            };
+                case TypewriterType.Instant:
+                    Typewriter = new InstantTypewriter { TextElement = lineText };
+                    break;
 
+                case TypewriterType.ByLetter:
+                    Typewriter = new LetterTypewriter { TextElement = lineText, CharactersPerSecond = lettersPerSecond };
+                    break;
+
+                case TypewriterType.ByWord:
+                    Typewriter = new WordTypewriter { TextElement = lineText, WordsPerSecond = wordsPerSecond };
+                    break;
+
+                case TypewriterType.Custom:
+                    Typewriter = customTypewriter?.Interface;
+                    if (Typewriter == null)
+                        Debug.LogWarning($"{nameof(BubblePresenter)}: typewriter style is Custom but no typewriter is assigned.");
+                    else
+                        Typewriter.TextElement = lineText;
+                    break;
+            }
+
+            // Wires buttonHandler + typewriter to the LineAdvancer (or unwires if disabled).
             ApplyLineAdvancerState();
-
-            buttonHandler?.SetLineAdvancer(lineAdvancer);
-
-            if (lineAdvancer != null && !GetSeparateHurryUpAndAdvanceControls(lineAdvancer))
-                Typewriter.ActionMarkupHandlers.Add(lineAdvancer);
-
-            buttonHandler?.SetLineAdvancer(lineAdvancer);
-
-            if (lineAdvancer != null && !GetSeparateHurryUpAndAdvanceControls(lineAdvancer))
-                Typewriter.ActionMarkupHandlers.Add(lineAdvancer);
 
             _targetLookup.Clear();
             foreach (var e in characterTargets)
@@ -179,39 +261,11 @@ namespace YarnSpinner.Custom
             }
         }
 
+        // Keeps the bubble glued to a moving target every frame while a line is showing.
         private void LateUpdate()
         {
             if (_lastTargetPos != null)
-            {
-                Vector2 targetScreen = WorldToScreenPoint(_lastTargetPos.position);
-                bool targetIsLowerHalf = IsTargetLowerHalfScreen(targetScreen);
-                //float shiftY = backGroundText != null
-                //    ? bubbleAboveTargetOffset + backGroundText.rect.height * 0.5f
-                //    : bubbleAboveTargetOffset;
-
-                if (bubbleRect != null)
-                {
-                    //Vector2 clamped = ClampBubbleToScreen(targetScreen.x, targetScreen.y + shiftY, screenBorderPadding);
-                    Vector2 clamped = ClampBubbleToScreen(targetScreen.x, targetScreen.y, screenBorderPadding);
-                    bubbleRect.position = new Vector3(clamped.x, clamped.y, 0f);
-                    //bubbleRect.position = new Vector3(targetScreen.x, targetScreen.y, 0f);
-
-                    //Decide to shift bubble above target if target is in lower half of screen, to reduce chance of tail being off-screen
-                    if (targetIsLowerHalf)
-                        bubbleRect.position += new Vector3(0f, bubbleAboveTargetOffset, 0f);
-                    else
-                        bubbleRect.position -= new Vector3(0f, bubbleBelowTargetOffset, 0f);
-
-                    // Only show tail when target is actually visible on screen
-                    if (IsTargetOnScreen(targetScreen))
-                    {
-                        RotateTailForDirection(bubbleRect.position, targetScreen);
-                        SetTailVisible(false);
-                    }
-                    else
-                        SetTailVisible(false);
-                }
-            }
+                PositionBubbleAtTarget(_lastTargetPos);
         }
 
         // ─────────────────────────────────────────────────────────────────────
@@ -226,27 +280,14 @@ namespace YarnSpinner.Custom
             return YarnTask.CompletedTask;
         }
 
-        /// <summary>
-        /// Requests that the current line be hurried up (skip the typewriter
-        /// straight to full text). Forwards to the assigned LineAdvancer, which
-        /// in turn tells the DialogueRunner; this presenter's RunLineAsync loop
-        /// observes that via LineCancellationToken.IsHurryUpRequested.
-        /// </summary>
+        /// <summary>Skips the typewriter straight to full text via the assigned LineAdvancer.</summary>
         public void RequestHurryUpLine() => lineAdvancer?.RequestLineHurryUp();
 
-        /// <summary>
-        /// Requests that dialogue advance to the next line. Forwards to the
-        /// assigned LineAdvancer, which in turn tells the DialogueRunner; this
-        /// presenter's RunLineAsync loop observes that via
-        /// LineCancellationToken.IsNextContentRequested.
-        /// </summary>
+        /// <summary>Advances to the next line via the assigned LineAdvancer.</summary>
         public void RequestNextDialogueLine() => lineAdvancer?.RequestNextLine();
 
         public override async YarnTask RunLineAsync(LocalizedLine line, LineCancellationToken token)
         {
-
-
-
             // ── SAVE/LOAD ────────────────────────────────────────────────────
             SceneLoaderBridge.CurrentLineId = line.TextID;
 
@@ -258,7 +299,6 @@ namespace YarnSpinner.Custom
             {
                 if (line.TextID == SceneLoaderBridge.TargetLineId)
                 {
-                    
                     SceneLoaderBridge.IsSilentReplay = false;
                     SceneLoaderBridge.TargetLineId = null;
                 }
@@ -268,66 +308,27 @@ namespace YarnSpinner.Custom
 
             buttonHandler?.OnLineBegin();
 
-
-            // init vairables Zone
-            //check for last character name to use as indicator for bubble animation
-            bool IsNewCharacter = _lastCharacterName != line.CharacterName;
-
             string currentCharacterName = line.CharacterName ?? string.Empty;
-            if (_lastCharacterName != currentCharacterName)
-                _lastCharacterName = currentCharacterName;
+            bool isNewCharacter = _lastCharacterName != currentCharacterName;
+            _lastCharacterName = currentCharacterName;
 
-            //Reset Line Text Preventing Ghost Text
-            lineText.text = string.Empty;
-
+            lineText.text = string.Empty; // prevent ghost text from the previous line
 
             // ── Resolve position & tail ───────────────────────────────────────
             bool foundTarget = _targetLookup.TryGetValue(currentCharacterName, out Transform worldTarget)
                                 && worldTarget != null;
 
-            if (foundTarget)
-                _lastTargetPos = worldTarget;
-            else
-                _lastTargetPos = null;
+            _lastTargetPos = foundTarget ? worldTarget : null;
 
-            //Resize bubble to fit text [Here]
+            // TODO: resize bubble to fit text
 
-            //Place bubble above target, or fallback anchor if no target found
             if (foundTarget)
             {
-                Vector2 targetScreen = WorldToScreenPoint(worldTarget.position);
-                bool targetIsLowerHalf = IsTargetLowerHalfScreen(targetScreen);
-                //float shiftY = backGroundText != null
-                //    ? bubbleAboveTargetOffset + backGroundText.rect.height * 0.5f
-                //    : bubbleAboveTargetOffset;
-
-                if (bubbleRect != null)
-                {
-                    //Vector2 clamped = ClampBubbleToScreen(targetScreen.x, targetScreen.y + shiftY, screenBorderPadding);
-                    Vector2 clamped = ClampBubbleToScreen(targetScreen.x, targetScreen.y, screenBorderPadding);
-                    bubbleRect.position = new Vector3(clamped.x, clamped.y, 0f);
-                    //bubbleRect.position = new Vector3(targetScreen.x, targetScreen.y, 0f);
-
-                    //Decide to shift bubble above target if target is in lower half of screen, to reduce chance of tail being off-screen
-                    if (targetIsLowerHalf)
-                        bubbleRect.position += new Vector3(0f, bubbleAboveTargetOffset, 0f);
-                    else
-                        bubbleRect.position -= new Vector3(0f, bubbleBelowTargetOffset, 0f);
-
-                    // Only show tail when target is actually visible on screen
-                    if (IsTargetOnScreen(targetScreen))
-                    {
-                        RotateTailForDirection(bubbleRect.position, targetScreen);
-                        SetTailVisible(false);
-                    }
-                    else
-                        SetTailVisible(false);
-                }
+                PositionBubbleAtTarget(worldTarget);
             }
             else if (fallbackCanvasAnchor != null)
             {
                 Vector2 fallbackScreen = RectTransformToScreenPoint(fallbackCanvasAnchor);
-
                 if (bubbleRect != null)
                 {
                     Vector2 clamped = ClampBubbleToScreen(fallbackScreen.x, fallbackScreen.y, fallbackScreenBorderPadding);
@@ -357,28 +358,17 @@ namespace YarnSpinner.Custom
             }
 
             // ── Typewriter ────────────────────────────────────────────────────
-            // Mirrors LinePresenter.RunLineAsync in YarnSpinner-Unity: hand the
-            // line off to an IAsyncTypewriter and await it, instead of hand-
-            // rolling a char-by-char loop. token.HurryUpToken is the same
-            // CancellationToken that LineAdvancer.RequestLineHurryUp() (and
-            // therefore BubblePresenterButtonHandler's click-while-typing
-            // case) cancels — so RunTypewriter below returns the moment a
-            // hurry-up is requested from ANY source (button, keyboard,
-            // gamepad), and just falls through to showing full text.
+            // token.HurryUpToken is the same token LineAdvancer.RequestLineHurryUp()
+            // cancels, so this returns immediately on hurry-up from any source.
             if (Typewriter != null && lineText != null)
             {
                 Typewriter.PrepareForContent(line.TextWithoutCharacterName);
 
-                if (useTypewriterEffect)
-                {
-                    await Typewriter
-                        .RunTypewriter(line.TextWithoutCharacterName, token.HurryUpToken)
-                        .SuppressCancellationThrow();
-                }
+                await Typewriter
+                    .RunTypewriter(line.TextWithoutCharacterName, token.HurryUpToken)
+                    .SuppressCancellationThrow();
 
-                // Whether we finished normally or were hurried up, make sure
-                // every character is visible before we move on.
-                lineText.maxVisibleCharacters = int.MaxValue;
+                lineText.maxVisibleCharacters = int.MaxValue; // ensure full text visible either way
             }
             else if (lineText != null)
             {
@@ -386,9 +376,7 @@ namespace YarnSpinner.Custom
                 lineText.text = lineBody;
             }
 
-            // If the player already requested "next" while the typewriter
-            // was running (e.g. a fast double-tap), skip straight out.
-            // Dismiss() below already calls buttonHandler.OnLineDismiss().
+            // Player already requested "next" mid-typewriter (e.g. fast double-tap) — bail out.
             if (token.IsNextContentRequested)
             {
                 Dismiss();
@@ -396,11 +384,6 @@ namespace YarnSpinner.Custom
             }
 
             // ── Wait for input ────────────────────────────────────────────────
-            // The typewriter has finished (or was hurried up to completion) —
-            // this is the "is the line fully shown yet" moment that
-            // BubblePresenterButtonHandler.IsWaitingForInput tracks, and that
-            // a LineAdvancer with "Separate Hurry Up And Advance Controls"
-            // needs in order to choose RequestLineHurryUp() vs RequestNextLine().
             buttonHandler?.OnTypewriterComplete();
 
             while (!token.IsNextContentRequested)
@@ -419,22 +402,46 @@ namespace YarnSpinner.Custom
                     bubbleCanvasGroup.alpha = 0f;
             }
 
-            if (IsNewCharacter)
+            if (isNewCharacter)
                 Dismiss();
         }
 
         // ─────────────────────────────────────────────────────────────────────
-        // helpler
+        // Positioning
+        // ─────────────────────────────────────────────────────────────────────
+
+        /// <summary>
+        /// Clamps the bubble to screen bounds around the target, nudges it above/below
+        /// depending on which half of the screen the target is on, and updates the tail.
+        /// Shared by LateUpdate (continuous tracking) and RunLineAsync (initial placement).
+        /// </summary>
+        private void PositionBubbleAtTarget(Transform target)
+        {
+            if (bubbleRect == null) return;
+
+            Vector2 targetScreen = WorldToScreenPoint(target.position);
+            Vector2 clamped = ClampBubbleToScreen(targetScreen.x, targetScreen.y, screenBorderPadding);
+            bubbleRect.position = new Vector3(clamped.x, clamped.y, 0f);
+
+            bool targetIsLowerHalf = IsTargetLowerHalfScreen(targetScreen);
+            bubbleRect.position += new Vector3(0f, targetIsLowerHalf ? bubbleAboveTargetOffset : -bubbleBelowTargetOffset, 0f);
+
+            if (IsTargetOnScreen(targetScreen))
+                RotateTailForDirection(bubbleRect.position, targetScreen);
+
+            // ponytail: tail sprite is forced hidden for now regardless of on/off-screen target;
+            // flip this to IsTargetOnScreen(targetScreen) once tail art/behaviour is finalized.
+            SetTailVisible(false);
+        }
+
+        // ─────────────────────────────────────────────────────────────────────
+        // helper
         // ─────────────────────────────────────────────────────────────────────
 
         /// <summary>Returns true if the screen-pixel point is within screen bounds.</summary>
         private bool IsTargetOnScreen(Vector2 screenPos) =>
             screenPos.x >= 0 && screenPos.x <= Screen.width &&
             screenPos.y >= 0 && screenPos.y <= Screen.height;
-
-        /// <summary>Returns true if screenPos is on the right half of the screen.</summary>
-        private bool IsTargetOnRightSide(Vector2 screenPos) =>
-            screenPos.x > Screen.width * 0.5f;
 
         /// <summary>
         /// Snaps the direction from bubbleScreenPos → targetScreenPos to one of 8
@@ -445,14 +452,10 @@ namespace YarnSpinner.Custom
         {
             if (tailImage == null || bubbleRect == null) return;
 
-            // Direction from bubble centre to target
             Vector2 dir = targetScreenPos - bubbleScreenPos;
+            float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;
+            float snapped = Mathf.Round(angle / 45f) * 45f; // −180 … +180, multiples of 45
 
-            // Snap angle to nearest 45° step
-            float angle = Mathf.Atan2(dir.y, dir.x) * Mathf.Rad2Deg;  // standard math angle
-            float snapped = Mathf.Round(angle / 45f) * 45f;             // −180 … +180, multiples of 45
-
-            // Map snapped angle → TailDirection
             TailDirection td = snapped switch
             {
                 -90f => TailDirection.BottomCenter,
@@ -461,13 +464,11 @@ namespace YarnSpinner.Custom
                 45f => TailDirection.TopRight,
                 90f => TailDirection.TopCenter,
                 135f => TailDirection.TopLeft,
-                // ±180° both map to left
                 float a when Mathf.Abs(a) == 180f => TailDirection.LeftCenter,
                 -135f => TailDirection.BottomLeft,
                 _ => TailDirection.BottomCenter
             };
 
-            // Place tail at the matching edge/corner of the bubble (anchor = bubble centre)
             float hw = bubbleRect.rect.width * 0.5f;
             float hh = bubbleRect.rect.height * 0.5f;
 
@@ -488,7 +489,6 @@ namespace YarnSpinner.Custom
                 _ => Vector2.zero
             };
 
-            // Rotate tail so its tip points toward the target.
             // Default tail points down = −90° in math. Δ = snapped − (−90°) = snapped + 90°
             tailImage.localRotation = Quaternion.Euler(0f, 0f, snapped + 90f);
         }
@@ -515,7 +515,8 @@ namespace YarnSpinner.Custom
             _renderCam != null
                 ? (Vector2)_renderCam.WorldToScreenPoint(worldPos)
                 : Vector2.zero;
-        private Boolean IsTargetLowerHalfScreen(Vector2 screenPos) =>
+
+        private bool IsTargetLowerHalfScreen(Vector2 screenPos) =>
             screenPos.y < Screen.height * 0.5f;
 
         private Vector2 RectTransformToScreenPoint(RectTransform rt)
@@ -555,7 +556,7 @@ namespace YarnSpinner.Custom
         /// <summary>
         /// LineAdvancer's `separateHurryUpAndAdvanceControls` field is private with
         /// no public accessor, and LineAdvancer.cs cannot be modified. Reflection
-        /// is used here purely to read that flag at Awake() time.
+        /// is used here purely to read that flag.
         /// </summary>
         private static bool GetSeparateHurryUpAndAdvanceControls(LineAdvancer advancer)
         {
@@ -573,34 +574,17 @@ namespace YarnSpinner.Custom
             return (bool)field.GetValue(advancer);
         }
 
-
-        /// ─────────────────────────────────────────────────────────────────────
-        /// Helpes for line advancer
-        // / ─────────────────────────────────────────────────────────────────────
         // ─────────────────────────────────────────────────────────────────────
         // Runtime LineAdvancer enable/disable
         // ─────────────────────────────────────────────────────────────────────
 
-        /// <summary>
-        /// Enables this presenter's use of a LineAdvancer at runtime. If no
-        /// LineAdvancer is assigned in the Inspector, one will be auto-found in
-        /// children/parent, same as at startup.
-        /// </summary>
+        /// <summary>Enables this presenter's use of a LineAdvancer at runtime.</summary>
         public void EnableLineAdvancer() => SetLineAdvancerEnabled(true);
 
-        /// <summary>
-        /// Disables this presenter's use of a LineAdvancer at runtime. The
-        /// assigned LineAdvancer reference is kept (not cleared) so it can be
-        /// re-enabled later; it is simply unhooked from the typewriter and the
-        /// button handler, and RequestHurryUpLine()/RequestNextDialogueLine()
-        /// become no-ops until re-enabled.
-        /// </summary>
+        /// <summary>Disables this presenter's use of a LineAdvancer at runtime (reference kept, just unhooked).</summary>
         public void DisableLineAdvancer() => SetLineAdvancerEnabled(false);
 
-        /// <summary>
-        /// Sets whether this presenter uses a LineAdvancer at runtime.
-        /// Safe to call at any time, including mid-line.
-        /// </summary>
+        /// <summary>Sets whether this presenter uses a LineAdvancer. Safe to call any time, including mid-line.</summary>
         public void SetLineAdvancerEnabled(bool enabled)
         {
             useLineAdvancer = enabled;
@@ -611,14 +595,12 @@ namespace YarnSpinner.Custom
         public bool IsLineAdvancerEnabled => useLineAdvancer;
 
         /// <summary>
-        /// Resolves, wires, or unwires the LineAdvancer based on the current
-        /// value of useLineAdvancer. Called from Awake() and whenever
-        /// SetLineAdvancerEnabled() is used at runtime.
+        /// Resolves, wires, or unwires the LineAdvancer based on useLineAdvancer.
+        /// Called from Awake() and whenever SetLineAdvancerEnabled() runs.
         /// </summary>
         private void ApplyLineAdvancerState()
         {
-            // Unhook whatever was previously active first, to avoid double-adding
-            // or leaving a stale handler on the typewriter.
+            // Unhook previous handler first to avoid double-adding or stale references.
             if (_activeLineAdvancer != null)
             {
                 Typewriter?.ActionMarkupHandlers.Remove(_activeLineAdvancer);
@@ -638,9 +620,10 @@ namespace YarnSpinner.Custom
                 lineAdvancer = GetComponentInParent<LineAdvancer>();
 
             _activeLineAdvancer = lineAdvancer;
-
             buttonHandler?.SetLineAdvancer(_activeLineAdvancer);
 
+            // If using Text Animator as the Custom typewriter: its actionTags list must
+            // include "pause" (default does) or line-progression handlers won't fire mid-line.
             if (_activeLineAdvancer != null && !GetSeparateHurryUpAndAdvanceControls(_activeLineAdvancer))
                 Typewriter?.ActionMarkupHandlers.Add(_activeLineAdvancer);
         }
