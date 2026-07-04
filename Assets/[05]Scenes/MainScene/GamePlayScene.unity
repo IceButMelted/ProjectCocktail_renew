@@ -4941,6 +4941,61 @@ MonoBehaviour:
   speedUpRate: 5
   decayRate: 10
   continueDuration: 0.6
+--- !u!21 &1119617583
+Material:
+  serializedVersion: 8
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Mat_Water_Lit (Instance) (Instance) (Instance) (Instance)
+  m_Shader: {fileID: -6465566751694194690, guid: e88f42718e96b6245a5881a8b4791a81, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
+  m_LightmapFlags: 4
+  m_EnableInstancingVariants: 0
+  m_DoubleSidedGI: 0
+  m_CustomRenderQueue: -1
+  stringTagMap: {}
+  disabledShaderPasses:
+  - MOTIONVECTORS
+  m_LockedProperties: 
+  m_SavedProperties:
+    serializedVersion: 3
+    m_TexEnvs:
+    - _BaseMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_Lightmaps:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_LightmapsInd:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_ShadowMasks:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
+    m_Floats:
+    - _Amplitude: 0.015732927
+    - _EmissionStrength: 1.25
+    - _Frequency: 15
+    - _QueueControl: 0
+    - _QueueOffset: 0
+    - _Speed: 10
+    - _WaterLevel: 0
+    m_Colors:
+    - _WaterColorBottom: {r: 0, g: 1, b: 0, a: 1}
+    - _WaterColorButtom: {r: 0.40204328, g: 1, b: 0, a: 0.39607844}
+    - _WaterColorTop: {r: 1, g: 0, b: 1, a: 1}
+  m_BuildTextureStacks: []
+  m_AllowLocking: 1
 --- !u!1 &1128690458
 GameObject:
   m_ObjectHideFlags: 0
@@ -6650,61 +6705,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1460337633}
   m_CullTransparentMesh: 1
---- !u!21 &1486032979
-Material:
-  serializedVersion: 8
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_Name: Mat_Water_Lit (Instance) (Instance) (Instance) (Instance)
-  m_Shader: {fileID: -6465566751694194690, guid: e88f42718e96b6245a5881a8b4791a81, type: 3}
-  m_Parent: {fileID: 0}
-  m_ModifiedSerializedProperties: 0
-  m_ValidKeywords: []
-  m_InvalidKeywords: []
-  m_LightmapFlags: 4
-  m_EnableInstancingVariants: 0
-  m_DoubleSidedGI: 0
-  m_CustomRenderQueue: -1
-  stringTagMap: {}
-  disabledShaderPasses:
-  - MOTIONVECTORS
-  m_LockedProperties: 
-  m_SavedProperties:
-    serializedVersion: 3
-    m_TexEnvs:
-    - _BaseMap:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - unity_Lightmaps:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - unity_LightmapsInd:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    - unity_ShadowMasks:
-        m_Texture: {fileID: 0}
-        m_Scale: {x: 1, y: 1}
-        m_Offset: {x: 0, y: 0}
-    m_Ints: []
-    m_Floats:
-    - _Amplitude: 0.015732927
-    - _EmissionStrength: 1.25
-    - _Frequency: 15
-    - _QueueControl: 0
-    - _QueueOffset: 0
-    - _Speed: 10
-    - _WaterLevel: 0
-    m_Colors:
-    - _WaterColorBottom: {r: 0, g: 1, b: 0, a: 1}
-    - _WaterColorButtom: {r: 0.40204328, g: 1, b: 0, a: 0.39607844}
-    - _WaterColorTop: {r: 1, g: 0, b: 1, a: 1}
-  m_BuildTextureStacks: []
-  m_AllowLocking: 1
 --- !u!114 &1487455296
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11934,11 +11934,19 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 7122898587700363817, guid: 74dc30c4f63e65b4cafd605906b67635, type: 3}
       insertIndex: 1
       addedObject: {fileID: 2010282546}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 2379317150112739148, guid: 74dc30c4f63e65b4cafd605906b67635, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5292133938211385328}
   m_SourcePrefab: {fileID: 100100000, guid: 74dc30c4f63e65b4cafd605906b67635, type: 3}
 --- !u!4 &1608620128271954549 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 7122898587700363817, guid: 74dc30c4f63e65b4cafd605906b67635, type: 3}
+  m_PrefabInstance: {fileID: 1608620128271954548}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1608620128271954550 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 2379317150112739148, guid: 74dc30c4f63e65b4cafd605906b67635, type: 3}
   m_PrefabInstance: {fileID: 1608620128271954548}
   m_PrefabAsset: {fileID: 0}
 --- !u!1 &1623411145963478948
@@ -15930,6 +15938,103 @@ Camera:
   m_CorrespondingSourceObject: {fileID: 796802110358375918, guid: 74dc30c4f63e65b4cafd605906b67635, type: 3}
   m_PrefabInstance: {fileID: 1608620128271954548}
   m_PrefabAsset: {fileID: 0}
+--- !u!82 &5292133938211385328
+AudioSource:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1608620128271954550}
+  m_Enabled: 1
+  serializedVersion: 4
+  OutputAudioMixerGroup: {fileID: 0}
+  m_audioClip: {fileID: 0}
+  m_Resource: {fileID: 0}
+  m_PlayOnAwake: 1
+  m_Volume: 1
+  m_Pitch: 1
+  Loop: 0
+  Mute: 0
+  Spatialize: 0
+  SpatializePostEffects: 0
+  Priority: 128
+  DopplerLevel: 1
+  MinDistance: 1
+  MaxDistance: 500
+  Pan2D: 0
+  rolloffMode: 0
+  BypassEffects: 0
+  BypassListenerEffects: 0
+  BypassReverbZones: 0
+  rolloffCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  panLevelCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  spreadCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  reverbZoneMixCustomCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.33333334
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
 --- !u!222 &5310960144258794586
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -16839,12 +16944,12 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 3458619378161505199, guid: 5728bb0f6d221f0489cec6e8dab5d683, type: 3}
       propertyPath: startNode
-      value: Bubble_Sample
+      value: D1_00_Start
       objectReference: {fileID: 0}
     - target: {fileID: 3458619378161505199, guid: 5728bb0f6d221f0489cec6e8dab5d683, type: 3}
       propertyPath: yarnProject
       value: 
-      objectReference: {fileID: 7545569452688597077, guid: 026b722b7d91591459a05239d6d41353, type: 3}
+      objectReference: {fileID: 7545569452688597077, guid: d6c7f29ec67568a49ae2638d17c354f9, type: 3}
     - target: {fileID: 3458619378161505199, guid: 5728bb0f6d221f0489cec6e8dab5d683, type: 3}
       propertyPath: allowOptionFallthrough
       value: 0
@@ -17045,6 +17150,10 @@ PrefabInstance:
       propertyPath: fallbackScreenBorderPadding
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 6015314527823841331, guid: 5728bb0f6d221f0489cec6e8dab5d683, type: 3}
+      propertyPath: customTypewriter.targetObject
+      value: 
+      objectReference: {fileID: 5732725779332928165}
     - target: {fileID: 6015314527823841331, guid: 5728bb0f6d221f0489cec6e8dab5d683, type: 3}
       propertyPath: characterTargets.Array.data[0].worldTarget
       value: 
@@ -17286,6 +17395,12 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 6607189813456878639, guid: 5728bb0f6d221f0489cec6e8dab5d683, type: 3}
       insertIndex: -1
       addedObject: {fileID: 5732725779332928163}
+    - targetCorrespondingSourceObject: {fileID: 6607189813456878639, guid: 5728bb0f6d221f0489cec6e8dab5d683, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5732725779332928165}
+    - targetCorrespondingSourceObject: {fileID: 6607189813456878639, guid: 5728bb0f6d221f0489cec6e8dab5d683, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 5732725779332928166}
     - targetCorrespondingSourceObject: {fileID: 3573812413334486407, guid: 5728bb0f6d221f0489cec6e8dab5d683, type: 3}
       insertIndex: -1
       addedObject: {fileID: 482701009}
@@ -17346,11 +17461,51 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 26ef910a7482f4ce9bbf4cd80ef5e3c5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: YarnSpinner.Addons.TextAnimatorIntegration::Yarn.Unity.Addons.TextAnimatorIntegration.TextAnimatorYarnTypewriter
-  timingsScriptableBase: {fileID: 11400000, guid: 050beadfacde12f4eb99a26fa0bdd280, type: 2}
+--- !u!114 &5732725779332928164
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5732725779332928162}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: e8ace8ced0e81c847968cdca0aeda757, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Febucci.TextAnimatorForUnity.TMP.Runtime::Febucci.TextAnimatorForUnity.TextMeshPro.TextAnimator_TMP
+  localSettings:
+    isResettingTimeOnNewText: 1
+    defaultEffectsMode: 1
+    timeScale: 0
+    defaultBehaviorTags: []
+    defaultAppearanceTags: []
+    defaultDisappearanceTags: []
+    isAnimatingBehaviors: 1
+    isAnimatingAppearances: 1
+    isAnimatingDisappearances: 1
+    useDynamicScaling: 1
+    referenceFontSize: 12
+  sharedSettings: {fileID: 11400000, guid: 503730955ff7ed9468949780cdcb9806, type: 2}
+  animationLoop: 0
+  databaseEffects: {fileID: 11400000, guid: 97da1bdf566b589458494ef757ccb8bb, type: 2}
+  styleSheet: {fileID: 11400000, guid: ba192cc0c25e54f2faf6411514bfe0b7, type: 2}
+--- !u!114 &5732725779332928165
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5732725779332928162}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 9c2c859ff89524cb4b0efeeb772dfd10, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: YarnSpinner.Addons.TextAnimatorIntegration::Yarn.Unity.Addons.TextAnimatorIntegration.TextAnimatorYarnTypewriter
+  timingsScriptableBase: {fileID: 11400000, guid: f9029dd0173d57a45ab78e2ad79be0b8, type: 2}
   actionsDatabase: {fileID: 11400000, guid: 1b2cf8f7a6cae46a6972f7ccec187814, type: 2}
   localSettings:
     useTypeWriter: 1
-    startTypewriterMode: 3
+    startTypewriterMode: -1
     hideAppearancesOnSkip: 0
     hideDisappearancesOnSkip: 0
     triggerEventsOnSkip: 0
@@ -17381,7 +17536,7 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   Animator: {fileID: 5732725779332928164}
---- !u!114 &5732725779332928164
+--- !u!114 &5732725779332928166
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -17390,25 +17545,16 @@ MonoBehaviour:
   m_GameObject: {fileID: 5732725779332928162}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e8ace8ced0e81c847968cdca0aeda757, type: 3}
+  m_Script: {fileID: 11500000, guid: 2d68c28ce7b16334a80fe39389408715, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Febucci.TextAnimatorForUnity.TMP.Runtime::Febucci.TextAnimatorForUnity.TextMeshPro.TextAnimator_TMP
-  localSettings:
-    isResettingTimeOnNewText: 1
-    defaultEffectsMode: 1
-    timeScale: 0
-    defaultBehaviorTags: []
-    defaultAppearanceTags: []
-    defaultDisappearanceTags: []
-    isAnimatingBehaviors: 1
-    isAnimatingAppearances: 1
-    isAnimatingDisappearances: 1
-    useDynamicScaling: 1
-    referenceFontSize: 12
-  sharedSettings: {fileID: 11400000, guid: 503730955ff7ed9468949780cdcb9806, type: 2}
-  animationLoop: 0
-  databaseEffects: {fileID: 0}
-  styleSheet: {fileID: 0}
+  m_EditorClassIdentifier: Febucci.TextAnimator.Demo.Sounds.Runtime::Febucci.UI.Examples.TAnimSoundWriter
+  source: {fileID: 5292133938211385328}
+  minSoundDelay: 0.07
+  interruptPreviousSound: 1
+  randomSequence: 1
+  sounds:
+  - {fileID: 8300000, guid: 2ed4b73a2398588448ae4d60a33449bc, type: 3}
+  - {fileID: 8300000, guid: 4634456d684077347852f5a3a867b282, type: 3}
 --- !u!1 &5778413623369431676
 GameObject:
   m_ObjectHideFlags: 0
