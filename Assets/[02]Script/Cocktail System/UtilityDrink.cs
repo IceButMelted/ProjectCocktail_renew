@@ -119,6 +119,15 @@ public static class DrinkUtility
     public static void UpdateTypeOfAlcohol(S_Drink d, IReadOnlyList<S_Drink> recipes)
         => d.AlcoholStrength = GetTypeOfAlcohol(d, recipes);
 
+    public static void UpdateGlassType(S_Drink d, IReadOnlyList<S_Drink> recipes)
+    {
+        var (match, errors) = FindBestIngredientMatch(d, recipes);
+        bool hasMatch = match != null && errors <= 2;
+        //if match get the glass type from the match, else Random glass type
+        d.CompatibleGlass = hasMatch ? match.CompatibleGlass : GlassType.Rocks;
+        //d.compatableGlass = hasMatch ? match.compatableGlass : ;
+    }
+
     // ── Ingredient Addition ────────────────────────────────
 
     /// <summary>Adds alcohol if the total-parts cap allows it.</summary>
@@ -182,9 +191,8 @@ public static class DrinkUtility
         if (technicalOnly) return technical;
 
         return technical &&
-               Mathf.Approximately(a.Price, b.Price) &&
-               a.CompatibleGlasses.OrderBy(g => g)
-                                  .SequenceEqual(b.CompatibleGlasses.OrderBy(g => g));
+               Mathf.Approximately(a.Price, b.Price)
+               ;
     }
 
     /// <summary>

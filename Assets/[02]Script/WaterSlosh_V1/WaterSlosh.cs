@@ -1,11 +1,15 @@
 using UnityEngine;
 using System.Collections;
+using Yarn.Unity;
+using static E_Cocktail;
+using AYellowpaper.SerializedCollections;
 
 public class WaterSlosh : MonoBehaviour
 {
     [Header("Assigns")]
     public GameObject waterSprite;
     public GameObject iceSprite;
+    public GameObject MaskingSprite;
 
     [Header("Water Settings")]
     [Range(0f,.95f)]public float waterLevel = 0.5f;
@@ -23,6 +27,9 @@ public class WaterSlosh : MonoBehaviour
     public float sloshDecay = 2f;
     public float velocityMultiplier = 0.1f;
 
+    
+
+    //private Variable
     private Rigidbody2D rb;
     private float currentAmplitude;
     private Vector3 lastPosition;
@@ -85,8 +92,22 @@ public class WaterSlosh : MonoBehaviour
 
     private Material GetMat()
     {
-        if (matInstance == null && waterSprite != null)
-            matInstance = waterSprite.GetComponent<Renderer>().material;
+        if (waterSprite == null) return null;
+
+        var renderer = waterSprite.GetComponent<Renderer>();
+        if (renderer == null) return null;
+
+#if UNITY_EDITOR
+        if (!Application.isPlaying)
+        {
+            // Don't instance a material in edit mode — edit the shared asset directly.
+            return renderer.sharedMaterial;
+        }
+#endif
+
+        if (matInstance == null)
+            matInstance = renderer.material;
+
         return matInstance;
     }
 
@@ -137,4 +158,14 @@ public class WaterSlosh : MonoBehaviour
         mat.SetColor("_WaterColorTop", waterColorTop);
         mat.SetColor("_WaterColorBottom", waterColorBottom);
     }
+
+    public void UpdateVisual(Sprite IceSprite, Sprite GlassSprite, Sprite WaterSprite) { 
+        waterSprite.GetComponent<SpriteRenderer>().sprite = WaterSprite;
+        this.GetComponent<SpriteRenderer>().sprite = GlassSprite;
+        iceSprite.GetComponent<SpriteRenderer>().sprite = IceSprite;
+        MaskingSprite.GetComponent<SpriteRenderer>().sprite = WaterSprite;
+    }
+
+    
+    
 }

@@ -1,7 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using AYellowpaper.SerializedCollections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using Yarn.Unity;
 using static E_Cocktail;
+using static WaterSlosh;
 
 // Runtime cocktail instance is created via ScriptableObject.CreateInstance in Awake —
 // a fresh in-memory object that never modifies a disk asset.
@@ -30,8 +33,10 @@ public class CocktailShakerData : MonoBehaviour, IIngredientReceiver, ITooltipPr
 
     [Header("Ingredient Buttons")]
     public List<GameObject> ingredientButtons = new List<GameObject>();
-    
 
+    [Header("Glass And Ice")]
+    [SerializedDictionary("Glass Type", "Visual")]
+    public SerializableDictionary<GlassType, VisualCocktailGlass> GlassVisualData = new SerializableDictionary<GlassType, VisualCocktailGlass>();
     // ── Runtime State ──────────────────────────────────────
 
     /// <summary>Live drink in the shaker. Fresh instance, never an asset reference.</summary>
@@ -98,7 +103,10 @@ public class CocktailShakerData : MonoBehaviour, IIngredientReceiver, ITooltipPr
         DrinkUtility.UpdateName(CurrentCocktail, recipes);
         DrinkUtility.UpdatePrice(CurrentCocktail, recipes);
         DrinkUtility.UpdateColorInGlass(CurrentCocktail, recipes);
-        SetColorInGlass(glassWaterSlosh, CurrentCocktail);
+        DrinkUtility.UpdateGlassType(CurrentCocktail, recipes);
+
+        SetColorAndGlass(glassWaterSlosh, CurrentCocktail);
+        
     }
 
     /// <summary>Returns the best-matching sprite, or <paramref name="fallback"/> if none found.</summary>
@@ -121,7 +129,7 @@ public class CocktailShakerData : MonoBehaviour, IIngredientReceiver, ITooltipPr
         CurrentCocktail.AlcoholList = new List<AlcoholIngredient>();
         CurrentCocktail.LiqueurList = new List<LiqueurIngredient>();
         CurrentCocktail.MixerList = new List<MixerIngredient>();
-        CurrentCocktail.CompatibleGlasses = new List<GlassType>();
+        CurrentCocktail.CompatibleGlass = GlassType.None;
 
         CurrentCocktail.waterColorTop = Color.clear;
         CurrentCocktail.waterColorBottom = Color.clear;
@@ -152,11 +160,23 @@ public class CocktailShakerData : MonoBehaviour, IIngredientReceiver, ITooltipPr
         }
     }
 
-    public void SetColorInGlass(WaterSlosh d, S_Drink r) {
+    public void SetColorAndGlass(WaterSlosh d, S_Drink r) {
         if (d == null) { Debug.LogWarning("WaterSlosh ref is null"); return; }
 
         d.waterColorTop = r.waterColorTop;
         d.waterColorBottom = r.waterColorBottom;
+        
+        GlassType compateGlass = r.CompatibleGlass;
+        GlassVisualData.TryGetValue(compateGlass, out var visualData);
+
+        if (visualData != null)
+        {
+            d.UpdateVisual(visualData.IceSprite, visualData.GlassSprite, visualData.WaterSprite);
+        }
+        else
+        {
+            Debug.LogWarning($"No visual data found for glass type {compateGlass}");
+        }
 
         glassWaterSlosh.UpdateColor();
     }
@@ -164,5 +184,13 @@ public class CocktailShakerData : MonoBehaviour, IIngredientReceiver, ITooltipPr
     public string GetTooltipText()
     {
         return DrinkUtility.GetCocktailIngredient(CurrentCocktail);
+    }
+
+    [System.Serializable]
+    public class VisualCocktailGlass
+    {
+        public Sprite GlassSprite;
+        public Sprite WaterSprite;
+        public Sprite IceSprite;
     }
 }

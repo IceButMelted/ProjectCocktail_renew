@@ -28,6 +28,10 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - _MainTex:
+        m_Texture: {fileID: 2800000, guid: 78992ce5caadb2b41aff7e41b5e4826c, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - unity_Lightmaps:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
@@ -48,11 +52,11 @@ Material:
     - _QueueControl: 0
     - _QueueOffset: 0
     - _Speed: 10
-    - _WaterLevel: 0.5
+    - _WaterLevel: 0.95
     m_Colors:
-    - _WaterColorBottom: {r: 1, g: 0.11814067, b: 0, a: 1}
+    - _WaterColorBottom: {r: 0, g: 1, b: 0, a: 1}
     - _WaterColorButtom: {r: 0.40204328, g: 1, b: 0, a: 0.39607844}
-    - _WaterColorTop: {r: 0.14285529, g: 1, b: 0, a: 1}
+    - _WaterColorTop: {r: 1, g: 0, b: 1, a: 1}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
 --- !u!114 &7298595593984535287

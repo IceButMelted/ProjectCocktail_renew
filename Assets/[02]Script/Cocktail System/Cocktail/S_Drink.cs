@@ -59,9 +59,10 @@ public class S_Drink : ScriptableObject
 
     // ── Serving ────────────────────────────────────────────
 
-    public List<GlassType> CompatibleGlasses = new List<GlassType>();
-
     // ── Visuals ────────────────────────────────────────────
+
+    public GlassType CompatibleGlass;
+
 
     /// <summary>Sprite shown in the UI when this drink is in play.</summary>
     public Sprite CocktailSprite;
