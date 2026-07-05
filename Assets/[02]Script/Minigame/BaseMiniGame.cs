@@ -243,7 +243,7 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
     {
         if (!PanelSlider.Slide(ref ArtWorkSessions[_currentArtIndex], ArtWorks[_currentArtIndex],
                 Direction.Up, SlideFinishCondition.BottomEdgeToBottomBound,
-                _slidePanelSpeed, EasingConfig.Bounce(EasingConfigTimer / 2)))
+                _slidePanelSpeed, EasingConfig.EaseInOut(EasingConfigTimer / 2)))
             return; // current artwork still animating
 
         _currentArtIndex++;
@@ -259,7 +259,7 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
     {
         if (!PanelSlider.Slide(ref MinigamePanelSession, _minigamePanel,
                 Direction.Up, SlideFinishCondition.BottomEdgeToBottomBound,
-                _slidePanelSpeed, EasingConfig.Bounce(EasingConfigTimer)))
+                _slidePanelSpeed, EasingConfig.EaseInOut(EasingConfigTimer)))
             return;
 
         //--- Remove Button from minbigame---
@@ -294,7 +294,7 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
 
         bool RemoveBG = PanelSlider.Slide(ref BackgroundSession, BackgroundPanelgame,
                 Direction.Down, SlideFinishCondition.TopEdgeToBottomBound, _slidePanelSpeed,
-                    EasingConfig.Bounce(EasingConfigTimer));
+                    EasingConfig.EaseInOut(EasingConfigTimer));
 
         if (!minigameDone || !RemoveBG) return; // wait for animation
 
@@ -366,11 +366,11 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
 
         bool minigameRemoving = PanelSlider.Slide(ref MinigamePanelSession, _minigamePanel,
                 Direction.Down, SlideFinishCondition.LeftEdgeToLeftBound,
-                _slidePanelSpeed, EasingConfig.Bounce(EasingConfigTimer));
+                _slidePanelSpeed, EasingConfig.EaseInOut(EasingConfigTimer));
 
         bool RemoveBG = PanelSlider.Slide(ref BackgroundSession, BackgroundPanelgame,
                 Direction.Down, SlideFinishCondition.TopEdgeToBottomBound, _slidePanelSpeed,
-                    EasingConfig.Bounce(EasingConfigTimer));
+                    EasingConfig.EaseInOut(EasingConfigTimer));
 
 
         //if (RemoveBG && minigameRemoving)

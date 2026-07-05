@@ -135,7 +135,7 @@ public class ShakingMinigame : BaseMiniGame
         _gaugeSlider.value = GaugeValue;
         _progressSlider.value = TimeInZone / _cfg.Duration;
         UpdateTargetZoneVisual();
-        UpdateProgressBarColor();
+        //UpdateProgressBarColor();
     }
 
     // ── FSM Hooks ──────────────────────────────────────────
@@ -169,7 +169,7 @@ public class ShakingMinigame : BaseMiniGame
         _zoneBorderMax = _zoneCenter + halfSize;
 
         UpdateTargetZoneVisual();
-        UpdateProgressBarColor();
+        //UpdateProgressBarColor();
     }
 
     private void ShrinkTargetZone(float progressDelta)

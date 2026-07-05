@@ -81,7 +81,7 @@ title: D1_02_Walter_Order
 ---
 //Walter's Order
 Walter: Just keep it simple, son. #line:17
-Walter: [oreder] "{Order_Cocktail_ByName_OutName("Sea Breeze")}" [/order] should be enough for tonight. #line:18
+Walter: [order] "{Order_Cocktail_ByName_OutName("Sea Breeze")}" [/order] should be enough for tonight. #line:18
 Player: Coming right up. #line:19
 <<SetEmotion NPC_Name.Owen "neutral">>
 
@@ -161,7 +161,7 @@ Isla: Same as always. Busy enough to forget what day it is. #line:2E
 Isla: More importantly, how is that back pain of yours doing, Mr. Walter? #line:2F
 Walter: Ah, don't worry about it, dear. #line:30
 Walter: I'll just take a pill or two, and it'll clear right up. #line:31
-Isla: [shake a=2]Take care of yourself.[/shake] Taking medicine alone won't help. #line:32
+Isla: [shake]Take care of yourself.[/shake] Taking medicine alone won't help. #line:32
 -> Get well soon. #line:33
     Player: Take it easy, Walter. I need my favorite regular staying healthy. #line:34
     Walter: Thank you, Mr. Bartender. #line:35
