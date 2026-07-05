@@ -163,7 +163,7 @@ public class WaterSlosh : MonoBehaviour
         waterSprite.GetComponent<SpriteRenderer>().sprite = WaterSprite;
         this.GetComponent<SpriteRenderer>().sprite = GlassSprite;
         iceSprite.GetComponent<SpriteRenderer>().sprite = IceSprite;
-        MaskingSprite.GetComponent<SpriteRenderer>().sprite = WaterSprite;
+        MaskingSprite.GetComponent<SpriteMask>().sprite = WaterSprite;
     }
 
     

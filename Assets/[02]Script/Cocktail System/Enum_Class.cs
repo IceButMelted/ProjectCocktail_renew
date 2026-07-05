@@ -56,6 +56,7 @@ public class E_Cocktail
         None,
         Hi_ball,
         Rocks,
+        Magrita,
         Martini,
         Cocktail,
         LongDrink,
