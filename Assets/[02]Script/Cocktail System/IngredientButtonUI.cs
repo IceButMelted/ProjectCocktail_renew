@@ -103,6 +103,11 @@ public class IngredientButtonUI : MonoBehaviour
         
     }
 
+    public void AddIce(bool enable) { 
+        _shaker.ToggleIce(enable);
+    }
+
+
     /// <summary>Reset the shaker to empty state.</summary>
     public void ResetShaker()
         => _shaker.ResetShaker();

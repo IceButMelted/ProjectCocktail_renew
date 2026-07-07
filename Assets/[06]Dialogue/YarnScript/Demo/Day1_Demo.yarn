@@ -140,6 +140,7 @@ title: D1_04_Isla_Arrive
 //Isla come in 
 <<Enable_InteractableObject SystemGame false>>
 <<Fix_Camera CamController true>>
+<<Switch_Camera CamController "MainCam">>
 
 
 <<Panel_FadeOut Panel_Transition>>
@@ -155,29 +156,36 @@ title: D1_04_Isla_Arrive
 Isla: [fade]Good evening.[/fade] #line:2A
 Player: Good evening. #line:2B
 Isla: [wave]Wow, you've really done a wonderful job with this place.[/wave] #line:2C
+<<SetLookDirection NPC_Name.Walter LookDirection.Right>>
 Walter: Good evening Isla. How's work treating you? #line:2D
+<<SetLookDirection NPC_Name.Isla LookDirection.Left>>
 Isla: Same as always. Busy enough to forget what day it is. #line:2E
-<<SetEmotion NPC_Name.Isla "neutral">>
+//<<SetEmotion NPC_Name.Isla "neutral">>
 Isla: More importantly, how is that back pain of yours doing, Mr. Walter? #line:2F
 Walter: Ah, don't worry about it, dear. #line:30
 Walter: I'll just take a pill or two, and it'll clear right up. #line:31
-Isla: [shake]Take care of yourself.[/shake] Taking medicine alone won't help. #line:32
+Isla: Take care of yourself. Taking medicine alone won't help. #line:32
 -> Get well soon. #line:33
     Player: Take it easy, Walter. I need my favorite regular staying healthy. #line:34
+    <<SetLookDirection NPC_Name.Walter LookDirection.Forward>>
     Walter: Thank you, Mr. Bartender. #line:35
 -> She's right. #line:36
     Player: She's right, Walter. #line:37
     Player: Medicine only masks the pain, it doesn't fix it. #line:38
+    <<SetLookDirection NPC_Name.Walter LookDirection.Forward>>
     Walter: [wiggle]Alright, alright, I'm surrounded by caretakers tonight, I see.[/wiggle] #line:39
 -> I feel your pain. #line:3A
     Player: Just standing behind this counter all night is already killing my back. #line:3B
+    <<SetLookDirection NPC_Name.Isla LookDirection.Forward>>
     Isla: [wave]Are you Ok?[/wave]  #line:3C
     Isla: You can let me check for you. #line:3D
     Player: Nah, it's ok. #line:3E
 -> A toast to health. #line:3F
     Player: Well, they say the right drink can comfort any ache. #line:40
+    <<SetLookDirection NPC_Name.Isla LookDirection.Forward>>
     Isla: [wiggle]Hey, but don't drink too much either.[/wiggle] #line:41
 
+<<SetLookDirection NPC_Name.Walter LookDirection.Forward>>
 <<SetEmotion NPC_Name.Isla "happy">>
 Isla: Oh by the way. my name is Isla. #line:42
 Isla: I'm a nurse at the local clinic. #line:43
@@ -245,8 +253,10 @@ Isla: It's a nice little town, once you get used to the quiet. #line:57
 Isla: Actually, I'm not from around here. #line:58
 Isla: I was transferred here for work. #line:59
 Walter: [wave]But she's become a part of the town now.[/wave] #line:5A
+<<SetLookDirection NPC_Name.Isla LookDirection.Left>>
 Isla: [wiggle]You're exaggerating, Mr. Walter.[/wiggle] #line:5B
 Isla: I just... ended up staying longer than I planned. #line:5C
+<<SetLookDirection NPC_Name.Isla LookDirection.Forward>>
 <<jump D1_07_Owen_Arrive>>
 ===
 
@@ -256,6 +266,7 @@ title: D1_07_Owen_Arrive
 //Owen come in 
 <<Enable_InteractableObject SystemGame false>>
 <<Fix_Camera CamController true>>
+<<Switch_Camera CamController "MainCam">>
 <<Panel_FadeOut Panel_Transition>>
 <<Panel_FadeIn Panel_Transition>>
 
@@ -266,17 +277,22 @@ title: D1_07_Owen_Arrive
 <<SetEmotion NPC_Name.Owen "happy">>
 
 Owen: [bounce a=3]Hey! hey!! Owen here![/bounce] #line:5D
+<<SetLookDirection NPC_Name.Isla LookDirection.Right>>
 Isla: [wiggle]Ugh keep your voice down Owen.[/wiggle] #line:5E
+<<SetLookDirection NPC_Name.Owen LookDirection.Left>>
 Owen: My bad, Isla. Nice to see you. #line:5F
 Owen: Oh and good evening Mr. Walter. How's your back? #line:60
+<<SetLookDirection NPC_Name.Walter LookDirection.Right>>
 Walter: Isla already asked. I'm fine, Owen. #line:61
 <<SetEmotion NPC_Name.Walter "neutral">>
+<<SetEmotion NPC_Name.Isla "neutral">>
 Owen: [shake]Wait, wait, wait[/shake] — new face behind the bar? #line:62
 Owen: I thought I knew everyone in town. #line:63
 Owen: Since when did this place have a bartender? #line:64
 -> Hello! #line:65
     Player: Hello. I'm a Bartender. #line:66
     Player: I just opened a few days ago. #line:67
+    <<SetEmotion NPC_Name.Isla "happy">>
     Owen: Newcomer? Glad to see you. #line:68
 -> Just the bartender. #line:69
     Player: Just the bartender. #line:6A
@@ -284,21 +300,29 @@ Owen: Since when did this place have a bartender? #line:64
     Owen: Mysterious. I like it. #line:6C
 -> Hey! Hey!! #line:6D
     Player: hey! Hey!! Bartender here! #line:6E
+    <<SetEmotion NPC_Name.Isla "happy">>
     Owen: [bounce]Now that's the spirit![/bounce] #line:6F
 -> Good evening. #line:70
     Player: Good evening. I'm Bartender, nice to meet you. #line:71
+    <<SetEmotion NPC_Name.Isla "neutral">>
     Owen: [wiggle]Whoa, so formal. I'm speechless.[/wiggle] #line:72
     Owen: Nice to meet you. #line:73
 
 Owen: Well, you picked the right town to open a bar. #line:74
 Owen: Looks like I've finally got a regular spot. #line:75
+<<SetLookDirection NPC_Name.Isla LookDirection.Right>>
 Isla: [wiggle]You show up everywhere, Owen.[/wiggle] #line:76
+<<SetLookDirection NPC_Name.Owen LookDirection.Left>>
 Owen: I'm easy-going. I'm fine with anywhere. #line:77
 <<jump D1_08_Owen_Order>>
 ===
 
 title: D1_08_Owen_Order
 ---
+<<SetLookDirection NPC_Name.Owen LookDirection.Forward>>
+<<SetLookDirection NPC_Name.Isla LookDirection.Forward>>
+<<SetLookDirection NPC_Name.Walter LookDirection.Forward>>
+
 Owen: Oh right, I should probably order before the bartender kicks me out. #line:78
 Owen: I'll have [order] {Order_Cocktail_ByName_OutName("Gin Fizz")}. [/order] #line:79
 Player: One moment. #line:7A
@@ -352,8 +376,11 @@ Owen: The hint is nature. #line:83
 
 Owen: I'm a forest ranger. #line:8C
 Owen: I take care of the forests and the wildlife. #line:8D
+<<SetLookDirection NPC_Name.Owen LookDirection.Left>>
 Owen: You got closer than Isla ever did. #line:8E
 Owen: First time we met, she thought I was homeless. #line:8F
+<<SetLookDirection NPC_Name.Isla LookDirection.Right>>
+<<SetLookDirection NPC_Name.Walter LookDirection.Right>>
 Isla: [shake a=2]It's because you were climbing a tree behind my dorm![/shake] #line:90
 Isla: And you looked all scruffy. #line:91
 Owen: Because I climbed up to catch the raccoon. #line:92
@@ -366,6 +393,7 @@ Player: And what about the raccoon? #line:97
 <<SetEmotion NPC_Name.Owen "neutral">>
 Owen: It ran away before we could catch it. #line:98
 Owen: It was rummaging through the trash at Cole's house. #line:99
+<<SetEmotion NPC_Name.Isla "neutral">>
 Isla: [wiggle]That poor raccoon probably didn't know what hit him.[/wiggle] #line:9A
 Owen: [wiggle]Hey, I was very gentle.[/wiggle] #line:9B
 <<jump D1_10_Walter_Leave>>
@@ -377,14 +405,18 @@ title: D1_10_Walter_Leave
 <<wait 1.6>>
 <<Panel_FadeIn Panel_Transition>>
 
+<<SetEmotion NPC_Name.Walter "neutral">>
 Walter: I think I should go now. #line:9C
+<<SetLookDirection NPC_Name.Isla LookDirection.Left>>
 Owen: [wiggle]Already? But I just got here.[/wiggle] #line:9D
+<<SetLookDirection NPC_Name.Walter LookDirection.Right>>
 Walter: It's late now, Owen. #line:9E
 Walter: [dangle]I'm not as young as I used to be.[/dangle] #line:9F
 Walter: I guess I'll have to let the young people continue the conversation. #line:A0
 Owen: [bounce]You're still a youth.[/bounce] #line:A1
 <<SetEmotion NPC_Name.Owen "neutral">>
 Walter: [wiggle]Ha. Nice try, Owen.[/wiggle] But flattery won't keep me up past my bedtime. #line:A2
+<<SetLookDirection NPC_Name.Isla LookDirection.Left>>
 Isla: Take care of yourself, Mr. Walter. #line:A3
 Player: Get home safely, Mr. Walter. #line:A4
 Walter: Thank you. You guys take care too. #line:A5
@@ -396,6 +428,7 @@ Owen: [wiggle]Take care, old man.[/wiggle] #line:A6
 title: D1_11_Bar_Talk
 ---
 //After Walter leave
+<<SetLookDirection NPC_Name.Isla LookDirection.Forward>>
 Isla: Hey, Mr. Bartender. #line:A7
 Player: Yes. #line:A8
 Isla: Do you mind if I ask why you moved here? #line:A9
@@ -408,6 +441,7 @@ Player: Of course not. #line:AA
 -> I'm bored with the city. #line:AF
     Player: The bright lights of the city aren't really my thing. #line:B0
     Isla: I get that. #line:B1
+    <<SetLookDirection NPC_Name.Owen LookDirection.Forward>>
     Owen: Don't worry, it's so quiet here you can hear the leaves falling. #line:B2
     Owen: [wiggle]Some people find it peaceful. Others last two weeks.[/wiggle] #line:B3
 -> Someone recommended this place. #line:B4
@@ -428,20 +462,26 @@ Owen: Just don't provoke Cole, okay? #line:BF
 Player: Who's Cole? #line:C0
 Owen: He's our local officer. #line:C1
 Owen: I don't talk to him much, but he's [shake]incredibly scary[/shake]. #line:C2
+<<SetLookDirection NPC_Name.Isla LookDirection.Right>>
 Isla: Not quite that bad. He's a good person. #line:C3
+<<SetLookDirection NPC_Name.Owen LookDirection.Left>>
 Owen: [wiggle]Maybe, but it's still scary.[/wiggle] #line:C4
 Isla: [wiggle]You talk as if you're not terrifying yourself, climbing trees in people's yards.[/wiggle] #line:C5
 Owen: [shake]It's a job![/shake] #line:C6
 Player: If I find a raccoon, I'll call. #line:C7
+<<SetLookDirection NPC_Name.Owen LookDirection.Forward>>
 Owen: Anytime, except when sleeping. #line:C8
 <<jump D1_12_Isla_Leave>>
 ===
 
 title: D1_12_Isla_Leave
 ---
+<<SetLookDirection NPC_Name.Isla LookDirection.Forward>>
 Isla: I think it's already late. #line:C9
 Isla: I should probably go. #line:CA
+<<SetLookDirection NPC_Name.Owen LookDirection.Left>>
 Owen: [wiggle]Come on, I was enjoying the conversation.[/wiggle] #line:CB
+<<SetLookDirection NPC_Name.Isla LookDirection.Right>>
 Isla: I have an early shift tomorrow. #line:CC
 Owen: [dangle]Fine...[/dangle] #line:CD
 Player: Get home safe! #line:CE
@@ -449,6 +489,7 @@ Player: Get home safe! #line:CE
 Isla: [bounce]Thanks! See you guys.[/bounce] #line:CF
 <<SetEmotion NPC_Name.Owen "happy">>
 Owen: Yup, see you. #line:D0
+<<SetLookDirection NPC_Name.Isla LookDirection.Left>>
 <<MoveOut NPC_Name.isla>>
 <<jump D1_13_Owen_Talk_Outro>>
 ===
@@ -485,6 +526,7 @@ Owen: The work never has a day off. #line:E3
 Player: Good luck, see you again. #line:E4
 Owen: Thanks, see you later. #line:E5
 Owen: [bounce]Owen, signing out.[/bounce] #line:E6
+<<SetLookDirection NPC_Name.Owen LookDirection.Left>>
 <<MoveOut NPC_Name.Owen>>
 
 <<Fix_Camera CamController true>>

@@ -68,6 +68,7 @@ public class CocktailShakerData : MonoBehaviour, IIngredientReceiver, ITooltipPr
     public void SetMethodToShake() => CurrentCocktail.PreparationMethod = Method.Shaking;
     public void SetMethodToMixing() => CurrentCocktail.PreparationMethod = Method.Stirring;
     public void ToggleIce() => CurrentCocktail.AddIce = !CurrentCocktail.AddIce;
+    public void ToggleIce(bool enable) => CurrentCocktail.AddIce = enable;  
 
     
 
