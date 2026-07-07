@@ -198,7 +198,7 @@ title: D1_05_Isla_Order
 //-> Everything is recommended here.
 Player: [swing]Everything is recommended here.[/swing] #line:4A
 Isla: Umm... #line:4B
-Isla: Okay, I'll have {Order_Cocktail_ByName_OutName("Cranberry fizz")}. #line:4C
+Isla: Okay, I'll have [order] {Order_Cocktail_ByName_OutName("Cranberry fizz")} [/order]. #line:4C
 Player: Got it. #line:4D
 
 <<SetEmotion NPC_Name.Isla "neutral">>
@@ -300,7 +300,7 @@ Owen: I'm easy-going. I'm fine with anywhere. #line:77
 title: D1_08_Owen_Order
 ---
 Owen: Oh right, I should probably order before the bartender kicks me out. #line:78
-Owen: I'll have {Order_Cocktail_ByName_OutName("Gin Fizz")}. #line:79
+Owen: I'll have [order] {Order_Cocktail_ByName_OutName("Gin Fizz")}. [/order] #line:79
 Player: One moment. #line:7A
 <<SetEmotion NPC_Name.Owen "neutral">>
 

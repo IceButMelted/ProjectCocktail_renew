@@ -34,14 +34,14 @@ public class BookUI_V2 : MonoBehaviour
         [TextArea(2, 6)] public string textAContent;
         [TextArea(2, 6)] public string textBContent;
 
-        [Tooltip("Source UI Image whose sprite is copied into imageA.")]
-        public Image imageASource;
+        [Tooltip("Sprite copied into imageA.")]
+        public Sprite imageASource;
 
-        [Tooltip("Source UI Image whose sprite is copied into imageB.")]
-        public Image imageBSource;
+        [Tooltip("Sprite copied into imageB.")]
+        public Sprite imageBSource;
 
-        [Tooltip("Source UI Image whose sprite is copied into singleImage.")]
-        public Image singleImageSource;
+        [Tooltip("Sprite copied into singleImage.")]
+        public Sprite singleImageSource;
     }
 
     [System.Serializable]
@@ -152,14 +152,14 @@ public class BookUI_V2 : MonoBehaviour
     /// <summary>
     /// Set content on a page at runtime.
     /// Pass null to leave any field unchanged.
-    /// imageASource / imageBSource are UI Image components — their sprite (and color) are copied across.
+    /// imageASource / imageBSource are sprites copied into imageA / imageB.
     /// </summary>
     public void SetPageContent(int spreadIndex,
                                bool isLeftPage,
                                string textAContent = null,
                                string textBContent = null,
-                               Image imageASource = null,
-                               Image imageBSource = null)
+                               Sprite imageASource = null,
+                               Sprite imageBSource = null)
     {
         if (!IsValidIndex(spreadIndex)) return;
 
@@ -169,24 +169,24 @@ public class BookUI_V2 : MonoBehaviour
         if (textAContent != null && page.textA != null) page.textA.text = textAContent;
         if (textBContent != null && page.textB != null) page.textB.text = textBContent;
 
-        if (imageASource != null && page.imageA != null) CopyImage(imageASource, page.imageA);
-        if (imageBSource != null && page.imageB != null) CopyImage(imageBSource, page.imageB);
+        if (imageASource != null && page.imageA != null) CopySprite(imageASource, page.imageA);
+        if (imageBSource != null && page.imageB != null) CopySprite(imageBSource, page.imageB);
 
         if (spreadIndex == CurrentSpreadIndex) ShowPage(page);
     }
 
     /// <summary>
     /// Set a full-page image on a SingleImage-mode page at runtime.
-    /// source is a UI Image component — its sprite and color are copied across.
+    /// source is a sprite copied into singleImage.
     /// </summary>
-    public void SetPageSingleImage(int spreadIndex, bool isLeftPage, Image source)
+    public void SetPageSingleImage(int spreadIndex, bool isLeftPage, Sprite source)
     {
         if (!IsValidIndex(spreadIndex)) return;
 
         BookPage page = isLeftPage ? _spreads[spreadIndex].leftPage
                                    : _spreads[spreadIndex].rightPage;
 
-        if (source != null && page.singleImage != null) CopyImage(source, page.singleImage);
+        if (source != null && page.singleImage != null) CopySprite(source, page.singleImage);
 
         if (spreadIndex == CurrentSpreadIndex) ShowPage(page);
     }
@@ -272,9 +272,9 @@ public class BookUI_V2 : MonoBehaviour
         if (!string.IsNullOrEmpty(page.textBContent) && page.textB != null)
             page.textB.text = page.textBContent;
 
-        if (page.imageASource != null && page.imageA != null) CopyImage(page.imageASource, page.imageA);
-        if (page.imageBSource != null && page.imageB != null) CopyImage(page.imageBSource, page.imageB);
-        if (page.singleImageSource != null && page.singleImage != null) CopyImage(page.singleImageSource, page.singleImage);
+        if (page.imageASource != null && page.imageA != null) CopySprite(page.imageASource, page.imageA);
+        if (page.imageBSource != null && page.imageB != null) CopySprite(page.imageBSource, page.imageB);
+        if (page.singleImageSource != null && page.singleImage != null) CopySprite(page.singleImageSource, page.singleImage);
     }
 
     private void UpdatePageNumberLabels()
@@ -288,13 +288,11 @@ public class BookUI_V2 : MonoBehaviour
     // ── Private — Helpers ─────────────────────────────────────────────────────
 
     /// <summary>
-    /// Copies sprite, color, and image type from one UI Image to another.
+    /// Copies a sprite into a target UI Image.
     /// </summary>
-    private static void CopyImage(Image source, Image target)
+    private static void CopySprite(Sprite source, Image target)
     {
-        target.sprite = source.sprite;
-        target.color = source.color;
-        target.type = source.type;
+        target.sprite = source;
     }
 
     private static void SetActive(Component c, bool active)
