@@ -33,6 +33,7 @@ public class CocktailShakerData : MonoBehaviour, IIngredientReceiver, ITooltipPr
 
     [Header("Ingredient Buttons")]
     public List<GameObject> ingredientButtons = new List<GameObject>();
+    public List<GameObject> bookUi = new List<GameObject>();
 
     [Header("Glass And Ice")]
     [SerializedDictionary("Glass Type", "Visual")]
@@ -158,6 +159,21 @@ public class CocktailShakerData : MonoBehaviour, IIngredientReceiver, ITooltipPr
             if (btn.TryGetComponent<ScaleOnHover>(out var hover)) hover.Interactable = active;
             if (btn.TryGetComponent<Interactable_3DObject>(out var objec)) objec.Interactable = active;
             if (btn.TryGetComponent<HoverTooltip>(out var tooltip)) tooltip.Interactable = active;
+        }
+    }
+
+    public void SetBookUiActive(bool active)
+    {
+        foreach (var btn in bookUi)
+        {
+            if (btn == null) continue;
+            if (btn.TryGetComponent<Interactable_2_5DObject>(out var interactable)) interactable.Interactable = active;
+            if (btn.TryGetComponent<UIPointerSound>(out var sound)) sound.Interactable = active;
+            if (btn.TryGetComponent<DragableObject>(out var drag)) drag.Interactable = active;
+            if (btn.TryGetComponent<ScaleOnHover>(out var hover)) hover.Interactable = active;
+            if (btn.TryGetComponent<Interactable_3DObject>(out var objec)) objec.Interactable = active;
+            if (btn.TryGetComponent<HoverTooltip>(out var tooltip)) tooltip.Interactable = active;
+            if (btn.TryGetComponent<BookUI_V2>(out var bookUI)) bookUI.SetActive(active);
         }
     }
 

@@ -24,4 +24,9 @@ public class SceneLoader : MonoBehaviour
         SceneLoaderBridge.TargetScene = SceneManager.GetActiveScene().name;
         SceneManager.LoadScene("LoadingScene");
     }
+
+    public void ExitGame()
+    {
+        Application.Quit();
+    }
 }
