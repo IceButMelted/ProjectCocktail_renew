@@ -10376,6 +10376,170 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c6369be48adcf049971239284feac61, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::AnimationEvent
+--- !u!1 &2103601418
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2103601421}
+  - component: {fileID: 2103601420}
+  - component: {fileID: 2103601419}
+  - component: {fileID: 2103601422}
+  m_Layer: 0
+  m_Name: '[GameLoop]'
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &2103601419
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2103601418}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 02582f9c04879881e8eafa970e849c3a, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Bar410.GameFlow.GameFlowCommands
+  _gameLoop: {fileID: 2103601420}
+--- !u!114 &2103601420
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2103601418}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 13292648f3b648e998f172c5e237a21f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Bar410.GameFlow.GameLoopFSM
+  _logTransitions: 1
+  _autoStart: 1
+--- !u!4 &2103601421
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2103601418}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &2103601422
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2103601418}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 083e042ed222430d78c5b69913a381e5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Bar410.GameFlow.GameFlowHooks
+  _gameLoop: {fileID: 2103601420}
+  _prepareBar:
+    _onEnter:
+      m_PersistentCalls:
+        m_Calls: []
+    _onUpdate:
+      m_PersistentCalls:
+        m_Calls: []
+    _onExit:
+      m_PersistentCalls:
+        m_Calls: []
+  _openBar:
+    _onEnter:
+      m_PersistentCalls:
+        m_Calls: []
+    _onUpdate:
+      m_PersistentCalls:
+        m_Calls: []
+    _onExit:
+      m_PersistentCalls:
+        m_Calls: []
+  _closingBar:
+    _onEnter:
+      m_PersistentCalls:
+        m_Calls: []
+    _onUpdate:
+      m_PersistentCalls:
+        m_Calls: []
+    _onExit:
+      m_PersistentCalls:
+        m_Calls: []
+  _talkingWithCustomer:
+    _onEnter:
+      m_PersistentCalls:
+        m_Calls: []
+    _onUpdate:
+      m_PersistentCalls:
+        m_Calls: []
+    _onExit:
+      m_PersistentCalls:
+        m_Calls: []
+  _prepareDrinks:
+    _onEnter:
+      m_PersistentCalls:
+        m_Calls: []
+    _onUpdate:
+      m_PersistentCalls:
+        m_Calls: []
+    _onExit:
+      m_PersistentCalls:
+        m_Calls: []
+  _garnish:
+    _onEnter:
+      m_PersistentCalls:
+        m_Calls: []
+    _onUpdate:
+      m_PersistentCalls:
+        m_Calls: []
+    _onExit:
+      m_PersistentCalls:
+        m_Calls: []
+  _serve:
+    _onEnter:
+      m_PersistentCalls:
+        m_Calls: []
+    _onUpdate:
+      m_PersistentCalls:
+        m_Calls: []
+    _onExit:
+      m_PersistentCalls:
+        m_Calls: []
+  _addIngredient:
+    _onEnter:
+      m_PersistentCalls:
+        m_Calls: []
+    _onUpdate:
+      m_PersistentCalls:
+        m_Calls: []
+    _onExit:
+      m_PersistentCalls:
+        m_Calls: []
+  _minigame:
+    _onEnter:
+      m_PersistentCalls:
+        m_Calls: []
+    _onUpdate:
+      m_PersistentCalls:
+        m_Calls: []
+    _onExit:
+      m_PersistentCalls:
+        m_Calls: []
 --- !u!1 &2134705942
 GameObject:
   m_ObjectHideFlags: 0
@@ -18105,14 +18269,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4fc40022cfeeeff45a895e08d156163e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  _endShiftBTN: {fileID: 1828677530}
+  _dialogueRunner: {fileID: 0}
+  _postItOrder: {fileID: 1631617833}
   _normalCocktailRepository: {fileID: 11400000, guid: f46e05887f9c1bb49ac87b93118e5cfa, type: 2}
   _specialCocktailRepository: {fileID: 0}
   _failCocktailSprite: {fileID: 21300000, guid: 098ccd04d394f96479ed4a40fae4c482, type: 3}
   _cocktailShakerData: {fileID: 6703485261602215137}
   _cocktailShaker: {fileID: 1907703764714398618}
-  _endShiftBTN: {fileID: 1828677530}
-  _dialogueRunner: {fileID: 0}
-  _postItOrder: {fileID: 1631617833}
 --- !u!114 &5992139444433898967
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22210,3 +22374,4 @@ SceneRoots:
   - {fileID: 1064966138}
   - {fileID: 1799108575}
   - {fileID: 1391191226}
+  - {fileID: 2103601421}
