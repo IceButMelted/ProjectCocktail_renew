@@ -23,7 +23,7 @@ public class DragableObject : PointerInteractableBase
     public LayerMask detectLayerMask;
 
     [Header("References")]
-    [SerializeField] private N_PlacementSystem _placementSystem;
+    public static N_PlacementSystem _placementSystem;
 
     [Header("Debug")]
     public bool DebugDraw = false;
@@ -50,6 +50,11 @@ public class DragableObject : PointerInteractableBase
     private bool _dragStarted;
 
     // ── Unity Lifecycle ───────────────────────────────────────────────────────
+    private void OnEnable()
+    {
+        if (_placementSystem == null)
+            _placementSystem = FindFirstObjectByType<N_PlacementSystem>();
+    }
 
     private void Awake()
     {
@@ -59,9 +64,6 @@ public class DragableObject : PointerInteractableBase
 
         if (_collider == null)
             Debug.LogWarning($"[DragableObject] No Collider found on '{name}'.");
-
-        if (_placementSystem == null)
-            _placementSystem = FindFirstObjectByType<N_PlacementSystem>();
     }
 
     private void Update()
