@@ -3659,7 +3659,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 2063047303304347187}
         m_TargetAssemblyTypeName: MinigameSystemManager, Assembly-CSharp
-        m_MethodName: ClosePanelReset
+        m_MethodName: CancelMinigame
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -5279,7 +5279,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 2063047303304347187}
         m_TargetAssemblyTypeName: MinigameSystemManager, Assembly-CSharp
-        m_MethodName: NextPhase
+        m_MethodName: CancelMinigame
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -6353,20 +6353,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b0f7df712c79dfb4a97210fddcd2ffec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ShakingMinigame
+  _panels: {fileID: 5310960144258794587}
+  amc: {fileID: 0}
   <Setting>k__BackingField: {fileID: 11400000, guid: 69be31c6794215c4aa2b30c35ee31c89, type: 2}
-  _slidePanelSpeed: 800
-  EasingConfigTimer: 1.2
-  _minigamePanel: {fileID: 3721970400581200708}
-  OpenPanel:
-  - {fileID: 80237545}
-  - {fileID: 61794030}
-  - {fileID: 657954087}
-  - {fileID: 762239103}
-  BackgroundPanelgame: {fileID: 390246133}
-  ArtWorks:
-  - {fileID: 1825243085}
-  - {fileID: 652458745}
-  ButtonPanel: {fileID: 1685282608}
   _gaugeSlider: {fileID: 7632866320040601843}
   _progressSlider: {fileID: 2879321573383797104}
   _targetZoneSlider: {fileID: 561555500500235951}
@@ -7232,7 +7221,6 @@ MonoBehaviour:
   detectLayerMask:
     serializedVersion: 2
     m_Bits: 128
-  _placementSystem: {fileID: 0}
   DebugDraw: 1
 --- !u!222 &1192047720584912321
 CanvasRenderer:
@@ -7428,7 +7416,6 @@ MonoBehaviour:
   detectLayerMask:
     serializedVersion: 2
     m_Bits: 128
-  _placementSystem: {fileID: 0}
   DebugDraw: 1
 --- !u!114 &1319116979696523597
 MonoBehaviour:
@@ -7913,20 +7900,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0486db295befabe448962e15f1f56ffe, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::MixingMinigame
+  _panels: {fileID: 8880442783135602983}
+  amc: {fileID: 0}
   <Setting>k__BackingField: {fileID: 11400000, guid: 45c27c70917228d4caf8f135c6ddf856, type: 2}
-  _slidePanelSpeed: 800
-  EasingConfigTimer: 1.2
-  _minigamePanel: {fileID: 5320834456977304519}
-  OpenPanel:
-  - {fileID: 80237545}
-  - {fileID: 61794030}
-  - {fileID: 657954087}
-  - {fileID: 762239103}
-  BackgroundPanelgame: {fileID: 390246133}
-  ArtWorks:
-  - {fileID: 1825243085}
-  - {fileID: 652458745}
-  ButtonPanel: {fileID: 1685282608}
   _needleSlider: {fileID: 5443366241719607567}
   _hitsProgressSlider: {fileID: 2125179177335497860}
   _targetZoneSlider: {fileID: 5842055981974742498}
@@ -8278,6 +8254,7 @@ MonoBehaviour:
   ShakerSprite: {fileID: 21300000, guid: a38d06b768b5fff4284ccec1b5925d53, type: 3}
   MethodUI: {fileID: 8061656765577325941}
   ServeUI: {fileID: 4222985342316545139}
+  AddIceUI: {fileID: 0}
 --- !u!65 &1956533331405035116
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -8857,7 +8834,6 @@ MonoBehaviour:
   detectLayerMask:
     serializedVersion: 2
     m_Bits: 128
-  _placementSystem: {fileID: 0}
   DebugDraw: 1
 --- !u!222 &2233769835868247158
 CanvasRenderer:
@@ -8959,7 +8935,6 @@ MonoBehaviour:
   detectLayerMask:
     serializedVersion: 2
     m_Bits: 128
-  _placementSystem: {fileID: 0}
   DebugDraw: 1
 --- !u!114 &2288351157979033707
 MonoBehaviour:
@@ -9272,7 +9247,6 @@ MonoBehaviour:
   detectLayerMask:
     serializedVersion: 2
     m_Bits: 128
-  _placementSystem: {fileID: 0}
   DebugDraw: 1
 --- !u!4 &2600711557786853036
 Transform:
@@ -9507,6 +9481,8 @@ GameObject:
   - component: {fileID: 5310960144258794586}
   - component: {fileID: 627140977724042131}
   - component: {fileID: 2814081630226628629}
+  - component: {fileID: 5310960144258794588}
+  - component: {fileID: 5310960144258794587}
   m_Layer: 5
   m_Name: Canvas_ShakingMinigame
   m_TagString: Untagged
@@ -9620,12 +9596,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::N_InputManager
   _sceneCamera: {fileID: 5292133938211385327}
   _range: 100
-  _placementLayer:
+  _zoneLayer:
     serializedVersion: 2
-    m_Bits: 64
-  _boxPlacementLayer:
-    serializedVersion: 2
-    m_Bits: 256
+    m_Bits: 0
   _draggableLayer:
     serializedVersion: 2
     m_Bits: 128
@@ -10002,7 +9975,6 @@ MonoBehaviour:
   detectLayerMask:
     serializedVersion: 2
     m_Bits: 128
-  _placementSystem: {fileID: 0}
   DebugDraw: 1
 --- !u!114 &3504420981799897361
 MonoBehaviour:
@@ -10021,7 +9993,6 @@ MonoBehaviour:
   detectLayerMask:
     serializedVersion: 2
     m_Bits: 128
-  _placementSystem: {fileID: 0}
   DebugDraw: 1
 --- !u!1 &3507252729295594802
 GameObject:
@@ -10035,6 +10006,8 @@ GameObject:
   - component: {fileID: 8880442783135602982}
   - component: {fileID: 2305258459593078686}
   - component: {fileID: 3775112041677207498}
+  - component: {fileID: 8880442783135602984}
+  - component: {fileID: 8880442783135602983}
   m_Layer: 5
   m_Name: Canvas_MixingMinigame
   m_TagString: Untagged
@@ -10507,7 +10480,6 @@ MonoBehaviour:
   detectLayerMask:
     serializedVersion: 2
     m_Bits: 128
-  _placementSystem: {fileID: 0}
   DebugDraw: 1
 --- !u!1 &3917053193147481438
 GameObject:
@@ -10637,7 +10609,6 @@ MonoBehaviour:
   detectLayerMask:
     serializedVersion: 2
     m_Bits: 128
-  _placementSystem: {fileID: 0}
   DebugDraw: 1
 --- !u!1 &4039429335838577330
 GameObject:
@@ -10815,7 +10786,6 @@ MonoBehaviour:
   detectLayerMask:
     serializedVersion: 2
     m_Bits: 128
-  _placementSystem: {fileID: 0}
   DebugDraw: 1
 --- !u!1 &4202311706896442900
 GameObject:
@@ -11204,6 +11174,7 @@ GameObject:
   - component: {fileID: 7123310225146430610}
   - component: {fileID: 361021736274743674}
   - component: {fileID: 5586983479910729479}
+  - component: {fileID: 7123310225146430611}
   m_Layer: 5
   m_Name: Canvas_MiniGame
   m_TagString: Untagged
@@ -12108,6 +12079,47 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2910853139366720954}
   m_CullTransparentMesh: 1
+--- !u!114 &5310960144258794587
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2910853139366720954}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 83ca8a1fcc389c4f5898abee58b0861c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MinigamePanelAnimator
+  _animators:
+  - {fileID: 7123310225146430611}
+  - {fileID: 5310960144258794588}
+  _showTrigger: Show
+  _hideTrigger: Hide
+  _introFallbackDuration: 5
+  _outroFallbackDuration: 1.5
+--- !u!95 &5310960144258794588
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2910853139366720954}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 8b9534c0768af3284ae2a3da75018f93, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!114 &5315047994252090376
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12241,7 +12253,6 @@ MonoBehaviour:
   detectLayerMask:
     serializedVersion: 2
     m_Bits: 128
-  _placementSystem: {fileID: 0}
   DebugDraw: 1
 --- !u!114 &5399675764193793790
 MonoBehaviour:
@@ -12311,7 +12322,6 @@ MonoBehaviour:
   detectLayerMask:
     serializedVersion: 2
     m_Bits: 128
-  _placementSystem: {fileID: 0}
   DebugDraw: 1
 --- !u!114 &5443366241719607567
 MonoBehaviour:
@@ -12669,7 +12679,6 @@ MonoBehaviour:
   detectLayerMask:
     serializedVersion: 2
     m_Bits: 128
-  _placementSystem: {fileID: 0}
   DebugDraw: 1
 --- !u!224 &5715997199825072019
 RectTransform:
@@ -13045,13 +13054,14 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4fc40022cfeeeff45a895e08d156163e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  _endShiftBTN: {fileID: 1828677530}
+  _dialogueRunner: {fileID: 2121270643943068571}
+  _postItOrder: {fileID: 0}
   _normalCocktailRepository: {fileID: 11400000, guid: e64c41a62842fd54491c7e08deb2cd77, type: 2}
   _specialCocktailRepository: {fileID: 0}
   _failCocktailSprite: {fileID: 21300000, guid: 098ccd04d394f96479ed4a40fae4c482, type: 3}
   _cocktailShakerData: {fileID: 6703485261602215137}
   _cocktailShaker: {fileID: 1907703764714398618}
-  _endShiftBTN: {fileID: 1828677530}
-  _dialogueRunner: {fileID: 2121270643943068571}
 --- !u!114 &5982970329552925957
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13092,7 +13102,6 @@ MonoBehaviour:
   detectLayerMask:
     serializedVersion: 2
     m_Bits: 128
-  _placementSystem: {fileID: 0}
   DebugDraw: 1
 --- !u!1 &6013997408221009630
 GameObject:
@@ -13497,7 +13506,6 @@ MonoBehaviour:
   detectLayerMask:
     serializedVersion: 2
     m_Bits: 128
-  _placementSystem: {fileID: 0}
   DebugDraw: 1
 --- !u!222 &6569973503634778381
 CanvasRenderer:
@@ -13656,7 +13664,6 @@ MonoBehaviour:
   detectLayerMask:
     serializedVersion: 2
     m_Bits: 128
-  _placementSystem: {fileID: 0}
   DebugDraw: 1
 --- !u!224 &6702925659037391675
 RectTransform:
@@ -13689,6 +13696,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: c8089d3203e65e84f927c45ab82a06a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::CocktailShakerData
+  glassWaterSlosh: {fileID: 0}
   OnAddAlcohol:
     m_PersistentCalls:
       m_Calls:
@@ -13842,6 +13850,10 @@ MonoBehaviour:
   - {fileID: 9055407222387393269}
   - {fileID: 2884906080914184493}
   - {fileID: 6645174633256040511}
+  bookUi: []
+  GlassVisualData:
+    m_keys: 
+    m_values: []
 --- !u!224 &6725960075511140104
 RectTransform:
   m_ObjectHideFlags: 0
@@ -14404,6 +14416,28 @@ Canvas:
   m_SortingLayerID: 0
   m_SortingOrder: 0
   m_TargetDisplay: 0
+--- !u!95 &7123310225146430611
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4338278167862342087}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 4b7ddd67af77cf7ecbc9d8cbe0828617, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &7142847924351611702
 GameObject:
   m_ObjectHideFlags: 0
@@ -15679,7 +15713,6 @@ MonoBehaviour:
   detectLayerMask:
     serializedVersion: 2
     m_Bits: 128
-  _placementSystem: {fileID: 0}
   DebugDraw: 1
 --- !u!114 &8251826053269290439
 MonoBehaviour:
@@ -16472,6 +16505,47 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3507252729295594802}
   m_CullTransparentMesh: 1
+--- !u!114 &8880442783135602983
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3507252729295594802}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 83ca8a1fcc389c4f5898abee58b0861c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MinigamePanelAnimator
+  _animators:
+  - {fileID: 7123310225146430611}
+  - {fileID: 8880442783135602984}
+  _showTrigger: Show
+  _hideTrigger: Hide
+  _introFallbackDuration: 5
+  _outroFallbackDuration: 1.5
+--- !u!95 &8880442783135602984
+Animator:
+  serializedVersion: 7
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3507252729295594802}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 8b9534c0768af3284ae2a3da75018f93, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_AnimatePhysics: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!114 &8891705885202887409
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16519,7 +16593,6 @@ MonoBehaviour:
   detectLayerMask:
     serializedVersion: 2
     m_Bits: 128
-  _placementSystem: {fileID: 0}
   DebugDraw: 1
 --- !u!114 &8928980564313812932
 MonoBehaviour:
@@ -16808,7 +16881,6 @@ MonoBehaviour:
   detectLayerMask:
     serializedVersion: 2
     m_Bits: 128
-  _placementSystem: {fileID: 0}
   DebugDraw: 1
 --- !u!114 &9073333309803274920
 MonoBehaviour:
