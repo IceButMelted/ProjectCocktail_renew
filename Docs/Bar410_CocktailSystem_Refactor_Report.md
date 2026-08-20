@@ -5,6 +5,7 @@
 **Plan:** `Bar410_CocktailSystem_Refactor_Plan.md`
 **Scope executed:** Phase 0–8 (โค้ดทั้งหมด) — **ไม่มีการแก้ซีน prefab หรือ asset ใด ๆ**
 **งานมือที่เหลือ:** `Bar410_CocktailSystem_Manual_Setup.md`
+**หน้าที่ของแต่ละไฟล์:** `Bar410_CocktailSystem_Architecture.md`
 **Compile status:** ✅ ผ่าน ไม่มี error (ยืนยันผ่าน Unity MCP)
 
 ---
@@ -64,16 +65,21 @@ B6 add 5 onto 9 -> allowed=False total=9 (expect False / 9)
 
 ---
 
-## 3. Phase 0 — บั๊กที่แก้
+## 3. บั๊กที่แก้ทั้งหมด 9 ตัว
 
-| # | ที่ | อาการเดิม | ที่แก้ |
-|---|---|---|---|
-| **B1** | `YarnInterface.cs` | `_cocktailType` ถูกกำหนดค่าแค่ `None` เท่านั้นทั้งโปรเจกต์ → `$type_of_cocktail` เขียน `0` เสมอ ทุก `<<if $type_of_cocktail ...>>` ใน Yarn เป็น branch ตาย | เปลี่ยนเป็น `_servedType` ที่ `CalculateSatisfaction()` เขียนค่าจริงลงไป |
-| **B3** | `YarnInterface.cs:183` | `ResolvePostItText` เรียก `FindFirstObjectByType<Post_It_Order>()` ทุกครั้งที่สั่งเครื่องดื่ม ทั้งที่มี `_postItOrder` เป็น `[SerializeField]` อยู่แล้ว | ใช้ฟิลด์ที่ผูกไว้ + warning ถ้าไม่ได้ผูก |
-| **B6** | `UtilityDrink.cs:48` | `IsValidRatio` เช็กแค่ว่ายอด **ปัจจุบัน** < 10 → เติม 5 หน่วยตอนมี 9 ได้แก้ว 14 หน่วย | `DrinkQuery.CanAdd(d, amount)` นับ amount ที่กำลังเติมด้วย |
-| **B7** | `DebugCocktail.cs:22` | `"Shaker:\n" + _shaker.CurrentCocktail` ต่อ string กับ ScriptableObject → พิมพ์ชื่อ object ไม่ใช่ข้อมูลเครื่องดื่ม | ใช้ `DrinkFormatter.GetCocktailInfo()` |
-| **B8** | `CocktailSystemManager.cs:37` | `Awake` เขียน `_characterData` ที่ประกาศอยู่ในไฟล์ partial อีกไฟล์ — coupling ที่มองไม่เห็น | ย้ายการประกาศมาไว้ไฟล์เดียวกับที่เขียนค่า |
-| **B11** | `SystemGame.prefab` | `_normalCocktailRepository` เป็น null → `Start()` โยน NullReferenceException | `CompositeDrinkRepository` ข้าม source ที่เป็น null และ log error ที่ระบุ GameObject แทน |
+ชื่อไฟล์ในคอลัมน์ "ที่" คือชื่อ **ก่อน** refactor
+
+| # | เฟส | ที่ | อาการเดิม | ที่แก้ |
+|---|---|---|---|---|
+| **B1** | 0 | `YarnInterface.cs` | `_cocktailType` ถูกกำหนดค่าแค่ `None` เท่านั้นทั้งโปรเจกต์ → `$type_of_cocktail` เขียน `0` เสมอ ทุก `<<if $type_of_cocktail ...>>` ใน Yarn เป็น branch ตาย | เปลี่ยนเป็น `_servedType` ที่ `CalculateSatisfaction()` เขียนค่าจริงลงไป |
+| **B3** | 0 | `YarnInterface.cs:183` | `ResolvePostItText` เรียก `FindFirstObjectByType<Post_It_Order>()` ทุกครั้งที่สั่งเครื่องดื่ม ทั้งที่มี `_postItOrder` เป็น `[SerializeField]` อยู่แล้ว | ใช้ฟิลด์ที่ผูกไว้ + warning ถ้าไม่ได้ผูก |
+| **B6** | 0 | `UtilityDrink.cs:48` | `IsValidRatio` เช็กแค่ว่ายอด **ปัจจุบัน** < 10 → เติม 5 หน่วยตอนมี 9 ได้แก้ว 14 หน่วย | `DrinkQuery.CanAdd(d, amount)` นับ amount ที่กำลังเติมด้วย |
+| **B7** | 0 | `DebugCocktail.cs:22` | `"Shaker:\n" + _shaker.CurrentCocktail` ต่อ string กับ ScriptableObject → พิมพ์ชื่อ object ไม่ใช่ข้อมูลเครื่องดื่ม | ใช้ `DrinkFormatter.GetCocktailInfo()` |
+| **B8** | 0 | `CocktailSystemManager.cs:37` | `Awake` เขียน `_characterData` ที่ประกาศอยู่ในไฟล์ partial อีกไฟล์ — coupling ที่มองไม่เห็น | ย้ายการประกาศมาไว้ไฟล์เดียวกับที่เขียนค่า |
+| **B11** | 0 | `SystemGame.prefab` | `_normalCocktailRepository` เป็น null → `Start()` โยน NullReferenceException | `CompositeDrinkRepository` ข้าม source ที่เป็น null และ log error ที่ระบุ GameObject แทน |
+| **B2** | 4 | `YarnInterface.cs:57-94` | `Order_Cocktail_OutName` กับ `OutDescription` **สุ่มใหม่ทั้งคู่** เรียกติดกันในโหนดเดียวได้คนละแก้ว — ชื่อกับคำอธิบายไม่ตรงกัน | `DrinkOrderContext` เก็บออเดอร์ไว้ ถ้ามีของลูกค้าคนเดิมที่ยังไม่ถูกให้คะแนน จะใช้ตัวเดิม |
+| **B4** | 3 | `YarnInterface.cs:226-235` vs `CocktailShakerData.cs:151-163` | `EnableButtonInYarn` เรียก `SetIngredientActive` แล้ววนลูป component เดิมซ้ำอีกรอบด้วยชุดที่ครอบคลุมน้อยกว่า — ปุ่มถูกเซ็ตสองครั้งด้วยนิยามต่างกัน | `InteractableToggle.Apply` จุดเดียว ยุบลูป 3 ก๊อป |
+| **B5** | 5 | `YarnInterface.cs:282` | `UpdateVariableInYarn()` เป็นทั้ง predicate ของ `WaitUntil` (โพลทุกเฟรม) และ command ที่เขียนตัวแปร 3 ตัว ปิดปุ่ม ซ่อน Post-It ทุกครั้งที่คืน true | แยกเป็น `IsTaskComplete` (query บริสุทธิ์) กับ `CommitTaskResult()` (เรียกครั้งเดียว) |
 
 ### โค้ดตายที่ลบ
 
@@ -86,7 +92,7 @@ B6 add 5 onto 9 -> allowed=False total=9 (expect False / 9)
 | `UtilityDrink.cs` | **ลบทั้งไฟล์** (412 บรรทัด) — ย้ายไป `Domain/` |
 
 > ตรวจแล้วว่า `ActionBehavior` **ไม่ได้ถูกผูกใน UnityEvent ของซีนหรือ prefab ไหนเลย** จึงลบได้ปลอดภัย
-> ส่วน `AddIce` ดู §5 ข้อ 1
+> ส่วน `AddIce` ที่ผูกอยู่ใน `CocktailSystem.prefab` ดู §6.1 ข้อ 3 และคู่มืองานมือ §2.1
 
 ---
 
@@ -430,23 +436,49 @@ S12 **ปิดแล้วโดยไม่ต้องแก้อะไร**
 
 ## 9. ไฟล์ที่เปลี่ยน
 
-**สร้างใหม่ 12 ไฟล์**
+รายละเอียดว่าแต่ละไฟล์ทำอะไร อยู่ใน `Bar410_CocktailSystem_Architecture.md`
+
+**สร้างใหม่ 30 ไฟล์**
 
 ```
+Cocktail/Domain/            11 ไฟล์  กติกาเกมทั้งหมด (GDD §15, §17, §18, §21.1)
+Cocktail/Shaker/             7 ไฟล์  ของในซีนที่ผ่าออกจาก CocktailShakerData
+Session/                     5 ไฟล์  DrinkOrderContext, OrderService, scoring, SO_Customer
+Yarn/                        4 ไฟล์  adapter + YarnVariableSync
 Cocktail/CompositeDrinkRepository.cs
-Cocktail/Domain/AlcoholClassifier.cs      Cocktail/Domain/DrinkFlagResolver.cs
-Cocktail/Domain/DrinkBuilder.cs           Cocktail/Domain/DrinkFormatter.cs
-Cocktail/Domain/DrinkColorBlender.cs      Cocktail/Domain/DrinkQuery.cs
-Cocktail/Domain/DrinkDeviation.cs         Cocktail/Domain/IngredientMath.cs
-Cocktail/Domain/PricingRules.cs           Cocktail/Domain/RecipeMatch.cs
-Cocktail/Domain/SatisfactionEvaluator.cs
+Hierarchical State Machine/  2 ไฟล์  BarSetupBridge, CocktailFlowBridge
+Assets/Editor/CocktailDataValidator.cs
 ```
 
-**แก้ 11 ไฟล์** — `CocktailSystemManager.cs`, `CocktailSystemManager.YarnInterface.cs`,
-`CocktailShakerData.cs`, `CocktailShaker.cs`, `DrinkIngredients.cs`, `IDrinkInterfaces.cs`,
-`SO_CocktailList.cs`, `S_Drink.cs`, `DebugCocktail.cs`, `Enum_Class.cs`,
-`IngredientButtonUI.cs`, `VisualizeCocktail.cs`
+**แยกไฟล์ (เนื้อหาเดิม โครงใหม่)**
 
-**ลบ 1 ไฟล์** — `UtilityDrink.cs` (+ `.meta`)
+| เดิม | เป็น |
+|---|---|
+| `UtilityDrink.cs` (412) | `Cocktail/Domain/` 11 ไฟล์ |
+| `CocktailSystemManager.YarnInterface.cs` (391) | `Yarn/` 4 ไฟล์ |
+| `Enum_Class.cs` (126) | `E_Cocktail.*.cs` 4 ไฟล์ (partial class เดียวกัน) |
+
+**ย้ายที่อยู่ (GUID คงเดิม, git บันทึกเป็น pure rename)**
+
+`BTN_2_5D.cs` → `BaseInteractable/` · `IInputProvider.cs` → `Minigame/` ·
+`NPC_Base.cs`, `CharacterData.cs` → `NPC/`
+
+**แก้ไข 10 ไฟล์** — `CocktailSystemManager.cs`, `CocktailShakerData.cs`, `CocktailShaker.cs`,
+`DrinkIngredients.cs`, `IDrinkInterfaces.cs`, `SO_CocktailList.cs`, `S_Drink.cs`,
+`DebugCocktail.cs`, `IngredientButtonUI.cs`, `VisualizeCocktail.cs`
+
+**ลบ 2 ไฟล์** — `UtilityDrink.cs`, `CocktailSystemManager.YarnInterface.cs`
 
 **ไม่แตะเลย** — ทุกไฟล์ `.unity`, `.prefab`, `.asset` และ `.meta` ของไฟล์เดิม
+
+---
+
+## 10. เอกสารชุดนี้
+
+| ไฟล์ | ใช้เมื่อ |
+|---|---|
+| `Bar410_CocktailSystem_Refactor_Plan.md` | อยากรู้ว่าตัดสินใจอะไรไปบ้างและเพราะอะไร (§10, §13 Decision Log) |
+| `Bar410_CocktailSystem_Refactor_Report.md` | เอกสารนี้ — ทำอะไรไปบ้าง ผลตรวจสอบ ตัวเลข |
+| `Bar410_CocktailSystem_Refactor_Summary.md` | อ่านสรุปสั้น |
+| `Bar410_CocktailSystem_Architecture.md` | **หาว่าไฟล์ไหนทำอะไร / จะแก้อะไรต้องเปิดไฟล์ไหน** |
+| `Bar410_CocktailSystem_Manual_Setup.md` | ลงมือทำงานมือใน Unity |

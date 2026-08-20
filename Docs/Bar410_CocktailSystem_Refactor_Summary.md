@@ -3,6 +3,7 @@
 **Date:** 2026-08-21 · **Branch:** `GameLoop/main` · **Compile:** ✅ ไม่มี error
 **เอกสารเต็ม:** `Bar410_CocktailSystem_Refactor_Report.md`
 **งานมือใน Unity:** `Bar410_CocktailSystem_Manual_Setup.md`
+**หน้าที่ของแต่ละไฟล์:** `Bar410_CocktailSystem_Architecture.md`
 **แผน:** `Bar410_CocktailSystem_Refactor_Plan.md`
 
 ---
@@ -93,6 +94,16 @@ CompatibleGlass = None -> 20
 
 อยู่ใน `Bar410_CocktailSystem_Manual_Setup.md` เรียงตามความสำคัญ
 สองข้อแรก (สลับ repository, ยืนยัน `MaxTolerance`) ควรทำก่อนเล่นทดสอบ ที่เหลือเป็นการเก็บกวาด
+
+## เอกสารชุดนี้
+
+| ไฟล์ | ใช้เมื่อ |
+|---|---|
+| `..._Refactor_Plan.md` | อยากรู้ว่าตัดสินใจอะไรไปและเพราะอะไร (§13 Decision Log) |
+| `..._Refactor_Report.md` | รายละเอียดเต็ม — ทำอะไรไป ผลตรวจสอบ ตัวเลข |
+| `..._Refactor_Summary.md` | เอกสารนี้ |
+| `..._Architecture.md` | **ไฟล์ไหนทำอะไร · จะแก้อะไรต้องเปิดไฟล์ไหน** |
+| `..._Manual_Setup.md` | ลงมือทำงานมือใน Unity |
 
 ## ยังค้างในโค้ด
 
