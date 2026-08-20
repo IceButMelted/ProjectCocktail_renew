@@ -1,7 +1,5 @@
 using System.Collections;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.CompilerServices;
 using UnityEngine;
 using UnityEngine.UI;
 using Yarn.Unity;
@@ -28,10 +26,21 @@ public partial class CocktailSystemManager
     [SerializeField] private Post_It_Order _postItOrder;
 
     // ── Task / Yarn ──
-    private CharacterData _characterData;
+    // _characterData lives in CocktailSystemManager.cs, next to the Awake() that fills it.
     private bool _TaskDone = false;
-    private TypeOfCocktail _cocktailType = TypeOfCocktail.None;
     private Satisfaction _satisfaction = Satisfaction.None;
+
+    /// <summary>
+    /// Type of the drink actually served, written by <see cref="CalculateSatisfaction"/>.
+    ///
+    /// Replaces the old _servedType, which was declared and reset but never assigned a
+    /// real value anywhere in the project (bug B1) — so $type_of_cocktail always wrote 0
+    /// and every &lt;&lt;if $type_of_cocktail ...&gt;&gt; branch in Yarn was dead.
+    /// </summary>
+    private TypeOfCocktail _servedType = TypeOfCocktail.None;
+
+    /// <summary>Comparison against the ordered recipe, kept so pricing can tell Fail (a) from Fail (b).</summary>
+    private RecipeMatch _lastOrderMatch = RecipeMatch.None;
 
     // ── Yarn variable name constants ──
     private const string TaskDoneVariableName = "$task_done";
@@ -164,15 +173,18 @@ public partial class CocktailSystemManager
             Debug.LogWarning("[CocktailSystemManager] Empty name provided to Order_Cocktail_SpecificName.");
             return false;
         }
-        var match = _normalDrinks.FirstOrDefault(d => d.Name.Equals(Name, System.StringComparison.OrdinalIgnoreCase));
-        if (match == null)
+
+        // Searches normal + special (plan §4.7): a story cocktail has to be orderable by
+        // name even though it never appears in a random order.
+        if (!_lookup.TryGetByName(Name, out drink))
         {
             Debug.LogWarning($"[CocktailSystemManager] No cocktail found with name '{Name}'.");
             return false;
         }
-        drink = match;
+
         return true;
     }
+
     private bool ResolvePostItText(string text)
     {
         if (string.IsNullOrEmpty(text))
@@ -180,7 +192,16 @@ public partial class CocktailSystemManager
             Debug.LogWarning("[CocktailSystemManager] Empty text provided to SetPostItText.");
             return false;
         }
-        FindFirstObjectByType<Post_It_Order>()?.SetPostItOrderText("Order : "+text);
+
+        // Uses the serialized reference instead of a scene search (bug B3): the field was
+        // already assigned and the search ran on every single order.
+        if (_postItOrder == null)
+        {
+            Debug.LogWarning("[CocktailSystemManager] Post_It_Order is not assigned.", this);
+            return false;
+        }
+
+        _postItOrder.SetPostItOrderText("Order : " + text);
         return true;
     }
 
@@ -245,7 +266,7 @@ public partial class CocktailSystemManager
         if (SceneLoaderBridge.IsSilentReplay) return; // ponytail: skip — vars already restored from save
         _TaskDone = false;
         _satisfaction = Satisfaction.None;
-        _cocktailType = TypeOfCocktail.None;
+        _servedType = TypeOfCocktail.None;
 
         _dialogueRunner.VariableStorage.SetValue(SatisfactionVariableName, 0f);
         _dialogueRunner.VariableStorage.SetValue(TypeOfCocktailVariableName, 0f);
@@ -285,7 +306,7 @@ public partial class CocktailSystemManager
         {
             EnableButtonInYarn(false);
             _dialogueRunner.VariableStorage.SetValue(SatisfactionVariableName, (int)_satisfaction);
-            _dialogueRunner.VariableStorage.SetValue(TypeOfCocktailVariableName, (int)_cocktailType);
+            _dialogueRunner.VariableStorage.SetValue(TypeOfCocktailVariableName, (int)_servedType);
             _dialogueRunner.VariableStorage.SetValue(TaskDoneVariableName, true);
 
             //disable UI Post-it
@@ -354,7 +375,7 @@ public partial class CocktailSystemManager
             + "\n" + sep
             //+ FormatEnumRow(TaskDoneVariableName, _TaskDone.ToString(), yarnTaskDone.ToString(), yarnTaskDone.ToString())
             + FormatEnumRow(SatisfactionVariableName, _satisfaction.ToString(), yarnSatisfactionRaw.ToString("0"), yarnSatisfactionName)
-            + FormatEnumRow(TypeOfCocktailVariableName, _cocktailType.ToString(), yarnCocktailRaw.ToString("0"), yarnCocktailName)
+            + FormatEnumRow(TypeOfCocktailVariableName, _servedType.ToString(), yarnCocktailRaw.ToString("0"), yarnCocktailName)
             + "\n" + sep;
 
         Debug.Log(log);
@@ -368,9 +389,4 @@ public partial class CocktailSystemManager
     }
 
     public void YarnDebugVariables() => DebugVariableFromYarn();
-
-    //private void SetPostItText( string ordering) {
-    //    string CharacterName = _dialogueRunner;
-    //}
-
 }

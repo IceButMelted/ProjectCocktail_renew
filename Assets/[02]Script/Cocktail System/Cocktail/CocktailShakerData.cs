@@ -51,11 +51,6 @@ public class CocktailShakerData : MonoBehaviour, IIngredientReceiver, ITooltipPr
         ResetCocktailData();
     }
 
-    private void Update()
-    {
-
-    }
-
     private void OnDestroy()
     {
         // Runtime ScriptableObject instances must be explicitly destroyed.
@@ -77,75 +72,69 @@ public class CocktailShakerData : MonoBehaviour, IIngredientReceiver, ITooltipPr
 
     public void TryToAddAlcohol(BaseSpirit alcohol, int amount = 1)
     {
-        DrinkUtility.TryToAddAlcohol(CurrentCocktail, alcohol, amount);
-        
+        if (!DrinkBuilder.TryAddAlcohol(CurrentCocktail, alcohol, amount)) return;
         OnAddIngredient?.Invoke();
     }
 
     public void TryToAddLiqueur(Liqueur liqueur, int amount = 1)
     {
-        DrinkUtility.TryToAddLiqueur(CurrentCocktail, liqueur, amount);
-        
+        if (!DrinkBuilder.TryAddLiqueur(CurrentCocktail, liqueur, amount)) return;
         OnAddIngredient?.Invoke();
     }
 
     public void TryToAddMixer(Mixer mixer, int amount = 1)
     {
-        DrinkUtility.TryToAddMixer(CurrentCocktail, mixer, amount);
-        
+        if (!DrinkBuilder.TryAddMixer(CurrentCocktail, mixer, amount)) return;
         OnAddIngredient?.Invoke();
     }
 
     // ── Cocktail Identity Update ───────────────────────────
 
-    /// <summary>Derives name, price, and strength from current ingredients vs recipe list.</summary>
+    /// <summary>Most recent comparison against the recipe database. Refreshed by <see cref="UpdateCocktailInShaker"/>.</summary>
+    public RecipeMatch LastMatch { get; private set; } = RecipeMatch.None;
+
+    /// <summary>
+    /// Derives name, price, strength, glass and colour from the current ingredients.
+    ///
+    /// One recipe scan, one identity. The previous version called five Update* methods
+    /// that each re-scanned the whole database and depended on each other's ordering.
+    /// </summary>
     public void UpdateCocktailInShaker(IReadOnlyList<S_Drink> recipes)
     {
-        DrinkUtility.UpdateTypeOfAlcohol(CurrentCocktail, recipes);
-        DrinkUtility.UpdateName(CurrentCocktail, recipes);
-        DrinkUtility.UpdatePrice(CurrentCocktail, recipes);
-        DrinkUtility.UpdateColorInGlass(CurrentCocktail, recipes);
-        DrinkUtility.UpdateGlassType(CurrentCocktail, recipes);
+        LastMatch = DrinkDeviation.FindBestMatch(CurrentCocktail, recipes);
+        DrinkBuilder.ApplyRecipeIdentity(CurrentCocktail, LastMatch);
 
         SetColorAndGlass(glassWaterSlosh, CurrentCocktail);
-        
     }
 
-    /// <summary>Returns the best-matching sprite, or <paramref name="fallback"/> if none found.</summary>
+    /// <summary>Returns the matched recipe's sprite, or <paramref name="fallback"/> when nothing matched.</summary>
     public Sprite GetCurrentSprite(IReadOnlyList<S_Drink> recipes, Sprite fallback)
-        => DrinkUtility.GetCocktailSprite(CurrentCocktail, recipes) ?? fallback;
+    {
+        var match = DrinkDeviation.FindBestMatch(CurrentCocktail, recipes);
+        return match.IsRecognised ? (match.Recipe.CocktailSprite ?? fallback) : fallback;
+    }
 
     // ── Reset ──────────────────────────────────────────────
 
     /// <summary>Fires OnResetedCocktail for Inspector-wired listeners.</summary>
     public void ResetShaker() => OnResetedCocktail?.Invoke();
 
-    /// <summary>Clears all cocktail data to defaults. No UI side-effects.</summary>
+    /// <summary>Clears all cocktail data to defaults. No UI side-effects beyond re-enabling buttons.</summary>
     public void ResetCocktailData()
     {
-        CurrentCocktail.Name = string.Empty;
-        CurrentCocktail.AlcoholStrength = TypeOfCocktail.None;
-        CurrentCocktail.PreparationMethod = Method.None;
-        CurrentCocktail.AddIce = false;
-        CurrentCocktail.Price = 0f;
-        CurrentCocktail.AlcoholList = new List<AlcoholIngredient>();
-        CurrentCocktail.LiqueurList = new List<LiqueurIngredient>();
-        CurrentCocktail.MixerList = new List<MixerIngredient>();
-        CurrentCocktail.CompatibleGlass = GlassType.None;
+        DrinkBuilder.Clear(CurrentCocktail);
+        LastMatch = RecipeMatch.None;
 
-        CurrentCocktail.waterColorTop = Color.clear;
-        CurrentCocktail.waterColorBottom = Color.clear;
-        
-        glassWaterSlosh.waterLevel = 0f;
+        if (glassWaterSlosh != null) glassWaterSlosh.waterLevel = 0f;
 
         SetIngredientActive(true);
     }
 
     // ── Ingredient Button Helpers ──────────────────────────
 
-    /// <summary>Disable all ingredient buttons once the 10-part cap is reached.</summary>
+    /// <summary>Disable all ingredient buttons once the part cap is reached.</summary>
     public void CanIngredientActive()
-        => SetIngredientActive(DrinkUtility.GetTotalIngredient(CurrentCocktail) < 10);
+        => SetIngredientActive(DrinkQuery.HasRoom(CurrentCocktail));
 
     /// <summary>Enable or disable every ingredient button uniformly.</summary>
     public void SetIngredientActive(bool active)
@@ -200,7 +189,7 @@ public class CocktailShakerData : MonoBehaviour, IIngredientReceiver, ITooltipPr
 
     public string GetTooltipText()
     {
-        return DrinkUtility.GetCocktailIngredient(CurrentCocktail);
+        return DrinkFormatter.GetCocktailIngredient(CurrentCocktail);
     }
 
     [System.Serializable]

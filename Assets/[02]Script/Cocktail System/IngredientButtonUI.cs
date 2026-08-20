@@ -51,19 +51,7 @@ public class IngredientButtonUI : MonoBehaviour
             case ButtonAction.AddLiqueur: AddLiqueur(); break;
             case ButtonAction.SetShaking: SetShaking(); break;
             case ButtonAction.SetMixing: SetMixing(); break;
-            case ButtonAction.AddIce: AddIce(); break;
-            case ButtonAction.ResetShaker: ResetShaker(); break;
-        }
-    }
-
-    public void ActionBehavior() {
-        switch (_action) {
-            case ButtonAction.AddMixer: AddMixer(); break;
-            case ButtonAction.AddAlcohol: AddAlcohol(); break;
-            case ButtonAction.AddLiqueur: AddLiqueur(); break;
-            case ButtonAction.SetShaking: SetShaking(); break;
-            case ButtonAction.SetMixing: SetMixing(); break;
-            case ButtonAction.AddIce: AddIce(); break;
+            case ButtonAction.AddIce: AddIce(true); break;
             case ButtonAction.ResetShaker: ResetShaker(); break;
         }
     }
@@ -96,16 +84,8 @@ public class IngredientButtonUI : MonoBehaviour
     public void SetMixing()
         => _shaker.SetMethod(Method.Stirring);
 
-    /// <summary>Add ice to the shaker.</summary>
-    public void AddIce()
-    {
-        //_shaker.SetIceAddIce();
-        
-    }
-
-    public void AddIce(bool enable) { 
-        _shaker.ToggleIce(enable);
-    }
+    /// <summary>Add or remove ice. The no-argument overload had an empty body and did nothing.</summary>
+    public void AddIce(bool enable) => _shaker.ToggleIce(enable);
 
 
     /// <summary>Reset the shaker to empty state.</summary>

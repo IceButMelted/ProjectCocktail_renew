@@ -1,6 +1,6 @@
 using UnityEngine;
 using UnityEngine.UI;
-using static DrinkUtility;
+using static DrinkQuery;
 
 /// <summary>
 /// Updates fill bars to visually represent the current cocktail's alcohol / mixer ratio.
@@ -8,7 +8,7 @@ using static DrinkUtility;
 /// </summary>
 public class VisualizeCocktail : MonoBehaviour
 {
-    private const float MAX_PARTS = 10f;
+    private const float MAX_PARTS = DrinkQuery.MaxTotalParts;
 
     [Header("Fill Bars")]
     [SerializeField] private Image alcoholFill;

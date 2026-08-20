@@ -37,6 +37,13 @@ public interface IDrinkRepository
     /// Falls back to a completely random drink if none match.
     /// </summary>
     S_Drink GetRandom(TypeOfCocktail type);
+
+    /// <summary>
+    /// Case-insensitive lookup by drink name, for the "customer orders a specific drink"
+    /// Yarn modes (GDD §12 modes 1-2). Keeps name searching out of the Yarn layer, which
+    /// used to run its own LINQ query over a cached list.
+    /// </summary>
+    bool TryGetByName(string name, out S_Drink drink);
 }
 
 // ── Ingredient Receiver ────────────────────────────────────

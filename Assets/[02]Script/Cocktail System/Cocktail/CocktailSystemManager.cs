@@ -4,28 +4,40 @@ using static E_Cocktail;
 
 public partial class CocktailSystemManager : MonoBehaviour
 {
-
     // Inspector Fields
     [Header("Cocktail Repository")]
     [Tooltip("Assign an SO_CocktailList asset — or any IDrinkRepository implementation.")]
     [SerializeField] private SO_CocktailList _normalCocktailRepository;
-    [SerializeField] private SO_CocktailList _specialCocktailRepository;
 
-    [Header("Fallback")]
-    [SerializeField] private Sprite _failCocktailSprite;
+    [Tooltip("Optional. Story/unlock cocktails. Searchable by name, but never randomly ordered.")]
+    [SerializeField] private SO_CocktailList _specialCocktailRepository;
 
     [Header("Cocktail References")]
     public CocktailShakerData _cocktailShakerData;
     public CocktailShaker _cocktailShaker;
 
+    // ── Character data ─────────────────────────────────────
+    // Declared here, next to the Awake() that fills it. It is read from the Yarn partial,
+    // but a field written in one file and declared in another is a trap for the next reader.
+    private CharacterData _characterData;
 
-    // ── Repositories (as interfaces)
-    private IDrinkRepository _normalRepository;
+    // ── Repositories (as interfaces) ───────────────────────
+
+    /// <summary>Everything searchable by name — normal + special (plan §4.7).</summary>
+    private IDrinkRepository _lookup;
+
+    /// <summary>
+    /// Pool that random orders draw from. Normal recipes only: a special cocktail must not
+    /// surface before the story reaches it, so it is reachable by name and nothing else.
+    /// </summary>
+    private IDrinkRepository _randomPool;
+
+    private IReadOnlyList<S_Drink> _allDrinks;
 
     // ── Cocktail ──
-    private IReadOnlyList<S_Drink> _normalDrinks;
     private S_Drink _targetCocktail;
-    public S_Drink TargetCocktail { 
+    public S_Drink TargetCocktail
+    {
         get => _targetCocktail;
         set => _targetCocktail = value;
     }
@@ -36,32 +48,18 @@ public partial class CocktailSystemManager : MonoBehaviour
     {
         _characterData = GetComponent<CharacterData>();
         if (_characterData == null)
-            Debug.LogError("[CocktailSystemManager] CharacterData not found in Component.");
+            Debug.LogError("[CocktailSystemManager] CharacterData not found in Component.", this);
 
-        // Depend on the interface, not the concrete type.
-        _normalRepository = _normalCocktailRepository;
-    }
+        // Depend on the interfaces, not the concrete assets.
+        // The composite skips null sources, so an unassigned special list is harmless and
+        // an unassigned normal list reports itself instead of throwing later (bug B11).
+        _lookup = new CompositeDrinkRepository(_normalCocktailRepository, _specialCocktailRepository);
+        _randomPool = _normalCocktailRepository;
 
-    private void Start()
-    {
-        // Cache the read-only list once — no .ToDrink() copy needed;
-        // S_Drink IS the data now.
-        _normalDrinks = _normalRepository.GetDrinks();
-    }
+        _allDrinks = _lookup.GetDrinks();
 
-    private void Update()
-    {
-//#if UNITY_EDITOR
-//        if (Input.GetKeyDown(KeyCode.P))
-//        {
-//            UpdateCocktailInShaker();
-//            Debug.Log(DrinkUtility.GetCocktailInfo(_cocktailShakerData.CurrentCocktail));
-//        }
-//        if (Input.GetKeyDown(KeyCode.E)) { ServeDrink(); Debug.Log("[CocktailSystemManager] Served via E key."); }
-//        if (Input.GetKeyDown(KeyCode.A)) SetSatisfactionPerfect();
-//        if (Input.GetKeyDown(KeyCode.S)) SetSatisfactionAcceptable();
-//        if (Input.GetKeyDown(KeyCode.D)) SetSatisfactionFail();
-//#endif
+        if (_allDrinks == null || _allDrinks.Count == 0)
+            Debug.LogError("[CocktailSystemManager] No cocktail recipes loaded — assign a Cocktail Repository.", this);
     }
 
     /// <summary>
@@ -83,62 +81,78 @@ public partial class CocktailSystemManager : MonoBehaviour
     /// This method is USE ON BUTTON
     /// This method use to reset the cocktail in shaker.
     /// </summary>
-    public void ResetCocktail() {
+    public void ResetCocktail()
+    {
         _cocktailShakerData.ResetShaker();
         _cocktailShakerData.ResetCocktailData();
     }
 
     // Cocktail — Public API
+
     /// <summary>Picks a uniformly random cocktail as the current target.</summary>
     public S_Drink RandomCocktail()
     {
-        _targetCocktail = _normalRepository.GetRandom();
-        //TargetCocktail = _targetCocktail;
+        _targetCocktail = _randomPool != null ? _randomPool.GetRandom() : null;
         return _targetCocktail;
     }
 
     /// <summary>Picks a random cocktail of a specific type as the current target.</summary>
     public S_Drink RandomCocktail(TypeOfCocktail type)
     {
-        _targetCocktail = _normalRepository.GetRandom(type);
-        //TargetCocktail = _targetCocktail;
+        _targetCocktail = _randomPool != null ? _randomPool.GetRandom(type) : null;
         return _targetCocktail;
     }
 
     /// <summary>
-    /// Calculates how well the shaker's current cocktail matches the target.
-    /// Delegates comparison to DrinkUtility — no algorithm here.
+    /// GDD §18 — how satisfied the customer is with what is in the shaker right now.
+    ///
+    /// Deviation is measured against the ORDERED recipe; the identity of what the player
+    /// actually made comes from a separate best-match search. See the note on
+    /// <see cref="DrinkDeviation.MatchAgainst"/> for why.
     /// </summary>
     public Satisfaction CalculateSatisfaction()
-        => DrinkUtility.CalculateSatisfaction(_cocktailShakerData.CurrentCocktail, _targetCocktail);
+    {
+        var served = _cocktailShakerData.CurrentCocktail;
+
+        if (_targetCocktail == null || served == null)
+        {
+            Debug.LogWarning("[CocktailSystemManager] CalculateSatisfaction with no target or no drink.");
+            return Satisfaction.None;
+        }
+
+        var orderMatch = DrinkDeviation.MatchAgainst(served, _targetCocktail);
+        var identity = DrinkDeviation.FindBestMatch(served, _allDrinks);
+
+        TypeOfCocktail servedType = identity.IsRecognised
+            ? AlcoholClassifier.Resolve(identity.Recipe)
+            : AlcoholClassifier.Compute(served);
+        TypeOfCocktail orderedType = AlcoholClassifier.Resolve(_targetCocktail);
+
+        // Cached so the Yarn layer can write $type_of_cocktail with a real value (bug B1)
+        // and so pricing can tell Fail (a) from Fail (b) (GDD §18.1).
+        _servedType = servedType;
+        _lastOrderMatch = orderMatch;
+
+        return SatisfactionEvaluator.Evaluate(orderMatch, servedType, orderedType);
+    }
+
+    /// <summary>GDD §18.1 — what the customer pays for the drink just evaluated.</summary>
+    public float CalculatePayout(Satisfaction result) => PricingRules.Payout(_lastOrderMatch, result);
 
     public string GetTargetName() => _targetCocktail != null ? _targetCocktail.Name : string.Empty;
 
-    /// <summary>
-    /// Derives the identity of whatever is in the shaker and refreshes visuals.
-    /// Used during debug (P key) and can be called externally.
-    /// </summary>
-    public void UpdateCocktailInShaker()
-    {
-        //S_Drink current = _cocktailShakerData.CurrentCocktail;
-        //DrinkUtility.UpdateTypeOfAlcohol(current, _normalDrinks);
-        //DrinkUtility.UpdateName(current, _normalDrinks);
-        //DrinkUtility.UpdatePrice(current, _normalDrinks);
-        //DrinkUtility.UpdateColorInGlass(current, _normalDrinks);
-
-        _cocktailShakerData.UpdateCocktailInShaker(_normalDrinks);
-        //Sprite sprite = DrinkUtility.GetCocktailSprite(current, _normalDrinks)
-        //                ?? _failCocktailSprite;
-        //_cocktailShaker.SetBTNSprite(sprite, sprite, sprite);
-    }
+    /// <summary>Derives the identity of whatever is in the shaker and refreshes visuals.</summary>
+    public void UpdateCocktailInShaker() => _cocktailShakerData.UpdateCocktailInShaker(_allDrinks);
 
     /// <summary>Editor / debug helper — picks a random target without returning it.</summary>
     public void RandomCocktailForDebug() => RandomCocktail();
 
-
-
     [ContextMenu("DebugTargetCocktail")]
-    public void DebugTargetCocktail() => Debug.Log(DrinkUtility.GetCocktailInfo(TargetCocktail));
+    public void DebugTargetCocktail() => Debug.Log(DrinkFormatter.GetCocktailInfo(TargetCocktail));
+
     [ContextMenu("DebugCurrentCocktail")]
-    public void DebugCurrentCocktail() => Debug.Log(DrinkUtility.GetCocktailInfo(_cocktailShakerData.CurrentCocktail));
+    public void DebugCurrentCocktail() => Debug.Log(DrinkFormatter.GetCocktailInfo(_cocktailShakerData.CurrentCocktail));
+
+    [ContextMenu("DebugLastMatch")]
+    public void DebugLastMatch() => Debug.Log(DrinkFormatter.DescribeMatch(_lastOrderMatch));
 }

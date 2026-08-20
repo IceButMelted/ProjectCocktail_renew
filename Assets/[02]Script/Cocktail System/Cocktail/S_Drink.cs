@@ -36,7 +36,7 @@ public class S_Drink : ScriptableObject
     /// <summary>
     /// Alcohol classification.
     /// Set manually in the Inspector for recipe assets.
-    /// Written at runtime by DrinkUtility.UpdateTypeOfAlcohol()
+    /// Written at runtime by DrinkBuilder.ApplyRecipeIdentity()
     /// for the shaker's live instance.
     /// </summary>
     public TypeOfCocktail AlcoholStrength;

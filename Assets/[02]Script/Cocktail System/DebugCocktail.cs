@@ -19,7 +19,10 @@ public class DebugCocktail : MonoBehaviour
     private void Update()
     {
         _targetText.text  = "Target: " + _system.GetTargetName();
-        _currentText.text = "Shaker:\n" + _shaker.CurrentCocktail;
+
+        // Was "Shaker:\n" + _shaker.CurrentCocktail — string-concatenating a ScriptableObject
+        // printed its object name, never the drink's contents (bug B7).
+        _currentText.text = "Shaker:\n" + DrinkFormatter.GetCocktailInfo(_shaker.CurrentCocktail);
     }
 
     public void UpdateSatisfaction()

@@ -48,7 +48,7 @@ public class CocktailShaker : Interactable_2_5DObject
 
     /// <summary>Block click when locked or shaker is empty.</summary>
     protected override bool CanClick()
-        => _canClick && DrinkUtility.GetTotalIngredient(_data.CurrentCocktail) > 0;
+        => _canClick && DrinkQuery.GetTotalIngredient(_data.CurrentCocktail) > 0;
 
     // ── UI ─────────────────────────────────────────────────
 
@@ -85,5 +85,5 @@ public class CocktailShaker : Interactable_2_5DObject
     // ── Debug ──────────────────────────────────────────────
     [ContextMenu("Debug Clicked")]
     public void DebugClicked()
-        => Debug.Log("Shaker clicked!\n" + DrinkUtility.GetCocktailInfo(_data.CurrentCocktail));
+        => Debug.Log("Shaker clicked!\n" + DrinkFormatter.GetCocktailInfo(_data.CurrentCocktail));
 }

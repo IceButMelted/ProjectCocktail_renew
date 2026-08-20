@@ -30,7 +30,8 @@ public class E_Cocktail
     public enum Mixer
     {   None = 0,
         Soda,
-        CanberryJuice,
+        CranberryJuice,     // was "CanberryJuice" — spelling only; the value is unchanged
+                            // so every serialized asset and prefab keeps working.
         LimeJuice,
         LemonJuice,
         GrapefruitJuice,
