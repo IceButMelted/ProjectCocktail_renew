@@ -3,7 +3,8 @@
 **Date:** 2026-08-21
 **Branch:** `GameLoop/main`
 **Plan:** `Bar410_CocktailSystem_Refactor_Plan.md`
-**Scope executed:** Phase 0, Phase 1, Phase 2, §4.7 — **งาน pure C# ทั้งหมด ไม่มีการแก้ซีน prefab หรือ asset**
+**Scope executed:** Phase 0–8 (โค้ดทั้งหมด) — **ไม่มีการแก้ซีน prefab หรือ asset ใด ๆ**
+**งานมือที่เหลือ:** `Bar410_CocktailSystem_Manual_Setup.md`
 **Compile status:** ✅ ผ่าน ไม่มี error (ยืนยันผ่าน Unity MCP)
 
 ---
@@ -16,9 +17,17 @@
 |---|---|---|
 | 0 | ลบโค้ดตาย + แก้บั๊ก B1, B3, B6, B7, B8, B11 | ✅ เสร็จ |
 | 1 | แยก `UtilityDrink.cs` → `Cocktail/Domain/` 11 ไฟล์ + generic `IngredientMath` | ✅ เสร็จ |
-| 2 | ทำให้ตรง GDD — S1, S2, S3, S5, S7 เต็ม · S6, S8 บางส่วน | ⚠️ เสร็จบางส่วน |
+| 2 | ทำให้ตรง GDD — S1, S2, S3, S4, S5, S7 เต็ม · S6, S8 บางส่วน | ⚠️ เสร็จบางส่วน |
 | §4.7 | `CompositeDrinkRepository` (D1) | ✅ เสร็จ |
-| 3–8 | แยก component, `DrinkOrderContext`, Yarn adapter, bridges, ย้ายไฟล์, งาน data | ❌ ยังไม่ทำ — ดู §6 |
+| 3 | แยก `CocktailShakerData` → 5 component + `InteractableToggle` (B4) | ✅ โค้ดเสร็จ · ย้ายข้อมูลเป็นงานมือ |
+| 4 | `DrinkOrderContext` / `OrderService` / `SO_Customer` / scoring (B2, S10, S11) | ✅ โค้ดเสร็จ · สร้าง asset เป็นงานมือ |
+| 5 | แยก Yarn adapter 4 ไฟล์ + B5 + โหมดสั่งที่ 5 (S9) | ✅ เสร็จ |
+| 6 | `BarSetupBridge` + `CocktailFlowBridge` | ✅ โค้ดเสร็จ · ใส่ในซีนเป็นงานมือ |
+| 7 | ย้ายไฟล์ 4 ไฟล์ + แยก `Enum_Class` เป็น partial 4 ไฟล์ | ✅ เสร็จ |
+| 8 | งาน data — เขียน validator แทน (ข้อมูลจริงเป็นการตัดสินใจของ design) | ⚠️ validator เสร็จ · กรอกข้อมูลเป็นงานมือ |
+
+**Phase 3–8 ถูกเขียนโดยยึดหลักเดียว: ของเดิมต้องไม่พัง** ทุก class ที่ซีนอ้างถึงยังอยู่ครบและยังมี
+เมธอดเดิมทุกตัวที่ UnityEvent ผูกไว้ ส่วนที่ต้องทำมือรวมไว้ใน `Bar410_CocktailSystem_Manual_Setup.md`
 
 **บั๊กที่แก้แล้ว 6 ตัว · ช่องว่าง GDD ที่ปิดแล้ว 5 ข้อเต็ม + 2 ข้อบางส่วน · ไฟล์ที่ยาวเกิน 200 บรรทัดเหลือ 1 ไฟล์**
 
@@ -180,43 +189,179 @@ DrinkBuilder.ApplyRecipeIdentity(CurrentCocktail, LastMatch);
 
 ---
 
-## 6. สิ่งที่ **ยังไม่ได้ทำ**
+## 5b. Phase 3–8
 
-### 6.1 Phase ที่เหลือ
+### 5b.1 Phase 3 — ผ่า `CocktailShakerData` ออกเป็น 5 component
 
-| Phase | งาน | ทำไมยังไม่ทำ |
+`Cocktail/Shaker/` :
+
+| ไฟล์ | หน้าที่เดียวของมัน |
+|---|---|
+| `ShakerContents.cs` | เครื่องดื่มที่อยู่ในแก้ว — วงจรชีวิต, เติมวัตถุดิบ, method/ice, reset |
+| `ShakerVisualPresenter.cs` | สี + sprite แก้ว + `WaterSlosh` |
+| `IngredientButtonGroup.cs` | roster ของ object ที่เปิด/ปิดพร้อมกัน (ใช้ 2 ตัว: วัตถุดิบ / หนังสือ) |
+| `ShakerPanelController.cs` | สิทธิ์เปิดแผง Method / AddIce / Serve |
+| `ShakerTooltip.cs` | ข้อความ tooltip |
+| `InteractableToggle.cs` | จุดเดียวที่รู้ว่า "เปิดให้ผู้เล่นกดได้" แปลว่าต้องแตะ component ไหนบ้าง |
+| `SO_GlassVisualTable.cs` | ตารางลุคแก้วเป็น asset (D5) |
+
+**B4 หายไปจริง** — เดิมมีลูป `TryGetComponent` 3 ก๊อปที่แตะ component คนละชุด
+(`SetIngredientActive` 6 ชนิด, `SetBookUiActive` 7 ชนิด, `EnableButtonInYarn` 4 ชนิด และตัวหลัง
+รันต่อจากตัวแรกทันที ทำให้ปุ่มถูกเซ็ตสองรอบด้วยนิยามที่ต่างกัน) ตอนนี้เหลือ `InteractableToggle.Apply`
+ตัวเดียว
+
+**`CocktailShakerData` ยังอยู่ แต่ไม่มี logic เหลือแล้ว** — เป็น shim ที่ถือข้อมูล serialize เดิมของ
+ซีนไว้ ส่งต่อให้ component จริงตอน `Awake` (สร้างให้อัตโนมัติถ้ายังไม่มี พร้อมป้อนค่าจากฟิลด์เดิม)
+แล้ว forward ทุกเมธอด **จึงไม่มีซีนไหนพัง และไม่มีข้อมูลไหนหาย**
+ตารางลุคแก้วแบบเก่าถูกแปลงเป็นตารางชั่วคราวตอนรัน พร้อม warning ชี้ไปคู่มือ
+
+`CocktailShaker` ก็ทำแบบเดียวกัน — flag แผง UI ย้ายไป `ShakerPanelController`
+ส่วน `SetCanShow*` / `ToggleUI` ที่ซีนผูกไว้ 19 จุดยังอยู่ครบและ forward ต่อ
+
+### 5b.2 Phase 4 — `DrinkOrderContext` และ session layer
+
+`Cocktail/Session/` :
+
+| ไฟล์ | หน้าที่ |
+|---|---|
+| `DrinkOrderContext.cs` | สถานะออเดอร์ทั้งวงจร — ใครสั่ง, สั่งอะไร, ผลเป็นยังไง, ได้เงินเท่าไร |
+| `OrderService.cs` | GDD §12 ทั้ง 5 โหมด + การสุ่มตาม §19.2 |
+| `DrinkScoringService.cs` | รัน §17–18 ครั้งเดียวตอนเสิร์ฟ แล้วเขียนผลลง context |
+| `ICustomerPreferences.cs` | abstraction ของ "ลูกค้าคนนี้ชอบอะไร" |
+| `SO_Customer.cs` | `SO_Customer` + `SO_CustomerRoster` ตาม GDD §19.1 |
+
+**นี่คือ `DrinkOrderContext` ที่ `Bar410_StateMachine_Implementation.md` §8 คำถามข้อ 4 ขอไว้** และ
+มันดูดเอา state 5 ตัวที่เคยกระจายอยู่บน `CocktailSystemManager` เข้ามารวมกัน (`_targetCocktail`,
+`_TaskDone`, `_satisfaction`, `_cocktailType`, `IsWaitingForTask`)
+
+| แก้ | อะไร |
+|---|---|
+| **B2** | `Order_Cocktail_OutName` กับ `OutDescription` เคยสุ่มใหม่ทั้งคู่ — เรียกติดกันได้คนละแก้ว ตอนนี้ถ้ามีออเดอร์ค้างของลูกค้าคนเดิมที่ยังไม่ถูกให้คะแนน จะใช้ตัวเดิม |
+| **S10** | §19.2 — รวมสูตรที่เข้าเกณฑ์ทั้งหมดก่อนแล้วค่อยสุ่ม uniform แทนการสุ่มประเภทก่อน |
+| **S11** | `SO_Customer` / `SO_CustomerRoster` · `CharacterData` implement `ICustomerPreferences` ต่อไปได้ |
+| **§18.2** | `PricingRules.RelationshipDelta` + `YarnVariableSync.ApplyRelationshipDelta` — เดิมไม่มีเลย |
+
+### 5b.3 Phase 5 — Yarn adapter
+
+`CocktailSystemManager.YarnInterface.cs` (391 บรรทัด) → 4 ไฟล์:
+
+| ไฟล์ | เนื้อหา |
+|---|---|
+| `Yarn/YarnVariableSync.cs` | **plain class** — จุดเดียวที่รู้ชื่อตัวแปร Yarn ทั้ง 3 ตัว |
+| `Yarn/CocktailSystemManager.YarnTask.cs` | commands: `wait_for_task`, `wait_scene`, `Can_End_Shift`, `Enable_InteractableObject`, `Reset_Variable` |
+| `Yarn/CocktailSystemManager.YarnOrders.cs` | functions สั่งเครื่องดื่ม + โหมด 5 (S9) |
+| `Yarn/CocktailSystemManager.YarnDebug.cs` | ContextMenu + ตาราง snapshot, `#if UNITY_EDITOR` |
+
+**ยังเป็น `partial class` เดียวกัน** — Yarn resolve instance command ด้วยชื่อ GameObject ดังนั้น
+การแยกเป็น MonoBehaviour คนละตัวจะทำให้ `<<wait_for_task SystemGame>>` เสี่ยงพัง แยกเป็นไฟล์
+partial ได้ประโยชน์เรื่องขนาดไฟล์ครบโดยไม่มีความเสี่ยงเลย
+
+**B5 แก้แล้ว** — เดิม `UpdateVariableInYarn()` เป็นทั้ง predicate ของ `WaitUntil` และ command
+ที่เขียนตัวแปร 3 ตัว ปิดปุ่ม และซ่อน Post-It ทุกครั้งที่คืน true ตอนนี้แยกเป็น
+`IsTaskComplete` (query บริสุทธิ์) กับ `CommitTaskResult()` (เรียกครั้งเดียว)
+
+**S9 เพิ่มแล้ว** — `<<order_by_type>>`, `<<order_customer>>` และ function
+`order_name()` / `order_flavor()` / `order_type()` / `order_satisfaction()`
+**ชื่อ command/function เดิมทั้ง 4 ตัวไม่ถูกแตะ** `.yarn` ที่มีอยู่ไม่ต้องแก้
+
+### 5b.4 Phase 6 — HSM bridges
+
+| ไฟล์ | เกาะกับ | ทำอะไร |
 |---|---|---|
-| 3 | แยก `CocktailShakerData` → 5 component | ต้องแก้ซีน/prefab **5 ที่** และผูก inspector คืนด้วยมือ ทำจากที่นี่แล้วยืนยันไม่ได้ว่าไม่พัง |
-| 4 | `DrinkOrderContext` / `OrderService` / `SO_Customer` (S10, S11) | ต้องผูก reference ในซีน |
-| 5 | แยก Yarn adapter 4 ไฟล์ + B5 + โหมดสั่งที่ 5 (S9) | ต้องแก้ซีน และ `CocktailYarnCommands` ต้องอยู่บน GameObject ชื่อ `SystemGame` เป๊ะ |
-| 6 | `BarSetupBridge` + `CocktailFlowBridge` | ต้องผูกใน `[GameLoop]` |
-| 7 | ย้ายไฟล์ + แยก `Enum_Class` เป็น partial | ต้องย้ายผ่าน Unity `MoveAsset` เพื่อรักษา `.meta` GUID |
-| 8 | งาน data (G1, G2, S12) | เป็นงานกรอกข้อมูลใน Inspector ไม่ใช่งานโค้ด |
+| `Level 1 - Game Loop/BarSetupBridge.cs` | `PrepareBarPhase` | Enter: ล็อกวัตถุดิบ เปิดหนังสือ ล้างแก้ว ปลดล็อกการวาง · Exit: ล็อกการวาง แล้ว**ยึด roster ของวันนั้นจากของที่ผู้เล่นวางจริง** |
+| `Level 3 - Prepare Drinks/CocktailFlowBridge.cs` | `PrepareDrinksPhase`, `AddIngredientState`, `ServeState` | `PrepareDrinks.Entered` ล้างแก้ว (บังคับกติกา HSM §3.1) · `AddIngredient` เปิด/ปิดปุ่ม · `Serve.Exited` คิดคะแนน |
 
-**ช่องว่าง GDD ที่ยังเปิดอยู่:** S9, S10, S11, S12, S13 · S14/S15 เลื่อนโดยเจตนา (D4/D1)
+**ไม่ต้องแก้ไฟล์ใดใน `Hierarchical State Machine/Base/` หรือ state class เลยแม้แต่บรรทัดเดียว**
+เพราะ `StateBase` เปิด `Entered`/`Exited` ไว้อยู่แล้ว — เป็นไปตามที่แผน §6 คาดไว้
 
-### 6.2 ⚠️ สิ่งที่ต้องทำด้วยมือใน Unity
+`Serve.Exited` ปิด TODO ที่ `ServeState.cs:29` และ `Bar410_StateMachine_Implementation.md` §3.2
+ทิ้งไว้ · มี guard `if (Order.IsScored) return;` กันการคิดคะแนนซ้ำกับปุ่ม Serve เดิม
 
-1. **`CocktailSystem.prefab` มี OnClick ที่ชี้ไปเมธอดที่ถูกลบ** — ปุ่มหนึ่งเรียก `AddIce()`
-   แบบไม่มี argument (`m_Mode: 1`) ซึ่งถูกลบเพราะ body ว่าง (ไม่เคยทำอะไรอยู่แล้ว)
-   ให้เปลี่ยนไปเรียก `AddIce(bool)` แทน
-   *ผลกระทบตอนนี้: ไม่มี* — prefab นี้ไม่ถูกอ้างถึงจากซีนไหนเลย (orphan)
-   ในซีนจริงทั้งหมดใช้ `m_Mode: 6` ซึ่งชี้ไป `AddIce(bool)` อยู่แล้ว จึงไม่กระทบ
+`CocktailFlowBridge` **จงใจไม่แตะ minigame** — เป็นงานของ `MinigameFlowBridge` ตาม
+`Bar410_Minigame_Integration_Plan.md` §3.3 ทำทั้งคู่จะกลายเป็นมีเจ้าของสองคน
+เตรียม `ShakerContents.RequiredMinigame` ไว้ให้ bridge นั้นเรียกแล้ว
 
-2. **ซีนใช้ชุดสูตรคนละชุด** — `New Drag Drop System.unity` และ `GamePlayScene.unity` ชี้ไป
-   `Demo_Normal_Cocktail` (6 สูตร) ส่วน `GamePlayScene 1.unity` ใช้ `Normal_Cocktail` (26 สูตร)
-   **ต้องสลับเป็น `Normal_Cocktail` ก่อนเล่นทดสอบ D7** ไม่งั้นค่าที่ยืนยันจะใช้ไม่ได้
+### 5b.5 Phase 7 — ย้ายไฟล์
 
-3. **`_specialCocktailRepository` ยังว่าง** — ผูก `Specia_Cocktail.asset` เข้าไปได้เลยถ้าต้องการ
-   (ตอนนี้ asset เองก็ยังไม่มีสูตร จึงยังไม่ต่างกัน)
+ย้ายด้วย `git mv` พร้อม `.meta` ทุกครั้ง → git บันทึกเป็น pure rename, GUID ไม่เปลี่ยน,
+prefab/scene ที่อ้างถึงไม่กระทบ
+
+| จาก | ไป |
+|---|---|
+| `Cocktail System/BTN_2_5D.cs` | `BaseInteractable/` |
+| `Cocktail System/IInputProvider.cs` | `Minigame/` |
+| `Cocktail System/NPC_Base.cs` | `NPC/` |
+| `Cocktail System/CharacterData.cs` | `NPC/` |
+
+`Enum_Class.cs` แยกเป็น 4 ไฟล์ตามโดเมน แต่ **ยังเป็น `partial class E_Cocktail` เดียวกัน** —
+`using static E_Cocktail;` ใน 20 ไฟล์ไม่ต้องแตะ
+
+### 5b.6 Phase 8 — validator แทนการกรอกข้อมูล
+
+`Assets/Editor/CocktailDataValidator.cs` → เมนู **`Bar410 > Validate Cocktail Data`**
+ไล่ทุก `S_Drink` และทุก `SO_GlassVisualTable` แล้วรายงานว่าอะไรขาด **ไม่แต่งข้อมูลให้เอง**
+เพราะแก้วไหนคู่กับสูตรไหนเป็นการตัดสินใจของ design
+
+ผลรันจริง:
+
+```
+assets=26   Σ ingredients != 10 -> 0   CompatibleGlass=None -> 20
+glass: Hi_ball x3, Rocks x2, Magrita x1, None x20
+สูตรซ้ำกันเป๊ะ: ไม่มี
+```
+
+**ข่าวดี: S12 ผ่านอยู่แล้ว** — ทั้ง 26 สูตรรวมได้ 10 หน่วยพอดีตาม GDD §15 และไม่มีสูตรซ้ำ
+เหลือแค่ G2 (20 ใบไม่มี `CompatibleGlass`) ซึ่งกู้อัตโนมัติไม่ได้เพราะข้อมูลเดิมหายไปแล้วจริง ๆ
+
+### 5b.7 ผลข้างเคียงของ S3 ที่วัดได้จริง
+
+ไล่ดูทั้ง 26 สูตรแล้ว มี **2 ใบที่มีแอลกอฮอล์ 5 หน่วยพอดี** คือ `23_JungleBird` และ `44_Siesta`
+ทั้งสองใบ **design กำหนดไว้เป็น `LowAlcohol` อยู่แล้ว** ในขณะที่โค้ดเดิมคำนวณได้ `HighAlcohol`
+
+→ การแก้ S3 ตาม GDD ทำให้ค่าที่คำนวณตรงกับที่ design เขียนไว้ **ยืนยันว่า GDD §15.2 ถูก และโค้ดเดิมผิด**
+
+---
+
+
+## 6. สิ่งที่ยังเหลือ
+
+### 6.1 งานมือใน Unity — `Bar410_CocktailSystem_Manual_Setup.md`
+
+โค้ดครบแล้ว **เกมเล่นได้เหมือนเดิมโดยไม่ต้องทำอะไรเลย** เพราะทุกจุดมี compatibility shim
+ที่เหลือคือเก็บกวาดให้สถาปัตยกรรมใหม่ทำงานเต็มตัว เรียงตามความสำคัญ:
+
+| # | งาน | จำเป็นแค่ไหน |
+|---|---|---|
+| 1 | สลับซีนจาก `Demo_Normal_Cocktail` (6 สูตร) → `Normal_Cocktail` (26) | **ก่อนเล่นทดสอบ D7** |
+| 2 | ยืนยันค่า `MaxTolerance` (D7) | **ก่อนส่งงาน** |
+| 3 | ลบ component Missing Script ของ `BookUI` 5 จุด | เก็บกวาด — ไม่กระทบบิลด์ |
+| 4 | กรอก `CompatibleGlass` 20 สูตร (G2) | แก้วไม่เปลี่ยนลุคถ้าไม่ทำ |
+| 5 | สร้าง `SO_GlassVisualTable` แล้วผูกทุกซีน (D5) | shim รองรับไปก่อนได้ |
+| 6 | ใส่ component ใหม่ 5 ตัวด้วยมือ แล้วลบ `CocktailShakerData` | shim รองรับไปก่อนได้ |
+| 7 | สร้าง `SO_Customer` + roster (S11) | `CharacterData` ใช้ต่อได้ |
+| 8 | ใส่ `BarSetupBridge` + `CocktailFlowBridge` ใน `[GameLoop]` | **flow ยังไม่ขับ Cocktail System จนกว่าจะทำ** |
+
+### 6.2 ช่องว่าง GDD ที่ยังเปิด
+
+| # | GDD | ติดอะไร |
+|---|---|---|
+| **S6** | §17.3 Fail(b) → ชื่อสุ่ม | ยังไม่มีคลังชื่อที่ designer เขียน ตอนนี้ใช้ `"???"` |
+| **S8** | §21.1 Fail(b) → `BlendIngredientColors` | ไม่มีข้อมูลสีต่อวัตถุดิบใน data model เลย |
+| **S13** | §10/§21 ผู้เล่นเลือกแก้วเอง | ยังไม่มี UI เลือกแก้ว |
+| S14 | §16 `MixMethod.Build` | เลื่อนตาม D4 — รอ Building minigame |
+| S15 | §16 `unlockedByDefault` | เลื่อนตาม D1 — ใช้ระบบ 2 asset แทน |
+
+S12 **ปิดแล้วโดยไม่ต้องแก้อะไร** — validator ยืนยันว่าทั้ง 26 สูตรรวมได้ 10 พอดีอยู่แล้ว
+
+ทั้งหมดมี `TODO(design, ...)` กำกับไว้ในโค้ด
 
 ### 6.3 ⚠️ เกมจะยากขึ้นทันทีที่รัน
 
-การแก้ S1 เปลี่ยนจาก "นับชนิดที่ผิด" เป็น "รวมส่วนต่าง" — **เครื่องดื่มจำนวนมากที่เคยได้
-`Acceptable` จะกลายเป็น `Fail` ทันที** ตัวอย่างที่รันไว้ใน §2: แก้วที่เคยได้ 2 คะแนน (ผ่าน)
-ตอนนี้ได้ 12 (ตก) ค่า `MaxTolerance = 3` ยังไม่ผ่านการเล่นทดสอบ — ดู D7 ในแผน §10.3
+การแก้ S1 เปลี่ยนจาก "นับชนิดที่ผิด" เป็น "รวมส่วนต่าง" — เครื่องดื่มจำนวนมากที่เคยได้
+`Acceptable` จะกลายเป็น `Fail` ค่า `MaxTolerance = 3` ยังไม่ผ่านการเล่นทดสอบ (D7)
 
 ---
+
 
 ## 7. ตัวเลขจริง (ไม่ใช่ตัวเลขที่แผนประมาณไว้)
 
@@ -226,28 +371,33 @@ DrinkBuilder.ApplyRecipeIdentity(CurrentCocktail, LastMatch);
 | การสแกนสูตรต่อการอัปเดต shaker 1 ครั้ง | 5 | **1** |
 | จุดที่ hardcode `errors <= 2` | 6 | **1** const |
 | จุดที่ hardcode เพดาน `10` | 2 | **1** const |
-| ไฟล์ที่ยาวเกิน 200 บรรทัด | 3 | **1** (`YarnInterface.cs` — Phase 5) |
+| ไฟล์ที่ยาวเกิน 200 บรรทัด | 3 | **1** (`CocktailShakerData.cs` — shim ที่จะถูกลบหลังงานมือ) |
+| ไฟล์ที่ยาวเกิน 150 บรรทัด | 4 | **3** |
+| จำนวนไฟล์ใน Cocktail System | 17 | 40 |
+| ลูป TryGetComponent เปิด/ปิด interactable | 3 ก๊อป (คนละชุด component) | **1** (`InteractableToggle`) |
 | `FindFirstObjectByType` ต่อการสั่ง 1 ครั้ง | 1 | **0** |
-| กติกา GDD ที่ implement ไม่ตรง | 14 | **7** (5 ปิดเต็ม, 2 ปิดบางส่วน) |
+| กติกา GDD ที่ implement ไม่ตรง | 15 | **5** (S6, S8, S13 บางส่วน/ค้าง · S14, S15 เลื่อนโดยเจตนา) |
 
 ### บรรทัดโค้ด — เพิ่มขึ้น ไม่ได้ลดลง
 
-| | code-only |
-|---|---:|
-| `UtilityDrink.cs` (เดิม) | 262 |
-| `Domain/` 11 ไฟล์ (ใหม่) | **329** |
+| | ก่อน | หลัง |
+|---|---:|---:|
+| จำนวนไฟล์ | 17 | 40 |
+| บรรทัดรวม (รวมคอมเมนต์) | 2,104 | 3,270 |
+| ไฟล์ยาวสุด | 412 (`UtilityDrink.cs`) | 239 (`CocktailShakerData.cs` — shim ชั่วคราว) |
 
-**แผนประมาณไว้ว่าจะลดลงเหลือ ~1,550 บรรทัด — รอบนี้ไม่ถึง และไม่ควรถึง** เหตุผล 2 ข้อ:
+**แผนประมาณไว้ว่าจะลดลงเหลือ ~1,550 บรรทัด — ไม่ถึง และไม่ควรถึง** สามเหตุผล:
 
-1. **Phase 2 เพิ่มกติกาที่ไม่เคยมีในโค้ด** — `PricingRules` (§18.1 + §18.2),
-   `SatisfactionEvaluator` เคส 3/4, `RecipeMatch`, `DrinkColorBlender`, `MatchAgainst`
-   ทั้งหมดนี้คือ GDD ที่โค้ดไม่เคย implement บรรทัดที่เพิ่มคือฟีเจอร์ที่ขาด ไม่ใช่ความอ้วน
-2. **การลดบรรทัดก้อนใหญ่อยู่ใน Phase 3–5** ซึ่งยังไม่ได้ทำ — `CocktailSystemManager` หายทั้งคลาส,
-   ย้าย debug block ~90 บรรทัดออกไป `#if UNITY_EDITOR`, แยก `CocktailShakerData`
+1. **เพิ่มกติกา GDD ที่โค้ดไม่เคยมี** — `PricingRules` (§18.1 + §18.2), `SatisfactionEvaluator`
+   เคส 3/4, `RecipeMatch`, `DrinkColorBlender`, `OrderService` โหมด 5, `DrinkOrderContext`
+   บรรทัดพวกนี้คือฟีเจอร์ที่ขาด ไม่ใช่ความอ้วน
+2. **`CocktailShakerData` และ `CocktailShaker` ยังอยู่ในฐานะ shim** — บรรทัดที่แผนคิดว่าจะหาย
+   จะหายจริงหลังงานมือใน §6.1 ข้อ 6 เสร็จ
+3. **คอมเมนต์อธิบายเหตุผล** — ทุกที่ที่โค้ดต่างจาก GDD หรือแก้บั๊กเก่ามีคำอธิบายกำกับว่าทำไม
+   เพื่อไม่ให้คนถัดไป "แก้กลับ" โดยไม่รู้
 
-ตัวเลขที่ดีขึ้นจริงในรอบนี้คือ **ความซ้ำ, จำนวนการสแกน และความตรงกับ GDD** ไม่ใช่จำนวนบรรทัด
-
----
+ตัวเลขที่ดีขึ้นจริงคือ **ความซ้ำ (9 เมธอด → 3, ลูป 3 ก๊อป → 1), จำนวนการสแกน (5 → 1),
+ขนาดไฟล์สูงสุด (412 → 239) และความตรงกับ GDD (ไม่ตรง 15 → 5)** ไม่ใช่จำนวนบรรทัด
 
 ## 8. หมายเหตุ / เรื่องที่ต้องตัดสินเพิ่ม
 
