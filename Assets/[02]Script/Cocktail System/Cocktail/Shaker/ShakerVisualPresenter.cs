@@ -39,15 +39,15 @@ public class ShakerVisualPresenter : MonoBehaviour
     private void OnEnable()
     {
         if (_contents == null) return;
-        _contents.IdentityResolved += OnIdentityResolved;
-        _contents.Cleared += OnCleared;
+        _contents.IdentityResolved.AddListener(OnIdentityResolved);
+        _contents.Cleared.AddListener(OnCleared);
     }
 
     private void OnDisable()
     {
         if (_contents == null) return;
-        _contents.IdentityResolved -= OnIdentityResolved;
-        _contents.Cleared -= OnCleared;
+        _contents.IdentityResolved.RemoveListener(OnIdentityResolved);
+        _contents.Cleared.RemoveListener(OnCleared);
     }
 
     // ── Fill animation passthrough (bound from UnityEvents) ──

@@ -1,5 +1,7 @@
+using System;
 using UnityEngine;
 using Yarn.Unity;
+using static E_Cocktail;
 
 namespace Bar410.GameFlow
 {
@@ -105,6 +107,32 @@ namespace Bar410.GameFlow
         /// <summary>Drink finished. Exits Prepare Drinks → step 3 Garnish.</summary>
         public void DrinkComplete() => _gameLoop.OpenBar.PrepareDrinks.Minigame.CompleteDrink();
 
+        // ── Level 3 · Which minigame step 2.2 runs ─────────
+        // Selection only — none of these transition. MinigameFlowBridge reads the choice
+        // when 2.2 is entered, and falls back to the shaker's method if nothing was selected.
+
+        /// <summary>Picks the minigame for the next entry into 2.2.</summary>
+        public void SelectMinigame(Enum_MiniGameType type)
+            => _gameLoop.OpenBar.PrepareDrinks.Minigame.SelectType(type);
+
+        /// <summary>String overload for Yarn. An unrecognised name warns and changes nothing.</summary>
+        public void SelectMinigame(string type)
+        {
+            if (TryParseMinigame(type, out var parsed)) SelectMinigame(parsed);
+        }
+
+        /// <summary>No-arg wrappers — Button.OnClick cannot pass an enum.</summary>
+        public void SelectShaking() => SelectMinigame(Enum_MiniGameType.Shaking);
+
+        public void SelectStiring() => SelectMinigame(Enum_MiniGameType.Stiring);
+
+        /// <summary>Select the minigame and advance 2.1 → 2.2 in one call.</summary>
+        public void IngredientAdded(string minigameType)
+        {
+            SelectMinigame(minigameType);
+            IngredientAdded();
+        }
+
         // ── Yarn Commands ──────────────────────────────────
         // Static so .yarn can call them without naming a target GameObject.
 
@@ -129,8 +157,23 @@ namespace Bar410.GameFlow
         [YarnCommand("flow_remake_drink")]
         public static void Yarn_RemakeDrink() => Resolve()?.RemakeDrink();
 
+        /// <summary>
+        /// <c>&lt;&lt;flow_ingredient_added&gt;&gt;</c> keeps the previously selected minigame;
+        /// <c>&lt;&lt;flow_ingredient_added Shaking&gt;&gt;</c> selects one on the way through.
+        /// </summary>
         [YarnCommand("flow_ingredient_added")]
-        public static void Yarn_IngredientAdded() => Resolve()?.IngredientAdded();
+        public static void Yarn_IngredientAdded(string minigameType = "")
+        {
+            var flow = Resolve();
+            if (flow == null) return;
+
+            if (!string.IsNullOrWhiteSpace(minigameType)) flow.SelectMinigame(minigameType);
+            flow.IngredientAdded();
+        }
+
+        /// <summary>Selects the minigame without transitioning: <c>&lt;&lt;flow_minigame Shaking&gt;&gt;</c>.</summary>
+        [YarnCommand("flow_minigame")]
+        public static void Yarn_SelectMinigame(string type) => Resolve()?.SelectMinigame(type);
 
         [YarnCommand("flow_another_ingredient")]
         public static void Yarn_AnotherIngredient() => Resolve()?.AnotherIngredient();
@@ -162,7 +205,55 @@ namespace Bar410.GameFlow
                 : loop.OpenBar.Sub.Current.ToString();
         }
 
+        /// <summary>Which minigame 2.2 will run: "Shaking" / "Stiring" / "Building" / "None".</summary>
+        [YarnFunction("flow_minigame_type")]
+        public static string Yarn_MinigameType()
+        {
+            var flow = Resolve();
+            return flow == null
+                ? string.Empty
+                : flow._gameLoop.OpenBar.PrepareDrinks.Minigame.PendingType.ToString();
+        }
+
+        /// <summary>
+        /// How the last run of 2.2 ended: "Completed" / "Cancelled", or "" before the first run.
+        /// Spelled like <see cref="MinigameOutcome"/> on purpose — one vocabulary across both layers.
+        /// </summary>
+        [YarnFunction("flow_minigame_result")]
+        public static string Yarn_MinigameResult()
+        {
+            var flow = Resolve();
+            var outcome = flow?._gameLoop.OpenBar.PrepareDrinks.Minigame.LastOutcome;
+            return outcome?.ToString() ?? string.Empty;
+        }
+
         // ── Internal ───────────────────────────────────────
+
+        /// <summary>
+        /// Accepts the enum's own spelling plus the two names designers actually write:
+        /// "Stirring" (correct English) and "Mixing" (the component's name) both mean Stiring.
+        /// An unrecognised name warns and leaves the current selection alone — it never
+        /// silently selects None, which would be indistinguishable from "no minigame".
+        /// </summary>
+        private static bool TryParseMinigame(string raw, out Enum_MiniGameType type)
+        {
+            type = Enum_MiniGameType.None;
+            if (string.IsNullOrWhiteSpace(raw)) return false;
+
+            var name = raw.Trim();
+
+            if (name.Equals("Mixing", StringComparison.OrdinalIgnoreCase) ||
+                name.Equals("Stirring", StringComparison.OrdinalIgnoreCase))
+            {
+                type = Enum_MiniGameType.Stiring;
+                return true;
+            }
+
+            if (Enum.TryParse(name, true, out type)) return true;
+
+            Debug.LogWarning($"[GameFlowCommands] '{raw}' is not a minigame type — selection unchanged.");
+            return false;
+        }
 
         private static GameFlowCommands Resolve()
         {

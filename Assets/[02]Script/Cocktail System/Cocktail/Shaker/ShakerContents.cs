@@ -13,24 +13,35 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using static E_Cocktail;
 
 public class ShakerContents : MonoBehaviour, IIngredientReceiver
 {
+    /// <summary>UnityEvent carrying the resolved match. Named type so the Inspector can serialise it.</summary>
+    [Serializable]
+    public class RecipeMatchEvent : UnityEvent<RecipeMatch> { }
+
     /// <summary>Live drink in the shaker. Fresh instance, never an asset reference.</summary>
     public S_Drink CurrentCocktail { get; private set; }
 
     /// <summary>Most recent comparison against the recipe database.</summary>
     public RecipeMatch LastMatch { get; private set; } = RecipeMatch.None;
 
-    /// <summary>Raised after anything about the drink changes — ingredient, method or ice.</summary>
-    public event Action Changed;
+    // ── Events ─────────────────────────────────────────────
+    // UnityEvent, not C# event: designers bind sounds, particles and UI straight in the
+    // Inspector without a programmer adding a subscriber first. Code still subscribes with
+    // AddListener / RemoveListener (see ShakerVisualPresenter).
 
-    /// <summary>Raised after the drink is emptied.</summary>
-    public event Action Cleared;
+    [Header("Events")]
+    [Tooltip("Anything about the drink changed — ingredient, method, ice or glass.")]
+    public UnityEvent Changed = new UnityEvent();
 
-    /// <summary>Raised after <see cref="UpdateIdentity"/> resolves a new match.</summary>
-    public event Action<RecipeMatch> IdentityResolved;
+    [Tooltip("The glass was emptied.")]
+    public UnityEvent Cleared = new UnityEvent();
+
+    [Tooltip("UpdateIdentity resolved what the drink currently is.")]
+    public RecipeMatchEvent IdentityResolved = new RecipeMatchEvent();
 
     // ── Unity Lifecycle ────────────────────────────────────
 

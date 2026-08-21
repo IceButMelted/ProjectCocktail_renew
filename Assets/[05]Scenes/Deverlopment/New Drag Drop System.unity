@@ -299,6 +299,13 @@ MonoBehaviour:
   _mixer: 0
   _alcohol: 0
   _liqueur: 0
+  _shaker: {fileID: 9013287975813823372}
+  OnPoured:
+    m_PersistentCalls:
+      m_Calls: []
+  OnRejected:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &66427464
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5863,7 +5870,7 @@ MonoBehaviour:
         m_CallState: 2
       - m_Target: {fileID: 3879473060986582093}
         m_TargetAssemblyTypeName: DragableObject, Assembly-CSharp
-        m_MethodName: set_enabled
+        m_MethodName: set_Interactable
         m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -7275,6 +7282,13 @@ MonoBehaviour:
   _mixer: 0
   _alcohol: 0
   _liqueur: 0
+  _shaker: {fileID: 9013287975813823372}
+  OnPoured:
+    m_PersistentCalls:
+      m_Calls: []
+  OnRejected:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!225 &1580896701 stripped
 CanvasGroup:
   m_CorrespondingSourceObject: {fileID: 58480027742233797, guid: 5728bb0f6d221f0489cec6e8dab5d683, type: 3}
@@ -8397,7 +8411,7 @@ MonoBehaviour:
         m_CallState: 2
       - m_Target: {fileID: 3879473060986582093}
         m_TargetAssemblyTypeName: DragableObject, Assembly-CSharp
-        m_MethodName: set_enabled
+        m_MethodName: set_Interactable
         m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -9413,7 +9427,7 @@ MonoBehaviour:
         m_CallState: 2
       - m_Target: {fileID: 3879473060986582093}
         m_TargetAssemblyTypeName: DragableObject, Assembly-CSharp
-        m_MethodName: set_enabled
+        m_MethodName: set_Interactable
         m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -10401,6 +10415,7 @@ GameObject:
   - component: {fileID: 2103601422}
   - component: {fileID: 2103601424}
   - component: {fileID: 2103601423}
+  - component: {fileID: 2103601425}
   m_Layer: 0
   m_Name: '[GameLoop]'
   m_TagString: Untagged
@@ -10536,13 +10551,37 @@ MonoBehaviour:
   _addIngredient:
     _onEnter:
       m_PersistentCalls:
-        m_Calls: []
+        m_Calls:
+        - m_Target: {fileID: 9013287975813823370}
+          m_TargetAssemblyTypeName: IngredientButtonGroup, Assembly-CSharp
+          m_MethodName: Enable
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
     _onUpdate:
       m_PersistentCalls:
         m_Calls: []
     _onExit:
       m_PersistentCalls:
-        m_Calls: []
+        m_Calls:
+        - m_Target: {fileID: 9013287975813823370}
+          m_TargetAssemblyTypeName: IngredientButtonGroup, Assembly-CSharp
+          m_MethodName: Disable
+          m_Mode: 1
+          m_Arguments:
+            m_ObjectArgument: {fileID: 0}
+            m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+            m_IntArgument: 0
+            m_FloatArgument: 0
+            m_StringArgument: 
+            m_BoolArgument: 0
+          m_CallState: 2
   _minigame:
     _onEnter:
       m_PersistentCalls:
@@ -10595,6 +10634,24 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   _placedIngredients: []
+--- !u!114 &2103601425
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2103601418}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 22436daba0bcb3fcd9f2cf37d76469b0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Bar410.GameFlow.MinigameFlowBridge
+  _gameLoop: {fileID: 2103601420}
+  _commands: {fileID: 2103601419}
+  _minigames: {fileID: 2063047303304347187}
+  _shakerContents: {fileID: 9013287975813823372}
+  _defaultType: 1
+  _autoAdvanceOnWin: 1
 --- !u!1 &2134705942
 GameObject:
   m_ObjectHideFlags: 0
@@ -10955,6 +11012,13 @@ MonoBehaviour:
   _mixer: 0
   _alcohol: 2
   _liqueur: 0
+  _shaker: {fileID: 9013287975813823372}
+  OnPoured:
+    m_PersistentCalls:
+      m_Calls: []
+  OnRejected:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &267617234672916264
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -11116,6 +11180,13 @@ MonoBehaviour:
   _mixer: 8
   _alcohol: 0
   _liqueur: 0
+  _shaker: {fileID: 9013287975813823372}
+  OnPoured:
+    m_PersistentCalls:
+      m_Calls: []
+  OnRejected:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!4 &456283288010177071
 Transform:
   m_ObjectHideFlags: 0
@@ -11564,6 +11635,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::VisualizeCocktail
   alcoholFill: {fileID: 2550652396693874256}
   mixerFill: {fileID: 5271658722579909530}
+  _shaker: {fileID: 9013287975813823372}
 --- !u!114 &830809162775974725
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12046,6 +12118,13 @@ MonoBehaviour:
   _mixer: 4
   _alcohol: 0
   _liqueur: 0
+  _shaker: {fileID: 9013287975813823372}
+  OnPoured:
+    m_PersistentCalls:
+      m_Calls: []
+  OnRejected:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &1227242553797363505
 GameObject:
   m_ObjectHideFlags: 0
@@ -12277,7 +12356,7 @@ MonoBehaviour:
   OnClicked:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 5846322313658519982}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: IngredientButtonUI, Assembly-CSharp
         m_MethodName: Invoke
         m_Mode: 1
@@ -12876,6 +12955,13 @@ MonoBehaviour:
   _mixer: 0
   _alcohol: 4
   _liqueur: 3
+  _shaker: {fileID: 9013287975813823372}
+  OnPoured:
+    m_PersistentCalls:
+      m_Calls: []
+  OnRejected:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!212 &1833155174411543623
 SpriteRenderer:
   serializedVersion: 2
@@ -13127,18 +13213,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: CocktailShaker, Assembly-CSharp
-        m_MethodName: set_Interactable
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
       - m_Target: {fileID: 1496199012}
         m_TargetAssemblyTypeName: CameraController, Assembly-CSharp
         m_MethodName: ResetRotaionAndMovement
@@ -13165,7 +13239,7 @@ MonoBehaviour:
         m_CallState: 2
       - m_Target: {fileID: 3879473060986582093}
         m_TargetAssemblyTypeName: DragableObject, Assembly-CSharp
-        m_MethodName: set_enabled
+        m_MethodName: set_Interactable
         m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -13205,18 +13279,6 @@ MonoBehaviour:
       - m_Target: {fileID: 9013287975813823368}
         m_TargetAssemblyTypeName: ShakerPanelController, Assembly-CSharp
         m_MethodName: SetCanShowAddIceUI
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: ResultCam
-          m_BoolArgument: 1
-        m_CallState: 2
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: CocktailShaker, Assembly-CSharp
-        m_MethodName: set_Interactable
         m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -13679,6 +13741,13 @@ MonoBehaviour:
   _mixer: 0
   _alcohol: 5
   _liqueur: 0
+  _shaker: {fileID: 9013287975813823372}
+  OnPoured:
+    m_PersistentCalls:
+      m_Calls: []
+  OnRejected:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &2304019744970677986
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13770,6 +13839,13 @@ MonoBehaviour:
   _mixer: 0
   _alcohol: 4
   _liqueur: 0
+  _shaker: {fileID: 9013287975813823372}
+  OnPoured:
+    m_PersistentCalls:
+      m_Calls: []
+  OnRejected:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &2440713282170556011
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -14218,6 +14294,13 @@ MonoBehaviour:
   _mixer: 0
   _alcohol: 1
   _liqueur: 0
+  _shaker: {fileID: 9013287975813823372}
+  OnPoured:
+    m_PersistentCalls:
+      m_Calls: []
+  OnRejected:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &2997034167730843240
 GameObject:
   m_ObjectHideFlags: 0
@@ -14529,6 +14612,13 @@ MonoBehaviour:
   _mixer: 7
   _alcohol: 0
   _liqueur: 0
+  _shaker: {fileID: 9013287975813823372}
+  OnPoured:
+    m_PersistentCalls:
+      m_Calls: []
+  OnRejected:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &3491894211675753580
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15254,6 +15344,13 @@ MonoBehaviour:
   _mixer: 0
   _alcohol: 4
   _liqueur: 2
+  _shaker: {fileID: 9013287975813823372}
+  OnPoured:
+    m_PersistentCalls:
+      m_Calls: []
+  OnRejected:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!223 &4163056777520422074
 Canvas:
   m_ObjectHideFlags: 0
@@ -15361,6 +15458,13 @@ MonoBehaviour:
   _mixer: 3
   _alcohol: 0
   _liqueur: 0
+  _shaker: {fileID: 9013287975813823372}
+  OnPoured:
+    m_PersistentCalls:
+      m_Calls: []
+  OnRejected:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!224 &4276253323585400399
 RectTransform:
   m_ObjectHideFlags: 0
@@ -16105,6 +16209,13 @@ MonoBehaviour:
   _mixer: 6
   _alcohol: 0
   _liqueur: 0
+  _shaker: {fileID: 9013287975813823372}
+  OnPoured:
+    m_PersistentCalls:
+      m_Calls: []
+  OnRejected:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &5051024869246235948
 GameObject:
   m_ObjectHideFlags: 0
@@ -16248,10 +16359,9 @@ GameObject:
   - component: {fileID: 225593342822976133}
   - component: {fileID: 8892971054120762377}
   - component: {fileID: 4878401707025172991}
-  - component: {fileID: 1531873348661671179}
-  - component: {fileID: 5846322313658519982}
   - component: {fileID: 480095270846866374}
   - component: {fileID: 8892971054120762378}
+  - component: {fileID: 1531873348661671179}
   m_Layer: 7
   m_Name: Mixer-Soda
   m_TagString: DragObject
@@ -18215,22 +18325,6 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &5846322313658519982
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 5167611187785147636}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b8f8ffd27e917c24591a711e45d44a20, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::IngredientButtonUI
-  _action: 1
-  _mixer: 1
-  _alcohol: 0
-  _liqueur: 0
 --- !u!65 &5884855689357870346
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -18334,6 +18428,13 @@ MonoBehaviour:
   _mixer: 0
   _alcohol: 3
   _liqueur: 0
+  _shaker: {fileID: 9013287975813823372}
+  OnPoured:
+    m_PersistentCalls:
+      m_Calls: []
+  OnRejected:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &6058510750360080631
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18500,7 +18601,7 @@ MonoBehaviour:
         m_CallState: 2
       - m_Target: {fileID: 3879473060986582093}
         m_TargetAssemblyTypeName: DragableObject, Assembly-CSharp
-        m_MethodName: set_enabled
+        m_MethodName: set_Interactable
         m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -18689,9 +18790,16 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::IngredientButtonUI
   _action: 1
-  _mixer: 2
+  _mixer: 1
   _alcohol: 0
   _liqueur: 0
+  _shaker: {fileID: 9013287975813823372}
+  OnPoured:
+    m_PersistentCalls:
+      m_Calls: []
+  OnRejected:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &6547797942485963138
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -20460,13 +20568,25 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 2063047303304347187}
-        m_TargetAssemblyTypeName: MinigameSystemManager, Assembly-CSharp
-        m_MethodName: StartShakingMinigame
-        m_Mode: 1
+      - m_Target: {fileID: 2103601419}
+        m_TargetAssemblyTypeName: Bar410.GameFlow.GameFlowCommands, Assembly-CSharp
+        m_MethodName: SelectShaking
+        m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 2103601419}
+        m_TargetAssemblyTypeName: Bar410.GameFlow.GameFlowCommands, Assembly-CSharp
+        m_MethodName: IngredientAdded
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -21004,6 +21124,13 @@ MonoBehaviour:
   _mixer: 0
   _alcohol: 4
   _liqueur: 1
+  _shaker: {fileID: 9013287975813823372}
+  OnPoured:
+    m_PersistentCalls:
+      m_Calls: []
+  OnRejected:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &8371773923753360455
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21020,6 +21147,13 @@ MonoBehaviour:
   _mixer: 0
   _alcohol: 4
   _liqueur: 4
+  _shaker: {fileID: 9013287975813823372}
+  OnPoured:
+    m_PersistentCalls:
+      m_Calls: []
+  OnRejected:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!1 &8371804828609863600
 GameObject:
   m_ObjectHideFlags: 0
@@ -21216,6 +21350,13 @@ MonoBehaviour:
   _mixer: 0
   _alcohol: 0
   _liqueur: 0
+  _shaker: {fileID: 9013287975813823372}
+  OnPoured:
+    m_PersistentCalls:
+      m_Calls: []
+  OnRejected:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!212 &8537616429113920561
 SpriteRenderer:
   serializedVersion: 2
@@ -21781,13 +21922,25 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 2063047303304347187}
-        m_TargetAssemblyTypeName: MinigameSystemManager, Assembly-CSharp
-        m_MethodName: StartMixingMinigame
-        m_Mode: 1
+      - m_Target: {fileID: 2103601419}
+        m_TargetAssemblyTypeName: Bar410.GameFlow.GameFlowCommands, Assembly-CSharp
+        m_MethodName: SelectStiring
+        m_Mode: 0
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+      - m_Target: {fileID: 2103601419}
+        m_TargetAssemblyTypeName: Bar410.GameFlow.GameFlowCommands, Assembly-CSharp
+        m_MethodName: IngredientAdded
+        m_Mode: 0
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -21952,6 +22105,39 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 799610f6c58adfad38c457a4adfc0ade, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ShakerContents
+  Changed:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 830191521745161996}
+        m_TargetAssemblyTypeName: VisualizeCocktail, Assembly-CSharp
+        m_MethodName: UpdateCocktailBars
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  Cleared:
+    m_PersistentCalls:
+      m_Calls:
+      - m_Target: {fileID: 830191521745161996}
+        m_TargetAssemblyTypeName: VisualizeCocktail, Assembly-CSharp
+        m_MethodName: ResetVisualBars
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
+  IdentityResolved:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &9013287975813823373
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22029,6 +22215,13 @@ MonoBehaviour:
   _mixer: 5
   _alcohol: 0
   _liqueur: 0
+  _shaker: {fileID: 9013287975813823372}
+  OnPoured:
+    m_PersistentCalls:
+      m_Calls: []
+  OnRejected:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &9073333309803274921
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -22207,6 +22400,13 @@ MonoBehaviour:
   _mixer: 0
   _alcohol: 0
   _liqueur: 0
+  _shaker: {fileID: 9013287975813823372}
+  OnPoured:
+    m_PersistentCalls:
+      m_Calls: []
+  OnRejected:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!224 &9178200775699099022
 RectTransform:
   m_ObjectHideFlags: 0

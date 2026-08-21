@@ -258,6 +258,18 @@ This is the maintenance problem in the Minigame folder. `MiniGameState` is not.
 
 ## 6. Open questions for design
 
+> **สถานะ 2026-08-21:** ข้อ 1 กับ 2 ตอบแล้ว ข้อ 3 / 4 ยังเปิดอยู่
+>
+> - **ข้อ 1 — ใช้ auto-advance** `_autoAdvanceOnWin = true` ชนะมินิเกม = เครื่องดื่มเสร็จ
+>   2.2 ออกไปข้อ 3 Garnish ทันที · ตรงกับ UI จริงที่ผู้เล่นเทวัตถุดิบให้ครบก่อน แล้วค่อยกด
+>   Shaking/Mixing ครั้งเดียวปิดท้าย — ลูป 2.1 ↔ 2.2 จึงไม่ถูกใช้ในซีนนี้
+> - **ข้อ 2 — มินิเกมแพ้ไม่ได้** จบได้สองทางเท่านั้นคือเล่นจนจบ (`Completed`) หรือกด Cancel
+>   (`Cancelled`) · `FireEndEvent(false)` เดิมไม่มีแล้ว ทางออกทั้งสองลงที่ `MinigamePhase.Idle` จุดเดียว
+>
+> ⚠️ **เอกสารนี้เขียนก่อน FSM Simplification (2026-08-20 คนละรอบ)** — item 1, 8, 9 และปัญหา
+> §5.1–5.3 ถูกปิดไปแล้วในรอบนั้น `SlidePhase` / `MiniGameState` ที่อ้างถึงไม่มีอยู่จริงแล้ว
+> อ่านคู่กับ `Bar410_Minigame_FSM_Simplification_Summary.md` เสมอ
+
 1. **Who ends step 2.2?** Auto-advance on win (`_autoAdvanceOnWin`), or does the player still press a
    button to choose "another ingredient" vs "drink complete"? The current UI implies the latter —
    plan defaults to `_autoAdvanceOnWin = false`.

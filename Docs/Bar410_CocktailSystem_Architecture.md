@@ -95,7 +95,7 @@
 
 | ไฟล์ | บรรทัด | หน้าที่เดียวของมัน |
 |---|---:|---|
-| `ShakerContents.cs` | 140 | **เครื่องดื่มที่อยู่ในแก้ว** — สร้าง/ทำลาย instance, เติมวัตถุดิบ, ตั้ง method/ice, `Clear`, `UpdateIdentity` · ยิง event `Changed` / `Cleared` / `IdentityResolved` |
+| `ShakerContents.cs` | 140 | **เครื่องดื่มที่อยู่ในแก้ว** — สร้าง/ทำลาย instance, เติมวัตถุดิบ, ตั้ง method/ice, `Clear`, `UpdateIdentity` · ยิง **UnityEvent** `Changed` / `Cleared` / `IdentityResolved` — designer ผูกเองได้ใน Inspector · โค้ดใช้ `AddListener` / `RemoveListener` |
 | `ShakerVisualPresenter.cs` | 92 | **ภาพของแก้ว** — สีน้ำ, sprite แก้ว/น้ำแข็ง, `WaterSlosh` · ฟัง event จาก `ShakerContents` |
 | `ShakerPanelController.cs` | 74 | **สิทธิ์เปิดแผง** Method / AddIce / Serve · `LockAll` / `ResetPermissions` ให้ HSM สั่งได้ |
 | `IngredientButtonGroup.cs` | 67 | **roster ของ object ที่เปิด/ปิดพร้อมกัน** · ใช้ 2 ตัว (วัตถุดิบ / หนังสือ) · `SetRoster` ให้ `BarSetupBridge` เปลี่ยนรายการได้ตอนรัน |
@@ -187,8 +187,8 @@ Yarn resolve **instance command** ด้วยชื่อ GameObject — `.yarn
 
 | ไฟล์ | บรรทัด | หน้าที่ |
 |---|---:|---|
-| `IngredientButtonUI.cs` | 93 | ปุ่มวัตถุดิบบน Canvas · `ButtonAction` เลือกว่าปุ่มนี้ทำอะไร |
-| `VisualizeCocktail.cs` | 54 | แถบวัดสัดส่วนแอลกอฮอล์/mixer |
+| `IngredientButtonUI.cs` | ~150 | ปุ่มวัตถุดิบ/วิธีชง/น้ำแข็ง · `ButtonAction` เลือกว่าปุ่มนี้ทำอะไร · คุยกับ `ShakerContents` โดยตรง (ถอยไปใช้ shim อัตโนมัติถ้าซีนยังมี) · UnityEvent `OnPoured` / `OnRejected` ให้ designer ผูกเอฟเฟกต์เอง |
+| `VisualizeCocktail.cs` | ~72 | แถบวัดสัดส่วนแอลกอฮอล์/mixer · อ่าน `ShakerContents` |
 | `DebugCocktail.cs` | 31 | overlay แสดงเป้าหมาย vs แก้วปัจจุบัน · `#if UNITY_EDITOR` |
 | `E_Cocktail.Dialogue.cs` | 24 | enum ฝั่งบทสนทนา — `TextType`, `ConversationPhase` |
 
@@ -238,8 +238,10 @@ Yarn resolve **instance command** ด้วยชื่อ GameObject — `.yarn
                     → OrderService เลือกสูตร → DrinkOrderContext.BeginOrder
                     → Post-It แสดงข้อความ
 
-2  ผู้เล่นชง        IngredientButtonUI → CocktailShakerData(shim) → ShakerContents
+2  ผู้เล่นชง        IngredientButtonUI → ShakerContents
                     → DrinkBuilder.TryAdd* (เช็กเพดาน 10 หน่วย)
+                    → OnPoured / OnRejected (UnityEvent สำหรับ designer)
+                    ซีนที่ยังมี CocktailShakerData จะเดินทางเก่าผ่าน shim เหมือนเดิม
 
 3  อัปเดตตัวตน      ShakerContents.UpdateIdentity
                     → DrinkDeviation.FindBestMatch  (สแกนสูตร 1 รอบ)

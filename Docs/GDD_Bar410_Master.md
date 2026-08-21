@@ -114,6 +114,24 @@ Every recipe consists of:
 - ตกแต่งแก้วก่อนเสิร์ฟ (ดู §16)
   Decorate the glass before serving (see §16)
 
+### 10.1 กติกา Minigame / Minigame Rules
+
+ยืนยันกับ design 2026-08-21 · ฝั่งเทคนิคดู `Bar410_Minigame_Integration_Report.md`
+Confirmed with design 2026-08-21 · technical detail in `Bar410_Minigame_Integration_Report.md`
+
+- **แพ้ไม่ได้** — มินิเกมจบได้สองทางเท่านั้น คือเล่นจนสำเร็จ (`Completed`) หรือผู้เล่นกดยกเลิก (`Cancelled`)
+  ไม่มีเงื่อนไขแพ้ ไม่มีบทลงโทษต่อคะแนน
+  **Cannot be lost** — a run ends only as `Completed` or `Cancelled`. There is no lose condition
+  and no scoring penalty.
+- **ยกเลิกได้ทุกเมื่อ** — กดยกเลิกได้ทุกจังหวะระหว่างเล่น เครื่องดื่มยังอยู่ครบเหมือนเดิม
+  ผู้เล่นกดวิธีชงใหม่เพื่อเริ่มมินิเกมอีกครั้งได้ทันที
+  **Cancellable at any time** — the drink is left untouched and the player may pick a mixing
+  method again to restart the minigame.
+- **เล่นสำเร็จ = เครื่องดื่มเสร็จ** — จบมินิเกมแล้วถือว่าเครื่องดื่มพร้อม เข้าสู่ขั้นตกแต่ง (Garnish) ทันที
+  วิธีชงจึงเป็นท่าปิดท้ายหลังเทวัตถุดิบครบแล้ว ไม่ใช่ทำต่อวัตถุดิบหนึ่งชนิด
+  **Completing it finishes the drink** — the flow moves straight to Garnish. The mixing method is
+  therefore the closing action after all ingredients are poured, not a per-ingredient step.
+
 ## 11. การเสิร์ฟเครื่องดื่ม / Serving
 
 ลากแก้วที่ชงเสร็จแล้วไปที่ลูกค้าเพื่อเสิร์ฟ
@@ -507,3 +525,4 @@ public struct YarnChoiceLogEntry
 | UI ให้ผู้เล่นเลือกเองเมื่อมีหลายสูตร match เท่ากัน (§17.2) / Player-driven tie-break UI | เลื่อนออกไป — v1 ใช้ index-order fallback / Deferred — v1 uses index-order fallback |
 | ระบบตกแต่งแบบ free-placement สไตล์ Puni the Florist (§21) / Free-placement decoration | เลื่อนออกไป — v1 ใช้ slot-based / Deferred — v1 ships slot-based |
 | การสุ่มสูตรแบบมี weight สำหรับโหมดสั่ง 3/4 (§19.2) / Weighted random order selection | เลื่อนออกไป — v1 ใช้ uniform random / Deferred — v1 uses uniform random |
+| Minigame ของวิธีชง `Build` (§10.1, §16) / The `Build` mixing minigame | ยังไม่ตัดสิน — มีแต่ค่า enum ยังไม่มีตัวเกม ต้องตอบก่อนว่าเป็นมินิเกมที่ 3 จริง หรือเป็นทางที่ข้ามมินิเกมไปเลย / Undecided — the enum value exists with no game behind it; design must say whether it is a third minigame or a "no minigame" path |

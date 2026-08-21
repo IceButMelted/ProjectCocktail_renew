@@ -32,7 +32,8 @@ Refactor `Assets/[02]Script/Cocktail System/` ทั้งระบบ เพื
 | `Bar410_CocktailSystem_Refactor_Summary.md` | สรุปสั้น |
 | `GDD_Bar410_Master.md` | **source of truth ด้านกติกาเกม** (มีสำเนาใน `Docs/` แล้ว) |
 | `Bar410_StateMachine_Implementation.md` | โครง HSM ที่มีอยู่ก่อน |
-| `Bar410_Minigame_Integration_Plan.md` | แผนเชื่อม minigame — **ยังไม่ได้ทำ** |
+| `Bar410_Minigame_Integration_Plan.md` | แผนเชื่อม minigame — **ทำแล้ว 2026-08-21** · แผนเก่ากว่าโค้ด อ่านหมายเหตุหัว §6 ก่อน |
+| `Bar410_Minigame_Integration_Report.md` · `_Summary.md` | ผลของงานเชื่อม minigame + โยก `VisualizeCocktail` / BaseInteractable |
 
 ---
 
@@ -148,12 +149,15 @@ GDD ถูกแก้ตามการตัดสินใจ D6 (§15.1/§16
 
 ### 8.1 🔴 ทำก่อน — ของที่ค้างอยู่จริงในซีน
 
-**3 UnityEvent binding ที่ target หลุด** (ไม่มีใครเดาแทนได้)
+**1 UnityEvent binding ที่ target หลุด** (ไม่มีใครเดาแทนได้)
 
 | ที่ | binding | ต้องตัดสินใจอะไร |
 |---|---|---|
-| `SystemGame/MiniGameSystem` ×2 | `CocktailShaker.set_Interactable` | `CocktailShaker` ไม่มีในซีนนี้แล้ว · ตัวแทนน่าจะเป็น `DragableObject.Interactable` บน `CocktailShaker` GameObject — แต่ต้องยืนยันว่าตั้งใจล็อก shaker ตอนเล่น minigame |
-| `Panel - Serve/BTN_Serving` | `GameObject.SetActive` | GameObject ที่เคยชี้ไปถูกลบ ไม่มีทางรู้ว่าตัวไหน |
+| `Panel - Serve/BTN_Serving` OnClick[10] | `GameObject.SetActive` | GameObject ที่เคยชี้ไปถูกลบ ไม่มีทางรู้ว่าตัวไหน |
+
+> ฝั่ง `MiniGameSystem` ปิดแล้ว 2026-08-21 — ล็อก shaker ตอนมินิเกมเปิดผ่าน
+> `DragableObject.Interactable(false)` และ `MinigameFlowBridge` ปลดล็อกให้เมื่อผู้เล่นกดยกเลิก
+> (`Bar410_Minigame_Integration_Report.md` §3.4–3.5)
 
 **Roster ขาด 2 คน** — `Demo_CustomerRoster` มีแค่ `Isla`, `Owen`, `Walter`
 `Cole` กับ `Freya` จะเข้า path `"No preferences for X; using every type"`
@@ -181,9 +185,12 @@ GDD ถูกแก้ตามการตัดสินใจ D6 (§15.1/§16
 
 ### 8.4 🟢 งานถัดไปที่เป็นก้อนใหญ่
 
-**`MinigameFlowBridge` ยังไม่ได้เขียน** — สเปกอยู่ใน `Bar410_Minigame_Integration_Plan.md` §3.3
-`CocktailFlowBridge` **จงใจไม่แตะ minigame** เพื่อไม่ให้มีเจ้าของสองคน
-`ShakerContents.RequiredMinigame` เตรียมไว้ให้ bridge นั้นเรียกแล้ว
+**`MinigameFlowBridge` เขียนแล้ว 2026-08-21** — อยู่บน `[GameLoop]` ผูกครบ ปุ่มวิธีชงเปลี่ยนไปสั่งผ่าน
+FSM แล้ว · รายละเอียดใน `Bar410_Minigame_Integration_Report.md`
+
+**ที่ค้างแทน: ไม่มีใครเรียก `flow_open_bar` / `flow_prepare_drinks`** ทั้งในซีนและใน `.yarn`
+flow จึงหยุดที่ Level 1 และปุ่มวิธีชงกดแล้วได้แค่ warning — ต้องตัดสินใจว่าจะให้บทสนทนาเป็นคนขับ
+(ตรงเจตนา GDD §12) หรือผูกปุ่มไว้ทดสอบก่อน
 
 ---
 
