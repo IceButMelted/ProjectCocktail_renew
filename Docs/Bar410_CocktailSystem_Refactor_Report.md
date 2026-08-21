@@ -7,6 +7,7 @@
 **งานมือที่เหลือ:** `Bar410_CocktailSystem_Manual_Setup.md`
 **หน้าที่ของแต่ละไฟล์:** `Bar410_CocktailSystem_Architecture.md`
 **Compile status:** ✅ ผ่าน ไม่มี error (ยืนยันผ่าน Unity MCP)
+> 📍 **เริ่มที่นี่ถ้าเพิ่งรับงานต่อ:** `Bar410_CocktailSystem_HANDOFF.md`
 
 ---
 

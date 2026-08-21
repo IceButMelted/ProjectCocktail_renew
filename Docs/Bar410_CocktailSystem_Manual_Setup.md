@@ -3,6 +3,7 @@
 **Date:** 2026-08-21 · **Branch:** `GameLoop/main`
 **คู่กับ:** `Bar410_CocktailSystem_Refactor_Plan.md` · `Bar410_CocktailSystem_Refactor_Report.md`
 **หน้าที่ของแต่ละไฟล์:** `Bar410_CocktailSystem_Architecture.md`
+> 📍 **เริ่มที่นี่ถ้าเพิ่งรับงานต่อ:** `Bar410_CocktailSystem_HANDOFF.md`
 
 โค้ดของ Phase 3–8 เขียนครบแล้วและคอมไพล์ผ่าน **เกมยังเล่นได้เหมือนเดิมโดยไม่ต้องทำอะไรในเอกสารนี้เลย**
 — ทุกอย่างมี compatibility shim รองรับอยู่ ที่เหลือคือการเก็บกวาดให้สถาปัตยกรรมใหม่ทำงานเต็มตัว

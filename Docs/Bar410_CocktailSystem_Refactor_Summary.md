@@ -5,6 +5,7 @@
 **งานมือใน Unity:** `Bar410_CocktailSystem_Manual_Setup.md`
 **หน้าที่ของแต่ละไฟล์:** `Bar410_CocktailSystem_Architecture.md`
 **แผน:** `Bar410_CocktailSystem_Refactor_Plan.md`
+> 📍 **เริ่มที่นี่ถ้าเพิ่งรับงานต่อ:** `Bar410_CocktailSystem_HANDOFF.md`
 
 ---
 

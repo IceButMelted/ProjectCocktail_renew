@@ -2,6 +2,7 @@
 
 **Date:** 2026-08-21 · **Branch:** `GameLoop/main`
 **คู่กับ:** `Bar410_CocktailSystem_Refactor_Report.md` · `Bar410_CocktailSystem_Manual_Setup.md`
+> 📍 **เริ่มที่นี่ถ้าเพิ่งรับงานต่อ:** `Bar410_CocktailSystem_HANDOFF.md`
 
 เอกสารอ้างอิงว่าไฟล์ไหนทำอะไร และ**ควรแก้ไฟล์ไหนเมื่ออยากเปลี่ยนอะไร**
 ทุกไฟล์อยู่ใต้ `Assets/[02]Script/` ยกเว้นที่ระบุ
