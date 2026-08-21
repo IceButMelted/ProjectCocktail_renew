@@ -254,8 +254,10 @@ public class DrinkRecipeSO : ScriptableObject
     public Color bottomColor;
     public string flavorDescription;
     public float price;
-    public GlassType glassType;                  // cosmetic เท่านั้น / cosmetic only, see §21
     public bool unlockedByDefault;
+    // glassType ถูกถอดออกจากสูตรแล้ว — ผู้เล่นเลือกแก้วเสิร์ฟเองเสมอ ไม่ผูกกับสูตร (ดู §21)
+    // glassType was removed from the recipe entirely — the player always picks the serving
+    // glass themselves, independent of the recipe (see §21).
 }
 
 // struct หนึ่งตัวต่อหนึ่งหมวด รูปร่างเหมือนกันหมด
@@ -423,26 +425,37 @@ Implemented as Cinemachine virtual camera swaps driven by this FSM (state → ac
 
 ## 21. ระบบเลือกแก้วและตกแต่ง / Glass Selection & Decoration
 
-- **เลือกแก้ว = Cosmetic เท่านั้น** ไม่กระทบ Perfect/Acceptable/Fail ใน §17-18 `glassType` เก็บในสูตร (§16) แต่อัลกอริทึมไม่อ่านค่านี้
-  **Glass selection is cosmetic only** — no effect on §17-18 scoring. `glassType` is stored on the recipe (§16) but is never read by the matching algorithm.
+- **เลือกแก้ว = Cosmetic เท่านั้น** ไม่กระทบ Perfect/Acceptable/Fail ใน §17-18 สูตร (§16) ไม่มีช่อง `glassType` แล้ว — แก้วไม่ผูกกับสูตรเลย
+  **Glass selection is cosmetic only** — no effect on §17-18 scoring. The recipe (§16) no longer
+  has a `glassType` field at all — the glass is never tied to the recipe.
 
-### 21.0 `glassType = NotFix` — สูตรที่ให้ผู้เล่นเลือกแก้วเอง
+### 21.0 ผู้เล่นเลือกแก้วเสิร์ฟเอง 100% / The player picks the serving glass entirely
 
-ค่าพิเศษหนึ่งค่าใน `GlassType` เปลี่ยนความหมายของช่องนี้จาก "แก้วของสูตร" เป็น "ผู้เล่นเลือกเอง":
-One special value flips this field from "the recipe's glass" to "the player's choice":
+ถอดกติกา `NotFix` แบบเดิมออกทั้งหมด — ทุกสูตรตอนนี้เหมือนกับที่เคยเป็น `NotFix`: ไม่มีสูตรไหน
+"ปักหมุด" แก้วได้อีก ผู้เล่นลากแก้ว (จากชั้นวาง) มาวางบนโต๊ะเป็นขั้นตอนแยกจากการชง — ทำก่อนหรือ
+หลังใส่วัตถุดิบก็ได้ (ระหว่าง Add Ingredient หรือ Garnish) จำกัด 1 ใบต่อโต๊ะ 1 ครั้ง เลือกแก้วหนึ่งใบ
+= ได้ทั้ง sprite ของแก้วและลาย/สไตล์การตกแต่งไปพร้อมกัน (ไม่มีขั้นเลือกแยกอีกต่อไป)
 
-| สูตรตั้ง `glassType` เป็น | ผลตอนชง / Behaviour |
-|---|---|
-| แก้วเจาะจง เช่น `Martini` | สูตรกำหนด — เขียนทับสิ่งที่ผู้เล่นเลือก / recipe wins, overwrites the player's pick |
-| **`NotFix`** | **สิ่งที่ผู้เล่นเลือกคงอยู่ ไม่ถูกเขียนทับ** / the player's pick stands |
-| `NotFix` แต่ผู้เล่นยังไม่เลือก | ใช้ค่าเริ่มต้น (`Hi_ball`) / falls back to the default glass |
-| ไม่ตรงสูตรใดเลย (Fail b, §17.3) | ใช้แก้ว "ไม่รู้จัก" (`Rocks`) ให้ดูออกว่าไม่ใช่เครื่องดื่มจริง / a distinct glass marks an unmatched drink |
+The old `NotFix` escape hatch is gone entirely — every recipe now behaves the way `NotFix`
+used to: no recipe can "pin" a glass anymore. The player drags a glass (from a shelf) onto the
+table as a step separate from mixing — doable before or after adding ingredients (during Add
+Ingredient or Garnish). Limited to 1 glass placed at a time. Picking one glass option sets both
+its sprite and its garnish look/style together (no separate garnish-style pick).
 
-ทั้งสี่กรณีเป็น cosmetic ล้วน ไม่มีผลต่อคะแนนตาม §17-18
-All four cases are purely cosmetic and do not affect §17-18 scoring.
+หลังชงเสร็จ (ผ่าน Minigame แล้ว) ผู้เล่นต้องลากภาชนะที่ใช้ชง (มีวัตถุดิบ+Method ครบ) ไปเทลงแก้ว
+ที่วางไว้ — ตอนนี้เองที่ตัวตนของเครื่องดื่ม (สี ฯลฯ) ถูกล็อกและย้ายไปแสดงที่แก้วเสิร์ฟแทนภาชนะชง
+After mixing finishes (post-minigame), the player must drag the mixing vessel (now holding
+ingredients + Method) onto the placed glass to pour — this is the moment the drink's identity
+(colour, etc.) locks in and its visuals move from the mixing vessel to the serving glass.
 
-> **Programmer note:** กติกานี้อยู่ที่ `DrinkBuilder.ApplyGlass` จุดเดียว · UI ที่ให้ผู้เล่นกดเลือก
-> ยังไม่ได้ทำ เมื่อทำแล้วให้เรียก `ShakerContents.SetGlass(glass)` ค่าจะไม่ถูกเขียนทับเอง
+แก้วที่วางไว้จะหายไปหลังเสิร์ฟลูกค้าเสร็จทุกครั้ง — ลูกค้าคนถัดไปต้องลากแก้วใหม่จากชั้นวางเสมอ
+ไม่มีการรีเซ็ตแก้วใบเดิมไว้ใช้ซ้ำ
+The placed glass is destroyed after each serve — the next customer always requires a fresh
+glass dragged from the shelf; the same instance is never reset and reused.
+
+ทุกกรณียังเป็น cosmetic ล้วน ไม่มีผลต่อคะแนนตาม §17-18
+All of this remains purely cosmetic and does not affect §17-18 scoring.
+
 - การตกแต่งไม่ส่งผลต่อรสชาติ/ส่วนผสม/คะแนน (ตาม GDD)
   Decoration does not affect taste/ingredients/scoring.
 - **ขอบเขต v1: Slot-based asset swap เท่านั้น** — แต่ละจุดตกแต่งเป็น slot ตายตัว คลิกแล้วสลับ asset ที่กำหนดไว้ล่วงหน้า

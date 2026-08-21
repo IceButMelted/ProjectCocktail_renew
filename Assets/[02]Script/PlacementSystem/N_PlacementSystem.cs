@@ -45,6 +45,7 @@ public class N_PlacementSystem : MonoBehaviour
             {
                 _selectedDragable.PastLocation = _lastValidPoint;
                 _selectedObject.transform.position = _lastValidPoint;
+                _currentZone.NotifyPlaced(_selectedObject);
             }
             else
             {

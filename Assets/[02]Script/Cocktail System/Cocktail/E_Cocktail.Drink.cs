@@ -66,9 +66,10 @@ public partial class E_Cocktail
         LongDrink,
 
         /// <summary>
-        /// "The player picks." A recipe set to NotFix hands glass selection to the player
-        /// (GDD §21), and DrinkBuilder.ApplyGlass will not overwrite their choice. Every
-        /// other value pins the glass to the recipe.
+        /// Legacy "player picks" marker from when recipes carried a CompatibleGlass field.
+        /// S_Drink no longer has that field at all — glass choice is entirely the player's,
+        /// via a placed serving glass (Cocktail/Glass/), not something a recipe can pin
+        /// anymore. Kept only because this enum is reused as SO_GlassOption.Shape.
         /// </summary>
         NotFix
     }

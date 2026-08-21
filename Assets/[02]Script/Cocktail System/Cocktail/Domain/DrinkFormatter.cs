@@ -16,7 +16,7 @@ public static class DrinkFormatter
         var sb = new StringBuilder();
         sb.AppendLine(string.IsNullOrEmpty(d.Name) ? "(unnamed)" : d.Name);
         sb.AppendLine($"Type: {d.AlcoholStrength} | Method: {d.PreparationMethod} | Ice: {d.AddIce} | Price: {d.Price}");
-        sb.AppendLine($"Glass: {d.CompatibleGlass} | Parts: {DrinkQuery.GetTotalIngredient(d)}/{DrinkQuery.MaxTotalParts}");
+        sb.AppendLine($"Parts: {DrinkQuery.GetTotalIngredient(d)}/{DrinkQuery.MaxTotalParts}");
         sb.Append("Alcohol: ").AppendLine(string.Join(", ", d.AlcoholList.Select(a => $"{a.Type}x{a.Amount}")));
         sb.Append("Liqueur: ").AppendLine(string.Join(", ", d.LiqueurList.Select(l => $"{l.Type}x{l.Amount}")));
         sb.Append("Mixer:   ").AppendLine(string.Join(", ", d.MixerList.Select(m => $"{m.Type}x{m.Amount}")));

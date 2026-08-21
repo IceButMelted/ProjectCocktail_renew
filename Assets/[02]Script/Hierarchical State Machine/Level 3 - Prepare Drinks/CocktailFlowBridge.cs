@@ -27,6 +27,11 @@ namespace Bar410.GameFlow
         [SerializeField] private ShakerPanelController _shakerPanels;
         [SerializeField] private IngredientButtonGroup _ingredients;
 
+        [Header("Serving Glass")]
+        [Tooltip("The tabletop zone a glass is placed in. Available across steps 2.1 and 3 (Garnish) alike — " +
+                 "its occupant is destroyed on a PrepareDrinks (re)entry, so every customer starts with an empty table.")]
+        [SerializeField] private GlassPlacementZone _glassZone;
+
         [Header("Behaviour")]
         [Tooltip("Re-enable pouring whenever step 2.1 AddIngredient is entered.")]
         [SerializeField] private bool _driveIngredientButtons = true;
@@ -84,6 +89,10 @@ namespace Bar410.GameFlow
             if (_shakerContents != null) _shakerContents.Clear();
             if (_shakerPanels != null) _shakerPanels.ResetPermissions();
             if (_cocktail != null) _cocktail.Order.ClearResult();
+
+            // Every customer starts with an empty table — a glass placed for the previous
+            // order (or a Garnish backtrack) does not carry over.
+            if (_glassZone != null) _glassZone.ClearAndDestroyOccupant();
         }
 
         // ── Step 2.1 · AddIngredient ───────────────────────

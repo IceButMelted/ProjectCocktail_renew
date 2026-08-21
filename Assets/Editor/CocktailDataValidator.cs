@@ -2,10 +2,14 @@
 // ============================================================
 //  CocktailDataValidator.cs — Bar410/Validate Cocktail Data
 //
-//  Phase 8 of the refactor plan is authoring work, not code: filling
-//  in CompatibleGlass on 20 recipes (G2) and completing the glass
-//  visual table (G1). This does not invent that data — it finds and
-//  lists exactly what is missing so a designer can fix it.
+//  Phase 8 of the refactor plan is authoring work, not code: recipes
+//  must total 10 parts (S12) and the legacy glass visual table (kept
+//  only for scenes still on the CocktailShakerData shim) should stay
+//  complete (G1). This does not invent that data — it finds and lists
+//  exactly what is missing so a designer can fix it.
+//
+//  CompatibleGlass was removed from S_Drink entirely (player now picks
+//  the serving glass at runtime) — this validator no longer checks it.
 //
 //  Menu: Bar410 > Validate Cocktail Data
 // ============================================================
@@ -43,7 +47,6 @@ public static class CocktailDataValidator
         var problems = 0;
 
         var wrongTotal = new List<string>();
-        var noGlass = new List<string>();
         var noName = new List<string>();
         var duplicates = new Dictionary<string, string>();
 
@@ -59,10 +62,6 @@ public static class CocktailDataValidator
             int total = DrinkQuery.GetTotalIngredient(drink);
             if (total != DrinkQuery.MaxTotalParts) wrongTotal.Add($"{label} = {total}");
 
-            // Plan gap G2 — 20 assets still carry the old "CompatibleGlasses" key, so this
-            // deserializes as None and never matches an entry in the glass visual table.
-            if (drink.CompatibleGlass == GlassType.None) noGlass.Add(label);
-
             if (string.IsNullOrEmpty(drink.Name)) noName.Add(path);
 
             // GDD §16 — no two recipes may share an identical ingredient multiset.
@@ -76,7 +75,6 @@ public static class CocktailDataValidator
         report.Insert(0, $"Checked {guids.Length} S_Drink assets.\n");
 
         problems += Section(report, "Ingredients do not total 10 (GDD §15, gap S12)", wrongTotal);
-        problems += Section(report, "CompatibleGlass is None (gap G2)", noGlass);
         problems += Section(report, "Drink has no Name", noName);
 
         return problems;

@@ -11,7 +11,9 @@ public class ShakerVisualPresenter : MonoBehaviour
     [Header("Glass")]
     [SerializeField] private WaterSlosh _glassWaterSlosh;
 
-    [Tooltip("Shared GlassType -> sprites asset. See plan D5 / §10.1.")]
+    [Tooltip("LEGACY only. S_Drink no longer carries a glass, so this is never read for " +
+             "per-drink sprite switching anymore — kept only so CocktailShakerData's Initialize " +
+             "call (unmigrated scenes) still compiles and can still fill it for its own use.")]
     [SerializeField] private SO_GlassVisualTable _glassVisuals;
 
     private ShakerContents _contents;
@@ -65,28 +67,17 @@ public class ShakerVisualPresenter : MonoBehaviour
         if (_glassWaterSlosh != null) _glassWaterSlosh.waterLevel = 0f;
     }
 
-    /// <summary>Pushes a drink's colour and glass type onto the WaterSlosh renderer.</summary>
+    /// <summary>
+    /// Pushes a drink's colour onto the WaterSlosh renderer. The shaker's own glass/ice/water
+    /// sprites are no longer driven per-drink — S_Drink has no glass field anymore, glass
+    /// choice belongs to the player-placed serving glass, applied separately once poured.
+    /// </summary>
     public void Apply(S_Drink drink)
     {
         if (_glassWaterSlosh == null || drink == null) return;
 
         _glassWaterSlosh.waterColorTop = drink.waterColorTop;
         _glassWaterSlosh.waterColorBottom = drink.waterColorBottom;
-
-        if (_glassVisuals == null)
-        {
-            Debug.LogWarning("[ShakerVisualPresenter] No SO_GlassVisualTable assigned — glass sprites unchanged.", this);
-        }
-        else if (_glassVisuals.TryGet(drink.CompatibleGlass, out var visual))
-        {
-            _glassWaterSlosh.UpdateVisual(visual.IceSprite, visual.GlassSprite, visual.WaterSprite);
-        }
-        else
-        {
-            // Known gap G1 — the shipped tables only filled 4 of 8 GlassType values.
-            Debug.LogWarning($"[ShakerVisualPresenter] No visual for glass type {drink.CompatibleGlass}.", this);
-        }
-
         _glassWaterSlosh.UpdateColor();
     }
 }

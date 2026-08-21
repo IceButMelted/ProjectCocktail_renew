@@ -77,46 +77,9 @@ public static class DrinkBuilder
             ? AlcoholClassifier.Resolve(match.Recipe)
             : AlcoholClassifier.Compute(runtime);
 
-        ApplyGlass(runtime, match, recognised);
-
         DrinkColorBlender.Resolve(match, runtime, out var top, out var bottom);
         runtime.waterColorTop = top;
         runtime.waterColorBottom = bottom;
-    }
-
-    /// <summary>Glass used when nobody has decided otherwise.</summary>
-    public const GlassType DefaultGlass = GlassType.Hi_ball;
-
-    /// <summary>Glass used for a drink that matched no recipe, so it reads as "not a real drink".</summary>
-    public const GlassType UnmatchedGlass = GlassType.Rocks;
-
-    /// <summary>
-    /// GDD §21 — glassware is cosmetic, and a recipe may hand the choice to the player.
-    ///
-    /// A recipe whose CompatibleGlass is <see cref="GlassType.NotFix"/> means exactly that:
-    /// the player's own selection stands and is NOT overwritten here. Every other recipe
-    /// pins its glass. Until the player has chosen anything, DefaultGlass fills in.
-    ///
-    /// TODO(design, plan S13): the selection UI itself does not exist yet. When it lands,
-    /// it only needs to call ShakerContents.SetGlass — this method already protects the
-    /// value from being stamped over on the next ingredient.
-    /// </summary>
-    private static void ApplyGlass(S_Drink runtime, in RecipeMatch match, bool recognised)
-    {
-        if (!recognised)
-        {
-            runtime.CompatibleGlass = UnmatchedGlass;
-            return;
-        }
-
-        if (match.Recipe.CompatibleGlass == GlassType.NotFix)
-        {
-            // Player's choice wins; only fill in a default if they have not picked yet.
-            if (runtime.CompatibleGlass == GlassType.None) runtime.CompatibleGlass = DefaultGlass;
-            return;
-        }
-
-        runtime.CompatibleGlass = match.Recipe.CompatibleGlass;
     }
 
     // ── Reset ──────────────────────────────────────────────
@@ -131,7 +94,6 @@ public static class DrinkBuilder
         d.PreparationMethod = Method.None;
         d.AddIce = false;
         d.Price = 0f;
-        d.CompatibleGlass = GlassType.None;
         d.waterColorTop = Color.clear;
         d.waterColorBottom = Color.clear;
 
