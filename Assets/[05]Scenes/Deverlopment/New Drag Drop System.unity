@@ -4490,8 +4490,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: eb3ba2775ea058346a91525b82aad98f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  _shaker: {fileID: 1907703764714398618}
-  _system: {fileID: 5929196172070313435}
+  _shaker: {fileID: 0}
+  _system: {fileID: 0}
   _targetText: {fileID: 1308643082}
   _currentText: {fileID: 525285163}
   _satisfactionText: {fileID: 1374501920}
@@ -5423,9 +5423,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 6703485261602215137}
-        m_TargetAssemblyTypeName: CocktailShakerData, Assembly-CSharp
-        m_MethodName: ResetShaker
+      - m_Target: {fileID: 9013287975813823372}
+        m_TargetAssemblyTypeName: ShakerContents, Assembly-CSharp
+        m_MethodName: Clear
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -5435,9 +5435,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 6703485261602215137}
-        m_TargetAssemblyTypeName: CocktailShakerData, Assembly-CSharp
-        m_MethodName: ResetCocktailData
+      - m_Target: {fileID: 9013287975813823372}
+        m_TargetAssemblyTypeName: ShakerContents, Assembly-CSharp
+        m_MethodName: Clear
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -5729,8 +5729,8 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 6703485261602215137}
-        m_TargetAssemblyTypeName: CocktailShakerData, Assembly-CSharp
+      - m_Target: {fileID: 9013287975813823371}
+        m_TargetAssemblyTypeName: ShakerVisualPresenter, Assembly-CSharp
         m_MethodName: StopFill
         m_Mode: 1
         m_Arguments:
@@ -5741,7 +5741,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
-      - m_Target: {fileID: 5929196172070313435}
+      - m_Target: {fileID: 6410945659571304439}
         m_TargetAssemblyTypeName: CocktailSystemManager, Assembly-CSharp
         m_MethodName: ServeDrink
         m_Mode: 1
@@ -5777,7 +5777,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 5929196172070313435}
+      - m_Target: {fileID: 6410945659571304439}
         m_TargetAssemblyTypeName: CocktailSystemManager, Assembly-CSharp
         m_MethodName: ResetCocktail
         m_Mode: 1
@@ -7066,6 +7066,17 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1541139865}
   m_Mesh: {fileID: 10202, guid: 0000000000000000e000000000000000, type: 0}
+--- !u!114 &1545303316 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 3458619378161505199, guid: 5728bb0f6d221f0489cec6e8dab5d683, type: 3}
+  m_PrefabInstance: {fileID: 5732725779332928158}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4bec29c0a230741bdac901dba8da47ee, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1547202548
 GameObject:
   m_ObjectHideFlags: 0
@@ -8288,7 +8299,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 5929196172070313435}
+      - m_Target: {fileID: 6410945659571304439}
         m_TargetAssemblyTypeName: CocktailSystemManager, Assembly-CSharp
         m_MethodName: ResetCocktail
         m_Mode: 1
@@ -9304,7 +9315,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 5929196172070313435}
+      - m_Target: {fileID: 6410945659571304439}
         m_TargetAssemblyTypeName: CocktailSystemManager, Assembly-CSharp
         m_MethodName: ResetCocktail
         m_Mode: 1
@@ -10388,6 +10399,8 @@ GameObject:
   - component: {fileID: 2103601420}
   - component: {fileID: 2103601419}
   - component: {fileID: 2103601422}
+  - component: {fileID: 2103601424}
+  - component: {fileID: 2103601423}
   m_Layer: 0
   m_Name: '[GameLoop]'
   m_TagString: Untagged
@@ -10540,6 +10553,48 @@ MonoBehaviour:
     _onExit:
       m_PersistentCalls:
         m_Calls: []
+--- !u!114 &2103601423
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2103601418}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a221c21443ec1c96e9dca03c5f1e5120, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Bar410.GameFlow.CocktailFlowBridge
+  _gameLoop: {fileID: 2103601420}
+  _cocktail: {fileID: 6410945659571304439}
+  _shakerContents: {fileID: 9013287975813823372}
+  _shakerPanels: {fileID: 9013287975813823368}
+  _ingredients: {fileID: 9013287975813823370}
+  _driveIngredientButtons: 1
+--- !u!114 &2103601424
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2103601418}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 893467d7a214cca4db78e5e50eae98e8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Bar410.GameFlow.BarSetupBridge
+  _gameLoop: {fileID: 2103601420}
+  _ingredients: {fileID: 9013287975813823370}
+  _bookUI: {fileID: 9013287975813823369}
+  _shakerPanels: {fileID: 9013287975813823368}
+  _shakerContents: {fileID: 9013287975813823372}
+  _onPlacementUnlocked:
+    m_PersistentCalls:
+      m_Calls: []
+  _onPlacementLocked:
+    m_PersistentCalls:
+      m_Calls: []
+  _placedIngredients: []
 --- !u!1 &2134705942
 GameObject:
   m_ObjectHideFlags: 0
@@ -12038,6 +12093,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6410945659571304438}
+  - component: {fileID: 6410945659571304439}
   m_Layer: 9
   m_Name: CocktailSystem
   m_TagString: Untagged
@@ -12898,44 +12954,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1907703764714398618
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2148763776751124476}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 3170a360f663cb64eb18976e10f476b5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CocktailShaker
-  _interactable: 1
-  S_Default: {fileID: 21300000, guid: a38d06b768b5fff4284ccec1b5925d53, type: 3}
-  S_Hover: {fileID: 21300000, guid: a38d06b768b5fff4284ccec1b5925d53, type: 3}
-  S_Clicked: {fileID: 21300000, guid: a38d06b768b5fff4284ccec1b5925d53, type: 3}
-  _disabledSprite: {fileID: 0}
-  _disabledColour: {r: 1, g: 1, b: 1, a: 0.5}
-  _dragThreshold: 10
-  OnClicked:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1907703764714398618}
-        m_TargetAssemblyTypeName: CocktailShaker, Assembly-CSharp
-        m_MethodName: ToggleUI
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  ShakerSprite: {fileID: 21300000, guid: a38d06b768b5fff4284ccec1b5925d53, type: 3}
-  MethodUI: {fileID: 8061656765577325941}
-  ServeUI: {fileID: 921171936}
-  AddIceUI: {fileID: 4222985342316545139}
 --- !u!65 &1956533331405035116
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -13097,9 +13115,9 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 6703485261602215137}
-        m_TargetAssemblyTypeName: CocktailShakerData, Assembly-CSharp
-        m_MethodName: SetIngredientActive
+      - m_Target: {fileID: 9013287975813823370}
+        m_TargetAssemblyTypeName: IngredientButtonGroup, Assembly-CSharp
+        m_MethodName: SetInteractable
         m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -13109,7 +13127,7 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 1907703764714398618}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: CocktailShaker, Assembly-CSharp
         m_MethodName: set_Interactable
         m_Mode: 6
@@ -13160,8 +13178,8 @@ MonoBehaviour:
   OnEndedGame:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1907703764714398618}
-        m_TargetAssemblyTypeName: CocktailShaker, Assembly-CSharp
+      - m_Target: {fileID: 9013287975813823368}
+        m_TargetAssemblyTypeName: ShakerPanelController, Assembly-CSharp
         m_MethodName: SetCanShowMethodUI
         m_Mode: 6
         m_Arguments:
@@ -13172,8 +13190,8 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 1907703764714398618}
-        m_TargetAssemblyTypeName: CocktailShaker, Assembly-CSharp
+      - m_Target: {fileID: 9013287975813823368}
+        m_TargetAssemblyTypeName: ShakerPanelController, Assembly-CSharp
         m_MethodName: SetCanShowServeUI
         m_Mode: 6
         m_Arguments:
@@ -13184,8 +13202,8 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
-      - m_Target: {fileID: 1907703764714398618}
-        m_TargetAssemblyTypeName: CocktailShaker, Assembly-CSharp
+      - m_Target: {fileID: 9013287975813823368}
+        m_TargetAssemblyTypeName: ShakerPanelController, Assembly-CSharp
         m_MethodName: SetCanShowAddIceUI
         m_Mode: 6
         m_Arguments:
@@ -13196,7 +13214,7 @@ MonoBehaviour:
           m_StringArgument: ResultCam
           m_BoolArgument: 1
         m_CallState: 2
-      - m_Target: {fileID: 1907703764714398618}
+      - m_Target: {fileID: 0}
         m_TargetAssemblyTypeName: CocktailShaker, Assembly-CSharp
         m_MethodName: set_Interactable
         m_Mode: 6
@@ -13208,7 +13226,7 @@ MonoBehaviour:
           m_StringArgument: ResultCam
           m_BoolArgument: 1
         m_CallState: 2
-      - m_Target: {fileID: 5929196172070313435}
+      - m_Target: {fileID: 6410945659571304439}
         m_TargetAssemblyTypeName: CocktailSystemManager, Assembly-CSharp
         m_MethodName: UpdateCocktailInShaker
         m_Mode: 1
@@ -13452,10 +13470,13 @@ GameObject:
   - component: {fileID: 456283288010177071}
   - component: {fileID: 9013287975813823366}
   - component: {fileID: 4295152258894951048}
-  - component: {fileID: 1907703764714398618}
-  - component: {fileID: 6703485261602215137}
   - component: {fileID: 3879473060986582093}
-  - component: {fileID: 9013287975813823367}
+  - component: {fileID: 9013287975813823372}
+  - component: {fileID: 9013287975813823371}
+  - component: {fileID: 9013287975813823370}
+  - component: {fileID: 9013287975813823369}
+  - component: {fileID: 9013287975813823368}
+  - component: {fileID: 9013287975813823373}
   m_Layer: 9
   m_Name: CocktailShaker
   m_TagString: Untagged
@@ -15403,34 +15424,6 @@ Transform:
   - {fileID: 749094635134958633}
   m_Father: {fileID: 6410945659571304438}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &4316212931790287370
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6013997408221009630}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7fe5106f5fce476428c39de5c5362d04, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::BookUI
-  _pages:
-  - {fileID: 6824244278288866177}
-  - {fileID: 1579264286118895232}
-  - {fileID: 3848500391723852735}
-  - {fileID: 7142847924351611702}
-  _startPageIndex: 0
-  _wrapAround: 0
-  OnPageChanged:
-    m_PersistentCalls:
-      m_Calls: []
-  OnBookOpened:
-    m_PersistentCalls:
-      m_Calls: []
-  OnBookClosed:
-    m_PersistentCalls:
-      m_Calls: []
 --- !u!1 &4331323610512233059
 GameObject:
   m_ObjectHideFlags: 0
@@ -18274,26 +18267,6 @@ MonoBehaviour:
   _interactable: 1
   newScale: 1.1
   scaleDuration: 0.2
---- !u!114 &5929196172070313435
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 8549453407235873290}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4fc40022cfeeeff45a895e08d156163e, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: '::'
-  _endShiftBTN: {fileID: 1828677530}
-  _dialogueRunner: {fileID: 0}
-  _postItOrder: {fileID: 1631617833}
-  _normalCocktailRepository: {fileID: 11400000, guid: f46e05887f9c1bb49ac87b93118e5cfa, type: 2}
-  _specialCocktailRepository: {fileID: 0}
-  _failCocktailSprite: {fileID: 21300000, guid: 098ccd04d394f96479ed4a40fae4c482, type: 3}
-  _cocktailShakerData: {fileID: 6703485261602215137}
-  _cocktailShaker: {fileID: 1907703764714398618}
 --- !u!114 &5992139444433898967
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18323,7 +18296,6 @@ GameObject:
   - component: {fileID: 3089264309471175488}
   - component: {fileID: 4163056777520422074}
   - component: {fileID: 625600451391193223}
-  - component: {fileID: 4316212931790287370}
   m_Layer: 0
   m_Name: Canvas_Overlay-Book
   m_TagString: Untagged
@@ -18406,7 +18378,7 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 5929196172070313435}
+      - m_Target: {fileID: 6410945659571304439}
         m_TargetAssemblyTypeName: CocktailSystemManager, Assembly-CSharp
         m_MethodName: ResetCocktail
         m_Mode: 1
@@ -18663,6 +18635,28 @@ Transform:
   - {fileID: 2790530113999384651}
   m_Father: {fileID: 9194944203317526869}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6410945659571304439
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1241516923878043752}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4fc40022cfeeeff45a895e08d156163e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: '::'
+  _normalCocktailRepository: {fileID: 11400000, guid: e64c41a62842fd54491c7e08deb2cd77, type: 2}
+  _specialCocktailRepository: {fileID: 0}
+  _customerRoster: {fileID: 11400000, guid: e3a3fbdd06635a7ef811260fb95a32f1, type: 2}
+  _shakerContents: {fileID: 9013287975813823372}
+  _ingredientButtons: {fileID: 9013287975813823370}
+  _cocktailShaker: {fileID: 0}
+  _cocktailShakerData: {fileID: 0}
+  _endShiftBTN: {fileID: 1828677530}
+  _dialogueRunner: {fileID: 1545303316}
+  _postItOrder: {fileID: 1631617833}
 --- !u!224 &6438383310780943338
 RectTransform:
   m_ObjectHideFlags: 0
@@ -18955,188 +18949,6 @@ RectTransform:
   m_AnchoredPosition: {x: -480, y: 0}
   m_SizeDelta: {x: 960, y: 400}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &6703485261602215137
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2148763776751124476}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c8089d3203e65e84f927c45ab82a06a3, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CocktailShakerData
-  glassWaterSlosh: {fileID: 209704593}
-  OnAddAlcohol:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 6703485261602215137}
-        m_TargetAssemblyTypeName: CocktailShakerData, Assembly-CSharp
-        m_MethodName: TryToAddAlcohol
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  OnAddLiqueur:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 6703485261602215137}
-        m_TargetAssemblyTypeName: CocktailShakerData, Assembly-CSharp
-        m_MethodName: TryToAddLiqueur
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  OnAddMixer:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 6703485261602215137}
-        m_TargetAssemblyTypeName: CocktailShakerData, Assembly-CSharp
-        m_MethodName: TryToAddMixer
-        m_Mode: 0
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  OnAddIngredient:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 830191521745161996}
-        m_TargetAssemblyTypeName: VisualizeCocktail, Assembly-CSharp
-        m_MethodName: UpdateCocktailBars
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 6703485261602215137}
-        m_TargetAssemblyTypeName: CocktailShakerData, Assembly-CSharp
-        m_MethodName: CanIngredientActive
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-  OnResetedCocktail:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 1907703764714398618}
-        m_TargetAssemblyTypeName: CocktailShaker, Assembly-CSharp
-        m_MethodName: InternalResetShaker
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 830191521745161996}
-        m_TargetAssemblyTypeName: VisualizeCocktail, Assembly-CSharp
-        m_MethodName: UpdateCocktailBars
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 5148116747481161406}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
-        m_MethodName: SetActive
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 1907703764714398618}
-        m_TargetAssemblyTypeName: CocktailShaker, Assembly-CSharp
-        m_MethodName: set_Interactable
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
-  ingredientButtons:
-  - {fileID: 5167611187785147636}
-  - {fileID: 7143693199058570841}
-  - {fileID: 17350565506289549}
-  - {fileID: 4039429335838577330}
-  - {fileID: 3468697838113644561}
-  - {fileID: 6816103086023267986}
-  - {fileID: 6937617142135898167}
-  - {fileID: 2474725344602536884}
-  - {fileID: 529737720104520287}
-  - {fileID: 2021116135966770699}
-  - {fileID: 5051024869246235948}
-  - {fileID: 8149892390553144023}
-  - {fileID: 5218728829220100711}
-  - {fileID: 3540431501787442897}
-  - {fileID: 9055407222387393269}
-  - {fileID: 2884906080914184493}
-  - {fileID: 6645174633256040511}
-  bookUi: []
-  GlassVisualData:
-    m_keys: 01040203
-    m_values:
-    - GlassSprite: {fileID: 21300000, guid: 85dec20ee28411049944b6ec3939bf5b, type: 3}
-      WaterSprite: {fileID: 21300000, guid: cdc3d021a083f1747a6418b420ae7079, type: 3}
-      IceSprite: {fileID: 21300000, guid: d261ad122d516484f957e83a83c2d92e, type: 3}
-    - GlassSprite: {fileID: 21300000, guid: 4c75a519171beed47856b687ceb6a26d, type: 3}
-      WaterSprite: {fileID: 21300000, guid: 3648c4bf94ad455469737b0ecabfb349, type: 3}
-      IceSprite: {fileID: 21300000, guid: 4884ba1d33ea5c74e89f101895fdc7a2, type: 3}
-    - GlassSprite: {fileID: 21300000, guid: 643a6cbab2b32cc4a9c02ff8356a4b50, type: 3}
-      WaterSprite: {fileID: 21300000, guid: 78992ce5caadb2b41aff7e41b5e4826c, type: 3}
-      IceSprite: {fileID: 21300000, guid: 8916ef2da2ce2cd469eb4bb73c0f9e16, type: 3}
-    - GlassSprite: {fileID: 21300000, guid: 8433832da3c49cf4c95bb2cd8266af3f, type: 3}
-      WaterSprite: {fileID: 21300000, guid: 7dcbbd47321c45f4bb105f865ae3b5eb, type: 3}
-      IceSprite: {fileID: 21300000, guid: ed4fcf3006f812e4d847128c2eeac48d, type: 3}
 --- !u!224 &6725960075511140104
 RectTransform:
   m_ObjectHideFlags: 0
@@ -21092,8 +20904,8 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
-      - m_Target: {fileID: 1907703764714398618}
-        m_TargetAssemblyTypeName: CocktailShaker, Assembly-CSharp
+      - m_Target: {fileID: 9013287975813823368}
+        m_TargetAssemblyTypeName: ShakerPanelController, Assembly-CSharp
         m_MethodName: SetCanShowServeUI
         m_Mode: 6
         m_Arguments:
@@ -21104,8 +20916,8 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 1
         m_CallState: 2
-      - m_Target: {fileID: 1907703764714398618}
-        m_TargetAssemblyTypeName: CocktailShaker, Assembly-CSharp
+      - m_Target: {fileID: 9013287975813823368}
+        m_TargetAssemblyTypeName: ShakerPanelController, Assembly-CSharp
         m_MethodName: SetCanShowAddIceUI
         m_Mode: 6
         m_Arguments:
@@ -21532,7 +21344,6 @@ GameObject:
   m_Component:
   - component: {fileID: 9194944203317526869}
   - component: {fileID: 3294841446475725966}
-  - component: {fileID: 5929196172070313435}
   - component: {fileID: 9194944203317526870}
   m_Layer: 0
   m_Name: SystemGame
@@ -22060,7 +21871,7 @@ SpriteRenderer:
   m_SpriteTileMode: 0
   m_WasSpriteAssigned: 1
   m_SpriteSortPoint: 0
---- !u!114 &9013287975813823367
+--- !u!114 &9013287975813823368
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -22069,20 +21880,90 @@ MonoBehaviour:
   m_GameObject: {fileID: 2148763776751124476}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 00e671623cb26464190f5d2964b3fe22, type: 3}
+  m_Script: {fileID: 11500000, guid: 82e49898d08a10eba9af0fe510035c5b, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HoverTooltip
-  _interactable: 1
-  _providerObject: {fileID: 2148763776751124476}
-  _tooltipText: 
-  _hoverDelay: 1
-  _cursorOffset: {x: 0, y: 100}
-  _backgroundColour: {r: 0.08, g: 0.08, b: 0.08, a: 0.9}
-  _textColour: {r: 1, g: 1, b: 1, a: 1}
-  _fontSize: 36
-  _padding: {x: 14, y: 8}
-  _fadeDuration: 0.12
-  _sharedCanvas: {fileID: 502491162}
+  m_EditorClassIdentifier: Assembly-CSharp::ShakerPanelController
+  _methodUI: {fileID: 7254511325814799525}
+  _serveUI: {fileID: 921171934}
+  _addIceUI: {fileID: 2951717826170212899}
+  _canShowMethodUI: 1
+  _canShowAddIceUI: 0
+  _canShowServeUI: 0
+--- !u!114 &9013287975813823369
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2148763776751124476}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa7845125d7374376b3968829051bbd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::IngredientButtonGroup
+  _members: []
+  _startInteractable: 1
+--- !u!114 &9013287975813823370
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2148763776751124476}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fa7845125d7374376b3968829051bbd5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::IngredientButtonGroup
+  _members:
+  - {fileID: 529737720104520287}
+  - {fileID: 2021116135966770699}
+  - {fileID: 5051024869246235948}
+  - {fileID: 8149892390553144023}
+  - {fileID: 5218728829220100711}
+  - {fileID: 3540431501787442897}
+  - {fileID: 9055407222387393269}
+  - {fileID: 2884906080914184493}
+  - {fileID: 6645174633256040511}
+  _startInteractable: 1
+--- !u!114 &9013287975813823371
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2148763776751124476}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 90176d009a6b187a8a29aa11d8acaf0f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ShakerVisualPresenter
+  _glassWaterSlosh: {fileID: 209704593}
+  _glassVisuals: {fileID: 11400000, guid: 501cbd5c7c82a0df08be83eefe1b3903, type: 2}
+--- !u!114 &9013287975813823372
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2148763776751124476}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 799610f6c58adfad38c457a4adfc0ade, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ShakerContents
+--- !u!114 &9013287975813823373
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2148763776751124476}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f90def67d8f5c05cc9d45fc1bb33c208, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::ShakerTooltip
 --- !u!222 &9051662080852308253
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -22440,6 +22321,7 @@ GameObject:
 SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
+  - {fileID: 2103601421}
   - {fileID: 424879370}
   - {fileID: 1608620128271954548}
   - {fileID: 9194944203317526869}
@@ -22454,4 +22336,3 @@ SceneRoots:
   - {fileID: 1064966138}
   - {fileID: 1799108575}
   - {fileID: 1391191226}
-  - {fileID: 2103601421}

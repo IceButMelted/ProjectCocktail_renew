@@ -47,7 +47,7 @@
 | `AlcoholClassifier.cs` | 38 | §15.2 | หน่วยแอลกอฮอล์ → `TypeOfCocktail` (`1..5` Low, `>=6` High) |
 | `DrinkColorBlender.cs` | 46 | §21.1 | สีน้ำในแก้ว |
 | `DrinkQuery.cs` | 42 | §15 | ยอดรวมต่อหมวด, เพดาน 10 หน่วย, `CanAdd` |
-| `DrinkBuilder.cs` | 110 | §10, §17.3 | **ที่เดียวที่เขียนทับ `S_Drink`** — `TryAdd*`, `ApplyRecipeIdentity`, `Clear` |
+| `DrinkBuilder.cs` | 145 | §10, §17.3, §21 | **ที่เดียวที่เขียนทับ `S_Drink`** — `TryAdd*`, `ApplyRecipeIdentity`, `ApplyGlass`, `Clear` |
 | `DrinkFormatter.cs` | 49 | — | ข้อความ debug และ tooltip |
 | `IngredientMath.cs` | 96 | — | generic helper ที่ทำให้ 3 ลิสต์วัตถุดิบไม่ต้องมีโค้ดคนละก๊อป |
 
@@ -276,5 +276,8 @@ Yarn resolve **instance command** ด้วยชื่อ GameObject — `.yarn
 
 **เครื่องดื่มไม่เปลี่ยนสี/แก้ว** → เช็กว่า `CompatibleGlass` ของสูตรถูกกรอกหรือยัง (รัน validator)
 และตาราง `SO_GlassVisualTable` มีค่านั้นครบไหม
+
+**อยากให้ผู้เล่นเลือกแก้วเองได้ในสูตรไหน** → ตั้ง `CompatibleGlass` ของสูตรนั้นเป็น **`NotFix`**
+· กติกาอยู่ที่ `DrinkBuilder.ApplyGlass` แล้ว เหลือแค่ UI เรียก `ShakerContents.SetGlass(glass)` (S13)
 
 **เพิ่ม component ที่ต้องเปิด/ปิดตอนล็อกการชง** → `Shaker/InteractableToggle.cs` **ที่เดียว**

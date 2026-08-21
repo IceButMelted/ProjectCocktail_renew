@@ -17,11 +17,9 @@ public static class DrinkDeviation
     /// <summary>
     /// GDD §17.3 — the largest deviation still counted as Seem_Like.
     ///
-    /// TODO(design, plan D7): this value has NOT been play-tested yet. It is set to the
-    /// GDD's number as a starting point. Fixing S1 made the game markedly harder, so the
-    /// real value may need to be higher. Change it HERE ONLY — never hardcode the number
-    /// anywhere else. Before testing, point the scene at Normal_Cocktail (26 recipes),
-    /// not Demo_Normal_Cocktail (6) — see plan §10.3.
+    /// Confirmed by design on 2026-08-21 (plan decision D7): 3 stands, tested against the
+    /// full 26-recipe list after the S1 fix. This is a decision, not a placeholder.
+    /// Change it HERE ONLY — never hardcode the number anywhere else.
     /// </summary>
     public const int MaxTolerance = 3;
 

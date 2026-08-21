@@ -14,9 +14,9 @@ using UnityEngine;
 public class ShakerPanelController : MonoBehaviour
 {
     [Header("UI Panels")]
-    [SerializeField] private ToggleActive _methodUI;
-    [SerializeField] private ToggleActive _serveUI;
-    [SerializeField] private ToggleActive _addIceUI;
+    [SerializeField] private GameObject _methodUI;
+    [SerializeField] private GameObject _serveUI;
+    [SerializeField] private GameObject _addIceUI;
 
     [Header("Initial Permissions")]
     [SerializeField] private bool _canShowMethodUI = true;
@@ -27,7 +27,7 @@ public class ShakerPanelController : MonoBehaviour
     /// Seeds panel references when this component was created at runtime by the
     /// CocktailShaker compatibility shim. Assign them in the Inspector after migrating.
     /// </summary>
-    public void Initialize(ToggleActive methodUI, ToggleActive addIceUI, ToggleActive serveUI)
+    public void Initialize(GameObject methodUI, GameObject addIceUI, GameObject serveUI)
     {
         if (_methodUI == null) _methodUI = methodUI;
         if (_addIceUI == null) _addIceUI = addIceUI;
@@ -51,11 +51,13 @@ public class ShakerPanelController : MonoBehaviour
     /// <summary>Toggles whichever panels are currently permitted.</summary>
     public void ToggleUI()
     {
-        if (_canShowMethodUI && _methodUI != null) _methodUI.ToggleActiveGameObject();
-        if (_canShowAddIceUI && _addIceUI != null) _addIceUI.ToggleActiveGameObject();
-        if (_canShowServeUI && _serveUI != null) _serveUI.ToggleActiveGameObject();
+        if (_canShowMethodUI && _methodUI != null) _methodUI.gameObject.SetActive(!_methodUI.gameObject.activeSelf);
+        if (_canShowAddIceUI && _addIceUI != null) _addIceUI.gameObject.SetActive(!_addIceUI.gameObject.activeSelf);
+        if (_canShowServeUI && _serveUI != null) _serveUI.gameObject.SetActive(!_serveUI.gameObject.activeSelf);
     }
 
+    
+    
     /// <summary>Back to the start-of-drink permissions: method only.</summary>
     public void ResetPermissions()
     {

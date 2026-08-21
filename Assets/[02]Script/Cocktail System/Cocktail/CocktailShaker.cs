@@ -17,9 +17,9 @@ public class CocktailShaker : Interactable_2_5DObject
 
     [Header("UI Panels")]
     [Tooltip("LEGACY — handed to ShakerPanelController on Awake. Assign them there once migrated.")]
-    public ToggleActive MethodUI;
-    public ToggleActive ServeUI;
-    public ToggleActive AddIceUI;
+    public GameObject MethodUI;
+    public GameObject ServeUI;
+    public GameObject AddIceUI;
 
     // ── Private State ──────────────────────────────────────
 

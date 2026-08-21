@@ -64,6 +64,12 @@ public partial class E_Cocktail
         Martini,
         Cocktail,
         LongDrink,
+
+        /// <summary>
+        /// "The player picks." A recipe set to NotFix hands glass selection to the player
+        /// (GDD §21), and DrinkBuilder.ApplyGlass will not overwrite their choice. Every
+        /// other value pins the glass to the recipe.
+        /// </summary>
         NotFix
     }
 

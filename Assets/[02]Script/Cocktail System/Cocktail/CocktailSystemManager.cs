@@ -24,8 +24,44 @@ public partial class CocktailSystemManager : MonoBehaviour
     [SerializeField] private SO_CustomerRoster _customerRoster;
 
     [Header("Cocktail References")]
-    public CocktailShakerData _cocktailShakerData;
+    [Tooltip("The drink in the glass. Preferred — assign this once the scene has been migrated.")]
+    [SerializeField] private ShakerContents _shakerContents;
+
+    [Tooltip("Ingredient buttons to lock while the player may not pour.")]
+    [SerializeField] private IngredientButtonGroup _ingredientButtons;
+
+    [Tooltip("Optional. Only used by CocktailShaker-based scenes.")]
     public CocktailShaker _cocktailShaker;
+
+    [Tooltip("LEGACY compatibility shim. Leave empty in migrated scenes — see the manual setup doc.")]
+    public CocktailShakerData _cocktailShakerData;
+
+    // ── Shaker access ──────────────────────────────────────
+    // Resolved lazily, not in Awake: in an unmigrated scene the real components are created
+    // by CocktailShakerData.Awake, and component Awake order on one GameObject is not
+    // guaranteed, so reading them eagerly can pick up a null.
+
+    /// <summary>The drink in the glass, whichever way this scene is wired.</summary>
+    private ShakerContents Contents
+    {
+        get
+        {
+            if (_shakerContents != null) return _shakerContents;
+            if (_cocktailShakerData != null) _shakerContents = _cocktailShakerData.Contents;
+            return _shakerContents;
+        }
+    }
+
+    /// <summary>Ingredient buttons, whichever way this scene is wired.</summary>
+    private IngredientButtonGroup IngredientButtons
+    {
+        get
+        {
+            if (_ingredientButtons != null) return _ingredientButtons;
+            if (_cocktailShakerData != null) _ingredientButtons = _cocktailShakerData.IngredientGroup;
+            return _ingredientButtons;
+        }
+    }
 
     // ── Character data ─────────────────────────────────────
     // Declared here, next to the Awake() that fills it. It is read from the Yarn partial,
@@ -109,8 +145,14 @@ public partial class CocktailSystemManager : MonoBehaviour
     /// </summary>
     public void ResetCocktail()
     {
-        _cocktailShakerData.ResetShaker();
-        _cocktailShakerData.ResetCocktailData();
+        if (Contents == null)
+        {
+            Debug.LogWarning("[CocktailSystemManager] No ShakerContents assigned — nothing to reset.", this);
+            return;
+        }
+
+        Contents.Clear();
+        if (IngredientButtons != null) IngredientButtons.SetInteractable(true);
     }
 
     // Cocktail — Public API
@@ -140,7 +182,7 @@ public partial class CocktailSystemManager : MonoBehaviour
     /// result, payout and relationship change on <see cref="Order"/>.
     /// </summary>
     public Satisfaction CalculateSatisfaction()
-        => Scoring.Score(Order, _cocktailShakerData.CurrentCocktail);
+        => Contents == null ? Satisfaction.None : Scoring.Score(Order, Contents.CurrentCocktail);
 
     /// <summary>GDD §18.1 — what the customer paid for the drink just scored.</summary>
     public float LastPayout => Order.Payout;
@@ -148,7 +190,16 @@ public partial class CocktailSystemManager : MonoBehaviour
     public string GetTargetName() => Order.TargetName;
 
     /// <summary>Derives the identity of whatever is in the shaker and refreshes visuals.</summary>
-    public void UpdateCocktailInShaker() => _cocktailShakerData.UpdateCocktailInShaker(_allDrinks);
+    public void UpdateCocktailInShaker()
+    {
+        if (Contents == null)
+        {
+            Debug.LogWarning("[CocktailSystemManager] No ShakerContents assigned — cannot update the drink.", this);
+            return;
+        }
+
+        Contents.UpdateIdentity(_allDrinks);
+    }
 
     /// <summary>Editor / debug helper — picks a random target without returning it.</summary>
     public void RandomCocktailForDebug() => RandomCocktail();
@@ -157,7 +208,8 @@ public partial class CocktailSystemManager : MonoBehaviour
     public void DebugTargetCocktail() => Debug.Log(DrinkFormatter.GetCocktailInfo(Order.Target));
 
     [ContextMenu("DebugCurrentCocktail")]
-    public void DebugCurrentCocktail() => Debug.Log(DrinkFormatter.GetCocktailInfo(_cocktailShakerData.CurrentCocktail));
+    public void DebugCurrentCocktail()
+        => Debug.Log(Contents == null ? "(no ShakerContents)" : DrinkFormatter.GetCocktailInfo(Contents.CurrentCocktail));
 
     [ContextMenu("DebugLastMatch")]
     public void DebugLastMatch() => Debug.Log(DrinkFormatter.DescribeMatch(Order.Match));

@@ -68,6 +68,22 @@ public class ShakerContents : MonoBehaviour, IIngredientReceiver
     }
 
     /// <summary>
+    /// Records the glass the player picked (GDD §21 — cosmetic only, no effect on scoring).
+    ///
+    /// It survives later ingredient additions ONLY when the matched recipe's glass is
+    /// <see cref="GlassType.NotFix"/>, which is how a recipe says "player's choice".
+    /// Any other recipe stamps its own glass over this on the next identity update.
+    /// </summary>
+    public void SetGlass(GlassType glass)
+    {
+        CurrentCocktail.CompatibleGlass = glass;
+        Changed?.Invoke();
+    }
+
+    /// <summary>Glass currently on the drink.</summary>
+    public GlassType CurrentGlass => CurrentCocktail.CompatibleGlass;
+
+    /// <summary>
     /// Which minigame the drink's method calls for (GDD §10).
     /// MinigameFlowBridge reads this as its second-priority type source
     /// (Bar410_Minigame_Integration_Plan §3.1).

@@ -353,7 +353,7 @@ glass: Hi_ball x3, Rocks x2, Magrita x1, None x20
 |---|---|---|
 | **S6** | §17.3 Fail(b) → ชื่อสุ่ม | ยังไม่มีคลังชื่อที่ designer เขียน ตอนนี้ใช้ `"???"` |
 | **S8** | §21.1 Fail(b) → `BlendIngredientColors` | ไม่มีข้อมูลสีต่อวัตถุดิบใน data model เลย |
-| **S13** | §10/§21 ผู้เล่นเลือกแก้วเอง | ยังไม่มี UI เลือกแก้ว |
+| **S13** | §10/§21 ผู้เล่นเลือกแก้วเอง | **กติกาทำแล้ว** — สูตรที่ตั้งเป็น `NotFix` จะไม่ทับแก้วที่ผู้เล่นเลือก · เหลือแค่ UI ให้กดเลือก → `ShakerContents.SetGlass` |
 | S14 | §16 `MixMethod.Build` | เลื่อนตาม D4 — รอ Building minigame |
 | S15 | §16 `unlockedByDefault` | เลื่อนตาม D1 — ใช้ระบบ 2 asset แทน |
 
