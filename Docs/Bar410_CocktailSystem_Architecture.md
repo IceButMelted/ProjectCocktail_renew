@@ -13,7 +13,7 @@
 
 ```
 ┌─ Flow bridges ─────────── Hierarchical State Machine/  (Bar410.GameFlow)
-│    BarSetupBridge          CocktailFlowBridge
+│    BarSetupBridge          CocktailFlowBridge          GarnishFlowBridge (ใหม่)
 │         ↓ เรียกลงมา · ห้ามมีใครเรียกขึ้นไป
 ├─ Yarn adapters ────────── Cocktail System/Yarn/
 │    YarnTask   YarnOrders   YarnDebug   YarnVariableSync
@@ -22,11 +22,21 @@
 ├─ Scene runtime ────────── Cocktail System/Cocktail/Shaker/ (MonoBehaviour)
 │    ShakerContents   ShakerVisualPresenter   ShakerPanelController
 │    IngredientButtonGroup   ShakerTooltip   InteractableToggle
+├─ Serving glass (ใหม่) ─── Cocktail System/Cocktail/Glass/  (MonoBehaviour + SO)
+│    SO_GlassOption   E_GarnishLook   GlassShelfSlot
+│    PlacedGlassInstance   GlassPlacementZone   PourSource
+├─ Ingredient drag (ใหม่) ─ Cocktail System/Cocktail/Ingredients/ (MonoBehaviour)
+│    IngredientHoverDetector   BottleIngredientSource
+│    FruitTraySlot   FruitPieceInstance
 └─ Domain ───────────────── Cocktail System/Cocktail/Domain/ (static, ไม่มี Unity lifecycle)
      DrinkDeviation   DrinkFlagResolver   SatisfactionEvaluator   PricingRules
      AlcoholClassifier   DrinkColorBlender   DrinkQuery   DrinkBuilder
      DrinkFormatter   IngredientMath   RecipeMatch
 ```
+
+> **Glass/Ingredients (ใหม่ 2026-08-22):** ระบบผู้เล่นเลือกแก้วเสิร์ฟเอง + ลาก-วางวัตถุดิบ
+> แทนที่ `CompatibleGlass`/`NotFix` เดิมทั้งหมด — รายละเอียดเต็มอยู่ที่
+> `Docs/Bar410_GlassFreedom_ManualSetup.md` ไม่ใช่เอกสารนี้ (เอกสารนี้แค่ให้เห็นตำแหน่งในสถาปัตยกรรม)
 
 **กฎเดียวที่ต้องจำ:** ลูกศรชี้ลงเสมอ — ชั้นล่างห้ามรู้จักชั้นบน
 `Domain/` ไม่รู้จัก `MonoBehaviour` เลย และ state class ใน HSM ไม่รู้จัก `UnityEngine` เลย
@@ -99,9 +109,33 @@
 | `ShakerVisualPresenter.cs` | 92 | **ภาพของแก้ว** — สีน้ำ, sprite แก้ว/น้ำแข็ง, `WaterSlosh` · ฟัง event จาก `ShakerContents` |
 | `ShakerPanelController.cs` | 74 | **สิทธิ์เปิดแผง** Method / AddIce / Serve · `LockAll` / `ResetPermissions` ให้ HSM สั่งได้ |
 | `IngredientButtonGroup.cs` | 67 | **roster ของ object ที่เปิด/ปิดพร้อมกัน** · ใช้ 2 ตัว (วัตถุดิบ / หนังสือ) · `SetRoster` ให้ `BarSetupBridge` เปลี่ยนรายการได้ตอนรัน |
-| `InteractableToggle.cs` | 37 | **จุดเดียวที่รู้ว่า "เปิดให้กดได้" แปลว่าต้องแตะ component ไหน** — เพิ่ม component ชนิดใหม่ แก้ที่นี่ที่เดียว |
+| `InteractableToggle.cs` | 37 | **จุดเดียวที่รู้ว่า "เปิดให้กดได้" แปลว่าต้องแตะ component ไหน** — เพิ่ม component ชนิดใหม่ แก้ที่นี่ที่เดียว · ตั้งแต่ 2026-08-22 มี `ApplyPrepareBarPhase`/`ApplyPrepareDrinksPhase` เป็นชุดค่าสุดท้ายต่อเฟส HSM ด้วย (แทน "เปิดหมดแล้วปิดย้อนหลังบางตัว") |
 | `ShakerTooltip.cs` | 17 | ข้อความ tooltip ตอน hover |
-| `SO_GlassVisualTable.cs` | 63 | asset ตาราง `GlassType → sprite` + คลาส `GlassVisual` |
+
+> ⚠️ `SO_GlassVisualTable.cs` ยังอยู่ในโฟลเดอร์นี้แต่**ไม่ใช่ระบบแก้วปัจจุบันแล้ว** — เก็บไว้เฉพาะให้
+> `CocktailShakerData` (legacy shim) เรียกใช้ได้ ระบบแก้วจริงตอนนี้คือ `SO_GlassOption` ใน §4b
+
+## 4b. Glass — ผู้เล่นเลือกแก้วเสิร์ฟเอง (`Cocktail System/Cocktail/Glass/`) — ใหม่ 2026-08-22
+
+แทนที่ `S_Drink.CompatibleGlass`/`NotFix` เดิมทั้งหมด (ลบฟิลด์ออกจาก `S_Drink` แล้ว) รายละเอียด
+setup เต็มอยู่ที่ `Docs/Bar410_GlassFreedom_ManualSetup.md`
+
+| ไฟล์ | หน้าที่เดียวของมัน |
+|---|---|
+| `SO_GlassOption.cs` | asset หนึ่งใบ = แก้วหนึ่งแบบ (sprite + garnish look + placed prefab) |
+| `E_GarnishLook.cs` | enum ลายตกแต่ง — ยังเป็น placeholder รอ design |
+| `GlassShelfSlot.cs` | ตำแหน่งชั้นวาง สร้างแก้วใหม่แทนที่ทุกครั้งที่ใบเก่าถูกหยิบไป |
+| `PlacedGlassInstance.cs` | แก้วที่วางอยู่บนโต๊ะจริง — ทำลายทิ้งหลังเสิร์ฟทุกครั้ง |
+| `GlassPlacementZone.cs` | โซนบนโต๊ะ รับแก้วได้ใบเดียว**ทั้งซีน** (`_occupant` เป็น `static` โดยตั้งใจ) |
+| `PourSource.cs` | marker บน `CocktailShaker` ให้ `GlassPlacementZone` แยกออกจากแก้ว |
+
+## 4c. Ingredients — ลาก-วางวัตถุดิบเข้าภาชนะชง (`Cocktail System/Cocktail/Ingredients/`) — ใหม่ 2026-08-22
+
+| ไฟล์ | หน้าที่เดียวของมัน |
+|---|---|
+| `IngredientHoverDetector.cs` | helper ราคาศ (ไม่ใช่ placement zone) เช็คว่าเมาส์ชี้ทับภาชนะชงอยู่ไหม |
+| `BottleIngredientSource.cs` | ติดคู่ขวด — ลาก hover ทับภาชนะชงแล้วปล่อย = เท, ดีดกลับที่เดิมเสมอ — **เทสแล้ว ใช้งานได้จริง** |
+| `FruitTraySlot.cs` / `FruitPieceInstance.cs` | ถาดผลไม้ — ชิ้นผลไม้เป็น child ของถาด มองไม่เห็นจนกว่าจะลาก ใช้แล้วหายเสมอ — **ยังไม่ได้ทำ/เทสในซีนจริง** |
 
 ---
 
@@ -211,7 +245,7 @@ Yarn resolve **instance command** ด้วยชื่อ GameObject — `.yarn
 
 | ไฟล์ | เมนู | หน้าที่ |
 |---|---|---|
-| `CocktailDataValidator.cs` | `Bar410 > Validate Cocktail Data` | ไล่ทุก `S_Drink` และ `SO_GlassVisualTable` แล้วรายงานว่าอะไรขาด — `Σ != 10`, `CompatibleGlass = None`, สูตรซ้ำ, ช่องแก้วที่ยังไม่ได้กรอก |
+| `CocktailDataValidator.cs` | `Bar410 > Validate Cocktail Data` | ไล่ทุก `S_Drink` แล้วรายงานว่าอะไรขาด — `Σ != 10`, สูตรซ้ำ, ไม่มีชื่อ · เลิกเช็ค `CompatibleGlass` แล้ว (ฟิลด์ถูกลบ 2026-08-22) — `ValidateGlassTables` ที่เหลืออยู่เช็คแค่ `SO_GlassVisualTable` ของ legacy shim เท่านั้น |
 | `IngredientButtonUIEditor.cs` | — | Inspector ของ `IngredientButtonUI` ซ่อนช่องที่ไม่เกี่ยวกับ action ที่เลือก |
 
 ---
@@ -277,10 +311,12 @@ Yarn resolve **instance command** ด้วยชื่อ GameObject — `.yarn
 **อยากให้ HSM สั่งอะไรเพิ่ม** → เพิ่มใน bridge ทั้งสองตัว **ห้ามแก้ state class**
 · state ยิง event, bridge แปลเป็นผลในซีน
 
-**เครื่องดื่มไม่เปลี่ยนสี/แก้ว** → เช็กว่า `CompatibleGlass` ของสูตรถูกกรอกหรือยัง (รัน validator)
-และตาราง `SO_GlassVisualTable` มีค่านั้นครบไหม
+**เครื่องดื่มไม่เปลี่ยนสีในแก้ว** → เช็ก `ShakerContents.CurrentCocktail.waterColorTop/Bottom` และ
+`ShakerVisualPresenter.Apply` — ไม่เกี่ยวกับ `CompatibleGlass` แล้ว (ฟิลด์นี้ถูกลบออกจาก `S_Drink`)
 
-**อยากให้ผู้เล่นเลือกแก้วเองได้ในสูตรไหน** → ตั้ง `CompatibleGlass` ของสูตรนั้นเป็น **`NotFix`**
-· กติกาอยู่ที่ `DrinkBuilder.ApplyGlass` แล้ว เหลือแค่ UI เรียก `ShakerContents.SetGlass(glass)` (S13)
+**อยากให้ผู้เล่นเลือกแก้วเสิร์ฟเอง** → ไม่ต้องตั้งอะไรที่สูตรอีกต่อไป — **ทุกสูตรเป็นแบบนั้นอยู่แล้ว
+โดยอัตโนมัติ** ผู้เล่นลากแก้วจาก `GlassShelfSlot` มาวางที่ `GlassPlacementZone` เอง ดู §4b และ
+`Docs/Bar410_GlassFreedom_ManualSetup.md` (ระบบ `NotFix`/`DrinkBuilder.ApplyGlass`/
+`ShakerContents.SetGlass` เดิมถูกลบทั้งหมดแล้ว 2026-08-22)
 
 **เพิ่ม component ที่ต้องเปิด/ปิดตอนล็อกการชง** → `Shaker/InteractableToggle.cs` **ที่เดียว**

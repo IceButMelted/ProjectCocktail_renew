@@ -79,6 +79,8 @@ public class Interactable_2_5DObject : PointerInteractableBase
         _isDragging = false;
         _pointerDownScreenPos = eventData.position;
         _spriteRenderer.sprite = S_Clicked;
+
+
     }
 
     public override void OnDrag(PointerEventData eventData)
@@ -153,7 +155,11 @@ public class Interactable_2_5DObject : PointerInteractableBase
         else
         {
             _spriteRenderer.sprite = _disabledSprite != null ? _disabledSprite : S_Default;
-            _spriteRenderer.color = _disabledColour;
+            _spriteRenderer.color = Color.white;
+
+            if(_disabledSprite == null)
+                _spriteRenderer.color = _disabledColour;
+
             _isHovering = false;
         }
     }

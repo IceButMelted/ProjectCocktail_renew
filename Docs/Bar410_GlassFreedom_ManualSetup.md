@@ -1,10 +1,11 @@
 # Bar410 — Glass Freedom & Two-Track Building: งานที่ต้องทำมือใน Unity
 
-**Date:** 2026-08-21 · **Branch:** `GameLoop/main`
+**Date:** 2026-08-21 · **อัปเดตล่าสุด:** 2026-08-22 · **Branch:** `GameLoop/main`
 **คู่กับ:** แผนงาน `robust-watching-lark` (ผู้เล่นเลือกแก้วเสิร์ฟเอง + แยกขั้นตอนชง/เลือกแก้ว)
-**อ้างอิงเพิ่ม:** `Bar410_CocktailSystem_Manual_Setup.md` (งานมือของรอบ refactor ก่อนหน้า — ยังไม่ปิด)
+**อ้างอิงเพิ่ม:** `Bar410_CocktailSystem_Manual_Setup.md` (งานมือของรอบ refactor ก่อนหน้า — ยังไม่ปิด, ส่วนแก้วในนั้นถูกแทนที่ด้วยเอกสารนี้แล้ว)
+**สถานะรวม:** ✅ **ยืนยันแล้วว่าเล่นได้จริงในซีน** (`New Cocktail System.unity` — ซีนทดสอบแยกของผู้ใช้) ทั้งฝั่งวางแก้วเสิร์ฟ (หยิบ/วาง/สลับแก้ว) และฝั่งวัตถุดิบหมวด **ขวด** (`BottleIngredientSource` ลากเทเข้าแก้วชง รวมถึงแก้บั๊กสั่น/jitter แล้ว) — **เหลือหมวด "Fruit" (`FruitTraySlot`/`FruitPieceInstance`) ที่ยังไม่ได้ทำ/เทสในซีนจริง** (ดู §1.3, §2.2, §3.3)
 
-โค้ดฝั่งนี้เขียนครบและคอมไพล์ผ่านแล้ว (`refresh_unity` + `read_console` ไม่มี error, `Bar410 > Validate Cocktail Data` ผ่าน) **แต่ยังเล่นไม่ได้ในซีน** — ของใหม่ทั้งหมดเป็นแค่คลาส ยังไม่มี GameObject/prefab จริงในซีนสักตัว งานที่เหลือทั้งหมดในเอกสารนี้คือ **งานมือใน Unity Editor + งาน art/design** ไม่ใช่โค้ด
+โค้ดทั้งหมดคอมไพล์ผ่าน (`refresh_unity` + `read_console` ไม่มี error, `Bar410 > Validate Cocktail Data` ผ่าน) งานที่เหลือในเอกสารนี้ (เฉพาะส่วน Fruit) คือ **งานมือใน Unity Editor + งาน art/design** ไม่ใช่โค้ด
 
 เรียงตามลำดับที่ควรทำ: **§1 art/data ก่อน** (ไม่มีของพวกนี้ prefab สร้างไม่ได้) → **§2 prefab** → **§3 วางในซีน** → **§4 ผูก Inspector** → **§5 ปุ่ม UI** → **§6 ทดสอบทีละก้อนตามลำดับ**
 
@@ -12,19 +13,20 @@
 
 ## 0. ภาพรวมของที่เพิ่มเข้ามา
 
-| ไฟล์ | อยู่ที่ | หน้าที่ |
-|---|---|---|
-| `SO_GlassOption` | `Cocktail/Glass/` | หนึ่ง asset = แก้วหนึ่งแบบที่เลือกได้ (sprite + garnish look + prefab) |
-| `E_GarnishLook` | `Cocktail/Glass/` | enum ลาย/สไตล์ตกแต่ง — **ตอนนี้เป็น placeholder เฉยๆ** (ดู §5.2) |
-| `GlassShelfSlot` | `Cocktail/Glass/` | ตำแหน่งบนชั้นวาง หนึ่ง slot ต่อหนึ่ง `SO_GlassOption` |
-| `PlacedGlassInstance` | `Cocktail/Glass/` | ตัวแก้วที่ถูกลากมาวางจริง (spawn จาก `GlassShelfSlot`) |
-| `GlassPlacementZone` | `Cocktail/Glass/` | โซนบนโต๊ะ รับแก้วได้ 1 ใบ + รับการ "เท" จากภาชนะชง |
-| `PourSource` | `Cocktail/Glass/` | marker เฉยๆ ติดคู่กับ `CocktailShaker` |
-| `IngredientHoverDetector` | `Cocktail/Ingredients/` | helper ราคาศ (ไม่ใช่ zone) เช็คว่าเมาส์ชี้ทับภาชนะชงอยู่หรือไม่ — ใช้ `N_InputManager.GetObjectMouseHover()` เดิม |
-| `BottleIngredientSource` | `Cocktail/Ingredients/` | ติดคู่ขวดเดิม — ลากไป hover ทับภาชนะชง = สแนปไปหน้าแก้วชง ปล่อย = เท (ดีดกลับที่เดิมเสมอ) |
-| `FruitTraySlot` / `FruitPieceInstance` | `Cocktail/Ingredients/` | ถาดผลไม้ — ลากได้ทีละชิ้น กลไก hover เดียวกับขวด ใช้แล้วหายเสมอ |
-| `GarnishFlowBridge` | `Hierarchical State Machine/Level 2 - Open Bar/` | คุมการเทตอน Garnish State (ใหม่) |
-| `CocktailFlowBridge` | (ของเดิม, แก้เพิ่ม) | ทำลายแก้วที่วางไว้ตอนกลับเข้า PrepareDrinks |
+| ไฟล์ | อยู่ที่ | หน้าที่ | สถานะ |
+|---|---|---|---|
+| `SO_GlassOption` | `Cocktail/Glass/` | หนึ่ง asset = แก้วหนึ่งแบบที่เลือกได้ (sprite + garnish look + prefab) | ✅ ใช้งานจริงแล้ว |
+| `E_GarnishLook` | `Cocktail/Glass/` | enum ลาย/สไตล์ตกแต่ง — **ตอนนี้เป็น placeholder เฉยๆ** (ดู §5.2) | 🔖 ค้าง (content) |
+| `GlassShelfSlot` | `Cocktail/Glass/` | ตำแหน่งบนชั้นวาง หนึ่ง slot ต่อหนึ่ง `SO_GlassOption` | ✅ เทสแล้ว |
+| `PlacedGlassInstance` | `Cocktail/Glass/` | ตัวแก้วที่ถูกลากมาวางจริง (spawn จาก `GlassShelfSlot`) | ✅ เทสแล้ว (หยิบ/วาง/สลับแก้วทำงานถูกต้อง) |
+| `GlassPlacementZone` | `Cocktail/Glass/` | โซนบนโต๊ะ รับแก้วได้ 1 ใบ (แชร์ทั้งซีนผ่าน `static _occupant`) + รับการ "เท" จากภาชนะชง | ✅ เทสแล้ว |
+| `PourSource` | `Cocktail/Glass/` | marker เฉยๆ ติดคู่กับ `CocktailShaker` | ✅ |
+| `IngredientHoverDetector` | `Cocktail/Ingredients/` | helper ราคาศ (ไม่ใช่ zone) เช็คว่าเมาส์ชี้ทับภาชนะชงอยู่หรือไม่ — ใช้ `N_InputManager.GetObjectMouseHover()` เดิม | ✅ ใช้งานจริงแล้ว |
+| `BottleIngredientSource` | `Cocktail/Ingredients/` | ติดคู่ขวดเดิม — ลากไป hover ทับภาชนะชง = สแนปไปหน้าแก้วชง ปล่อย = เท (ดีดกลับที่เดิมเสมอ) | ✅ **เทสแล้ว ใช้งานได้จริง** (รวมแก้บั๊กสั่น/self-occlusion แล้ว) |
+| `FruitTraySlot` / `FruitPieceInstance` | `Cocktail/Ingredients/` | ถาดผลไม้ — ลากได้ทีละชิ้น กลไก hover เดียวกับขวด ใช้แล้วหายเสมอ, เป็น child ของถาด (ตามถาดได้ตอนย้าย) | 🔴 **ยังไม่ได้ทำในซีน/ยังไม่เทส** — โค้ดเขียนเสร็จ คอมไพล์ผ่าน แต่ไม่มี prefab/GameObject จริง (ดู §1.3, §2.2, §3.3) |
+| `GarnishFlowBridge` | `Hierarchical State Machine/Level 2 - Open Bar/` | คุมการเทตอน Garnish State (ใหม่) | 🔖 ยังไม่ได้ผูกในซีน/ยังไม่เทส |
+| `CocktailFlowBridge` | (ของเดิม, แก้เพิ่ม) | ทำลายแก้วที่วางไว้ตอนกลับเข้า PrepareDrinks | 🔖 ยังไม่ได้ผูก `_glassZone`/ยังไม่เทส |
+| `IngredientButtonGroup`/`InteractableToggle` phase methods | `Cocktail/Shaker/` (ของเดิม, แก้เพิ่ม) | `EnableInteractablePrepareBarPhase()`/`EnableInteractablePrepareDrinksPhase()` — สลับสิทธิ์ลาก bar-layout ↔ ลากเทตามเฟส HSM | ✅ ผูกแล้วใน `GameFlowHooks` (`New Cocktail System.unity`), เทสแล้ว |
 
 ---
 
@@ -85,6 +87,11 @@ Component ที่ต้องมี:
 | `SpriteRenderer` | sprite ของชิ้นผลไม้นั้น |
 | `FruitPieceInstance` | ไม่ต้องตั้งอะไร — `Initialize` ถูกเรียกตอน spawn จาก `FruitTraySlot` |
 
+> **ชิ้นนี้จะไม่แสดงผล (renderer ปิดอยู่) จนกว่าจะเริ่มลากจริงๆ** — `FruitPieceInstance` ปิด
+> `Renderer` ทุกตัวใน children ตอน `Awake()` แล้วเปิดกลับตอนเริ่มลาก (ยัง**มี** collider ทำงานอยู่
+> เสมอ ลากได้ตั้งแต่แรก แค่มองไม่เห็นจนกว่าจะขยับ) — เพราะงั้น **`FruitTraySlot` ต้องมี sprite/art
+> ของตัวเองแสดงว่า "มีผลไม้อยู่ในถาด"** ไม่งั้นถาดจะดูว่างเปล่า
+
 ---
 
 ## 3. วางในซีน `New Drag Drop System`
@@ -104,11 +111,36 @@ Component ที่ต้องมี:
 
 ### 3.3 ถาดผลไม้ (6 จุด)
 
-ต่อผลไม้แต่ละชนิด: สร้าง GameObject ว่างที่ตำแหน่งถาด → เพิ่ม **`FruitTraySlot`** → ผูก
-**Fruit Type** (`Mixer` enum ค่าที่ตรงกัน) และ **Piece Prefab** (จาก §2.2)
+ต่อผลไม้แต่ละชนิด: สร้าง GameObject ที่ตำแหน่งถาด (**ใส่ sprite ของตัวเองด้วย** เพราะชิ้นที่ spawn
+ออกมาจะมองไม่เห็นจนกว่าจะลาก — ดู §2.2) → เพิ่ม **`Collider`** + **`FruitTraySlot`** (ตอนนี้
+`[RequireComponent(typeof(DragableObject))]` แล้ว — เพิ่ม `FruitTraySlot` ปุ๊บ Unity จะเพิ่ม
+`DragableObject` ให้เองอัตโนมัติ) → ผูก **Fruit Type** (`Mixer` enum ค่าที่ตรงกัน) และ
+**Piece Prefab** (จาก §2.2)
 
 > พิจารณาว่าจะ**เอา `IngredientButtonUI`/`DragableObject` เดิมของ 6 ขวดนี้ออกจากชั้นวางขวด**
 > เพราะตอนนี้กลายเป็นถาดแทนขวดแล้ว ไม่ใช่ขวดอีกต่อไป
+
+**ทำไมตัว Tray เองก็เป็น `DragableObject`:** เพื่อให้ย้ายทั้งถาดได้ตอนจัดร้าน (Prepare) เหมือนของ
+วางบาร์อื่นๆ — ชิ้นผลไม้ที่ spawn ออกมาตอนนี้เป็น **child ของ `FruitTraySlot`** แล้ว (ผูกไว้ใน
+`Instantiate(..., transform)`) จะตามตัวถาดไปด้วยเวลาลากย้ายที่
+
+**ผูกเปิด/ปิดการลากทั้งถาดตามช่วง (ใช้ Inspector binding แบบเดียวกับที่มีอยู่แล้ว ไม่ต้องเขียนโค้ดใหม่):**
+ในซีนนี้ `[GameLoop] > GameFlow Hooks` ช่อง **Level 3 · `_addIngredient`** ผูก `OnEnter` →
+`IngredientButtonGroup.Enable()` และ `OnExit` → `.Disable()` บน `_ingredients` อยู่แล้ว (คู่กับที่
+`CocktailFlowBridge` ทำเรื่องเดียวกันซ้ำในโค้ด — ไม่ชนกัน) ให้ทำแบบเดียวกันกับถาดผลไม้ (และจะทำกับ
+ขวดที่แปลงเป็น drag ได้ก็ได้เหมือนกัน) โดยผูกที่ **`_prepareBar`** (Level 1) แทน:
+- **`_prepareBar.OnEnter`** → ลาก `FruitTraySlot`'s `DragableObject` ของแต่ละถาดเข้าไปในช่อง
+  target → เลือก property **Interactable** (bool) → ตั้งเป็น **true**
+- **`_prepareBar.OnExit`** → target เดียวกัน → **Interactable** → **false**
+
+ผลคือ: ลากย้ายทั้งถาดได้เฉพาะตอน Prepare เท่านั้น พอเข้า Open Bar (ทุก step รวม PrepareDrinks)
+ตัวถาดจะลากไม่ได้อีก — ส่วนการดึงชิ้นผลไม้ออกมาใส่แก้วชง (`FruitPieceInstance`) เป็นคนละ
+`DragableObject` คนละ Interactable กัน ไม่ถูกล็อกไปด้วย ยังทำงานปกติทุก phase ที่ Track B เปิดอยู่
+
+> ⚠️ **จุดที่ต้องระวังตอนเทส:** collider ของ `FruitTraySlot` (ทั้งถาด) กับ collider ของ
+> `FruitPieceInstance` (child) อยู่ตำแหน่งใกล้/ทับกัน — ราคาศจะชนอันไหนก่อนขึ้นกับระยะ/ขนาด
+> collider จริงในซีน ถ้าเทสแล้วพบว่าตอน PrepareDrinks ลากชิ้นผลไม้ไม่ออก (เหมือนกำลังลากทั้งถาด
+> แทน) ให้ปรับขนาด/ตำแหน่ง collider ของ `FruitTraySlot` ให้เล็กกว่า/ไม่ทับกับจุดที่ชิ้นผลไม้อยู่พอดี
 
 ### 3.4 ภาชนะชง — ไม่ต้องเพิ่ม zone อะไรแล้ว
 
@@ -119,6 +151,13 @@ Component ที่ต้องมี:
 ไม่ผ่านระบบ placement/clamp เลย **ไม่ต้องสร้าง/เพิ่มคอมโพเนนต์อะไรบนภาชนะชงสำหรับ Track B**
 (สิ่งเดียวที่ต้องมีคือ `Collider` ของภาชนะชงต้องอยู่บน layer เดียวกับ `N_InputManager._draggableLayer`
 — ซึ่งควรอยู่แล้ว เพราะภาชนะชงเป็น `DragableObject` ของมันเองอยู่แล้ว)
+
+> **แก้บั๊ก "สั่นเหมือนวางไม่ได้":** ตอน hover ทับภาชนะชง ของที่ลากอยู่จะถูกสแนปไปที่
+> `_hoverOffset` — ถ้าไม่กันไว้ collider ของตัวมันเองจะไปทับ ray เดียวกับที่ใช้เช็ค hover ทำให้ผลลัพธ์
+> สลับ hover/ไม่ hover ทุกเฟรม (เห็นเป็นอาการสั่น) `BottleIngredientSource`/`FruitPieceInstance`
+> แก้แล้วโดยสลับ `gameObject.layer` ของตัวเองไปเป็น **`Ignore Raycast`** ชั่วคราวระหว่างลาก แล้ว
+> คืนค่าเดิมตอนปล่อย — **อย่าตั้งใจใช้ layer `Ignore Raycast` กับ gameplay logic อื่นในซีนนี้** เพราะ
+> ขวด/ผลไม้จะไปอยู่ชั่วคราวตรงนั้นระหว่างลากทุกครั้ง
 
 ### 3.5 แปลงขวดเดิม (11 ขวดที่เหลือ) ให้ลากเทได้
 

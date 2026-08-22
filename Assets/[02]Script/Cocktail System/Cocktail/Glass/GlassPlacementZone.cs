@@ -38,6 +38,7 @@ public class GlassPlacementZone : SurfacePlacementZone
 
     private void OnItemPlaced(GameObject item)
     {
+
         if (item.TryGetComponent<PlacedGlassInstance>(out var glass))
         {
             // Swap: destroy whatever was here before accepting the new one. Destroy() is

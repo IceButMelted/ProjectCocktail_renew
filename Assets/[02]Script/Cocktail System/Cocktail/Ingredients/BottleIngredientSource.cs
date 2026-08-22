@@ -23,6 +23,8 @@ public class BottleIngredientSource : MonoBehaviour
     private DragableObject _dragable;
     private IngredientButtonUI _button;
     private Vector3 _homePosition;
+    private int _homeLayer;
+    private int _ignoreRaycastLayer;
     private bool _wasDragging;
     private bool _isHoveringShaker;
 
@@ -31,6 +33,8 @@ public class BottleIngredientSource : MonoBehaviour
         _dragable = GetComponent<DragableObject>();
         _button = GetComponent<IngredientButtonUI>();
         _homePosition = transform.position;
+        _homeLayer = gameObject.layer;
+        _ignoreRaycastLayer = LayerMask.NameToLayer("Ignore Raycast");
     }
 
     /// <summary>
@@ -42,11 +46,23 @@ public class BottleIngredientSource : MonoBehaviour
     {
         bool isDragging = _dragable.IsDragging;
 
+        if (!_wasDragging && isDragging) OnDragStarted();
+
         if (isDragging) UpdateHover();
 
         if (_wasDragging && !isDragging) OnDragEnded();
 
         _wasDragging = isDragging;
+    }
+
+    private void OnDragStarted()
+    {
+        // Excluded from its own hover raycast for the whole drag. Without this, the instant
+        // it snaps in front of the shaker its own collider sits on the same camera-to-mouse
+        // ray IngredientHoverDetector casts, intercepting it — hover flips off next frame,
+        // the snap undoes, the ray reaches the shaker again, hover flips back on... a
+        // 2-frame oscillation that reads as the object shaking in place.
+        gameObject.layer = _ignoreRaycastLayer;
     }
 
     private void UpdateHover()
@@ -64,6 +80,7 @@ public class BottleIngredientSource : MonoBehaviour
         // a bottle is a source, it never actually lives anywhere but its own spot.
         transform.position = _homePosition;
         _dragable.PastLocation = _homePosition;
+        gameObject.layer = _homeLayer;
 
         if (_isHoveringShaker) _button.Invoke();
 

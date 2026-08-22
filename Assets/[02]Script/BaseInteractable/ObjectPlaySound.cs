@@ -32,7 +32,10 @@ public class UIPointerSound : PointerInteractableBase
 
     private bool _canPlayEnter = true;
     private bool _canPlayExit = true;
-    private bool _canPlayUp = true;
+    private bool _canPlayUp = true; //TODO : if that component have Interactable_2_5DObject or Interactable_3DObject, we need to disable the sound on pointer up when the object is not interactable
+    public void SetCanPlayEnter(bool value) => _canPlayEnter = value;
+    public void SetCanPlayExit(bool value) => _canPlayExit = value;
+    public void SetCanPlayUp(bool value) => _canPlayUp = value;
 
     private DragableObject _dragableObject;
     private float _lastDragTime = -1f;

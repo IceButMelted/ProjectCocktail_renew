@@ -11,7 +11,8 @@
 เรียงตามความสำคัญ: **§1 ทำก่อนเล่นทดสอบ** → **§2–4 เก็บกวาด** → **§5–6 เปิดใช้ของใหม่**
 
 > 🔧 ตรวจงานตัวเองได้ตลอดด้วยเมนู **`Bar410 > Validate Cocktail Data`**
-> มันจะไล่ทุก `S_Drink` และทุก `SO_GlassVisualTable` แล้วรายงานว่าอะไรขาด
+> มันจะไล่ทุก `S_Drink` แล้วรายงานว่าอะไรขาด (ไม่เช็ค `CompatibleGlass`/`SO_GlassVisualTable`
+> อีกต่อไปตั้งแต่ 2026-08-22 — ฟิลด์นั้นถูกลบออกจาก `S_Drink` แล้ว ดู §4 ด้านล่าง)
 
 ---
 
@@ -83,28 +84,30 @@ commit `99f9cef` ลบ `BookUI.cs` ทิ้ง (ถูกแทนที่ด
 | สูตรทั้งหมด | 26 |
 | `Σ ingredients == 10` (GDD §15) | ✅ ผ่านครบ |
 | สูตรซ้ำกันเป๊ะ (GDD §16) | ✅ ไม่มี |
-| `CompatibleGlass` ถูกกำหนด | ✅ ครบทั้ง 26 ใบ |
 
-**ที่ทำไป:** 20 ใบที่เคยเป็น `None` (ข้อมูลเดิมหายไปเพราะคีย์เก่า `CompatibleGlasses:`)
-ถูกตั้งเป็น **`Hi_ball` ทั้งหมดตามที่ตกลง** — เป็นค่าชั่วคราวเพื่อให้ระบบภาพทำงานได้ก่อน
-
-การใช้แก้วตอนนี้: `Hi_ball` ×23 · `Rocks` ×2 · `Magrita` ×1
-
-> 🔖 **งานที่เหลือของ design:** ไล่ตั้งแก้วให้ตรงกับเครื่องดื่มจริง เช่น Martini ควรเป็น
-> `Martini`, Old Fashioned ควรเป็น `Rocks` · หรือตั้งเป็น **`NotFix`** ถ้าอยากให้ผู้เล่นเลือกเอง (ดู §4.1)
+> `CompatibleGlass` ถูกลบออกจาก `S_Drink` ทั้งหมดแล้ว (2026-08-22) — validator เลิกเช็คแถวนี้
+> ดู §4 ด้านล่างว่าทำไม
 
 ---
 
-## 4. ตารางลุคแก้ว (D5) — ✅ เสร็จแล้ว
+## 4. ⚠️ ตารางลุคแก้ว (D5) — **เลิกใช้แล้ว ถูกแทนที่ทั้งหมด**
+
+> **superseded 2026-08-22:** ทั้ง §4 และ §4.1 เดิม (ตารางลุคแก้วต่อ `GlassType` + กติกา
+> `NotFix`) ถูกรื้อทิ้งทั้งระบบ — ผู้เล่นเลือกแก้วเสิร์ฟเองทุกสูตรแล้วโดยไม่ต้องตั้งอะไรที่ recipe
+> เก็บเนื้อหาเดิมไว้ด้านล่างเป็นบันทึกประวัติเฉยๆ **ห้ามอ้างอิงเป็นสถานะปัจจุบัน**
+> ระบบจริงตอนนี้อยู่ที่ `Docs/Bar410_GlassFreedom_ManualSetup.md` (`SO_GlassOption`,
+> `GlassShelfSlot`, `GlassPlacementZone` ใน `Cocktail/Glass/`) — `SO_GlassVisualTable.asset`/
+> `GlassType.NotFix`/`DrinkBuilder.ApplyGlass`/`ShakerContents.SetGlass` ในเนื้อหาเดิมด้านล่าง
+> **ไม่มีอยู่จริงในโค้ดแล้ว** (เก็บไว้ในโค้ดแค่ส่วนที่ `CocktailShakerData` legacy shim ใช้เท่านั้น)
+
+<details>
+<summary>เนื้อหาเดิม (ประวัติ ก่อน 2026-08-22)</summary>
 
 `Cocktail Config/GlassVisualTable.asset` มีครบ **7 entry** ทุกค่าของ `GlassType` แล้ว
 (`Cocktail`, `LongDrink`, `NotFix` ที่ยังขาดถูกเติมด้วย visual ของ `Hi_ball` ไว้ก่อนตามที่ตกลง)
 
 ในซีน `New Drag Drop System` ผูก asset นี้เข้ากับ `CocktailShakerData` และ
 `ShakerVisualPresenter` เรียบร้อย — ไม่ใช้ตารางแยกรายซีนอีกต่อไป
-
-> 🔖 **งานที่เหลือของ art:** วาด/ผูก sprite จริงของ `Cocktail`, `LongDrink`, `NotFix`
-> ตอนนี้ทั้งสามใช้ภาพเดียวกับ Hi_ball
 
 ### 4.1 `GlassType.NotFix` = ผู้เล่นเลือกแก้วเอง
 
@@ -127,6 +130,8 @@ recipe=NotFix   player=None   -> Hi_ball   (ยังไม่เลือก ->
 
 **ยังขาด UI ให้ผู้เล่นเลือก (S13)** — เมื่อทำ UI แล้วให้เรียก `ShakerContents.SetGlass(glass)`
 จุดเดียว ค่าจะไม่ถูกเขียนทับเองแล้ว เพราะ `DrinkBuilder.ApplyGlass` กันไว้ให้
+
+</details>
 
 ---
 
@@ -253,7 +258,7 @@ recipe=NotFix   player=None   -> Hi_ball   (ยังไม่เลือก ->
 |---|---|---|
 | S6 | GDD §17.3 — Fail(b) ต้องสุ่มชื่อจากคลังที่ designer เขียน | ยังไม่มีคลังชื่อ ตอนนี้ใช้ `"???"` (`DrinkBuilder.UnmatchedName`) |
 | S8 | GDD §21.1 — Fail(b) ต้อง `BlendIngredientColors(poured)` | ไม่มีข้อมูลสีต่อวัตถุดิบใน data model ตอนนี้ใช้สีน้ำตาลขุ่นแทนสีดำ |
-| S13 | GDD §10/§21 — ผู้เล่นเลือกแก้วเอง | **กติกา `NotFix` ทำแล้ว** (§4.1) เหลือแค่ UI ให้กดเลือก → เรียก `ShakerContents.SetGlass` |
+| S13 | GDD §10/§21 — ผู้เล่นเลือกแก้วเอง | ✅ **ปิดแล้วจริง 2026-08-22** — ไม่ใช่กติกา `NotFix` ต่อสูตรแบบเดิมอีกต่อไป แต่เป็นระบบลาก-วางแก้วเสิร์ฟใหม่ทั้งระบบ ดู `Docs/Bar410_GlassFreedom_ManualSetup.md` |
 | S14 | GDD §16 — `MixMethod.Build` | เลื่อนตาม D4 รอ Building minigame |
 | S15 | GDD §16 — `unlockedByDefault` | เลื่อนตาม D1 ใช้ระบบ 2 asset (`CompositeDrinkRepository`) แทน |
 
@@ -267,7 +272,7 @@ recipe=NotFix   player=None   -> Hi_ball   (ยังไม่เลือก ->
 |---|---|---|
 | **E1** | §15.1 / §16 | เปลี่ยนจาก `IngredientType` แบน + `IngredientCategory` เป็น **enum แยกต่อหมวด** (`BaseSpirit` / `Liqueur` / `Mixer`) พร้อม struct 3 ตัวและเงื่อนไข `Σ = 10` ข้ามสามลิสต์ · เขียนกำกับต้นทุนของการเพิ่มหมวดใหม่ไว้ให้ design รู้ |
 | **E2** | §19.1 | ตัด `relationshipValue` ออกจาก `CustomerSO` + เพิ่ม `id` · อธิบายว่าทำไมห้าม mirror (§22 เป็นแหล่งความจริงเดียว) |
-| **ใหม่** | §21.0 | บันทึกกติกา **`glassType = NotFix` = ผู้เล่นเลือกแก้วเอง** พร้อมตารางพฤติกรรมครบ 4 กรณี |
+| **ใหม่ (เดิม)** | §21.0 | บันทึกกติกา `glassType = NotFix` — **แก้ไขซ้ำอีกรอบ 2026-08-22** เมื่อรื้อระบบ `NotFix` ทิ้งทั้งหมด (ดู §21.0 ปัจจุบันในไฟล์ GDD) |
 
 ---
 

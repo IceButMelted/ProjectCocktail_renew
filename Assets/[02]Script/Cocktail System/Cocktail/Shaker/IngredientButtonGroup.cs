@@ -43,6 +43,58 @@ public class IngredientButtonGroup : MonoBehaviour
     public void Enable() => SetInteractable(true);
     public void Disable() => SetInteractable(false);
 
+    /// <summary>Enables or disables only one component type across every member.</summary>
+    public void EnableOnlyDragDrop(bool enable) {
+        for (int i = 0; i < _members.Count; i++)
+            InteractableToggle.ApplyOnlyDragDrop(_members[i], enable);
+    }
+    public void EnableOnlyHoverTooltip(bool enable) {
+        for (int i = 0; i < _members.Count; i++)
+            InteractableToggle.ApplyOnlyHoverTooltip(_members[i], enable);
+    }
+    public void EnableOnlyScaleOnHover(bool enable) {
+        for (int i = 0; i < _members.Count; i++)
+            InteractableToggle.ApplyOnlyScaleOnHover(_members[i], enable);
+    }
+    public void EnableOnlyUIPointerSound(bool enable, bool? canPlayUp = null) {
+        for (int i = 0; i < _members.Count; i++)
+            InteractableToggle.ApplyOnlyUIPointerSound(_members[i], enable, canPlayUp);
+    }
+    public void EnableOnlyBookUI(bool enable) {
+        for (int i = 0; i < _members.Count; i++)
+            InteractableToggle.ApplyOnlyBookUI(_members[i], enable);
+    }
+    public void EnableOnlyInteractable_2_5DObject(bool enable) {
+        for (int i = 0; i < _members.Count; i++)
+            InteractableToggle.ApplyOnlyInteractable_2_5DObject(_members[i], enable);
+    }
+    public void EnableOnlyInteractable_3DObject(bool enable) {
+        for (int i = 0; i < _members.Count; i++)
+            InteractableToggle.ApplyOnlyInteractable_3DObject(_members[i], enable);
+    }
+    public void EnableOnlyBottleIngredientSource(bool enable) {
+        for (int i = 0; i < _members.Count; i++)
+            InteractableToggle.ApplyOnlyBottleIngredientSource(_members[i], enable);
+    }
+
+    ///--- Enable/Disable on this Phase------
+
+    /// <summary>Level 1 Prepare: drag-and-drop bar layout on, pouring off. See InteractableToggle.ApplyPrepareBarPhase.</summary>
+    public void EnableInteractablePrepareBarPhase()
+    {
+        IsInteractable = true;
+        for (int i = 0; i < _members.Count; i++)
+            InteractableToggle.ApplyPrepareBarPhase(_members[i]);
+    }
+
+    /// <summary>Level 3 AddIngredient: pouring (click or bottle-drag) on. See InteractableToggle.ApplyPrepareDrinksPhase.</summary>
+    public void EnableInteractablePrepareDrinksPhase()
+    {
+        IsInteractable = true;
+        for (int i = 0; i < _members.Count; i++)
+            InteractableToggle.ApplyPrepareDrinksPhase(_members[i]);
+    }
+
     /// <summary>
     /// Replaces the roster, applying the current interactable state to the new members.
     /// Used by BarSetupBridge once the player has finished laying out the bar.

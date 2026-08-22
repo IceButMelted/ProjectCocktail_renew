@@ -1,13 +1,17 @@
 // ============================================================
 //  FruitPieceInstance.cs — One piece dragged off a fruit tray.
 //
-//  Same raycast-hover detection as BottleIngredientSource (see
-//  IngredientHoverDetector) — snaps to a small offset in front of the
-//  shaker while hovering it. Unlike a bottle, a fruit piece never
+//  Exists (collider active) from the moment its tray slot spawns it,
+//  but stays invisible until an actual drag begins — the tray's own
+//  art is what shows "fruit is here"; this only becomes visible once
+//  pulled out. Same raycast-hover detection as BottleIngredientSource
+//  (see IngredientHoverDetector) — snaps to a small offset in front of
+//  the shaker while hovering it. Unlike a bottle, a fruit piece never
 //  snaps back: it is destroyed the instant the drag ends regardless
 //  of outcome (delivered — landed on the shaker and had room — or
 //  lost — dropped anywhere else, or the shaker had no room), and its
-//  tray slot spawns a fresh replacement either way.
+//  tray slot spawns a fresh (also invisible-until-dragged) replacement
+//  either way.
 // ============================================================
 
 using UnityEngine;
@@ -30,6 +34,9 @@ public class FruitPieceInstance : MonoBehaviour
     private FruitTraySlot _origin;
 
     private DragableObject _dragable;
+    private Renderer[] _renderers;
+    private int _homeLayer;
+    private int _ignoreRaycastLayer;
     private bool _wasDragging;
     private ShakerContents _hoveredShaker;
 
@@ -40,17 +47,39 @@ public class FruitPieceInstance : MonoBehaviour
         _origin = origin;
     }
 
-    private void Awake() => _dragable = GetComponent<DragableObject>();
+    private void Awake()
+    {
+        _dragable = GetComponent<DragableObject>();
+        _homeLayer = gameObject.layer;
+        _ignoreRaycastLayer = LayerMask.NameToLayer("Ignore Raycast");
+
+        // Invisible until actually pulled from the tray — the tray's own art is what reads
+        // as "fruit is here"; the collider stays active so a drag can still start on it.
+        _renderers = GetComponentsInChildren<Renderer>(true);
+        SetVisible(false);
+    }
 
     private void LateUpdate()
     {
         bool isDragging = _dragable.IsDragging;
+
+        if (!_wasDragging && isDragging) OnDragStarted();
 
         if (isDragging) UpdateHover();
 
         if (_wasDragging && !isDragging) Consume();
 
         _wasDragging = isDragging;
+    }
+
+    private void OnDragStarted()
+    {
+        SetVisible(true);
+
+        // Same self-occlusion fix as BottleIngredientSource: excluded from its own hover
+        // raycast for the drag, otherwise snapping in front of the shaker puts this piece's
+        // collider on the same ray IngredientHoverDetector casts, causing a flicker/shake.
+        gameObject.layer = _ignoreRaycastLayer;
     }
 
     private void UpdateHover()
@@ -77,5 +106,10 @@ public class FruitPieceInstance : MonoBehaviour
 
         if (_origin != null) _origin.SpawnReplacement();
         Destroy(gameObject);
+    }
+
+    private void SetVisible(bool visible)
+    {
+        for (int i = 0; i < _renderers.Length; i++) _renderers[i].enabled = visible;
     }
 }

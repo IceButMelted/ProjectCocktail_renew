@@ -100,18 +100,30 @@ public class ShakerContents : MonoBehaviour, IIngredientReceiver
 
     public void TryToAddAlcohol(BaseSpirit alcohol, int amount = 1)
     {
+        if (alcohol == BaseSpirit.None) { 
+            Debug.LogWarning("ShakerContents.TryToAddAlcohol called with BaseSpirit.None. Ignoring.");
+            return;
+        }
         if (!DrinkBuilder.TryAddAlcohol(CurrentCocktail, alcohol, amount)) return;
         Changed?.Invoke();
     }
 
     public void TryToAddLiqueur(Liqueur liqueur, int amount = 1)
     {
+        if (liqueur == Liqueur.None) { 
+            Debug.LogWarning("ShakerContents.TryToAddLiqueur called with Liqueur.None. Ignoring.");
+            return; 
+        }
         if (!DrinkBuilder.TryAddLiqueur(CurrentCocktail, liqueur, amount)) return;
         Changed?.Invoke();
     }
 
     public void TryToAddMixer(Mixer mixer, int amount = 1)
     {
+        if (mixer == Mixer.None) { 
+            Debug.LogWarning("ShakerContents.TryToAddMixer called with Mixer.None. Ignoring.");
+            return; 
+        }
         if (!DrinkBuilder.TryAddMixer(CurrentCocktail, mixer, amount)) return;
         Changed?.Invoke();
     }
