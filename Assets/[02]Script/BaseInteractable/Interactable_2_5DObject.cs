@@ -7,10 +7,14 @@ using UnityEngine.EventSystems;
 ///
 /// </summary>
 [RequireComponent(typeof(Collider))]
-[RequireComponent(typeof(SpriteRenderer))]
+//[RequireComponent(typeof(SpriteRenderer))] // this going to child, so not required on parent
+[RequireComponent(typeof(DragableObject))]
+
 public class Interactable_2_5DObject : PointerInteractableBase
 {
     // ── Inspector ─────────────────────────────────────────────────────────────
+    [Header("Components")]
+    [SerializeField]protected SpriteRenderer _spriteRenderer;
 
     [Header("Sprites")]
     [SerializeField] protected Sprite S_Default;
@@ -32,7 +36,6 @@ public class Interactable_2_5DObject : PointerInteractableBase
 
     // ── Private State ─────────────────────────────────────────────────────────
 
-    private SpriteRenderer _spriteRenderer;
     private DragableObject _dragableObject;        // optional sibling
     private bool _isHovering;
     private bool _isDragging;
@@ -42,7 +45,9 @@ public class Interactable_2_5DObject : PointerInteractableBase
 
     protected virtual void Awake()
     {
-        _spriteRenderer = GetComponent<SpriteRenderer>();
+        if(_spriteRenderer == null)
+            _spriteRenderer = GetComponent<SpriteRenderer>() == null ?  GetComponent<SpriteRenderer>() : GetComponentInChildren<SpriteRenderer>();
+
         _dragableObject = GetComponent<DragableObject>();
         _spriteRenderer.sprite = S_Default;
         ApplyInteractableVisual();
