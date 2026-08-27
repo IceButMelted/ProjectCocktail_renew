@@ -96,10 +96,50 @@ public class DragableObject : PointerInteractableBase
 
         if (Vector2.Distance(eventData.position, _pointerDownScreenPos) >= _dragThreshold)
         {
+            if (OnThresholdCrossed(eventData)) return; // handed off to a different object — don't also drag this one
+
             _dragStarted = true;
             IsAnyDragging = true;
             _placementSystem.StartDrag(this);
         }
+    }
+
+    /// <summary>
+    /// Override to redirect this gesture onto a different DragableObject entirely instead of
+    /// dragging this one (e.g. DragableFruitTraySlot handing off to a spawned FruitPieceInstance).
+    /// Return true to mean "handled — don't drag me." Default behaviour is unchanged for every
+    /// object that doesn't override this.
+    /// </summary>
+    protected virtual bool OnThresholdCrossed(PointerEventData eventData) => false;
+
+    /// <summary>
+    /// Called by whoever decided to hand a drag gesture off to this object instead of the one
+    /// that actually received OnPointerDown/OnDrag — takes over exactly where a normal drag
+    /// would have started.
+    /// </summary>
+    public void BeginRedirectedDrag(PointerEventData eventData)
+    {
+        if (!Interactable || _dragStarted) return;
+
+        _pointerDownScreenPos = eventData.position;
+        _dragStarted = true;
+        IsAnyDragging = true;
+        _placementSystem.StartDrag(this);
+    }
+
+    /// <summary>
+    /// Called by whoever redirected a drag onto this object (see <see cref="BeginRedirectedDrag"/>)
+    /// once the pointer is released, since this object never receives its own OnPointerUp for a
+    /// gesture that started on a different GameObject.
+    /// </summary>
+    public void FinishRedirectedDrag()
+    {
+        if (!_dragStarted) return;
+
+        _placementSystem.ReleaseObject();
+        BeingDrags = false;
+        IsAnyDragging = false;
+        _dragStarted = false;
     }
 
     public override void OnPointerUp(PointerEventData eventData)

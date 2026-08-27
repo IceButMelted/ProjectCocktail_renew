@@ -1,11 +1,15 @@
 # Bar410 — Glass Freedom & Two-Track Building: งานที่ต้องทำมือใน Unity
 
-**Date:** 2026-08-21 · **อัปเดตล่าสุด:** 2026-08-22 · **Branch:** `GameLoop/main`
+**Date:** 2026-08-21 · **อัปเดตล่าสุด:** 2026-08-23 · **Branch:** `GameLoop/main`
 **คู่กับ:** แผนงาน `robust-watching-lark` (ผู้เล่นเลือกแก้วเสิร์ฟเอง + แยกขั้นตอนชง/เลือกแก้ว)
 **อ้างอิงเพิ่ม:** `Bar410_CocktailSystem_Manual_Setup.md` (งานมือของรอบ refactor ก่อนหน้า — ยังไม่ปิด, ส่วนแก้วในนั้นถูกแทนที่ด้วยเอกสารนี้แล้ว)
-**สถานะรวม:** ✅ **ยืนยันแล้วว่าเล่นได้จริงในซีน** (`New Cocktail System.unity` — ซีนทดสอบแยกของผู้ใช้) ทั้งฝั่งวางแก้วเสิร์ฟ (หยิบ/วาง/สลับแก้ว) และฝั่งวัตถุดิบหมวด **ขวด** (`BottleIngredientSource` ลากเทเข้าแก้วชง รวมถึงแก้บั๊กสั่น/jitter แล้ว) — **เหลือหมวด "Fruit" (`FruitTraySlot`/`FruitPieceInstance`) ที่ยังไม่ได้ทำ/เทสในซีนจริง** (ดู §1.3, §2.2, §3.3)
+**สถานะรวม:** ✅ **ยืนยันแล้วว่าเล่นได้จริงในซีน** (`New Cocktail System.unity` — ซีนทดสอบแยกของผู้ใช้) ทั้งฝั่งวางแก้วเสิร์ฟ, หมวด **ขวด** (`BottleIngredientSource` — ทดสอบแล้ว 1 ใน 11 ขวด คือ `Alchohol-Vodka`, อีก 10 ยังไม่ได้ใส่ component) และหมวด **Fruit** (`FruitTraySlot`/`FruitPieceInstance`, `FruitTrayGroup`) **ครบทั้ง 6 ชนิดแล้ว 2026-08-23** — sprite ยังเป็น placeholder (ยืมของขวดเดิม) ไม่ใช่ art จริง — **เหลืองานหลักคือปุ่ม UI "ตกแต่งเสร็จแล้ว" ที่ยังไม่มี** (ดู §5.2) และของเก็บตกอื่นๆ ใน HANDOFF §8
 
-โค้ดทั้งหมดคอมไพล์ผ่าน (`refresh_unity` + `read_console` ไม่มี error, `Bar410 > Validate Cocktail Data` ผ่าน) งานที่เหลือในเอกสารนี้ (เฉพาะส่วน Fruit) คือ **งานมือใน Unity Editor + งาน art/design** ไม่ใช่โค้ด
+🆕 **วัตถุดิบที่ต้องกดเทน้ำได้ปกติ *และ* ดึงผลไม้ออกมาได้ในตัวเดียวกัน** (ตอนนี้มีแค่
+`Mixer-LemonJuice (1)`) ใช้คลาสใหม่ `DragableFruitTraySlot : DragableObject` แทนที่
+`DragableObject`+`FruitTraySlot` แยกกัน — ดู HANDOFF §5 #14/#15 และ §6 D13 สำหรับเหตุผล/กับดัก
+
+โค้ดทั้งหมดคอมไพล์ผ่าน (`refresh_unity` + `read_console` ไม่มี error, `Bar410 > Validate Cocktail Data` ผ่าน) งานที่เหลือส่วนใหญ่ตอนนี้เป็น **งานมือใน Unity Editor + งาน art/design** ไม่ใช่โค้ด (ยกเว้นปุ่ม UI §5.2 ที่ต้องผูก Inspector ใหม่)
 
 เรียงตามลำดับที่ควรทำ: **§1 art/data ก่อน** (ไม่มีของพวกนี้ prefab สร้างไม่ได้) → **§2 prefab** → **§3 วางในซีน** → **§4 ผูก Inspector** → **§5 ปุ่ม UI** → **§6 ทดสอบทีละก้อนตามลำดับ**
 
@@ -23,7 +27,9 @@
 | `PourSource` | `Cocktail/Glass/` | marker เฉยๆ ติดคู่กับ `CocktailShaker` | ✅ |
 | `IngredientHoverDetector` | `Cocktail/Ingredients/` | helper ราคาศ (ไม่ใช่ zone) เช็คว่าเมาส์ชี้ทับภาชนะชงอยู่หรือไม่ — ใช้ `N_InputManager.GetObjectMouseHover()` เดิม | ✅ ใช้งานจริงแล้ว |
 | `BottleIngredientSource` | `Cocktail/Ingredients/` | ติดคู่ขวดเดิม — ลากไป hover ทับภาชนะชง = สแนปไปหน้าแก้วชง ปล่อย = เท (ดีดกลับที่เดิมเสมอ) | ✅ **เทสแล้ว ใช้งานได้จริง** (รวมแก้บั๊กสั่น/self-occlusion แล้ว) |
-| `FruitTraySlot` / `FruitPieceInstance` | `Cocktail/Ingredients/` | ถาดผลไม้ — ลากได้ทีละชิ้น กลไก hover เดียวกับขวด ใช้แล้วหายเสมอ, เป็น child ของถาด (ตามถาดได้ตอนย้าย) | 🔴 **ยังไม่ได้ทำในซีน/ยังไม่เทส** — โค้ดเขียนเสร็จ คอมไพล์ผ่าน แต่ไม่มี prefab/GameObject จริง (ดู §1.3, §2.2, §3.3) |
+| `FruitTraySlot` / `FruitPieceInstance` | `Cocktail/Ingredients/` | ถาดผลไม้ — ลากได้ทีละชิ้น กลไก hover เดียวกับขวด ใช้แล้วหายเสมอ, เป็น child ของถาด (ตามถาดได้ตอนย้าย) | ✅ **เทสแล้ว ใช้งานได้จริง ครบทั้ง 6 ชนิด** (2026-08-23) — sprite ยัง placeholder |
+| `FruitTrayGroup` | `Cocktail/Ingredients/` | spawn/despawn piece ของทุก tray พร้อมกันตอนเข้า/ออก AddIngredient — ไม่มี piece ค้างนอกช่วงนี้ | ✅ ผูกกับ `GameFlowHooks.AddIngredient` แล้ว |
+| `DragableFruitTraySlot` | `Cocktail/Ingredients/` | 🆕 สำหรับวัตถุดิบที่กดเทน้ำได้ *และ* ดึงผลไม้ได้ในตัวเดียวกัน (`: DragableObject`, ลากจะ hijack ไปที่ piece ที่เพิ่ง spawn) | ✅ เทสแล้ว บน `Mixer-LemonJuice (1)` |
 | `GarnishFlowBridge` | `Hierarchical State Machine/Level 2 - Open Bar/` | คุมการเทตอน Garnish State (ใหม่) | 🔖 ยังไม่ได้ผูกในซีน/ยังไม่เทส |
 | `CocktailFlowBridge` | (ของเดิม, แก้เพิ่ม) | ทำลายแก้วที่วางไว้ตอนกลับเข้า PrepareDrinks | 🔖 ยังไม่ได้ผูก `_glassZone`/ยังไม่เทส |
 | `IngredientButtonGroup`/`InteractableToggle` phase methods | `Cocktail/Shaker/` (ของเดิม, แก้เพิ่ม) | `EnableInteractablePrepareBarPhase()`/`EnableInteractablePrepareDrinksPhase()` — สลับสิทธิ์ลาก bar-layout ↔ ลากเทตามเฟส HSM | ✅ ผูกแล้วใน `GameFlowHooks` (`New Cocktail System.unity`), เทสแล้ว |

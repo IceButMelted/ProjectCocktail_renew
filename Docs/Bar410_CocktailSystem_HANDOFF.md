@@ -1,7 +1,7 @@
 # Bar410 — Cocktail System: เอกสารส่งต่องาน / HANDOFF
 
-**Date เริ่มต้น:** 2026-08-21 · **อัปเดตล่าสุด:** 2026-08-22 · **Branch:** `GameLoop/main` · **HEAD:** `bbdaccd` (push แล้ว)
-**สถานะ:** โค้ดคอมไพล์ผ่านไม่มี error · `Bar410 > Validate Cocktail Data` ผ่าน · **working tree มีของค้างไม่ได้ commit** (bug fix + doc update ล่าสุดหลัง `bbdaccd` — ดู §0)
+**Date เริ่มต้น:** 2026-08-21 · **อัปเดตล่าสุด:** 2026-08-23 · **Branch:** `GameLoop/main` · **HEAD:** `b505b53` (push แล้วหรือยังไม่แน่ใจ เช็ค `git status` ก่อน)
+**สถานะ:** โค้ดคอมไพล์ผ่านไม่มี error · `Bar410 > Validate Cocktail Data` ผ่าน · **working tree มีของค้างไม่ได้ commit** (ดู §0 — งาน "ผสมขวด/tray" ของ `Mixer-LemonJuice (1)` รอบใหม่ล่าสุดหลัง `b505b53`)
 
 > อ่านไฟล์นี้ก่อนไฟล์อื่นทั้งหมด แล้วค่อยเจาะรายละเอียดจากเอกสารที่อ้างถึงใน §2
 > 🆕 **ถ้ามาต่องาน "Glass Freedom" (ผู้เล่นเลือกแก้วเสิร์ฟเอง + ลาก-วางวัตถุดิบ) โดยเฉพาะ อ่าน §1b ก่อน**
@@ -19,10 +19,18 @@
 
 **นัยสำคัญ:** ถ้า clone repo ใหม่หรือเช็คเอาต์ branch ใหม่ ซีน `New Cocktail System.unity` **จะหายไปเลยถ้าไม่ได้ถูก commit ไว้ก่อน** — ก่อนทำงานต่อบนเครื่องอื่น ให้เช็คก่อนว่าไฟล์นี้ยังอยู่ในเครื่อง หรือถามเจ้าของโปรเจกต์ว่าตั้งใจ commit มันหรือยัง
 
-**ของค้างไม่ได้ commit ตอนนี้** (โค้ด + เอกสาร แก้ไปแล้วแต่ยังไม่ลง git):
-- Bug fix ใน `BottleIngredientSource.cs`/`FruitPieceInstance.cs`/`FruitTraySlot.cs`/`GlassPlacementZone.cs` (jitter fix, invisible-until-dragged, tray-parenting)
-- `IngredientButtonGroup.cs`/`InteractableToggle.cs`/`ObjectPlaySound.cs` — phase-gated interactable system + API cleanup (ดู §6 รายการใหม่)
-- เอกสารทุกตัวที่ระบุใน §2 ถูกอัปเดตให้ตรงกับ Glass Freedom แล้ว (รอบนี้)
+**ของค้างไม่ได้ commit ตอนนี้** (โค้ดแก้ไปแล้วแต่ยังไม่ลง git หลัง `b505b53`):
+- `DragableObject.cs` — เพิ่ม hook `OnThresholdCrossed` (protected virtual, default no-op) +
+  เมธอด public `BeginRedirectedDrag`/`FinishRedirectedDrag` ให้ subclass ใช้ยกมือ (hand off) การลาก
+  ไปให้ object อื่นได้ ไม่กระทบพฤติกรรมเดิมของ object ไหนที่ไม่ override
+- `DragableFruitTraySlot.cs` (ใหม่) — `: DragableObject` สำหรับวัตถุดิบที่เป็น**ทั้งของกดเทน้ำ
+  (`Interactable_2_5DObject`/`IngredientButtonUI`) และ tray ผลไม้ในตัวเดียวกัน** (ตอนนี้มีแค่
+  `Mixer-LemonJuice (1)`) — ดู §5 กับดักใหม่ #14/#15 และ §6 D13
+- `InteractableToggle.cs` — เพิ่ม `ApplyOnlyFruitTraySlot` มองหา `DragableFruitTraySlot` ผูกเข้า
+  `ApplyPrepareBarPhase`(false)/`ApplyPrepareDrinksPhase`(true)
+- Scene `New Cocktail System.unity`: `Mixer-LemonJuice (1)` เปลี่ยนจาก `DragableObject`+`FruitTraySlot`
+  (สองคอมโพเนนต์แยก) เป็น `DragableFruitTraySlot` ตัวเดียว, ลบ null-reference ที่ค้างใน
+  `FruitTrayGroup._members` จากการสลับคอมโพเนนต์นี้ด้วย
 
 ---
 
@@ -55,26 +63,30 @@ Refactor `Assets/[02]Script/Cocktail System/` ทั้งระบบ เพื
   (`IngredientHoverDetector`) ไม่ใช่ placement zone — ลองใช้ zone มาก่อนแล้วมีปัญหาสั่น/jitter
   (ดู §5 กับดักใหม่)
 
-**สถานะจริง ณ ตอนนี้ (ยืนยันจากผู้ใช้เอง 2026-08-22):**
+**สถานะจริง ณ ตอนนี้ (อัปเดต 2026-08-23):**
 
 | ส่วน | สถานะ |
 |---|---|
 | Track A (เลือกแก้ว) — หยิบ/วาง/สลับแก้ว | ✅ **เทสแล้ว ใช้งานได้จริง** |
-| Track B — หมวด **ขวด** (`BottleIngredientSource`) | ✅ **เทสแล้ว ใช้งานได้จริง** (รวมแก้บั๊กสั่นแล้ว) |
-| Track B — หมวด **Fruit** (`FruitTraySlot`/`FruitPieceInstance`) | 🔴 **ยังไม่ได้ทำ/เทสในซีนจริง** — โค้ดเขียนเสร็จคอมไพล์ผ่าน แต่ไม่มี prefab/GameObject จริง |
-| การเทจากภาชนะชงลงแก้ว (`GarnishFlowBridge`) | 🔖 เขียนโค้ดเสร็จ ยังไม่ได้ผูก/เทสในซีน |
+| Track B — หมวด **ขวด** (`BottleIngredientSource`) | 🟡 **เทสแล้ว ใช้งานได้จริง แต่ติดแค่ `Alchohol-Vodka`** — อีก 10 ขวดที่เหลือ (Gin/Rum/Whiskey/Tequila/TripleSec/SweetVermouth/DryVermouth/Campari/Soda/Syrup) ยังไม่มี `BottleIngredientSource` |
+| Track B — หมวด **Fruit** (`FruitTraySlot`/`FruitPieceInstance`) | ✅ **เทสแล้ว ใช้งานได้จริง ครบทั้ง 6 ชนิด** — sprite ยังเป็น placeholder (ยืมสไปรต์ขวดเดิมมาใช้ ไม่ใช่ art จริง) |
+| วัตถุดิบที่กดเทได้ **และ** ดึงผลไม้ออกได้ในตัวเดียวกัน (`Mixer-LemonJuice (1)`) | ✅ **เทสแล้ว ใช้งานได้จริง** ผ่าน `DragableFruitTraySlot` (ดู §5 #14/#15, §6 D13) |
+| การเทจากภาชนะชงลงแก้ว (`GarnishFlowBridge`) | 🟡 ผูกในซีนแล้ว ยังไม่มีปุ่ม UI เรียก `TryFinishGarnish()` — ดู §8.2 |
 | Phase-gated interactable (`EnableInteractablePrepareBarPhase`/`Drinks`) | ✅ ผูกแล้วใน `GameFlowHooks` (ซีน `New Cocktail System`), เทสแล้ว |
 
-**เอกสารของฟีเจอร์นี้โดยเฉพาะ:** `Docs/Bar410_GlassFreedom_ManualSetup.md` (งานมือที่เหลือทั้งหมด
-อยู่ที่นี่ — เฉพาะส่วน Fruit ที่ยังไม่เสร็จ) · แผนต้นฉบับอยู่ใน plan file `robust-watching-lark`
-(อนุมัติและทำครบ 6 ขั้นแล้ว) · GDD อัปเดตแล้วที่ §21/§21.0
+**เอกสารของฟีเจอร์นี้โดยเฉพาะ:** `Docs/Bar410_GlassFreedom_ManualSetup.md` · แผนต้นฉบับอยู่ใน plan
+file `robust-watching-lark` (อนุมัติและทำครบ 6 ขั้นแล้ว) · GDD อัปเดตแล้วที่ §21/§21.0
 
 **สิ่งที่ต้องทำต่อ เรียงตามลำดับ:**
-1. Art/data ของหมวด Fruit (6 sprite ชิ้นผลไม้ + ตัดสินใจ `E_GarnishLook` จริง) — `Docs/Bar410_GlassFreedom_ManualSetup.md` §1
-2. สร้าง prefab + วางในซีน `New Cocktail System.unity` — §2–§3 ของเอกสารเดียวกัน
-3. ผูก `GarnishFlowBridge`/`CocktailFlowBridge._glassZone` ให้ครบ — §4
-4. ทดสอบวงจรเต็ม: สั่งเครื่องดื่ม → ใส่วัตถุดิบ (ขวด+ผลไม้ผสมกัน) → มินิเกม → วางแก้ว → เท → เสิร์ฟ
-5. **commit ซีน `New Cocktail System.unity`** เข้า git (ตอนนี้ยัง untracked — ดู §0)
+1. สร้างปุ่ม/panel UI "ตกแต่งเสร็จแล้ว" ผูกเข้า `GarnishFlowBridge.TryFinishGarnish()` (ไม่ใช่
+   `GameFlowCommands.GarnishDone()` ตรงๆ) — ตอนนี้เทแล้วไม่มีทางกดจบไป Serve ได้เลย
+2. เพิ่ม `BottleIngredientSource` ให้ขวดที่เหลืออีก 10 อัน + ปรับ Hover Offset ทีละอัน (§3.5 ของ
+   `Bar410_GlassFreedom_ManualSetup.md`)
+3. Art จริงของหมวด Fruit (sprite ชิ้นผลไม้แทนของที่ยืมมาจากขวด) + ตัดสินใจ `E_GarnishLook`/กลไก
+   ตกแต่งแก้วจริง — ยังเป็น placeholder ทั้งคู่
+4. ทดสอบวงจรเต็ม: สั่งเครื่องดื่ม → ใส่วัตถุดิบ (ขวด+ผลไม้ผสมกัน) → มินิเกม → วางแก้ว → เท → กด
+   ตกแต่งเสร็จ (รอข้อ 1) → เสิร์ฟ
+5. **commit งานค้างที่ระบุใน §0** เข้า git
 
 ---
 
@@ -150,6 +162,8 @@ Domain ────────── Cocktail System/Cocktail/Domain/   กต�
 | 11 🆕 | **`DragableObject.Interactable` ต้องเป็น `true` ทั้งช่วง Prepare และ AddIngredient สำหรับขวด** | มันไม่ใช่สวิตช์ bar-layout อย่างเดียว — เป็น input listener จริงที่ `BottleIngredientSource` เกาะอยู่ (`OnPointerDown`/`OnDrag` เช็คค่านี้) ปิดมันตอน AddIngredient จะทำให้ลากเทไม่ได้เลย ไม่ใช่แค่ล็อกการย้าย |
 | 12 🆕 | **อย่าใช้ `PlacementZoneBase` ตรวจจับ "ลากทับภาชนะชง"** | เคยลองแล้ว (`IngredientDropTarget`) แต่ระบบ clamp ตำแหน่งทุกเฟรมทำให้ของสั่น/jitter — ใช้ raycast ตรงผ่าน `IngredientHoverDetector` แทน |
 | 13 🆕 | **layer `Ignore Raycast` ถูกใช้ชั่วคราวระหว่างลากขวด/ผลไม้** | `BottleIngredientSource`/`FruitPieceInstance` สลับ layer ตัวเองไปเป็น `Ignore Raycast` ระหว่างลากเพื่อกัน self-occlusion แล้วคืนค่าเดิมตอนปล่อย — **อย่าเอา layer นี้ไปใช้ gameplay logic อื่นในซีนนี้** |
+| 14 🆕 | **`Interactable_2_5DObject` + `FruitTraySlot`/`DragableFruitTraySlot` บน object เดียวกัน = collider ชนกันแบบไม่ deterministic ถ้าไม่ใช้ `DragableFruitTraySlot`** | piece spawn ที่ตำแหน่งเดียวกับ collider ของปุ่มพอดี raycast จะสุ่มว่าโดนอันไหนตามความแม่นยำของ float ทุกเฟรม — วัตถุดิบที่ต้องกดเทได้ *และ* ดึงผลไม้ได้ในตัวเดียวกันต้องใช้ `DragableFruitTraySlot` เท่านั้น (ดู #15, D13) ห้ามใช้ `FruitTraySlot` (sibling ธรรมดา) คู่กับ `Interactable_2_5DObject` |
+| 15 🆕 | **`OnDrag` ของ `DragableObject`/subclass ถูกเรียกทุกเฟรมที่ลากเกิน threshold ไม่ใช่แค่ครั้งเดียว** | ถ้า override `OnThresholdCrossed` แล้วไม่กันการเรียกซ้ำเอง (เช่นเช็ค `_activePiece != null` ก่อน) จะ spawn object ใหม่ทุกเฟรมตลอดที่ลากอยู่ (เจอจริงแล้วใน `DragableFruitTraySlot` รอบพัฒนานี้ ก่อนแก้ค้างไปสูงสุด 29 instance ตอนทดสอบ) — ฟีเจอร์ต่อไปที่ override hook นี้ต้องกันเคสนี้เองเสมอ เพราะ base class ไม่ได้กันให้ |
 
 ---
 
@@ -172,6 +186,7 @@ Domain ────────── Cocktail System/Cocktail/Domain/   กต�
 | **D10** 🆕 | จำนวนแก้วที่วางได้ | **แค่ 1 ใบทั้งซีน ไม่ใช่ 1 ใบต่อโซน** — `GlassPlacementZone._occupant` เป็น `static` โดยตั้งใจ ยืนยัน 2026-08-22 |
 | **D11** 🆕 | Fruit vs Bottle | **เป็นแค่ interaction/visual ต่างกัน ไม่ใช่ ingredient category ใหม่** — ทั้งคู่ยังเป็น `Mixer` enum เดิม ยืนยัน 2026-08-22 |
 | **D12** 🆕 | กลไกตรวจจับ "ลากทับภาชนะชง" | **raycast ตรง (`IngredientHoverDetector`) ไม่ใช่ `PlacementZoneBase`** — ลองแบบ zone มาก่อนแล้วมีปัญหาสั่น ยืนยัน 2026-08-22 |
+| **D13** 🆕 | คลิก vs ลาก บน `Mixer-LemonJuice (1)` | **คลิก = เทน้ำผ่าน `Interactable_2_5DObject`/`IngredientButtonUI` เดิม ลาก = ดึงผลไม้ออกมาเสมอ ไม่มีทางลากทั้งขวดไปเทที่ shaker แบบ `BottleIngredientSource`** — ยืนยันแล้วว่าตั้งใจ ไม่ต้องมี `BottleIngredientSource` บน object นี้ พิจารณาสองทางก่อนตัดสินแบบนี้: (1) แยก collider ไม่ให้ทับกัน (ไม่ต้องเขียนโค้ด แต่พึ่งวินัยเรื่อง geometry) กับ (2) hijack การลากไปที่ piece ที่เพิ่ง spawn ผ่าน `DragableFruitTraySlot`/`OnThresholdCrossed` (เขียนโค้ดเพิ่ม แต่ geometry ขยับยังไงก็ไม่พัง) — เลือกทาง (2) ยืนยัน 2026-08-23 |
 
 GDD ถูกแก้ตามการตัดสินใจ D6 (§15.1/§16), D8 (§19.1), D9/D10 (§21/§21.0 เขียนใหม่ทั้งหมด) แล้ว
 
@@ -218,22 +233,41 @@ GDD ถูกแก้ตามการตัดสินใจ D6 (§15.1/§16
 `New Cocktail System.unity` (คนละซีนกับ §7.3) รวมถึงแก้บั๊กสั่น (self-occlusion) และระบบ
 phase-gated interactable (`EnableInteractablePrepareBarPhase`/`PrepareDrinksPhase`) แล้ว
 
+### 7.5 🆕 Glass Freedom — หมวด Fruit ครบทั้ง 6 ชนิด + วัตถุดิบสองบทบาทในตัวเดียว (2026-08-23)
+
+- Tray ครบ 6 ชนิด (`Cranberry`/`Lemon`/`Lime`/`Grapefruit`/`PepperMint`/`Orange`) แต่ละชนิดมี
+  piece prefab แยกของตัวเอง (`FruitPiece_<Type>.prefab`) sprite ยังยืมของขวดเดิมมาใช้เป็น
+  placeholder — ไม่ใช่ art จริง
+- `FruitTrayGroup` — spawn/despawn piece ของ 5 tray สะอาดพร้อมกันตอนเข้า/ออก AddIngredient
+  (ผูกกับ `GameFlowHooks.AddIngredient.OnEnter/OnExit`) ไม่มี piece ค้างอยู่นอกช่วงนี้เลย
+- `Mixer-LemonJuice (1)` เป็นวัตถุดิบที่ **กดเทน้ำได้ปกติ และลากดึงผลไม้ออกมาได้ในตัวเดียวกัน** —
+  ใช้ `DragableFruitTraySlot` (ดู §5 #14/#15, §6 D13) แทนที่ `DragableObject`+`FruitTraySlot`
+  แยกกันแบบเดิม
+- `CocktailFlowBridge._glassZone` และ `GarnishFlowBridge` (ใหม่บน `[GameLoop]`) ผูกครบกับ
+  `GlassPlacementZone` (object ชื่อ `Plane`) แล้ว — ปิดช่องว่างเดิมจาก §8.2 ของรอบก่อน (ยกเว้นปุ่ม
+  UI ที่ยังไม่มี ดู §8.2 ใหม่)
+
 ---
 
 ## 8. ยังไม่เสร็จ — เรียงตามความสำคัญ
 
-### 8.1 🔴 Glass Freedom — หมวด Fruit (ใหม่, สำคัญสุดตอนนี้)
+### 8.1 🔴 Glass Freedom — ไม่มีทางจบ Garnish state (สำคัญสุดตอนนี้)
 
-`FruitTraySlot`/`FruitPieceInstance` เขียนโค้ดเสร็จคอมไพล์ผ่านแล้ว แต่**ไม่มี prefab/GameObject
-จริงในซีนเลย** — งานที่เหลือทั้งหมดอยู่ที่ `Docs/Bar410_GlassFreedom_ManualSetup.md` §1.3/§2.2/§3.3
-(sprite ผลไม้ 6 ชนิด, สร้าง prefab, วางถาดในซีน, เทส hover/jitter เหมือนที่ทำกับขวดแล้ว)
+`GarnishFlowBridge` ผูกในซีนครบแล้ว (ดู §7.5) แต่**ยังไม่มีปุ่ม/panel UI ไหนเรียก
+`GarnishFlowBridge.TryFinishGarnish()` เลย** — เทเสร็จแล้วก็ค้าง ไปต่อ Serve ไม่ได้ ต้องสร้าง UI
+ใหม่ (ดู `Bar410_GlassFreedom_ManualSetup.md` §5.2 — **ห้ามผูกเข้า `GameFlowCommands.GarnishDone()`
+ตรงๆ** เพราะจะข้ามการเช็คว่าเทแล้วหรือยัง)
 
-### 8.2 🟡 Glass Freedom — ยังไม่ได้ผูก/เทสในซีน
+### 8.2 🟡 Glass Freedom — งานที่เหลือของหมวดขวด/decoration
 
-- `GarnishFlowBridge` (การเทจากภาชนะชงลงแก้ว) — เขียนเสร็จ ยังไม่ได้วางบน `[GameLoop]`/ผูก Inspector
-- `CocktailFlowBridge._glassZone` — ยังไม่ได้ผูก (`fileID: 0` ในซีนล่าสุดที่เช็ค)
+- ขวดที่เหลือ 10 อัน (Gin/Rum/Whiskey/Tequila/TripleSec/SweetVermouth/DryVermouth/Campari/Soda/Syrup)
+  ยังไม่มี `BottleIngredientSource` — มีแค่ `Alchohol-Vodka` ตัวเดียวที่ทดสอบแล้ว
 - กลไกตกแต่งแก้วหลังเท (decoration) — ยังไม่ตัดสินใจกลไก มี `TODO(design)` กำกับไว้ใน `GarnishFlowBridge.cs`
 - `E_GarnishLook` enum — ยังเป็น placeholder รอ design ตัดสินใจรายการจริง
+- sprite ของหมวด Fruit ทั้ง 6 ชนิด (tray + piece) ยังยืมสไปรต์ขวดเดิมมาใช้ ไม่ใช่ art จริง
+- object เศษๆ ที่พบระหว่างพัฒนา ยังไม่ได้ตัดสินใจ: `Cube` (มี `GlassPlacementZone` ซ้ำกับ `Plane`
+  บน layer ผิด — ผู้ใช้ขอให้เก็บไว้เฉยๆ ไม่ต้องแตะ) และ `BaseFruitPieceInstance` (raw prefab ลอยอยู่
+  root-level ในซีน ไม่ได้เป็นลูกของ tray ไหน หน้าตาเหมือนของทดสอบค้าง ยังไม่ได้ถาม/ลบ)
 
 ### 8.3 🔴 ของค้างจากรอบ refactor เดิม (ซีน `New Drag Drop System` เท่านั้น)
 

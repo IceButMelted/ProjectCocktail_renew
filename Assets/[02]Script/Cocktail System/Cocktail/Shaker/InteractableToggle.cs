@@ -83,6 +83,16 @@ public static class InteractableToggle
         if (target.TryGetComponent<BottleIngredientSource>(out var bottle)) bottle.enabled = enable;
     }
 
+    /// <summary>
+    /// Turns a DragableFruitTraySlot's drag-hijack on or off — only meaningful on an ingredient
+    /// that doubles as a fruit tray (e.g. Mixer-LemonJuice (1)); a no-op on anything else.
+    /// </summary>
+    public static void ApplyOnlyFruitTraySlot(GameObject target, bool enable)
+    {
+        if (target == null) return;
+        if (target.TryGetComponent<DragableFruitTraySlot>(out var tray)) tray.SetHijackEnabled(enable);
+    }
+
     public static void ApplyOnlyInteractable_2_5DObject(GameObject target, bool interactable)
     {
         if (target == null) return;
@@ -114,6 +124,7 @@ public static class InteractableToggle
         ApplyOnlyUIPointerSound(target, true, canPlayUp: false);
         ApplyOnlyBookUI(target, true);
         ApplyOnlyBottleIngredientSource(target, false);
+        ApplyOnlyFruitTraySlot(target, false);
     }
 
     /// <summary>
@@ -137,5 +148,6 @@ public static class InteractableToggle
         ApplyOnlyUIPointerSound(target, true);
         ApplyOnlyBookUI(target, true);
         ApplyOnlyBottleIngredientSource(target, true);
+        ApplyOnlyFruitTraySlot(target, true);
     }
 }

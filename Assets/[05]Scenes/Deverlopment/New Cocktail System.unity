@@ -3665,7 +3665,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::FruitTrayGroup
   _members:
   - {fileID: 787652018}
-  - {fileID: 1591846679}
   - {fileID: 1299793746}
   - {fileID: 965477549}
   - {fileID: 1765371618}
@@ -15865,7 +15864,6 @@ GameObject:
   - component: {fileID: 1591846678}
   - component: {fileID: 1591846677}
   - component: {fileID: 1591846676}
-  - component: {fileID: 1591846675}
   - component: {fileID: 1591846674}
   - component: {fileID: 1591846673}
   - component: {fileID: 1591846672}
@@ -15994,24 +15992,6 @@ MonoBehaviour:
   _interactable: 1
   newScale: 1.1
   scaleDuration: 0.2
---- !u!114 &1591846675
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1591846668}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6102873c730fa6445b33680b1e865215, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DragableObject
-  _interactable: 1
-  _dragThreshold: 10
-  detectLayerMask:
-    serializedVersion: 2
-    m_Bits: 128
-  DebugDraw: 1
 --- !u!65 &1591846676
 BoxCollider:
   m_ObjectHideFlags: 0
@@ -16116,9 +16096,15 @@ MonoBehaviour:
   m_GameObject: {fileID: 1591846668}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b3ffc3b8042d0f344a92dca9a65a1035, type: 3}
+  m_Script: {fileID: 11500000, guid: cb168581a9fee0241a0a396ca545e9de, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::FruitTraySlot
+  m_EditorClassIdentifier: Assembly-CSharp::DragableFruitTraySlot
+  _interactable: 1
+  _dragThreshold: 10
+  detectLayerMask:
+    serializedVersion: 2
+    m_Bits: 0
+  DebugDraw: 1
   _fruitType: 4
   _piecePrefab: {fileID: 4662130341140586092, guid: 5567e664eb37d3146b854a03732073f5, type: 3}
 --- !u!1 &1596626091
@@ -19923,15 +19909,15 @@ PrefabInstance:
     m_Modifications:
     - target: {fileID: 345655952664627687, guid: 084acd2f365381e42856dce54ef43561, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 7.108
+      value: 6.329
       objectReference: {fileID: 0}
     - target: {fileID: 345655952664627687, guid: 084acd2f365381e42856dce54ef43561, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.459
+      value: 1.583
       objectReference: {fileID: 0}
     - target: {fileID: 345655952664627687, guid: 084acd2f365381e42856dce54ef43561, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 6.525
+      value: 5.103
       objectReference: {fileID: 0}
     - target: {fileID: 345655952664627687, guid: 084acd2f365381e42856dce54ef43561, type: 3}
       propertyPath: m_LocalRotation.w
