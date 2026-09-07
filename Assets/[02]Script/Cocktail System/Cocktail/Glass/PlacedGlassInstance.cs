@@ -5,6 +5,7 @@
 //  GlassPlacementZone.SetGlass; destroyed once served, never dragged.
 // ============================================================
 
+using System;
 using UnityEngine;
 
 public class PlacedGlassInstance : MonoBehaviour
@@ -44,8 +45,16 @@ public class PlacedGlassInstance : MonoBehaviour
     /// <summary>Starts the water-level-rising animation. Called by GarnishFlowBridge.Pour.</summary>
     public void StartFill() => _waterSlosh?.StartFilling();
 
-    /// <summary>True while the pour animation is still raising the water level.</summary>
-    public bool IsFilling => _waterSlosh != null && _waterSlosh.IsFilling;
+    /// <summary>
+    /// Fires once the pour animation finishes raising the water level. Pass-through to the
+    /// sibling WaterSlosh so callers (GarnishFlowBridge) react to the fill finishing instead of
+    /// polling a boolean every frame.
+    /// </summary>
+    public event Action OnFillComplete
+    {
+        add { if (_waterSlosh != null) _waterSlosh.OnFillComplete += value; }
+        remove { if (_waterSlosh != null) _waterSlosh.OnFillComplete -= value; }
+    }
 
     private void OnDestroy()
     {

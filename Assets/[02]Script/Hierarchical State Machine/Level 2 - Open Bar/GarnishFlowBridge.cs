@@ -35,6 +35,10 @@ namespace Bar410.GameFlow
         [SerializeField] private GlassPlacementZone _glassZone;
 
         private bool _pourComplete;
+        private PlacedGlassInstance _pouringGlass;
+
+        /// <summary>True once a pour has fully finished filling — <see cref="TryFinishGarnish"/> only succeeds when this is true.</summary>
+        public bool CanFinishGarnish => _pourComplete;
 
         // ── Unity ──────────────────────────────────────────
 
@@ -51,6 +55,8 @@ namespace Bar410.GameFlow
 
         private void OnDestroy()
         {
+            UnsubscribeFromPouringGlass();
+
             if (_gameLoop == null || _gameLoop.OpenBar == null) return;
 
             var garnish = _gameLoop.OpenBar.Garnish;
@@ -81,6 +87,8 @@ namespace Bar410.GameFlow
         public void ChooseGlass(SO_GlassOption option)
         {
             if (_glassZone == null) return;
+
+            UnsubscribeFromPouringGlass(); // the old glass is about to be destroyed — drop its fill subscription with it
 
             _glassZone.SetGlass(option);
             _pourComplete = false; // a freshly-placed glass has nothing poured into it yet
@@ -115,16 +123,28 @@ namespace Bar410.GameFlow
                 return;
             }
 
+            UnsubscribeFromPouringGlass(); // re-pouring into the same glass shouldn't double-subscribe
+
             var glass = _glassZone.Occupant;
+            _pouringGlass = glass;
+            glass.OnFillComplete += OnPourFillComplete;
+
             glass.ApplyDrink(_shakerContents.CurrentCocktail);
             glass.StartFill();
-            StartCoroutine(WaitForFillThenComplete(glass));
         }
 
-        private System.Collections.IEnumerator WaitForFillThenComplete(PlacedGlassInstance glass)
+        private void OnPourFillComplete()
         {
-            while (glass != null && glass.IsFilling) yield return null;
-            if (glass != null) _pourComplete = true;
+            UnsubscribeFromPouringGlass();
+            _pourComplete = true;
+        }
+
+        private void UnsubscribeFromPouringGlass()
+        {
+            if (_pouringGlass == null) return;
+
+            _pouringGlass.OnFillComplete -= OnPourFillComplete;
+            _pouringGlass = null;
         }
 
         // ── Called by the "done garnishing" UI instead of GameFlowCommands.GarnishDone() ──

@@ -284,7 +284,6 @@ GameObject:
   - component: {fileID: 3202017098113511574}
   - component: {fileID: 5899400836915257497}
   - component: {fileID: 6127202830856402037}
-  - component: {fileID: 4684000709362132037}
   - component: {fileID: 2143040260856795421}
   - component: {fileID: 662837798067623192}
   m_Layer: 7
@@ -392,24 +391,6 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 4.526765, y: 10.208844, z: 0.20000003}
   m_Center: {x: -0.2889223, y: 5.104422, z: 0}
---- !u!114 &4684000709362132037
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7203641576762235526}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 6102873c730fa6445b33680b1e865215, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::DragableObject
-  _interactable: 1
-  _dragThreshold: 10
-  detectLayerMask:
-    serializedVersion: 2
-    m_Bits: 0
-  DebugDraw: 0
 --- !u!114 &2143040260856795421
 MonoBehaviour:
   m_ObjectHideFlags: 0

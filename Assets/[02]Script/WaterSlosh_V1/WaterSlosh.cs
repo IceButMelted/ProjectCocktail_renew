@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using System.Collections;
 using Yarn.Unity;
@@ -77,8 +78,8 @@ public class WaterSlosh : MonoBehaviour
     }
 #endif
 
-    /// <summary>True while a StartFilling() coroutine is actively raising the water level.</summary>
-    public bool IsFilling => _fillCoroutine != null;
+    /// <summary>Fires once, when a StartFilling() run reaches the top — never on StopFilling().</summary>
+    public event Action OnFillComplete;
 
     public void StartFilling()
     {
@@ -126,6 +127,7 @@ public class WaterSlosh : MonoBehaviour
         waterLevel = 0.94f;
         UpdateMatVariable();
         _fillCoroutine = null;
+        OnFillComplete?.Invoke();
     }
 
     public void StopFilling()
