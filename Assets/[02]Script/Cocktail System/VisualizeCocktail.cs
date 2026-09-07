@@ -3,12 +3,12 @@ using UnityEngine.UI;
 using static DrinkQuery;
 
 /// <summary>
-/// Updates fill bars to visually represent the current cocktail's alcohol / mixer ratio.
-/// Max capacity is always 10 parts total (GDD §15).
+/// Updates fill bars for the current cocktail's alcohol/mixer ratio.
+/// Max capacity is 10 parts total (GDD §15).
 ///
-/// Reads <see cref="ShakerContents"/> — the refactored owner of the live drink. It used to
-/// read the legacy CocktailShaker, which no longer exists in scenes that finished the
-/// migration, so the lookup returned null and the first refresh threw.
+/// Reads <see cref="ShakerContents"/>, the live drink's owner. Previously read the
+/// legacy CocktailShaker, absent from migrated scenes — lookup returned null and the
+/// first refresh threw.
 /// </summary>
 public class VisualizeCocktail : MonoBehaviour
 {
@@ -30,7 +30,7 @@ public class VisualizeCocktail : MonoBehaviour
         if (_shaker == null)
             Debug.LogWarning("[VisualizeCocktail] No ShakerContents in the scene — the bars will stay empty.", this);
 
-        // Ensure both images respond to fillAmount regardless of Inspector setting
+        // Force fillAmount to work regardless of Inspector setting
         InitFillImage(alcoholFill);
         InitFillImage(mixerFill);
     }
@@ -44,7 +44,7 @@ public class VisualizeCocktail : MonoBehaviour
         img.fillAmount = 0f;
     }
 
-    /// <summary>Show the bars and refresh them to match the current shaker state.</summary>
+    /// <summary>Shows the bars and refreshes them to match the current shaker state.</summary>
     public void UpdateCocktailBars()
     {
         gameObject.SetActive(true);

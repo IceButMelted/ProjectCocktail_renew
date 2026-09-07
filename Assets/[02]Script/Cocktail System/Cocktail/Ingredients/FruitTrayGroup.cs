@@ -1,15 +1,14 @@
 // ============================================================
-//  FruitTrayGroup.cs — A named set of fruit trays whose spawned
-//  pieces should exist only while AddIngredient is the active
-//  Prepare Drinks step.
+//  FruitTrayGroup.cs — Named set of fruit trays whose spawned pieces
+//  should exist only while AddIngredient is the active Prepare Drinks
+//  step.
 //
 //  Mirrors IngredientButtonGroup's shape (one Inspector binding via
-//  GameFlowHooks instead of one binding per tray), but drives
-//  FruitTraySlot's spawn/despawn cycle instead of InteractableToggle —
-//  piece *presence*, not just interactability, is what needs to change
-//  per phase, since a live piece's collider sits close enough to the
-//  tray's own collider to interfere with dragging the tray itself
-//  (see the collider-overlap risk noted in
+//  GameFlowHooks instead of per-tray), but drives FruitTraySlot's
+//  spawn/despawn cycle instead of InteractableToggle — piece
+//  *presence*, not just interactability, must change per phase: a
+//  live piece's collider sits close enough to the tray's own to
+//  interfere with dragging the tray (collider-overlap risk noted in
 //  Docs/Bar410_GlassFreedom_ManualSetup.md §3.3).
 // ============================================================
 
@@ -30,7 +29,7 @@ public class FruitTrayGroup : MonoBehaviour
 
     /// <summary>
     /// Bind to AddIngredient.OnExit — removes every live piece so trays can be dragged/
-    /// repositioned in other phases without a stray piece collider getting in the way.
+    /// repositioned elsewhere without a stray piece collider getting in the way.
     /// </summary>
     public void DespawnAll()
     {

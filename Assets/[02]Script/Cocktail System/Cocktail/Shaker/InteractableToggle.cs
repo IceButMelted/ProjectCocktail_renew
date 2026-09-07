@@ -1,17 +1,12 @@
 // ============================================================
-//  InteractableToggle.cs — The one place that knows what
-//  "enable this object for the player" actually means.
+//  InteractableToggle.cs — the one place that knows what
+//  "enable this object for the player" means.
 //
-//  Plan bug B4: three separate loops did this, each touching a
-//  DIFFERENT subset of components —
-//    CocktailShakerData.SetIngredientActive   6 component types
-//    CocktailShakerData.SetBookUiActive       7 component types
-//    CocktailSystemManager.EnableButtonInYarn 4 component types,
-//                                             and it ran straight
-//                                             after SetIngredientActive,
-//                                             setting the same objects twice.
-//  Adding a new interactable component used to mean remembering all
-//  three; now it means editing Apply().
+//  Bug B4: three separate loops did this, each touching a different
+//  component subset — SetIngredientActive (6 types), SetBookUiActive
+//  (7 types), EnableButtonInYarn (4 types, run right after
+//  SetIngredientActive, double-setting the same objects).
+//  Adding a component used to mean updating all three; now just Apply().
 // ============================================================
 
 using UnityEngine;
@@ -19,8 +14,8 @@ using UnityEngine;
 public static class InteractableToggle
 {
     /// <summary>
-    /// Enables or disables every interaction component present on <paramref name="target"/>.
-    /// Missing components are simply skipped — objects are free to carry any subset.
+    /// Enables/disables every interaction component on <paramref name="target"/>.
+    /// Missing components are skipped — any subset is fine.
     /// </summary>
     public static void Apply(GameObject target, bool interactable)
     {
@@ -34,7 +29,7 @@ public static class InteractableToggle
         if (target.TryGetComponent<UIPointerSound>(out var sound)) sound.Interactable = interactable;
         if (target.TryGetComponent<BookUI_V2>(out var book)) book.SetActive(interactable);
 
-        //this blew for disable other component that's not inherited from Intaractable_2_5DObject or Interactable_3DObject, so we need to add a separate check for it
+        // Separate check: BottleIngredientSource doesn't inherit Interactable_2_5DObject/3DObject.
         if (target.TryGetComponent<BottleIngredientSource>(out var bottle)) bottle.enabled = interactable; 
     }
 
@@ -57,10 +52,9 @@ public static class InteractableToggle
     }
 
     /// <summary>
-    /// Sets pointer-sound interactability. Pass <paramref name="canPlayUp"/> only when the
-    /// pointer-up sound needs to end up different from <paramref name="interactable"/> (e.g.
-    /// muted specifically while everything else stays on) — leave it null to let the
-    /// Interactable setter's own OnInteractableChanged hook decide it as usual.
+    /// Sets pointer-sound interactability. Pass <paramref name="canPlayUp"/> only to make
+    /// pointer-up differ from <paramref name="interactable"/> (e.g. muted while rest stays on);
+    /// leave null to let Interactable's OnInteractableChanged hook decide as usual.
     /// </summary>
     public static void ApplyOnlyUIPointerSound(GameObject target, bool interactable, bool? canPlayUp = null)
     {
@@ -84,8 +78,8 @@ public static class InteractableToggle
     }
 
     /// <summary>
-    /// Turns a DragableFruitTraySlot's drag-hijack on or off — only meaningful on an ingredient
-    /// that doubles as a fruit tray (e.g. Mixer-LemonJuice (1)); a no-op on anything else.
+    /// Toggles a DragableFruitTraySlot's drag-hijack — meaningful only on an ingredient that
+    /// doubles as a fruit tray (e.g. Mixer-LemonJuice (1)); no-op otherwise.
     /// </summary>
     public static void ApplyOnlyFruitTraySlot(GameObject target, bool enable)
     {
@@ -106,35 +100,11 @@ public static class InteractableToggle
     }
 
     /// <summary>
-    /// Level 1 Prepare: bar-layout dragging and hover feedback stay on; pouring (click or
-    /// bottle-drag) is off, and the release sound is muted since repositioning fires
-    /// pointer-up constantly. One pass per target instead of "enable everything, then undo
-    /// a few" — that shape is exactly what let DragableObject slip through un-reasoned-about
-    /// before; a single explicit end-state per phase removes that whole class of mistake.
-    /// </summary>
-    public static void ApplyPrepareBarPhase(GameObject target)
-    {
-        if (target == null) return;
-
-        ApplyOnlyInteractable_2_5DObject(target, false);
-        ApplyOnlyInteractable_3DObject(target, true);
-        ApplyOnlyDragDrop(target, true);
-        ApplyOnlyScaleOnHover(target, true);
-        ApplyOnlyHoverTooltip(target, true);
-        ApplyOnlyUIPointerSound(target, true, canPlayUp: false);
-        ApplyOnlyBookUI(target, true);
-        ApplyOnlyBottleIngredientSource(target, false);
-        ApplyOnlyFruitTraySlot(target, false);
-    }
-
-    /// <summary>
-    /// Level 3 AddIngredient: pouring (click or bottle-drag) is on. DragableObject stays on
-    /// here too — it is the same input listener BottleIngredientSource's own drag detection
-    /// rides on (OnPointerDown/OnDrag both gate on DragableObject.Interactable), not a
-    /// separate bar-layout switch, so turning it off would silently break pouring rather than
-    /// just locking repositioning. BottleIngredientSource.OnDragEnded already forces the
-    /// bottle back to its own spot on every release regardless, so leaving DragableObject on
-    /// does not let bottles actually relocate outside Prepare.
+    /// Level 3 AddIngredient: pouring (click or bottle-drag) on. DragableObject stays on too
+    /// — BottleIngredientSource's drag detection gates on DragableObject.Interactable
+    /// (OnPointerDown/OnDrag), not a separate switch, so disabling it would silently break
+    /// pouring, not just lock repositioning. BottleIngredientSource.OnDragEnded forces the
+    /// bottle back to its spot on every release regardless, so it can't relocate outside Prepare.
     /// </summary>
     public static void ApplyPrepareDrinksPhase(GameObject target)
     {

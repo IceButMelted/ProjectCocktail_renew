@@ -2,17 +2,16 @@
 //  SO_GlassVisualTable.cs — GlassType -> sprites, in ONE asset.
 //  Plan decision D5 (§10.1).
 //
-//  This table used to be a SerializableDictionary field on
-//  CocktailShakerData, which meant one independent copy per scene
-//  and per prefab. There were five, and three of them had already
-//  drifted: two scenes held identical 4-entry tables, one scene held
-//  an EMPTY table, and neither prefab had the field serialized at all.
-//  Moving it to an asset makes all of them point at one source.
+//  Used to be a SerializableDictionary field on CocktailShakerData: one
+//  independent copy per scene/prefab. Of five copies, three had drifted
+//  (two scenes with identical 4-entry tables, one scene EMPTY, neither
+//  prefab serializing the field at all). Moving it to an asset makes
+//  all of them point at one source.
 //
-//  Known gap G1: GlassType has 8 values but the tables in the scenes
-//  only ever filled 4 (Hi_ball, Martini, Rocks, Magrita). A lookup
-//  miss only warns and leaves the previous sprite on screen, so fill
-//  every value you actually use — see Bar410_CocktailSystem_Manual_Setup.md.
+//  Known gap G1: GlassType has 8 values but the scene tables only ever
+//  filled 4 (Hi_ball, Martini, Rocks, Magrita). A lookup miss only warns
+//  and leaves the previous sprite on screen, so fill every value you
+//  use — see Bar410_CocktailSystem_Manual_Setup.md.
 // ============================================================
 
 using AYellowpaper.SerializedCollections;
@@ -22,9 +21,9 @@ using static E_Cocktail;
 /// <summary>
 /// Sprites for one kind of glass.
 ///
-/// Top-level on purpose: the old CocktailShakerData.VisualCocktailGlass was a nested
-/// class, and Unity serializes nested types under the owner's name. Reusing it here would
-/// have tied the asset's format to a class that is on its way out.
+/// Top-level on purpose: old CocktailShakerData.VisualCocktailGlass was a nested class,
+/// and Unity serializes nested types under the owner's name. Reusing it here would tie
+/// the asset's format to a class on its way out.
 /// </summary>
 [System.Serializable]
 public class GlassVisual

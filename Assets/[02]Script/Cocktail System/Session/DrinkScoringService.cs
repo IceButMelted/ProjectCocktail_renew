@@ -1,10 +1,10 @@
 // ============================================================
 //  DrinkScoringService.cs — Runs GDD §17-18 once, at serve time,
-//  and writes the whole outcome into the order context.
+//  writes the whole outcome into the order context.
 //
-//  Sits between the Domain rules (which are pure) and the flow layer
-//  (which owns when scoring happens). CocktailFlowBridge calls this
-//  from ServeState.Exited — the TODO left in ServeState.cs:29 and
+//  Sits between the pure Domain rules and the flow layer (which owns
+//  when scoring happens). CocktailFlowBridge calls this from
+//  ServeState.Exited — the TODO in ServeState.cs:29 and
 //  Bar410_StateMachine_Implementation.md §3.2.
 // ============================================================
 
@@ -19,13 +19,13 @@ public class DrinkScoringService
     public DrinkScoringService(IDrinkRepository lookup) => _lookup = lookup;
 
     /// <summary>
-    /// Scores <paramref name="served"/> against the order held in <paramref name="context"/>
-    /// and stores the result there. Returns the satisfaction for convenience.
+    /// Scores <paramref name="served"/> against the order in <paramref name="context"/>,
+    /// stores the result, and returns the satisfaction.
     ///
-    /// Two comparisons happen, and they are not the same one:
-    ///   identity  — best match across the whole database: what did the player MAKE?
-    ///   order     — comparison against the requested recipe: does it match the ORDER?
-    /// See the note on DrinkDeviation.MatchAgainst for why §18 scores the second.
+    /// Two distinct comparisons:
+    ///   identity — best match across the whole database: what did the player MAKE?
+    ///   order    — comparison against the requested recipe: does it match the ORDER?
+    /// See DrinkDeviation.MatchAgainst for why §18 scores the second.
     /// </summary>
     public Satisfaction Score(DrinkOrderContext context, S_Drink served)
     {
@@ -48,7 +48,7 @@ public class DrinkScoringService
             ? AlcoholClassifier.Resolve(identity.Recipe)
             : AlcoholClassifier.Compute(served);
 
-        // Mode 5 (GDD §12) has no target recipe, so the identity match IS the comparison —
+        // Mode 5 (GDD §12) has no target recipe, so identity match IS the comparison —
         // any recipe of the right type satisfies the order.
         RecipeMatch orderMatch = context.Target != null
             ? DrinkDeviation.MatchAgainst(served, context.Target)

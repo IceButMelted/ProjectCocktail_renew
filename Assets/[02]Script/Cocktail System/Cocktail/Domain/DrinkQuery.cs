@@ -28,8 +28,8 @@ public static class DrinkQuery
     /// <summary>
     /// True when <paramref name="amount"/> more parts still fit under the cap.
     ///
-    /// Fixes plan bug B6: the old IsValidRatio only checked that the CURRENT total was
-    /// below 10, so pouring 5 parts onto a 9-part drink produced a 14-part glass.
+    /// Fixes plan bug B6: old IsValidRatio only checked the CURRENT total was below 10,
+    /// so pouring 5 parts onto a 9-part drink produced a 14-part glass.
     /// </summary>
     public static bool CanAdd(S_Drink d, int amount)
         => GetTotalIngredient(d) + amount <= MaxTotalParts;

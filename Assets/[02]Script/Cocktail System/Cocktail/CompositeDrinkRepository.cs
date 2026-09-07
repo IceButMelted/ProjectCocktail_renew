@@ -1,14 +1,14 @@
 // ============================================================
 //  CompositeDrinkRepository.cs — plan §4.7 (decision D1).
 //
-//  Presents several IDrinkRepository sources as one. Written now
-//  so the seam exists before there is special-cocktail content:
-//  Specia_Cocktail.asset is currently empty and the field feeding
-//  it is null in every scene, so behaviour is unchanged today.
+//  Presents several IDrinkRepository sources as one. Written now so
+//  the seam exists before special-cocktail content: Specia_Cocktail.asset
+//  is currently empty and the field feeding it is null in every scene,
+//  so behaviour is unchanged today.
 //
-//  Also removes plan bug B11 — SystemGame.prefab has a null
-//  repository reference, which used to throw NullReferenceException
-//  from CocktailSystemManager.Start().
+//  Also fixes plan bug B11 — SystemGame.prefab's null repository
+//  reference used to throw NullReferenceException from
+//  CocktailSystemManager.Start().
 // ============================================================
 
 using System.Collections.Generic;
@@ -26,7 +26,7 @@ public class CompositeDrinkRepository : IDrinkRepository
 
         foreach (var source in sources)
         {
-            // ScriptableObject sources compare against null through the Unity lifetime check.
+            // ScriptableObject sources compare null via Unity's lifetime check.
             if (source == null || (source is Object unityObject && unityObject == null)) continue;
 
             var drinks = source.GetDrinks();
@@ -44,9 +44,9 @@ public class CompositeDrinkRepository : IDrinkRepository
     /// <summary>
     /// Uniform across the WHOLE union.
     ///
-    /// Do not "pick a source, then pick a drink from it" — that is the same distribution
-    /// bug as plan S10. With 26 normal and 2 special recipes, picking a source first would
-    /// give the specials a 50% chance instead of 2/28.
+    /// Do not "pick a source, then pick a drink from it" — same distribution bug as plan
+    /// S10. With 26 normal and 2 special recipes, picking a source first would give the
+    /// specials a 50% chance instead of 2/28.
     /// </summary>
     public S_Drink GetRandom()
     {

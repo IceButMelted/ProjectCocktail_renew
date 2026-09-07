@@ -12,8 +12,8 @@ public class ShakerVisualPresenter : MonoBehaviour
     [SerializeField] private WaterSlosh _glassWaterSlosh;
 
     [Tooltip("LEGACY only. S_Drink no longer carries a glass, so this is never read for " +
-             "per-drink sprite switching anymore — kept only so CocktailShakerData's Initialize " +
-             "call (unmigrated scenes) still compiles and can still fill it for its own use.")]
+             "per-drink sprite switching — kept only so CocktailShakerData's Initialize " +
+             "call (unmigrated scenes) still compiles and can fill it.")]
     [SerializeField] private SO_GlassVisualTable _glassVisuals;
 
     private ShakerContents _contents;
@@ -28,9 +28,8 @@ public class ShakerVisualPresenter : MonoBehaviour
     }
 
     /// <summary>
-    /// Seeds references when this component was created at runtime rather than authored in
-    /// the scene. Used by the CocktailShakerData compatibility shim; assign the fields in
-    /// the Inspector instead once the manual migration has been done.
+    /// Seeds refs when created at runtime rather than authored in the scene. Used by the
+    /// CocktailShakerData compatibility shim; assign in the Inspector after migration.
     /// </summary>
     public void Initialize(WaterSlosh glass, SO_GlassVisualTable visuals)
     {
@@ -68,9 +67,9 @@ public class ShakerVisualPresenter : MonoBehaviour
     }
 
     /// <summary>
-    /// Pushes a drink's colour onto the WaterSlosh renderer. The shaker's own glass/ice/water
-    /// sprites are no longer driven per-drink — S_Drink has no glass field anymore, glass
-    /// choice belongs to the player-placed serving glass, applied separately once poured.
+    /// Pushes a drink's colour onto the WaterSlosh renderer. Shaker's own glass/ice/water
+    /// sprites are no longer driven per-drink — glass choice belongs to the player-placed
+    /// serving glass, applied separately once poured.
     /// </summary>
     public void Apply(S_Drink drink)
     {

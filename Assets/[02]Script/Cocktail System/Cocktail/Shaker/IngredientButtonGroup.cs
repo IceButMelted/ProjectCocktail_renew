@@ -2,13 +2,13 @@
 //  IngredientButtonGroup.cs — A named set of objects the player
 //  may or may not interact with right now.
 //
-//  Put one on the ingredient shelf and one on the recipe book;
-//  the old code kept two hand-maintained lists on CocktailShakerData
-//  plus two near-identical loops to walk them.
+//  Put one on the ingredient shelf and one on the recipe book; old
+//  code kept two hand-maintained lists on CocktailShakerData plus two
+//  near-identical loops to walk them.
 //
 //  BarSetupBridge (plan §6.1) rebuilds the ingredient group from
 //  whatever the player actually placed on the bar during
-//  PrepareBarPhase, which is why the roster is settable at runtime.
+//  PrepareBarPhase, hence the roster being settable at runtime.
 // ============================================================
 
 using System.Collections.Generic;
@@ -79,14 +79,6 @@ public class IngredientButtonGroup : MonoBehaviour
 
     ///--- Enable/Disable on this Phase------
 
-    /// <summary>Level 1 Prepare: drag-and-drop bar layout on, pouring off. See InteractableToggle.ApplyPrepareBarPhase.</summary>
-    public void EnableInteractablePrepareBarPhase()
-    {
-        IsInteractable = true;
-        for (int i = 0; i < _members.Count; i++)
-            InteractableToggle.ApplyPrepareBarPhase(_members[i]);
-    }
-
     /// <summary>Level 3 AddIngredient: pouring (click or bottle-drag) on. See InteractableToggle.ApplyPrepareDrinksPhase.</summary>
     public void EnableInteractablePrepareDrinksPhase()
     {
@@ -96,8 +88,8 @@ public class IngredientButtonGroup : MonoBehaviour
     }
 
     /// <summary>
-    /// Replaces the roster, applying the current interactable state to the new members.
-    /// Used by BarSetupBridge once the player has finished laying out the bar.
+    /// Replaces the roster, applying current interactable state to new members.
+    /// Used by BarSetupBridge once the player finishes laying out the bar.
     /// </summary>
     public void SetRoster(IEnumerable<GameObject> members)
     {

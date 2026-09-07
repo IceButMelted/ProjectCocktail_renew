@@ -1,10 +1,9 @@
 // ============================================================
 //  SO_GlassOption.cs — One glass the player can drag from the shelf.
 //
-//  Replaces SO_GlassVisualTable for the new player-chosen-glass system:
-//  a flat list of options instead of a dictionary keyed by GlassType,
-//  since garnish look now has to travel with the choice too and there
-//  is no longer any recipe-driven key to look entries up by.
+//  Replaces SO_GlassVisualTable: a flat list instead of a dictionary
+//  keyed by GlassType, since garnish look now travels with the choice
+//  and there's no longer a recipe-driven key to look entries up by.
 // ============================================================
 
 using UnityEngine;

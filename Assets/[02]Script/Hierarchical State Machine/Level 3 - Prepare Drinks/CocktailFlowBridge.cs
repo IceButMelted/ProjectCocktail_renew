@@ -111,6 +111,11 @@ namespace Bar410.GameFlow
 
         private void OnServeExited()
         {
+            // The served glass never carries over — the next customer always gets a fresh one
+            // from GlassPlacementZone.SetGlass. Unconditional, independent of the scoring guard
+            // below, so it still runs even when scoring already happened via the legacy path.
+            if (_glassZone != null) _glassZone.ClearAndDestroyOccupant();
+
             // Closes the TODO in ServeState.cs and Bar410_StateMachine_Implementation.md §3.2
             // ("scoring moved to ServeState.OnExit"). Guarded because the existing Serve
             // button already scores through CocktailSystemManager.ServeDrink(); whichever

@@ -1,7 +1,7 @@
 # Bar410 — Cocktail System: เอกสารส่งต่องาน / HANDOFF
 
-**Date เริ่มต้น:** 2026-08-21 · **อัปเดตล่าสุด:** 2026-08-23 · **Branch:** `GameLoop/main` · **HEAD:** `b505b53` (push แล้วหรือยังไม่แน่ใจ เช็ค `git status` ก่อน)
-**สถานะ:** โค้ดคอมไพล์ผ่านไม่มี error · `Bar410 > Validate Cocktail Data` ผ่าน · **working tree มีของค้างไม่ได้ commit** (ดู §0 — งาน "ผสมขวด/tray" ของ `Mixer-LemonJuice (1)` รอบใหม่ล่าสุดหลัง `b505b53`)
+**Date เริ่มต้น:** 2026-08-21 · **อัปเดตล่าสุด:** 2026-09-01 · **Branch:** `GameLoop/main` · **HEAD:** `c4390ac` (push แล้วหรือยังไม่แน่ใจ เช็ค `git status` ก่อน)
+**สถานะ:** โค้ดคอมไพล์ผ่านไม่มี error · **working tree มีของค้างไม่ได้ commit** (ดู §0)
 
 > อ่านไฟล์นี้ก่อนไฟล์อื่นทั้งหมด แล้วค่อยเจาะรายละเอียดจากเอกสารที่อ้างถึงใน §2
 > 🆕 **ถ้ามาต่องาน "Glass Freedom" (ผู้เล่นเลือกแก้วเสิร์ฟเอง + ลาก-วางวัตถุดิบ) โดยเฉพาะ อ่าน §1b ก่อน**
@@ -31,6 +31,26 @@
 - Scene `New Cocktail System.unity`: `Mixer-LemonJuice (1)` เปลี่ยนจาก `DragableObject`+`FruitTraySlot`
   (สองคอมโพเนนต์แยก) เป็น `DragableFruitTraySlot` ตัวเดียว, ลบ null-reference ที่ค้างใน
   `FruitTrayGroup._members` จากการสลับคอมโพเนนต์นี้ด้วย
+
+**เพิ่มอีกรอบ 2026-09-01** (ของค้างไม่ได้ commit เช่นกัน — ทั้งหมดยืนยันด้วย Unity MCP compile +
+Play mode test แล้ว):
+- `N_PlacementSystem.cs` — `UpdateDragPosition` เช็ค `DragableObject.IgnorePlacementZones` ก่อนหา
+  Placement Zone ถ้า true ข้ามไปใช้ floating position ทันที (ตามคำขอ: ลากวัตถุดิบข้าม zone อื่น
+  เช่น `GlassPlacementZone` ไม่ให้โดน clamp ติด)
+- `DragableObject.cs` — เพิ่ม property `IgnorePlacementZones` (default false)
+- `BottleIngredientSource.cs` / `FruitPieceInstance.cs` — set/unset `IgnorePlacementZones` ใน
+  `OnEnable`/`OnDisable` (ไม่ใช่ `Awake` — เคย set ครั้งเดียวถาวรแล้วทำให้ขวดลอยตลอดแม้ตอน Prepare
+  Bar phase ที่ component ถูกปิด แก้แล้ว) — ยังเพิ่ม `OnEnable`/`OnDisable` reset ให้ตรงกับตอนที่
+  component ถูก `InteractableToggle` เปิด/ปิดตาม phase จริง
+- `ScaleOnHover.cs` — เพิ่ม `Update()` เช็ค sibling `DragableObject.IsDragging` เอง บังคับหดสเกลกลับ
+  ตอนลากจบ (แก้บั๊กสเกลค้างใหญ่จาก `OnPointerExit`'s `IsAnyDragging` guard) + เพิ่ม `public
+  ForceReset()` ให้เรียกจากนอกคลาสได้
+- `DragableFruitTraySlot.cs` — เปลี่ยน field-init จาก `Awake()` เป็น `Start()` (Awake ชนกับของ
+  `DragableObject` แม่ ทำให้ `PastLocation`/`_collider` ไม่เคยถูก set บั๊กดีดกลับ `(0,0,0)`) +
+  เรียก `ScaleOnHover.ForceReset()` ทันทีตอน hijack drag เริ่ม (host เองไม่เคย `IsDragging=true`
+  เลยตอน hijack ทำให้ fix ของ `ScaleOnHover` จับไม่ได้)
+- `BTN - FinishGranish` (`Panel - Granish UI`, ผู้ใช้ทำเอง) ผูกเข้า `GarnishFlowBridge.TryFinishGarnish()`
+  ถูกต้องแล้ว — ยืนยันด้วย Unity MCP (target/method ตรง) ดู §8.1 สำหรับช่องว่างที่เหลือ (panel ไม่ปิดตัวเองหลังจบ)
 
 ---
 
@@ -68,25 +88,29 @@ Refactor `Assets/[02]Script/Cocktail System/` ทั้งระบบ เพื
 | ส่วน | สถานะ |
 |---|---|
 | Track A (เลือกแก้ว) — หยิบ/วาง/สลับแก้ว | ✅ **เทสแล้ว ใช้งานได้จริง** |
-| Track B — หมวด **ขวด** (`BottleIngredientSource`) | 🟡 **เทสแล้ว ใช้งานได้จริง แต่ติดแค่ `Alchohol-Vodka`** — อีก 10 ขวดที่เหลือ (Gin/Rum/Whiskey/Tequila/TripleSec/SweetVermouth/DryVermouth/Campari/Soda/Syrup) ยังไม่มี `BottleIngredientSource` |
+| Track B — หมวด **ขวด** (`BottleIngredientSource`) | ✅ **เทสแล้ว ใช้งานได้จริง ครบทั้ง 11 ขวด** — `_hoverOffset` ตั้งใจให้เท่ากันทุกตัว `(0, 0.3, -0.2)` เพราะ geometry ขวดเหมือนกัน (ยืนยัน 2026-09-01) ไม่ใช่ค่า default ที่ยังไม่ได้ปรับ |
 | Track B — หมวด **Fruit** (`FruitTraySlot`/`FruitPieceInstance`) | ✅ **เทสแล้ว ใช้งานได้จริง ครบทั้ง 6 ชนิด** — sprite ยังเป็น placeholder (ยืมสไปรต์ขวดเดิมมาใช้ ไม่ใช่ art จริง) |
 | วัตถุดิบที่กดเทได้ **และ** ดึงผลไม้ออกได้ในตัวเดียวกัน (`Mixer-LemonJuice (1)`) | ✅ **เทสแล้ว ใช้งานได้จริง** ผ่าน `DragableFruitTraySlot` (ดู §5 #14/#15, §6 D13) |
-| การเทจากภาชนะชงลงแก้ว (`GarnishFlowBridge`) | 🟡 ผูกในซีนแล้ว ยังไม่มีปุ่ม UI เรียก `TryFinishGarnish()` — ดู §8.2 |
+| การเทจากภาชนะชงลงแก้ว (`GarnishFlowBridge`) | ✅ **เทสแล้ว ใช้งานได้จริง** — `BTN - FinishGranish` (`[GameLoop]/Canvas/Panel - Granish UI/`) ผูกเข้า `GarnishFlowBridge.TryFinishGarnish()` ถูกต้อง (ไม่ใช่ `GameFlowCommands.GarnishDone()` ตรงๆ) ยืนยัน 2026-09-01 · `Panel - Granish UI` ปิดตัวเองตอนออกจาก Garnish แล้วเช่นกัน (`_garnish._onExit` → `Panel - Granish UI.SetActive(false)`) — **หมายเหตุ:** call เดิม `Panel - BookUI.SetActive(false)` ที่เคยอยู่ใน `_onExit` หายไปด้วย (ถูกแทนที่ ไม่ใช่เพิ่มต่อ) ยังไม่ยืนยันว่าตั้งใจ |
 | Phase-gated interactable (`EnableInteractablePrepareBarPhase`/`Drinks`) | ✅ ผูกแล้วใน `GameFlowHooks` (ซีน `New Cocktail System`), เทสแล้ว |
 
 **เอกสารของฟีเจอร์นี้โดยเฉพาะ:** `Docs/Bar410_GlassFreedom_ManualSetup.md` · แผนต้นฉบับอยู่ใน plan
 file `robust-watching-lark` (อนุมัติและทำครบ 6 ขั้นแล้ว) · GDD อัปเดตแล้วที่ §21/§21.0
 
 **สิ่งที่ต้องทำต่อ เรียงตามลำดับ:**
-1. สร้างปุ่ม/panel UI "ตกแต่งเสร็จแล้ว" ผูกเข้า `GarnishFlowBridge.TryFinishGarnish()` (ไม่ใช่
-   `GameFlowCommands.GarnishDone()` ตรงๆ) — ตอนนี้เทแล้วไม่มีทางกดจบไป Serve ได้เลย
-2. เพิ่ม `BottleIngredientSource` ให้ขวดที่เหลืออีก 10 อัน + ปรับ Hover Offset ทีละอัน (§3.5 ของ
-   `Bar410_GlassFreedom_ManualSetup.md`)
-3. Art จริงของหมวด Fruit (sprite ชิ้นผลไม้แทนของที่ยืมมาจากขวด) + ตัดสินใจ `E_GarnishLook`/กลไก
+1. 🆕 กำลัง focus อยู่ (2026-09-01): ขั้นตอนการ **Pouring** (ลากภาชนะชง `CocktailShaker`/`PourSource`
+   ไปวางที่แก้วใน `GlassPlacementZone` → `GarnishFlowBridge.OnZonePlaced`) — เคย mark ว่าเทสแล้วใช้
+   งานได้จริงตั้งแต่ session 2026-08-23 แต่ผู้ใช้กำลังกลับมาดูรายละเอียด/ขัดเกลาเพิ่ม รายละเอียด
+   เฉพาะยังไม่ระบุ ณ ตอนบันทึกนี้
+2. Art จริงของหมวด Fruit (sprite ชิ้นผลไม้แทนของที่ยืมมาจากขวด) + ตัดสินใจ `E_GarnishLook`/กลไก
    ตกแต่งแก้วจริง — ยังเป็น placeholder ทั้งคู่
-4. ทดสอบวงจรเต็ม: สั่งเครื่องดื่ม → ใส่วัตถุดิบ (ขวด+ผลไม้ผสมกัน) → มินิเกม → วางแก้ว → เท → กด
-   ตกแต่งเสร็จ (รอข้อ 1) → เสิร์ฟ
-5. **commit งานค้างที่ระบุใน §0** เข้า git
+3. ทดสอบวงจรเต็ม: สั่งเครื่องดื่ม → ใส่วัตถุดิบ (ขวด+ผลไม้ผสมกัน) → มินิเกม → วางแก้ว → เท → กด
+   ตกแต่งเสร็จ → เสิร์ฟ
+4. **commit งานค้างที่ระบุใน §0** เข้า git
+
+**ปิดแล้ว 2026-09-01:** `BottleIngredientSource` ครบทั้ง 11 ขวด (ดูตารางด้านบน + §7.4) ·
+ปุ่ม "ตกแต่งเสร็จแล้ว" (`BTN - FinishGranish`) ผูกเข้า `GarnishFlowBridge.TryFinishGarnish()`
+ถูกต้องแล้ว — จบ Garnish ไป Serve ได้จริงแล้ว (ยกเว้นช่องว่างใหม่ข้อ 1 ด้านบน)
 
 ---
 
@@ -251,17 +275,17 @@ phase-gated interactable (`EnableInteractablePrepareBarPhase`/`PrepareDrinksPhas
 
 ## 8. ยังไม่เสร็จ — เรียงตามความสำคัญ
 
-### 8.1 🔴 Glass Freedom — ไม่มีทางจบ Garnish state (สำคัญสุดตอนนี้)
+### 8.1 ✅ Glass Freedom — จบ Garnish state ได้แล้ว (ปิด 2026-09-01)
 
-`GarnishFlowBridge` ผูกในซีนครบแล้ว (ดู §7.5) แต่**ยังไม่มีปุ่ม/panel UI ไหนเรียก
-`GarnishFlowBridge.TryFinishGarnish()` เลย** — เทเสร็จแล้วก็ค้าง ไปต่อ Serve ไม่ได้ ต้องสร้าง UI
-ใหม่ (ดู `Bar410_GlassFreedom_ManualSetup.md` §5.2 — **ห้ามผูกเข้า `GameFlowCommands.GarnishDone()`
-ตรงๆ** เพราะจะข้ามการเช็คว่าเทแล้วหรือยัง)
+`BTN - FinishGranish` (`[GameLoop]/Canvas/Panel - Granish UI/`) ผูกเข้า
+`GarnishFlowBridge.TryFinishGarnish()` ถูกต้อง (ยืนยันผ่าน Unity MCP — target/method ตรง ไม่ใช่
+`GameFlowCommands.GarnishDone()` ตรงๆ) และ `Panel - Granish UI` ปิดตัวเองตอนออกจาก Garnish แล้ว
+(`_garnish._onExit → Panel - Granish UI.SetActive(false)`) — จบ Garnish ไป Serve ได้จริงครบวงจร
+**หมายเหตุค้าง:** call เดิม `Panel - BookUI.SetActive(false)` ที่เคยอยู่ใน `_onExit` หายไป (ถูก
+แทนที่ ไม่ใช่เพิ่มต่อ) ยังไม่ยืนยันว่าตั้งใจเอาออกหรือเผลอลบ — ถามผู้ใช้ก่อนแก้อะไรเพิ่ม
 
 ### 8.2 🟡 Glass Freedom — งานที่เหลือของหมวดขวด/decoration
 
-- ขวดที่เหลือ 10 อัน (Gin/Rum/Whiskey/Tequila/TripleSec/SweetVermouth/DryVermouth/Campari/Soda/Syrup)
-  ยังไม่มี `BottleIngredientSource` — มีแค่ `Alchohol-Vodka` ตัวเดียวที่ทดสอบแล้ว
 - กลไกตกแต่งแก้วหลังเท (decoration) — ยังไม่ตัดสินใจกลไก มี `TODO(design)` กำกับไว้ใน `GarnishFlowBridge.cs`
 - `E_GarnishLook` enum — ยังเป็น placeholder รอ design ตัดสินใจรายการจริง
 - sprite ของหมวด Fruit ทั้ง 6 ชนิด (tray + piece) ยังยืมสไปรต์ขวดเดิมมาใช้ ไม่ใช่ art จริง

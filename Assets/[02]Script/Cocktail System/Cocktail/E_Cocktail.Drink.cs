@@ -2,16 +2,16 @@
 //  E_Cocktail.Drink.cs — part of E_Cocktail.
 //  Ingredients, glassware, preparation method and scoring.
 //
-//  Plan §4.6: the enums are grouped by domain across four files, but
-//  E_Cocktail stays ONE partial class. Twenty files do
-//  `using static E_Cocktail;`; splitting it into separate classes
-//  would break every one of them for no gain.
+//  Plan §4.6: enums are grouped by domain across 4 files, but
+//  E_Cocktail stays ONE partial class. 20 files do
+//  `using static E_Cocktail;`; splitting into separate classes
+//  would break all of them for no gain.
 //
-//  NOTE — deliberate deviation from GDD §15.1 (plan decision D6):
-//  the GDD models ingredients as one flat IngredientType enum plus a
-//  category lookup. Three typed enums are kept instead so a Mixer
-//  button cannot be assigned a spirit and each Inspector dropdown
-//  stays short. See DrinkIngredients.cs and Domain/IngredientMath.cs.
+//  NOTE — deliberate deviation from GDD §15.1 (plan decision D6): GDD
+//  models ingredients as one flat IngredientType enum + category lookup.
+//  Three typed enums kept instead so a Mixer button can't be assigned a
+//  spirit, and each Inspector dropdown stays short. See
+//  DrinkIngredients.cs and Domain/IngredientMath.cs.
 // ============================================================
 
 public partial class E_Cocktail
@@ -42,8 +42,8 @@ public partial class E_Cocktail
     {
         None = 0,
         Soda,
-        CranberryJuice,     // was "CanberryJuice" — spelling only; the underlying value is
-                            // unchanged, so every serialized asset and prefab keeps working.
+        CranberryJuice,     // was "CanberryJuice" — spelling fix only, value unchanged,
+                            // serialized assets/prefabs keep working.
         LimeJuice,
         LemonJuice,
         GrapefruitJuice,
@@ -67,16 +67,16 @@ public partial class E_Cocktail
 
         /// <summary>
         /// Legacy "player picks" marker from when recipes carried a CompatibleGlass field.
-        /// S_Drink no longer has that field at all — glass choice is entirely the player's,
-        /// via a placed serving glass (Cocktail/Glass/), not something a recipe can pin
-        /// anymore. Kept only because this enum is reused as SO_GlassOption.Shape.
+        /// S_Drink no longer has that field — glass choice is entirely the player's via a
+        /// placed serving glass (Cocktail/Glass/). Kept only because this enum is reused as
+        /// SO_GlassOption.Shape.
         /// </summary>
         NotFix
     }
 
     /// <summary>
-    /// How a drink is mixed. GDD §16 also lists Build; it is not here yet because no
-    /// Building minigame exists (plan decision D4 / Bar410_Minigame_Integration_Plan §1).
+    /// How a drink is mixed. GDD §16 also lists Build; not here yet — no Building minigame
+    /// exists (plan decision D4 / Bar410_Minigame_Integration_Plan §1).
     /// </summary>
     public enum Method : byte
     {
@@ -97,10 +97,9 @@ public partial class E_Cocktail
 
     /// <summary>
     /// GDD §18 — how happy the customer is.
-    ///
-    /// The numeric values are written into Yarn's $satisfaction, so .yarn files compare
-    /// against them. Do not reorder or insert members. Fail (a) and Fail (b) are told
-    /// apart by RecipeMatch.IsFailB, not by a new member here.
+    /// Numeric values are written into Yarn's $satisfaction; .yarn files compare against
+    /// them — do not reorder or insert members. Fail (a)/(b) told apart by
+    /// RecipeMatch.IsFailB, not a new member here.
     /// </summary>
     public enum Satisfaction
     {

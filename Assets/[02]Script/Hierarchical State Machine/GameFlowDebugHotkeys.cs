@@ -9,7 +9,7 @@ namespace Bar410.GameFlow
     /// row so the flow can be exercised without playing through dialogue/UI each time.
     /// Drop this on any GameObject in a scene that already has <see cref="GameFlowCommands"/>.
     ///
-    /// 1 OpenBar · 2 PrepareDrinks · 3 IngredientAdded · 4 AnotherIngredient ·
+    /// 2 PrepareDrinks · 3 IngredientAdded · 4 AnotherIngredient ·
     /// 5 DrinkComplete · 6 GarnishDone · 7 ServeDone · 8 RemakeDrink · 9 CloseBar ·
     /// 0 NextDay
     /// </summary>
@@ -20,8 +20,7 @@ namespace Bar410.GameFlow
 
         private void Update()
         {
-            if (Input.GetKeyDown(KeyCode.Alpha1)) Run("1 OpenBar", f => f.OpenBar());
-            else if (Input.GetKeyDown(KeyCode.Alpha2)) Run("2 PrepareDrinks", f => f.PrepareDrinks());
+            if (Input.GetKeyDown(KeyCode.Alpha2)) Run("2 PrepareDrinks", f => f.PrepareDrinks());
             else if (Input.GetKeyDown(KeyCode.Alpha3)) Run("3 IngredientAdded", f => f.IngredientAdded());
             else if (Input.GetKeyDown(KeyCode.Alpha4)) Run("4 AnotherIngredient", f => f.AnotherIngredient());
             else if (Input.GetKeyDown(KeyCode.Alpha5)) Run("5 DrinkComplete", f => f.DrinkComplete());
@@ -53,11 +52,10 @@ namespace Bar410.GameFlow
             GUILayout.Label("<b>GameFlow Debug Hotkeys</b>");
             GUILayout.Label($"Phase: {GameFlowCommands.Yarn_CurrentPhase()}  Step: {GameFlowCommands.Yarn_CurrentStep()}");
             GUILayout.Space(4);
-            GUILayout.Label("1 OpenBar          6 GarnishDone");
-            GUILayout.Label("2 PrepareDrinks    7 ServeDone");
-            GUILayout.Label("3 IngredientAdded  8 RemakeDrink");
-            GUILayout.Label("4 AnotherIngredient 9 CloseBar");
-            GUILayout.Label("5 DrinkComplete    0 NextDay");
+            GUILayout.Label("2 PrepareDrinks    6 GarnishDone");
+            GUILayout.Label("3 IngredientAdded  7 ServeDone");
+            GUILayout.Label("4 AnotherIngredient 8 RemakeDrink");
+            GUILayout.Label("5 DrinkComplete    9 CloseBar, 0 NextDay");
             GUILayout.EndArea();
         }
 #endif

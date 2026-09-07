@@ -1,22 +1,19 @@
 // ============================================================
 //  CocktailShakerData.cs — COMPATIBILITY SHIM.
 //
-//  This class used to hold five unrelated jobs: the live drink,
-//  the glass visuals, the ingredient-button roster, the book-UI
-//  roster, and the hover tooltip. Plan §4.2 splits those into
-//  ShakerContents / ShakerVisualPresenter / IngredientButtonGroup /
-//  ShakerTooltip, all in Cocktail/Shaker/.
+//  Used to hold 5 unrelated jobs: live drink, glass visuals,
+//  ingredient-button roster, book-UI roster, hover tooltip. Plan §4.2
+//  splits those into ShakerContents / ShakerVisualPresenter /
+//  IngredientButtonGroup / ShakerTooltip, in Cocktail/Shaker/.
 //
-//  It still exists because five scenes and prefabs reference it by
-//  GUID and bind eight of its methods to UnityEvents. Deleting it
-//  outright would turn those into Missing Script and silently drop
-//  the ingredient lists and glass table stored on them.
+//  Still exists: 5 scenes/prefabs reference it by GUID and bind 8 of
+//  its methods to UnityEvents. Deleting it would turn those into
+//  Missing Script and silently drop their ingredient lists/glass table.
 //
-//  So it now owns NO behaviour: it keeps the serialized data the
-//  scenes already hold, hands that data to the real components on
-//  Awake, and forwards every call. Once the manual migration in
-//  Docs/Bar410_CocktailSystem_Manual_Setup.md is done, this file
-//  can be deleted.
+//  Now owns NO behaviour: keeps the scenes' serialized data, hands it
+//  to the real components on Awake, forwards every call. Delete once
+//  the manual migration in Docs/Bar410_CocktailSystem_Manual_Setup.md
+//  is done.
 // ============================================================
 
 using AYellowpaper.SerializedCollections;
@@ -91,8 +88,8 @@ public class CocktailShakerData : MonoBehaviour, IIngredientReceiver, ITooltipPr
     }
 
     /// <summary>
-    /// Converts the per-scene <see cref="GlassVisualData"/> into a throw-away table so an
-    /// unmigrated scene keeps its glass visuals. Returns null when there is nothing to convert.
+    /// Converts per-scene <see cref="GlassVisualData"/> into a throw-away table so an
+    /// unmigrated scene keeps its glass visuals. Null when nothing to convert.
     /// </summary>
     private SO_GlassVisualTable BuildLegacyTable()
     {
@@ -134,9 +131,9 @@ public class CocktailShakerData : MonoBehaviour, IIngredientReceiver, ITooltipPr
     }
 
     /// <summary>
-    /// Finds the two IngredientButtonGroups, creating them from the legacy lists when the
-    /// scene has not been migrated yet. Two groups on one GameObject is unusual, so the
-    /// migrated setup should put them on the shelf and the book instead.
+    /// Finds the two IngredientButtonGroups, creating them from legacy lists if unmigrated.
+    /// Two groups on one GameObject is unusual — migrated setup should split them across
+    /// shelf and book.
     /// </summary>
     private void ResolveButtonGroups()
     {

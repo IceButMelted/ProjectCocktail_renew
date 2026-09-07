@@ -3,11 +3,10 @@ using UnityEngine;
 using static E_Cocktail;
 
 /// <summary>
-/// Scene-side owner of the cocktail session: which repositories are in play, who is being
-/// served, and the services that answer questions about the drink.
-///
-/// The rules themselves live in Cocktail/Domain (pure, testable) and the session state in
-/// Cocktail/Session. This class wires them to the scene and to Yarn — nothing more.
+/// Scene-side owner of the cocktail session: active repositories, who's being served,
+/// and the services answering questions about the drink.
+/// Rules live in Cocktail/Domain (pure, testable), session state in Cocktail/Session.
+/// This class just wires them to the scene and Yarn.
 /// </summary>
 public partial class CocktailSystemManager : MonoBehaviour
 {
@@ -37,9 +36,9 @@ public partial class CocktailSystemManager : MonoBehaviour
     public CocktailShakerData _cocktailShakerData;
 
     // ── Shaker access ──────────────────────────────────────
-    // Resolved lazily, not in Awake: in an unmigrated scene the real components are created
-    // by CocktailShakerData.Awake, and component Awake order on one GameObject is not
-    // guaranteed, so reading them eagerly can pick up a null.
+    // Resolved lazily, not in Awake: in an unmigrated scene real components are created by
+    // CocktailShakerData.Awake, and Awake order on one GameObject isn't guaranteed —
+    // reading eagerly can pick up null.
 
     /// <summary>The drink in the glass, whichever way this scene is wired.</summary>
     private ShakerContents Contents
@@ -64,8 +63,8 @@ public partial class CocktailSystemManager : MonoBehaviour
     }
 
     // ── Character data ─────────────────────────────────────
-    // Declared here, next to the Awake() that fills it. It is read from the Yarn partial,
-    // but a field written in one file and declared in another is a trap for the next reader.
+    // Declared here, next to the Awake() that fills it. Read from the Yarn partial, but a
+    // field written in one file and declared in another traps the next reader.
     private CharacterData _characterData;
 
     // ── Repositories (as interfaces) ───────────────────────
@@ -74,8 +73,8 @@ public partial class CocktailSystemManager : MonoBehaviour
     private IDrinkRepository _lookup;
 
     /// <summary>
-    /// Pool that random orders draw from. Normal recipes only: a special cocktail must not
-    /// surface before the story reaches it, so it is reachable by name and nothing else.
+    /// Pool random orders draw from. Normal recipes only — a special cocktail must not
+    /// surface before the story reaches it, so it's reachable by name only.
     /// </summary>
     private IDrinkRepository _randomPool;
 
@@ -103,8 +102,8 @@ public partial class CocktailSystemManager : MonoBehaviour
     {
         _characterData = GetComponent<CharacterData>();
 
-        // The composite skips null sources, so an unassigned special list is harmless and
-        // an unassigned normal list reports itself instead of throwing later (bug B11).
+        // Composite skips null sources: unassigned special list is harmless, unassigned
+        // normal list reports itself instead of throwing later (bug B11).
         _lookup = new CompositeDrinkRepository(_normalCocktailRepository, _specialCocktailRepository);
         _randomPool = _normalCocktailRepository;
         _allDrinks = _lookup.GetDrinks();
@@ -125,8 +124,7 @@ public partial class CocktailSystemManager : MonoBehaviour
     }
 
     /// <summary>
-    /// This method is USE ON BUTTON
-    /// Serve the drink to the customer and update the Yarn variable with the result
+    /// Button hook. Serves the drink to the customer and updates the Yarn result variable.
     /// </summary>
     public void ServeDrink()
     {
@@ -139,10 +137,7 @@ public partial class CocktailSystemManager : MonoBehaviour
         UpdateVariableInYarnTrigger();
     }
 
-    /// <summary>
-    /// This method is USE ON BUTTON
-    /// This method use to reset the cocktail in shaker.
-    /// </summary>
+    /// <summary>Button hook. Resets the cocktail in the shaker.</summary>
     public void ResetCocktail()
     {
         if (Contents == null)
@@ -178,8 +173,8 @@ public partial class CocktailSystemManager : MonoBehaviour
     }
 
     /// <summary>
-    /// GDD §18 — scores what is in the shaker against the current order and records the
-    /// result, payout and relationship change on <see cref="Order"/>.
+    /// GDD §18 — scores shaker contents against the current order; records result,
+    /// payout and relationship change on <see cref="Order"/>.
     /// </summary>
     public Satisfaction CalculateSatisfaction()
         => Contents == null ? Satisfaction.None : Scoring.Score(Order, Contents.CurrentCocktail);
@@ -203,6 +198,15 @@ public partial class CocktailSystemManager : MonoBehaviour
 
     /// <summary>Editor / debug helper — picks a random target without returning it.</summary>
     public void RandomCocktailForDebug() => RandomCocktail();
+
+    /// <summary>
+    /// Fallback for testing without dialogue: only randomizes a target if nothing was placed
+    /// yet (e.g. by a real Order_Cocktail_* Yarn call). Never overwrites a dialogue-driven order.
+    /// </summary>
+    public void RandomCocktailIfNoOrder()
+    {
+        if (!Order.HasOrder) RandomCocktail();
+    }
 
     [ContextMenu("DebugTargetCocktail")]
     public void DebugTargetCocktail() => Debug.Log(DrinkFormatter.GetCocktailInfo(Order.Target));

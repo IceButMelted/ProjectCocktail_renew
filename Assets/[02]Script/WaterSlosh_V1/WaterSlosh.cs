@@ -77,8 +77,11 @@ public class WaterSlosh : MonoBehaviour
     }
 #endif
 
+    /// <summary>True while a StartFilling() coroutine is actively raising the water level.</summary>
+    public bool IsFilling => _fillCoroutine != null;
+
     public void StartFilling()
-    { 
+    {
         _fillCoroutine = StartCoroutine(FillWater());
     }
 
@@ -100,7 +103,7 @@ public class WaterSlosh : MonoBehaviour
 #if UNITY_EDITOR
         if (!Application.isPlaying)
         {
-            // Don't instance a material in edit mode — edit the shared asset directly.
+            // Don't instance a material in edit mode ï¿½ edit the shared asset directly.
             return renderer.sharedMaterial;
         }
 #endif
@@ -122,6 +125,7 @@ public class WaterSlosh : MonoBehaviour
         }
         waterLevel = 0.94f;
         UpdateMatVariable();
+        _fillCoroutine = null;
     }
 
     public void StopFilling()

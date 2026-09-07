@@ -3,8 +3,8 @@
 //
 //  Two repositories, not one (plan §4.7):
 //    lookup     normal + special. Named orders must find a story cocktail.
-//    randomPool normal only. A special must never surface in a random order
-//               before the story reaches it.
+//    randomPool normal only. Specials must never surface in a random
+//               order before the story reaches them.
 // ============================================================
 
 using System.Collections.Generic;
@@ -74,8 +74,8 @@ public class OrderService
             return false;
         }
 
-        // No Target: any recipe of this type satisfies the order (GDD §12 mode 5),
-        // so satisfaction is decided purely by ServedType == OrderedType.
+        // No Target: any recipe of this type satisfies the order (GDD §12 mode 5);
+        // satisfaction is decided purely by ServedType == OrderedType.
         context.BeginOrder(customer, OrderMode.FixedByType, null, type);
         return true;
     }
@@ -86,10 +86,10 @@ public class OrderService
     /// GDD §19.2 — gather every recipe whose type is in the customer's preferences, THEN
     /// pick uniformly from that pool.
     ///
-    /// Plan fix S10: the old code picked a preferred TYPE uniformly first and only then a
-    /// recipe within it. With 20 High recipes and 4 None recipes that gave each type an
-    /// equal chance instead of each recipe, so a None-alcohol drink was five times more
-    /// likely per recipe than the GDD intends.
+    /// Plan fix S10: old code picked a preferred TYPE uniformly first, then a recipe
+    /// within it. With 20 High recipes and 4 None recipes that gave each type equal
+    /// chance instead of each recipe, making a None-alcohol drink 5x more likely per
+    /// recipe than the GDD intends.
     ///
     /// GDD §24 keeps weighted selection out of v1 — uniform is the decision, not a stub.
     /// </summary>

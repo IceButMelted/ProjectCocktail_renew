@@ -1,9 +1,9 @@
 // ============================================================
 //  AlcoholClassifier.cs — GDD §15.2, alcohol units -> DrinkType.
 //
-//  Plan decision S3: the GDD threshold wins over the old code.
-//  The previous UtilityDrink used ">= 5 -> High", which classified
-//  a 5-part drink as High; GDD §15.2 states 5 is inclusive of Low.
+//  Plan S3: GDD threshold wins over old code. Old UtilityDrink used
+//  ">= 5 -> High", classifying a 5-part drink as High; GDD §15.2
+//  says 5 is inclusive of Low.
 // ============================================================
 
 using static E_Cocktail;

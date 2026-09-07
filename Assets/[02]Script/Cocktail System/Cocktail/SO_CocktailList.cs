@@ -1,18 +1,14 @@
 // ============================================================
 //  SO_CocktailList.cs — ScriptableObject recipe collection.
 //
-//  SOLID — D (Dependency Inversion):
-//    Implements IDrinkRepository so CocktailSystemManager never
-//    references this concrete type directly.  Swap for any other
+//  SOLID — D: implements IDrinkRepository so CocktailSystemManager
+//    never references this concrete type directly. Swap for any other
 //    source (e.g. JSON loader, server) without touching consumers.
 //
-//  SOLID — O (Open / Closed):
-//    New filtering strategies (e.g. GetByGlass) are added as
-//    new interface methods + implementations here — existing
-//    callers are unaffected.
+//  SOLID — O: new filtering strategies (e.g. GetByGlass) are added as
+//    new interface methods + implementations here — existing callers unaffected.
 //
-//  SOLID — S (Single Responsibility):
-//    Stores and serves recipe data.  No game logic.
+//  SOLID — S: stores and serves recipe data. No game logic.
 // ============================================================
 
 using System.Collections.Generic;
@@ -44,8 +40,8 @@ public class SO_CocktailList : ScriptableObject, IDrinkRepository
     /// <inheritdoc/>
     public S_Drink GetRandom(TypeOfCocktail type)
     {
-        // Built without LINQ so this allocates one list instead of an enumerator chain
-        // plus a ToList; it runs whenever a customer places an order.
+        // No LINQ: allocates one list instead of an enumerator chain plus ToList;
+        // runs whenever a customer places an order.
         var matches = new List<S_Drink>();
 
         if (cocktails != null)

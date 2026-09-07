@@ -24,7 +24,7 @@ public static class DrinkFormatter
         return sb.ToString();
     }
 
-    /// <summary>Ingredient list only, one per line. Shown in the shaker tooltip. เพิ่มหมวดใหม่: แก้ที่นี่</summary>
+    /// <summary>Ingredient list, one per line, for the shaker tooltip. เพิ่มหมวดใหม่: แก้ที่นี่</summary>
     public static string GetCocktailIngredient(S_Drink d)
     {
         if (d == null) return string.Empty;

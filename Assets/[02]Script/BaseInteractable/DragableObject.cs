@@ -39,6 +39,13 @@ public class DragableObject : PointerInteractableBase
     public Vector3 PastLocation { get; set; }
     public int NumbersObjectOverlaying { get; private set; }
 
+    /// <summary>When true, N_PlacementSystem never clamps this object onto a PlacementZoneBase
+    /// while dragging — it always floats with the cursor instead. Set by ingredient sources
+    /// (BottleIngredientSource/FruitPieceInstance) so passing over an unrelated zone (e.g. the
+    /// glass's GlassPlacementZone) doesn't snap the dragged bottle/fruit onto it; their own
+    /// shaker-hover snap (IngredientHoverDetector) is entirely separate from this system.</summary>
+    public bool IgnorePlacementZones { get; set; } = false;
+
     /// <summary>True only while an active drag gesture is in progress.</summary>
     public bool IsDragging => BeingDrags && _dragStarted;
 

@@ -3,14 +3,14 @@ using UnityEngine.Events;
 using static E_Cocktail;
 
 /// <summary>
-/// One ingredient / method / ice button. Set <see cref="ButtonAction"/> in the Inspector to
-/// choose what it does, then wire the click to <see cref="Invoke"/> — one connection, no
-/// manual swapping. Works from a UI Button as well as from Interactable_2_5DObject.OnClicked.
+/// One ingredient / method / ice button. Set <see cref="ButtonAction"/> in the Inspector,
+/// wire the click to <see cref="Invoke"/> — one connection, no manual swapping. Works from
+/// a UI Button or Interactable_2_5DObject.OnClicked.
 ///
-/// Talks to <see cref="ShakerContents"/>, the refactored owner of the live drink. It used to
-/// talk to the CocktailShakerData shim, which the migrated scenes no longer have — the lookup
-/// returned null and every pour threw. Scenes that still carry the shim keep their old
-/// behaviour: see <see cref="Legacy"/>.
+/// Talks to <see cref="ShakerContents"/>, the refactored owner of the live drink (used to
+/// talk to the CocktailShakerData shim, absent in migrated scenes — lookup returned null
+/// and every pour threw). Scenes still carrying the shim keep old behaviour: see
+/// <see cref="Legacy"/>.
 /// </summary>
 public class IngredientButtonUI : MonoBehaviour
 {
@@ -46,8 +46,8 @@ public class IngredientButtonUI : MonoBehaviour
     // ── Shaker resolution ─────────────────────────────────
 
     /// <summary>
-    /// Resolved on first use, not in Awake: in unmigrated scenes ShakerContents is added by
-    /// the CocktailShakerData shim during ITS Awake, and script execution order is not fixed.
+    /// Resolved on first use, not Awake: in unmigrated scenes ShakerContents is added by
+    /// the CocktailShakerData shim during ITS Awake, and script execution order isn't fixed.
     /// </summary>
     private ShakerContents Shaker
     {
@@ -66,8 +66,8 @@ public class IngredientButtonUI : MonoBehaviour
 
     /// <summary>
     /// The compatibility shim, when the scene still has one. Its ingredient UnityEvents are
-    /// authored per scene (pour animation, sounds, the add itself), so where it exists those
-    /// events stay the single path — calling ShakerContents directly as well would pour twice.
+    /// authored per scene (pour animation, sounds, the add itself), so where it exists they
+    /// stay the single path — calling ShakerContents directly too would pour twice.
     /// </summary>
     private CocktailShakerData Legacy
         => _legacy != null ? _legacy : _legacy = FindFirstObjectByType<CocktailShakerData>(FindObjectsInactive.Include);
@@ -124,8 +124,8 @@ public class IngredientButtonUI : MonoBehaviour
     public void AddIce(bool enable) => Shaker?.ToggleIce(enable);
 
     /// <summary>
-    /// Empty the shaker. With the shim present this raises its OnResetedCocktail chain exactly
-    /// as before; without it, the drink is cleared and ShakerContents.Cleared carries the news.
+    /// Empty the shaker. With the shim present, raises its OnResetedCocktail chain as before;
+    /// without it, the drink is cleared and ShakerContents.Cleared carries the news.
     /// </summary>
     public void ResetShaker()
     {
@@ -137,7 +137,7 @@ public class IngredientButtonUI : MonoBehaviour
 
     /// <summary>
     /// Runs the add and reports whether it landed. DrinkBuilder silently refuses a pour that
-    /// would break the 10-unit ceiling, so the part count is what tells the two apart.
+    /// breaks the 10-unit ceiling, so part count is what tells the two apart.
     /// </summary>
     private void Pour(System.Action add)
     {

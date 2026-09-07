@@ -1,16 +1,14 @@
 // ============================================================
 //  IngredientMath.cs — Category-agnostic ingredient algorithms.
 //
-//  Plan §4.1.1 (decision D6): the project keeps three parallel
-//  ingredient lists rather than the flat model in GDD §15.1, so
-//  that each category keeps its own enum and stays type-safe in
-//  the Inspector. The cost of that choice is paid exactly once,
-//  here: every algorithm is written generically and knows about
-//  no category in particular.
+//  Plan §4.1.1 (D6): keeps 3 parallel ingredient lists instead of
+//  the flat model in GDD §15.1, so each category keeps its own
+//  enum and stays type-safe in the Inspector. Cost paid once here:
+//  every algorithm is generic, no category-specific knowledge.
 //
-//  Adding a 4th category (Bitters, Garnish, ...) therefore needs
-//  NO new algorithm — only a new struct plus one line at each of
-//  the four aggregation points marked "เพิ่มหมวดใหม่: แก้ที่นี่".
+//  Adding a 4th category needs NO new algorithm — just a new
+//  struct plus one line at each aggregation point marked
+//  "เพิ่มหมวดใหม่: แก้ที่นี่".
 // ============================================================
 
 using System;
@@ -59,8 +57,8 @@ internal static class IngredientMath
     }
 
     /// <summary>
-    /// GDD §17.1 — Σ |recipe − poured| across the union of keys present on either side.
-    /// This is one category's contribution; callers add the categories together.
+    /// GDD §17.1 — Σ |recipe − poured| across the union of keys on either side.
+    /// One category's contribution; callers sum across categories.
     /// </summary>
     public static int Deviation<TItem, TKey>(List<TItem> poured, List<TItem> recipe)
         where TItem : struct, IIngredientEntry<TKey>

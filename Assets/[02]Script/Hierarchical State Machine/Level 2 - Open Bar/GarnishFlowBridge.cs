@@ -8,12 +8,15 @@ namespace Bar410.GameFlow
     /// The only place GarnishState touches scene objects — companion to CocktailFlowBridge and
     /// MinigameFlowBridge. GarnishState itself stays plain C# and knows nothing about any of this.
     ///
-    /// Owns the "pour" interaction: dragging the mixing vessel (CocktailShaker, tagged with a
-    /// PourSource marker) onto whatever glass the player has placed in the shared
-    /// GlassPlacementZone. A successful pour locks the drink's visuals onto the glass and gates
-    /// the existing GarnishDone() flow command — call <see cref="TryFinishGarnish"/> from the
-    /// "done" button/UI instead of GameFlowCommands.GarnishDone() directly, so garnishing can't
-    /// be finished before anything was actually poured.
+    /// Glass, ice, and pouring are all UI-button-driven here (Bar410 gameplay revision, see
+    /// docs/adr/0002-glass-pour-fixed-position-buttons.md): the player picks a glass from a list
+    /// (<see cref="ChooseGlass"/>), which spawns already placed in the shared
+    /// GlassPlacementZone; the mixing vessel is fixed beside it and poured with a button
+    /// (<see cref="Pour"/>) instead of dragged. A successful pour locks the drink's visuals onto
+    /// the glass and gates the existing GarnishDone() flow command — call
+    /// <see cref="TryFinishGarnish"/> from the "done" button/UI instead of
+    /// GameFlowCommands.GarnishDone() directly, so garnishing can't be finished before anything
+    /// was actually poured.
     ///
     /// TODO(design, plan Glass-freedom): the decoration step itself (what happens between a
     /// successful pour and pressing done) is undecided — for now the flow is playable end-to-end
@@ -27,8 +30,8 @@ namespace Bar410.GameFlow
         [SerializeField] private GameFlowCommands _commands;
 
         [Header("Cocktail Scene Objects")]
+        [SerializeField] private CocktailSystemManager _cocktail;
         [SerializeField] private ShakerContents _shakerContents;
-        [SerializeField] private DragableObject _shakerDragable;
         [SerializeField] private GlassPlacementZone _glassZone;
 
         private bool _pourComplete;
@@ -44,20 +47,15 @@ namespace Bar410.GameFlow
             var garnish = _gameLoop.OpenBar.Garnish;
             garnish.Entered += OnGarnishEntered;
             garnish.Exited += OnGarnishExited;
-
-            if (_glassZone != null) _glassZone.Placed += OnZonePlaced;
         }
 
         private void OnDestroy()
         {
-            if (_gameLoop != null && _gameLoop.OpenBar != null)
-            {
-                var garnish = _gameLoop.OpenBar.Garnish;
-                garnish.Entered -= OnGarnishEntered;
-                garnish.Exited -= OnGarnishExited;
-            }
+            if (_gameLoop == null || _gameLoop.OpenBar == null) return;
 
-            if (_glassZone != null) _glassZone.Placed -= OnZonePlaced;
+            var garnish = _gameLoop.OpenBar.Garnish;
+            garnish.Entered -= OnGarnishEntered;
+            garnish.Exited -= OnGarnishExited;
         }
 
         // ── Step 3 · Garnish ───────────────────────────────
@@ -66,30 +64,67 @@ namespace Bar410.GameFlow
         {
             _pourComplete = false;
 
-            // The shaker is locked coming out of the minigame (MinigameFlowBridge) — unlock it
-            // here so it can be dragged onto the placed glass to pour.
-            if (_shakerDragable != null) InteractableToggle.Apply(_shakerDragable.gameObject, true);
+            // The drink's identity (name/colour/etc.) is resolved against the recipe database
+            // once mixing is done, not on every ingredient add — Garnish entry is that "done
+            // mixing" moment. Without this, S_Drink.waterColorTop/Bottom stay at their unset
+            // (fully transparent) default and the poured glass looks empty even with liquid in it.
+            _cocktail?.UpdateCocktailInShaker();
         }
 
         private void OnGarnishExited()
         {
-            if (_shakerDragable != null) InteractableToggle.Apply(_shakerDragable.gameObject, false);
+        }
+
+        // ── Glass ──────────────────────────────────────────
+
+        /// <summary>Called by a glass-option button in the Garnish UI (one button per SO_GlassOption).</summary>
+        public void ChooseGlass(SO_GlassOption option)
+        {
+            if (_glassZone == null) return;
+
+            _glassZone.SetGlass(option);
+            _pourComplete = false; // a freshly-placed glass has nothing poured into it yet
+        }
+
+        // ── Ice ────────────────────────────────────────────
+
+        /// <summary>Called by the Garnish "add ice" toggle. Sets the scored recipe flag and the glass visual together.</summary>
+        public void ToggleIce(bool enable)
+        {
+            if (_shakerContents != null) _shakerContents.SetIce(enable);
+            _glassZone?.Occupant?.ApplyIce(enable);
         }
 
         // ── Pour ───────────────────────────────────────────
 
-        private void OnZonePlaced(GameObject item)
+        /// <summary>
+        /// Called by the Garnish "pour" button. Plays the glass's water-rising fill animation;
+        /// <see cref="TryFinishGarnish"/> only succeeds once that animation has finished.
+        /// </summary>
+        public void Pour()
         {
-            if (!item.TryGetComponent<PourSource>(out _)) return;
-            if (_shakerContents == null || _glassZone.Occupant == null) return;
+            if (_glassZone == null || _glassZone.Occupant == null)
+            {
+                Debug.LogWarning("[GarnishFlowBridge] No glass placed yet — choose a glass before pouring.", this);
+                return;
+            }
 
-            _glassZone.Occupant.ApplyDrink(_shakerContents.CurrentCocktail);
+            if (_shakerContents == null || _shakerContents.IsEmpty)
+            {
+                Debug.LogWarning("[GarnishFlowBridge] Nothing in the shaker to pour.", this);
+                return;
+            }
 
-            // The drink now visually lives in the glass — move the shaker out of the way.
-            if (_shakerDragable != null)
-                _shakerDragable.transform.position = _shakerDragable.PastLocation;
+            var glass = _glassZone.Occupant;
+            glass.ApplyDrink(_shakerContents.CurrentCocktail);
+            glass.StartFill();
+            StartCoroutine(WaitForFillThenComplete(glass));
+        }
 
-            _pourComplete = true;
+        private System.Collections.IEnumerator WaitForFillThenComplete(PlacedGlassInstance glass)
+        {
+            while (glass != null && glass.IsFilling) yield return null;
+            if (glass != null) _pourComplete = true;
         }
 
         // ── Called by the "done garnishing" UI instead of GameFlowCommands.GarnishDone() ──

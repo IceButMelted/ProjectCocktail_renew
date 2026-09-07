@@ -3,9 +3,9 @@ using UnityEngine;
 /// <summary>
 /// The shaker as an interactable object: can it be clicked, and what sprite does it show.
 ///
-/// The panel-permission flags it used to own moved to <see cref="ShakerPanelController"/>
+/// Panel-permission flags it used to own moved to <see cref="ShakerPanelController"/>
 /// (plan §4.2) so the HSM can decide what the player may open in each flow state. The
-/// SetCanShow* methods below stay because five scenes bind them to UnityEvents; they now
+/// SetCanShow* methods stay because five scenes bind them to UnityEvents; they now
 /// forward to that component.
 /// </summary>
 [RequireComponent(typeof(CocktailShakerData))]

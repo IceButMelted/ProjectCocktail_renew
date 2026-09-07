@@ -2,9 +2,8 @@
 //  RecipeMatch.cs — Result of comparing a poured drink to the
 //  recipe database. GDD §17.
 //
-//  Computed ONCE per shaker update and passed around, replacing
-//  the five independent recipe scans the old UtilityDrink ran
-//  (plan §2.4).
+//  Computed ONCE per shaker update and passed around, replacing the
+//  five independent recipe scans the old UtilityDrink ran (plan §2.4).
 // ============================================================
 
 using static E_Cocktail;
@@ -49,9 +48,9 @@ public readonly struct RecipeMatch
     public bool IsRecognised => HasRecipe && Flag != DrinkFlag.Fail;
 
     /// <summary>
-    /// GDD §18 case 5 — "Fail (b)", nothing matched at all.
-    /// Distinct from "Fail (a)" (case 4), where a recipe matched but the type was wrong;
-    /// the two price differently (GDD §18.1), so the distinction has to survive.
+    /// GDD §18 case 5 — "Fail (b)", nothing matched at all. Distinct from "Fail (a)"
+    /// (case 4), where a recipe matched but the type was wrong; the two price
+    /// differently (GDD §18.1), so the distinction must survive.
     /// </summary>
     public bool IsFailB => !HasRecipe || Deviation > DrinkDeviation.MaxTolerance;
 

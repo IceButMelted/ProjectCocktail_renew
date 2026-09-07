@@ -1,17 +1,16 @@
 // ============================================================
-//  DrinkOrderContext.cs — Everything known about the order the
+//  DrinkOrderContext.cs — everything known about the order the
 //  player is currently working on. Plain C#, no UnityEngine.
 //
-//  This is the DrinkOrderContext that Bar410_StateMachine_Implementation.md
-//  §8 open question 4 asks for: built up across the Open Bar steps and
-//  scored at serve time.
+//  The DrinkOrderContext Bar410_StateMachine_Implementation.md §8
+//  open question 4 asks for: built up across Open Bar, scored at serve.
 //
-//  It also replaces five scattered pieces of state that used to live on
-//  CocktailSystemManager and be mutated from anywhere:
+//  Replaces 5 scattered pieces of state that used to live on
+//  CocktailSystemManager, mutated from anywhere:
 //      _targetCocktail   -> Target
 //      _TaskDone         -> IsScored
 //      _satisfaction     -> Result
-//      _cocktailType     -> ServedType   (which nothing ever assigned — bug B1)
+//      _cocktailType     -> ServedType   (never assigned — bug B1)
 //      IsWaitingForTask  -> read by YarnTaskGate
 // ============================================================
 
@@ -48,8 +47,7 @@ public class DrinkOrderContext
 
     /// <summary>
     /// The type the customer expects. GDD §18 cases 3/4 need this to tell Acceptable from
-    /// Fail (a); before this class existed the value was never stored anywhere, so case 4
-    /// was unreachable.
+    /// Fail (a); before this class, the value was never stored, so case 4 was unreachable.
     /// </summary>
     public TypeOfCocktail OrderedType { get; private set; } = TypeOfCocktail.None;
 

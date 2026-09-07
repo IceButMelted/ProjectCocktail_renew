@@ -1,12 +1,11 @@
 // ============================================================
 //  CocktailSystemManager.YarnTask.cs
 //
-//  Yarn COMMANDS: the calls .yarn scripts make to drive the game.
-//  Command names are a public contract — Day1_Demo.yarn calls
-//  <<wait_for_task SystemGame>> and <<Enable_InteractableObject
-//  SystemGame false>> seven times, and instance commands resolve by
-//  GameObject name, so this partial must stay on the object named
-//  "SystemGame". Do not rename the commands.
+//  Yarn COMMANDS driving the game. Command names are a public contract —
+//  Day1_Demo.yarn calls <<wait_for_task SystemGame>> and
+//  <<Enable_InteractableObject SystemGame false>> 7x, and instance commands
+//  resolve by GameObject name, so this partial must stay on "SystemGame".
+//  Do not rename commands.
 // ============================================================
 
 using System.Collections;
@@ -18,9 +17,9 @@ public partial class CocktailSystemManager
 {
     /// <summary>
     /// True while Yarn is parked inside &lt;&lt;wait_for_task&gt;&gt;.
-    /// Read by SaveLoadManager to decide whether to save the checkpoint line instead of
-    /// the live line (GDD §23.1). Kept static by plan decision D3 so the save system is
-    /// not dragged into this refactor; giving it a proper owner is its own task.
+    /// Read by SaveLoadManager to pick checkpoint vs live line (GDD §23.1).
+    /// Static per plan decision D3 to keep save system out of this refactor;
+    /// proper owner is a future task.
     /// </summary>
     public static bool IsWaitingForTask { get; private set; }
 
@@ -44,10 +43,8 @@ public partial class CocktailSystemManager
 
     /// <summary>
     /// PURE query — safe to poll every frame from WaitUntil.
-    ///
-    /// Plan bug B5: the old UpdateVariableInYarn() was used as the WaitUntil predicate but
-    /// also wrote three Yarn variables, disabled the ingredient buttons and hid the Post-It
-    /// every time it returned true. Query and command are now separate.
+    /// Bug B5: old UpdateVariableInYarn() served as this predicate AND wrote 3 Yarn vars,
+    /// disabled ingredient buttons, hid the Post-It on every true. Query/command now split.
     /// </summary>
     public bool IsTaskComplete => Order.IsScored;
 
@@ -112,22 +109,19 @@ public partial class CocktailSystemManager
     }
 
     /// <summary>
-    /// Enables or disables everything the player uses to build a drink.
-    ///
-    /// Plan bug B4: this used to call SetIngredientActive and THEN walk the same button
-    /// list again with a narrower set of components, setting each object twice with two
-    /// different definitions of "interactable". One call now, one definition
-    /// (InteractableToggle).
+    /// Enables/disables everything the player uses to build a drink.
+    /// Bug B4: used to call SetIngredientActive then re-walk the button list with a
+    /// narrower component set, setting each object twice under two definitions of
+    /// "interactable". Now one call, one definition (InteractableToggle).
     /// </summary>
     [YarnCommand("Enable_InteractableObject")]
     public void EnableButtonInYarn(bool enable)
     {
         if (SceneLoaderBridge.IsSilentReplay) return; // skip — UI side effect
 
-        // Both references are optional: a scene may drive the shaker through
-        // IngredientButtonGroup alone and carry no CocktailShaker component at all.
-        // Yarn calls this seven times in Day1_Demo.yarn, so an unassigned reference must
-        // not take the whole conversation down with a NullReferenceException.
+        // Both refs optional: a scene may drive the shaker via IngredientButtonGroup
+        // alone, no CocktailShaker. Yarn calls this 7x in Day1_Demo.yarn — an unassigned
+        // ref must not crash the conversation with a NullReferenceException.
         if (_cocktailShaker != null) _cocktailShaker.Interactable = enable;
 
         if (IngredientButtons != null) IngredientButtons.SetInteractable(enable);

@@ -2,18 +2,13 @@
 //  S_Drink.cs — ScriptableObject, pure data container.
 //  Replaces SO_Cocktail; no methods live here.
 //
-//  SOLID — S (Single Responsibility):
-//    S_Drink owns one concern: holding the authoritative data
-//    for a cocktail recipe or a runtime drink instance.
-//    All operations live in UtilityDrink.cs.
+//  SOLID — S: owns one concern, holding authoritative data for a
+//    recipe or runtime drink instance. Operations live in UtilityDrink.cs.
 //
-//  SOLID — O (Open / Closed):
-//    Adding new ingredient categories only requires a new list
-//    field and a matching entry in UtilityDrink — this class
-//    never needs modification for behavioural extensions.
+//  SOLID — O: new ingredient categories only need a new list field
+//    plus a matching entry in UtilityDrink — no modification here.
 //
-//  SOLID — L (Liskov Substitution):
-//    Inherits ScriptableObject cleanly; no override surprises.
+//  SOLID — L: inherits ScriptableObject cleanly, no override surprises.
 //    A runtime instance (CreateInstance<S_Drink>) is fully
 //    substitutable wherever a recipe reference is expected.
 // ============================================================
@@ -34,10 +29,8 @@ public class S_Drink : ScriptableObject
     public string Description;
 
     /// <summary>
-    /// Alcohol classification.
-    /// Set manually in the Inspector for recipe assets.
-    /// Written at runtime by DrinkBuilder.ApplyRecipeIdentity()
-    /// for the shaker's live instance.
+    /// Alcohol classification. Set manually in Inspector for recipe assets;
+    /// written at runtime by DrinkBuilder.ApplyRecipeIdentity() for the shaker's live instance.
     /// </summary>
     public TypeOfCocktail AlcoholStrength;
 
@@ -61,10 +54,10 @@ public class S_Drink : ScriptableObject
 
     // ── Visuals ────────────────────────────────────────────
 
-    /// <summary>Sprite shown in the UI when this drink is in play.</summary>
+    /// <summary>UI sprite for this drink.</summary>
     public Sprite CocktailSprite;
 
-    /// <summary>3-D game object spawned when this drink is served.</summary>
+    /// <summary>3-D object spawned when served.</summary>
     public GameObject CocktailGameObject;
 
     public float Price;

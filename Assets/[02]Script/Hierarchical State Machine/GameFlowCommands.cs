@@ -50,12 +50,9 @@ namespace Bar410.GameFlow
             if (Instance == this) Instance = null;
         }
 
-        // ── Level 1 · Prepare / Close ──────────────────────
+        // ── Level 1 · Close ─────────────────────────────────
 
-        /// <summary>Bar setup done — open the bar. Prepare → Open.</summary>
-        public void OpenBar() => _gameLoop.PrepareBar.RequestOpenBar();
-
-        /// <summary>End-of-day actions done — start the next day. Close → Prepare.</summary>
+        /// <summary>End-of-day actions done — start the next day. Close → Open.</summary>
         public void NextDay() => _gameLoop.ClosingBar.RequestNextDay();
 
         // ── Level 2 · Step 1 · Talking ─────────────────────
@@ -135,9 +132,6 @@ namespace Bar410.GameFlow
 
         // ── Yarn Commands ──────────────────────────────────
         // Static so .yarn can call them without naming a target GameObject.
-
-        [YarnCommand("flow_open_bar")]
-        public static void Yarn_OpenBar() => Resolve()?.OpenBar();
 
         [YarnCommand("flow_next_day")]
         public static void Yarn_NextDay() => Resolve()?.NextDay();

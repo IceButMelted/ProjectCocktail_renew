@@ -1,12 +1,11 @@
 // ============================================================
 //  CocktailSystemManager.YarnOrders.cs
 //
-//  Yarn FUNCTIONS that place an order and hand the writer a string
-//  to drop into a line, plus the mode-5 command GDD §12 asks for.
+//  Yarn FUNCTIONS that place an order and return a string for the
+//  writer to drop into a line, plus the mode-5 command GDD §12 asks for.
 //
-//  The four Order_Cocktail_* names are load-bearing: they are what
-//  the .yarn files already call. New surface is added alongside them,
-//  never in place of them.
+//  The four Order_Cocktail_* names are load-bearing — .yarn files
+//  already call them. New surface is added alongside, never in place.
 // ============================================================
 
 using UnityEngine;
@@ -18,8 +17,8 @@ public partial class CocktailSystemManager
     private static CocktailSystemManager _instance;
 
     /// <summary>
-    /// Cached lookup for the static Yarn functions. The old code called
-    /// FindAnyObjectByType on every single order.
+    /// Cached lookup for the static Yarn functions. Old code called
+    /// FindAnyObjectByType on every order.
     /// </summary>
     private static CocktailSystemManager Resolve()
     {
@@ -107,10 +106,9 @@ public partial class CocktailSystemManager
 
     /// <summary>
     /// Places (or reuses) a preference-based order and returns the requested text.
-    ///
-    /// Plan bug B2: Order_Cocktail_OutName and Order_Cocktail_OutDescription each rolled a
-    /// NEW random drink, so a node that called both named one cocktail and described a
-    /// different one. A standing, unserved order for the same customer is now reused.
+    /// Bug B2: Order_Cocktail_OutName/OutDescription each rolled a NEW random drink, so a
+    /// node calling both named one cocktail and described a different one. Now reuses a
+    /// standing, unserved order for the same customer.
     /// </summary>
     private string PlacePreferenceOrder(NPC_Name customer, bool byFlavor)
     {
@@ -150,9 +148,8 @@ public partial class CocktailSystemManager
 
     /// <summary>
     /// Pushes the order text onto the Post-It.
-    ///
-    /// Plan bug B3: this used FindFirstObjectByType on every order despite _postItOrder
-    /// already being a serialized reference on this component.
+    /// Bug B3: used FindFirstObjectByType on every order despite _postItOrder already
+    /// being a serialized reference on this component.
     /// </summary>
     private bool ResolvePostItText(string text)
     {

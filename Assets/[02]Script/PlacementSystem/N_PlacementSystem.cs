@@ -60,7 +60,8 @@ public class N_PlacementSystem : MonoBehaviour
 
     private void UpdateDragPosition()
     {
-        if (_inputManager.TryGetPlacementPoint(_selectedCollider.bounds, out Vector3 placementPoint, out PlacementZoneBase zone))
+        if (!_selectedDragable.IgnorePlacementZones &&
+            _inputManager.TryGetPlacementPoint(_selectedCollider.bounds, out Vector3 placementPoint, out PlacementZoneBase zone))
         {
             _currentZone = zone;
             _lastValidPoint = placementPoint + zone.GetPivotOffset(_bottomOffset);

@@ -1,13 +1,12 @@
 // ============================================================
-//  PlacedGlassInstance.cs — One glass the player has dragged onto the
-//  table. Carries its own SO_GlassOption visuals (no lookup table —
-//  each option bundles its own sprites). Destroyed once the customer
-//  has been served; a fresh one must be dragged next customer.
+//  PlacedGlassInstance.cs — The one glass currently on the table.
+//  Carries its own SO_GlassOption visuals (no lookup table — each
+//  option bundles its own sprites). Spawned already placed by
+//  GlassPlacementZone.SetGlass; destroyed once served, never dragged.
 // ============================================================
 
 using UnityEngine;
 
-[RequireComponent(typeof(DragableObject))]
 public class PlacedGlassInstance : MonoBehaviour
 {
     [Tooltip("Optional. If assigned, this glass's sprites/water color are pushed onto it.")]
@@ -15,30 +14,19 @@ public class PlacedGlassInstance : MonoBehaviour
 
     public SO_GlassOption Option { get; private set; }
 
-    private GlassShelfSlot _origin;
     private GlassPlacementZone _zone;
 
-    /// <summary>Called once, right after Instantiate, by the shelf slot that spawned this.</summary>
-    public void Initialize(SO_GlassOption option, GlassShelfSlot origin)
+    /// <summary>Called once, right after Instantiate, by GlassPlacementZone.SetGlass.</summary>
+    public void Initialize(SO_GlassOption option)
     {
         Option = option;
-        _origin = origin;
 
         if (_waterSlosh != null && option != null)
             _waterSlosh.UpdateVisual(option.IceSprite, option.GlassSprite, option.WaterSprite);
     }
 
-    /// <summary>Called by the zone once this instance actually lands there (not on every drag frame).</summary>
-    public void NotifyPlaced(GlassPlacementZone zone)
-    {
-        _zone = zone;
-
-        if (_origin != null)
-        {
-            _origin.SpawnReplacement();
-            _origin = null;
-        }
-    }
+    /// <summary>Called by the zone once this instance is assigned as its occupant.</summary>
+    public void NotifyPlaced(GlassPlacementZone zone) => _zone = zone;
 
     /// <summary>Pushes the served drink's colour onto this glass. Called by GarnishFlowBridge on pour.</summary>
     public void ApplyDrink(S_Drink drink)
@@ -49,6 +37,15 @@ public class PlacedGlassInstance : MonoBehaviour
         _waterSlosh.waterColorBottom = drink.waterColorBottom;
         _waterSlosh.UpdateColor();
     }
+
+    /// <summary>Toggles the ice visual. Called by GarnishFlowBridge.ToggleIce.</summary>
+    public void ApplyIce(bool enable) => _waterSlosh?.AddIce(enable);
+
+    /// <summary>Starts the water-level-rising animation. Called by GarnishFlowBridge.Pour.</summary>
+    public void StartFill() => _waterSlosh?.StartFilling();
+
+    /// <summary>True while the pour animation is still raising the water level.</summary>
+    public bool IsFilling => _waterSlosh != null && _waterSlosh.IsFilling;
 
     private void OnDestroy()
     {

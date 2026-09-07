@@ -1,6 +1,6 @@
 // ============================================================
 //  CocktailSystemManager.YarnDebug.cs — ContextMenu helpers and the
-//  variable snapshot table. Editor only; none of it ships.
+//  variable snapshot table. Editor-only; doesn't ship.
 // ============================================================
 
 using UnityEngine;
@@ -20,8 +20,8 @@ public partial class CocktailSystemManager
     public void SetSatisfactionFail() => DebugForceSatisfaction(Satisfaction.Fail);
 
     /// <summary>
-    /// Publishes a satisfaction without a real drink behind it, so dialogue branches can be
-    /// exercised without mixing anything. Writes Yarn directly and marks the order scored so
+    /// Publishes a satisfaction with no real drink behind it, so dialogue branches can be
+    /// tested without mixing. Writes Yarn directly and marks the order scored so
     /// &lt;&lt;wait_for_task&gt;&gt; releases.
     /// </summary>
     private void DebugForceSatisfaction(Satisfaction satisfaction)

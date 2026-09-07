@@ -2,27 +2,24 @@
 //  DrinkIngredients.cs
 //  Pure value-type data for cocktail ingredients.
 //
-//  SOLID — S (Single Responsibility):
-//    This file owns exactly one concern: the shape of an ingredient.
+//  SOLID — S: owns exactly one concern, the shape of an ingredient.
 //    No logic, no Unity lifecycle, no dependencies.
 //
 //  NOTE — deliberate deviation from GDD §15.1 / §16 (plan decision D6):
-//    The GDD models ingredients as ONE flat list of IngredientAmount
-//    plus an IngredientType -> IngredientCategory lookup. This project
-//    keeps THREE typed lists instead, so a Mixer button can never be
-//    assigned a spirit and each Inspector dropdown stays short as the
-//    ingredient roster grows.
-//    The duplication this would normally cause is absorbed by the
-//    generic helpers in Domain/IngredientMath.cs — see plan §4.1.1.
+//    GDD models ingredients as ONE flat IngredientAmount list plus an
+//    IngredientType -> IngredientCategory lookup. This project keeps
+//    THREE typed lists instead, so a Mixer button can never be assigned
+//    a spirit and each Inspector dropdown stays short as the roster grows.
+//    Resulting duplication is absorbed by the generic helpers in
+//    Domain/IngredientMath.cs — see plan §4.1.1.
 // ============================================================
 
 using static E_Cocktail;
 
 /// <summary>
-/// Shared shape of one ingredient entry, so <see cref="IngredientMath"/> can work
-/// on any category without knowing which one it is.
-/// Implemented explicitly on the structs below; the public fields keep their
-/// original names so serialized asset/scene data is unaffected.
+/// Shared shape of one ingredient entry, so <see cref="IngredientMath"/> can work on
+/// any category without knowing which one. Implemented on the structs below; public
+/// fields keep original names so serialized asset/scene data is unaffected.
 /// </summary>
 public interface IIngredientEntry<TKey> where TKey : struct
 {

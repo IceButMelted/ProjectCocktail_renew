@@ -1,27 +1,26 @@
 // ============================================================
-//  DragableFruitTraySlot.cs — A DragableObject that also spawns a
+//  DragableFruitTraySlot.cs — a DragableObject that also spawns a
 //  fruit piece to pull out (e.g. Mixer-LemonJuice (1)).
 //
 //  Some ingredients double as a click-to-pour object (Interactable_2_5DObject
 //  + IngredientButtonUI on the same GameObject) AND a fruit tray. A plain
-//  click still pours normally through those siblings, unaffected. Dragging
-//  is where the conflict would be: the host's own collider and a spawned
-//  FruitPieceInstance's collider would sit on top of each other, and which
-//  one wins a given raycast would be a coin flip.
+//  click still pours normally, unaffected. Dragging is where the conflict
+//  is: the host's collider and a spawned FruitPieceInstance's collider
+//  would overlap, and which one wins a raycast would be a coin flip.
 //
-//  Fix: don't let the host start its own drag at all when hijack is
-//  enabled — spawn a piece right at the moment the drag threshold is
-//  crossed (not before, so no piece collider exists to compete with the
-//  host's own Interactable_2_5DObject collider until the player has
-//  actually committed to a drag) and hand the rest of the gesture to it
-//  via DragableObject.BeginRedirectedDrag/FinishRedirectedDrag. See
-//  DragableObject.OnThresholdCrossed — the one small hook this relies on.
+//  Fix: don't let the host start its own drag when hijack is enabled —
+//  spawn a piece right when the drag threshold is crossed (not before, so
+//  no piece collider competes with the host's Interactable_2_5DObject
+//  collider until the player has committed to a drag) and hand the rest
+//  of the gesture to it via
+//  DragableObject.BeginRedirectedDrag/FinishRedirectedDrag. See
+//  DragableObject.OnThresholdCrossed — the one hook this relies on.
 //
-//  The spawned piece is given a null FruitTraySlot origin on purpose:
-//  unlike the plain FruitTraySlot's "always keep one ready" respawn loop,
-//  a piece here should not respawn itself after being consumed — the next
-//  one is only ever created by the next drag gesture, so nothing exists
-//  outside an active drag.
+//  The spawned piece gets a null FruitTraySlot origin on purpose: unlike
+//  plain FruitTraySlot's "always keep one ready" respawn loop, a piece
+//  here shouldn't respawn after being consumed — the next one is only
+//  created by the next drag gesture, so nothing exists outside an active
+//  drag.
 // ============================================================
 
 using UnityEngine;
@@ -35,30 +34,37 @@ public class DragableFruitTraySlot : DragableObject
 
     private bool _hijackEnabled;
     private DragableObject _activePiece;
+    private ScaleOnHover _scaleOnHover;
+
+    // Start, not Awake — DragableObject's own Awake is private (not virtual), so a
+    // same-named Awake here would hide it from Unity's dispatch instead of running
+    // alongside it, leaving PastLocation/_collider on the base class uninitialized.
+    private void Start() => _scaleOnHover = GetComponent<ScaleOnHover>();
 
     /// <summary>
-    /// Turns the drag-hijack on or off — see InteractableToggle.ApplyOnlyFruitTraySlot, applied
-    /// by IngredientButtonGroup's phase methods (on during AddIngredient, off during PrepareBar
-    /// so dragging this object repositions it like any other bar-layout object instead).
+    /// Turns drag-hijack on/off — see InteractableToggle.ApplyOnlyFruitTraySlot, applied by
+    /// IngredientButtonGroup's phase methods (on during AddIngredient, off during PrepareBar
+    /// so dragging repositions it like any other bar-layout object).
     /// </summary>
     public void SetHijackEnabled(bool enabled) => _hijackEnabled = enabled;
 
     protected override bool OnThresholdCrossed(PointerEventData eventData)
     {
-        // OnDrag fires every frame the pointer moves past threshold, not just once — the base
-        // class's own _dragStarted flag is what normally blocks re-entry, but this object's
-        // _dragStarted never flips true on the hijack path (that's the whole point), so this
-        // needs its own "already handled this gesture" guard or it would spawn a fresh piece
-        // every single frame for the rest of the drag.
         if (_activePiece != null) return true;
 
         if (!_hijackEnabled) return false;
 
         var piece = SpawnPiece();
-        if (piece == null) return false; // no piece prefab assigned — drag the host normally
+        if (piece == null) return false;
 
         _activePiece = piece;
         piece.BeginRedirectedDrag(eventData);
+
+        // Control just moved to the piece — this object's DragableObject.IsDragging never
+        // turns true for a hijacked gesture, so ScaleOnHover never sees a drag-end to reset
+        // from (see ScaleOnHover.ForceReset doc). Un-enlarge now instead of waiting for a
+        // pointer-exit that may never come.
+        _scaleOnHover?.ForceReset();
         return true;
     }
 
@@ -68,14 +74,14 @@ public class DragableFruitTraySlot : DragableObject
         {
             _activePiece.FinishRedirectedDrag();
             _activePiece = null;
-            return; // gesture was handed off entirely — this object neither pours nor drags
+            return; 
         }
 
         base.OnPointerUp(eventData);
     }
 
-    /// <summary>Cancel a hijacked piece too if this object is disabled mid-drag, the same way
-    /// the base class cancels its own drag — otherwise the piece would be stranded.</summary>
+    /// <summary>Cancel a hijacked piece too if disabled mid-drag, same as base class cancels
+    /// its own drag — otherwise the piece would be stranded.</summary>
     protected override void OnInteractableChanged(bool interactable)
     {
         base.OnInteractableChanged(interactable);

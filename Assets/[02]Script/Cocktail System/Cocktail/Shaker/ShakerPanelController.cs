@@ -2,11 +2,10 @@
 //  ShakerPanelController.cs — Which shaker panels the player is
 //  allowed to open right now.
 //
-//  Split out of CocktailShaker, which was an interactable AND a
-//  panel state machine. The HSM cares about this: each flow state
-//  decides what the player may do, and CocktailFlowBridge (plan
-//  §6.2) drives these flags on state entry rather than leaving them
-//  to whichever button happened to fire last.
+//  Split out of CocktailShaker, which was an interactable AND a panel
+//  state machine. The HSM cares: each flow state decides what the
+//  player may do, and CocktailFlowBridge (plan §6.2) drives these
+//  flags on state entry, not whichever button fired last.
 // ============================================================
 
 using UnityEngine;
@@ -24,8 +23,8 @@ public class ShakerPanelController : MonoBehaviour
     [SerializeField] private bool _canShowServeUI = false;
 
     /// <summary>
-    /// Seeds panel references when this component was created at runtime by the
-    /// CocktailShaker compatibility shim. Assign them in the Inspector after migrating.
+    /// Seeds panel refs when created at runtime by the CocktailShaker compatibility
+    /// shim. Assign in the Inspector after migrating.
     /// </summary>
     public void Initialize(GameObject methodUI, GameObject addIceUI, GameObject serveUI)
     {

@@ -1,13 +1,13 @@
 // ============================================================
-//  ShakerContents.cs — What is in the glass, and nothing else.
+//  ShakerContents.cs — what is in the glass, and nothing else.
 //
-//  One of five components CocktailShakerData used to be (plan §4.2).
-//  No UI, no sprites, no button roster, no tooltip: those live in
+//  One of 5 components CocktailShakerData used to be (plan §4.2).
+//  No UI, sprites, button roster, or tooltip — those live in
 //  ShakerVisualPresenter, ShakerPanelController, IngredientButtonGroup
 //  and ShakerTooltip.
 //
-//  The live drink is a ScriptableObject.CreateInstance — an in-memory
-//  object that never writes back to a recipe asset on disk.
+//  The live drink is a ScriptableObject.CreateInstance — in-memory,
+//  never writes back to a recipe asset on disk.
 // ============================================================
 
 using System;
@@ -29,9 +29,9 @@ public class ShakerContents : MonoBehaviour, IIngredientReceiver
     public RecipeMatch LastMatch { get; private set; } = RecipeMatch.None;
 
     // ── Events ─────────────────────────────────────────────
-    // UnityEvent, not C# event: designers bind sounds, particles and UI straight in the
-    // Inspector without a programmer adding a subscriber first. Code still subscribes with
-    // AddListener / RemoveListener (see ShakerVisualPresenter).
+    // UnityEvent, not C# event: designers bind sounds/particles/UI straight in the
+    // Inspector without a programmer adding a subscriber. Code still subscribes via
+    // AddListener/RemoveListener (see ShakerVisualPresenter).
 
     [Header("Events")]
     [Tooltip("Anything about the drink changed — ingredient, method, ice or glass.")]

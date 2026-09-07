@@ -2,9 +2,8 @@
 //  YarnVariableSync.cs — The only place C# state is written into
 //  Yarn's VariableStorage, and the only place the names live.
 //
-//  Plain class, not a MonoBehaviour: it takes a DialogueRunner and
-//  does nothing else, so the rules it writes can be exercised
-//  without a scene.
+//  Plain class, not a MonoBehaviour: takes a DialogueRunner and does
+//  nothing else, so the rules it writes can be exercised without a scene.
 // ============================================================
 
 using UnityEngine;
@@ -78,9 +77,8 @@ public class YarnVariableSync
     }
 
     /// <summary>
-    /// GDD §22 / plan decision D8 — relationship lives in Yarn and nowhere else.
-    /// Never mirror this into a ScriptableObject; an SO written at runtime keeps its value
-    /// between Play sessions in the Editor.
+    /// GDD §22 / D8 — relationship lives in Yarn and nowhere else. Never mirror into a
+    /// ScriptableObject; an SO written at runtime keeps its value between Play sessions.
     /// </summary>
     public float ReadRelationship(NPC_Name customer)
     {

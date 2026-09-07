@@ -4,10 +4,9 @@ namespace Bar410.GameFlow
 {
     // ── Level 1 Keys ───────────────────────────────────────
 
-    /// <summary>Top-level day loop. Strictly linear: Prepare → Open → Close → Prepare.</summary>
+    /// <summary>Top-level day loop. Strictly linear: Open → Close → Open.</summary>
     public enum GamePhase
     {
-        Prepare,
         Open,
         Close
     }
@@ -35,7 +34,6 @@ namespace Bar410.GameFlow
 
         public StateMachine<GamePhase> Machine { get; } = new StateMachine<GamePhase>();
 
-        public PrepareBarPhase PrepareBar { get; private set; }
         public OpenBarPhase OpenBar { get; private set; }
         public ClosingBarPhase ClosingBar { get; private set; }
 
@@ -74,18 +72,15 @@ namespace Bar410.GameFlow
 
         private void Build()
         {
-            PrepareBar = new PrepareBarPhase();
             OpenBar = new OpenBarPhase();
             ClosingBar = new ClosingBarPhase();
 
             // Each phase raises its own "I'm done" event; this level decides what that means.
-            PrepareBar.OnRequestOpenBar += () => Machine.TryTransition(GamePhase.Open);
             OpenBar.OnRequestExitToClose += () => Machine.TryTransition(GamePhase.Close);
-            ClosingBar.OnRequestNextDay += () => Machine.TryTransition(GamePhase.Prepare);
+            ClosingBar.OnRequestNextDay += () => Machine.TryTransition(GamePhase.Open);
 
-            Machine.AddState(GamePhase.Prepare, PrepareBar, new[] { GamePhase.Open });
             Machine.AddState(GamePhase.Open, OpenBar, new[] { GamePhase.Close });
-            Machine.AddState(GamePhase.Close, ClosingBar, new[] { GamePhase.Prepare });
+            Machine.AddState(GamePhase.Close, ClosingBar, new[] { GamePhase.Open });
 
             if (_logTransitions)
                 Machine.OnTransition += (from, to) => Debug.Log($"[GameLoop] {from} -> {to}");
@@ -95,7 +90,7 @@ namespace Bar410.GameFlow
         public void StartDay()
         {
             if (Machine.IsRunning) return;
-            Machine.SetInitial(GamePhase.Prepare);
+            Machine.SetInitial(GamePhase.Open);
         }
     }
 }

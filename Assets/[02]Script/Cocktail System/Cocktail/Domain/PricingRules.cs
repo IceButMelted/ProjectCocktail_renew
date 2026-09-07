@@ -1,8 +1,7 @@
 // ============================================================
 //  PricingRules.cs — GDD §18.1 payout per satisfaction outcome.
-//  Plan fix S5: the old code had no multipliers at all — it paid
-//  the matched recipe's price flat, or a 5.0 fallback where the
-//  GDD specifies a fixed 50.
+//  Plan fix S5: old code had no multipliers — paid the matched
+//  recipe's price flat, or a 5.0 fallback where GDD specifies 50.
 // ============================================================
 
 using static E_Cocktail;
@@ -39,9 +38,8 @@ public static class PricingRules
     }
 
     /// <summary>
-    /// GDD §18.2 — relationship change applied after the reaction plays.
-    /// The value is written into Yarn's $rel_&lt;id&gt;, which stays the single source
-    /// of truth (plan decision D8); nothing mirrors it into a ScriptableObject.
+    /// GDD §18.2 — relationship change applied after the reaction plays. Written into
+    /// Yarn's $rel_&lt;id&gt;, the single source of truth (D8); never mirrored to an SO.
     /// </summary>
     public static float RelationshipDelta(Satisfaction result)
     {
