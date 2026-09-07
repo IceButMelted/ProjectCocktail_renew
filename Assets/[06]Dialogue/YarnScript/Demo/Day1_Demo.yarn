@@ -85,6 +85,7 @@ Walter: [order] "{Order_Cocktail_ByName_OutName("Sea Breeze")}" [/order] should 
 Player: Coming right up. #line:19
 <<SetEmotion NPC_Name.Owen "neutral">>
 
+<<flow_prepare_drinks>>
 
 <<Reset_Camera CamController>>
 <<Switch_Camera CamController "MainCam">>
@@ -211,6 +212,8 @@ Player: Got it. #line:4D
 
 <<SetEmotion NPC_Name.Isla "neutral">>
 
+<<flow_prepare_drinks>>
+
 <<Reset_Camera CamController>>
 <<Switch_Camera CamController "MainCam">>
 <<Fix_Camera CamController false>>
@@ -327,6 +330,8 @@ Owen: Oh right, I should probably order before the bartender kicks me out. #line
 Owen: I'll have [order] {Order_Cocktail_ByName_OutName("Gin Fizz")}. [/order] #line:79
 Player: One moment. #line:7A
 <<SetEmotion NPC_Name.Owen "neutral">>
+
+<<flow_prepare_drinks>>
 
 <<Reset_Camera CamController>>
 <<Switch_Camera CamController "MainCam">>

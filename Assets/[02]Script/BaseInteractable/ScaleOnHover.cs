@@ -7,6 +7,7 @@ public class ScaleOnHover : PointerInteractableBase
 
     [SerializeField] private float newScale = 1.1f;
     [SerializeField] private float scaleDuration = 0.2f;
+    [SerializeField] private GameObject scaleTarget; //Optinal to prevent scaling collider
 
     // ── Private State ─────────────────────────────────────────────────────────
 
@@ -29,6 +30,11 @@ public class ScaleOnHover : PointerInteractableBase
         {
             Debug.LogWarning($"ScaleOnHover on '{gameObject.name}' requires a Collider. Adding BoxCollider...");
             gameObject.AddComponent<BoxCollider>();
+        }
+
+        // If no scale target is assigned, default to the GameObject this script is attached to.
+        if (scaleTarget == null) { 
+            scaleTarget = this.gameObject;
         }
     }
 

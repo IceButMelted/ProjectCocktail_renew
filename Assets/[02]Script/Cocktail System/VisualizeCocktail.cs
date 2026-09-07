@@ -47,6 +47,15 @@ public class VisualizeCocktail : MonoBehaviour
     /// <summary>Shows the bars and refreshes them to match the current shaker state.</summary>
     public void UpdateCocktailBars()
     {
+        // ShakerContents.Clear() fires Changed right after Cleared (see ShakerContents.Clear) —
+        // without this guard, resetting the shaker on PrepareDrinks entry re-shows this panel
+        // a moment after Cleared just hid it, with nothing actually poured yet.
+        if (_shaker != null && _shaker.IsEmpty)
+        {
+            ResetVisualBars();
+            return;
+        }
+
         gameObject.SetActive(true);
         if (_shaker == null) return;
 

@@ -7151,6 +7151,18 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
+      - m_Target: {fileID: 8588145331695426067}
+        m_TargetAssemblyTypeName: ShakerPanelController, Assembly-CSharp
+        m_MethodName: ShowMethod
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
   Cleared:
     m_PersistentCalls:
       m_Calls:
@@ -7198,6 +7210,7 @@ MonoBehaviour:
   _methodUI: {fileID: 6354495852225320396}
   _serveUI: {fileID: 761406268305808613}
   _addIceUI: {fileID: 5035871305330110241}
+  _shakerContents: {fileID: 4080245901194107346}
   _canShowMethodUI: 1
   _canShowAddIceUI: 0
   _canShowServeUI: 0
@@ -11457,6 +11470,7 @@ MonoBehaviour:
   _shakerContents: {fileID: 4080245901194107346}
   _shakerPanels: {fileID: 8588145331695426067}
   _ingredients: {fileID: 0}
+  _visualCocktail: {fileID: 6135816583879962768}
   _glassZone: {fileID: 0}
   _driveIngredientButtons: 1
 --- !u!114 &5508285943544454353
@@ -12816,6 +12830,7 @@ MonoBehaviour:
   _interactable: 1
   newScale: 1.1
   scaleDuration: 0.2
+  scaleTarget: {fileID: 0}
 --- !u!114 &1946895210740682517
 MonoBehaviour:
   m_ObjectHideFlags: 0

@@ -40,6 +40,9 @@ public class ShakerContents : MonoBehaviour, IIngredientReceiver
     [Tooltip("The glass was emptied.")]
     public UnityEvent Cleared = new UnityEvent();
 
+    [Tooltip("The glass was filled to its capacity.")]
+    public UnityEvent OnFulled = new UnityEvent();
+
     [Tooltip("UpdateIdentity resolved what the drink currently is.")]
     public RecipeMatchEvent IdentityResolved = new RecipeMatchEvent();
 
@@ -126,6 +129,15 @@ public class ShakerContents : MonoBehaviour, IIngredientReceiver
         }
         if (!DrinkBuilder.TryAddMixer(CurrentCocktail, mixer, amount)) return;
         Changed?.Invoke();
+    }
+
+    public void IsCocktailFull()
+    {
+        if (!DrinkQuery.HasRoom(CurrentCocktail))
+        {
+            OnFulled?.Invoke();
+        }
+
     }
 
     // ── Identity ───────────────────────────────────────────
