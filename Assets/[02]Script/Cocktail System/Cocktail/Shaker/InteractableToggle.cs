@@ -117,7 +117,27 @@ public static class InteractableToggle
         ApplyOnlyHoverTooltip(target, true);
         ApplyOnlyUIPointerSound(target, true);
         ApplyOnlyBookUI(target, true);
+
         ApplyOnlyBottleIngredientSource(target, true);
         ApplyOnlyFruitTraySlot(target, true);
+    }
+
+    //this migh be use Apply(flase) instead
+    public static void ApplyAddIngredientFull(GameObject target) {
+
+        if(target == null) return;
+
+        ApplyOnlyInteractable_2_5DObject(target, false);
+        ApplyOnlyInteractable_3DObject(target, false);
+        ApplyOnlyDragDrop(target, false);
+        ApplyOnlyScaleOnHover(target, false);
+        ApplyOnlyHoverTooltip(target, false);
+        ApplyOnlyUIPointerSound(target, false);
+        ApplyOnlyBookUI(target, true);
+
+        ApplyOnlyBottleIngredientSource(target, false);
+        ApplyOnlyFruitTraySlot(target, false);
+
+
     }
 }

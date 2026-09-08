@@ -17,6 +17,11 @@ public class ShakerPanelController : MonoBehaviour
     [SerializeField] private GameObject _serveUI;
     [SerializeField] private GameObject _addIceUI;
 
+    [Tooltip("Optional. When set, ShowMethod() stays closed while the shaker is empty — " +
+             "ShakerContents.Clear() fires Changed too, so without this the method panel " +
+             "re-opens itself the instant it's reset.")]
+    [SerializeField] private ShakerContents _shakerContents;
+
     [Header("Initial Permissions")]
     [SerializeField] private bool _canShowMethodUI = true;
     [SerializeField] private bool _canShowAddIceUI = false;
@@ -45,6 +50,19 @@ public class ShakerPanelController : MonoBehaviour
     public void SetActiveServe(bool active)
     {
         if (_serveUI != null) _serveUI.gameObject.SetActive(active);
+    }
+
+    /// <summary>Shows the method panel, but only while step 2.1 is actually allowed to display it.</summary>
+    public void ShowMethod()
+    {
+        if (_shakerContents != null && _shakerContents.IsEmpty) return;
+        if (_canShowMethodUI && _methodUI != null) _methodUI.gameObject.SetActive(true);
+    }
+
+    /// <summary>Hides the method panel outright — called whenever step 2.1 is left.</summary>
+    public void HideMethod()
+    {
+        if (_methodUI != null) _methodUI.gameObject.SetActive(false);
     }
 
     /// <summary>Toggles whichever panels are currently permitted.</summary>

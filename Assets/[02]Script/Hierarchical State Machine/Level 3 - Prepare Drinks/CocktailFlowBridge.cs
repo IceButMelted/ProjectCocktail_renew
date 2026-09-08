@@ -26,6 +26,7 @@ namespace Bar410.GameFlow
         [SerializeField] private ShakerContents _shakerContents;
         [SerializeField] private ShakerPanelController _shakerPanels;
         [SerializeField] private IngredientButtonGroup _ingredients;
+        [SerializeField] private VisualizeCocktail _visualCocktail;
 
         [Header("Serving Glass")]
         [Tooltip("The tabletop zone a glass is placed in. Available across steps 2.1 and 3 (Garnish) alike — " +
@@ -100,11 +101,24 @@ namespace Bar410.GameFlow
         private void OnAddIngredientEntered()
         {
             if (_driveIngredientButtons && _ingredients != null) _ingredients.SetInteractable(true);
+
+            // Re-entering 2.1 with existing content (e.g. cancelling out of the minigame) needs
+            // both panels back — they only otherwise react to the next Changed/Cleared event, and
+            // nothing fires one on a bare state re-entry. Both no-op while the shaker is empty
+            // (fresh PrepareDrinks entry already cleared it via OnPrepareDrinksEntered above).
+            if (_shakerPanels != null) _shakerPanels.ShowMethod();
+            if (_visualCocktail != null) _visualCocktail.UpdateCocktailBars();
         }
 
         private void OnAddIngredientExited()
         {
             if (_driveIngredientButtons && _ingredients != null) _ingredients.SetInteractable(false);
+
+            // The method panel and the fill-bar readout are only meaningful while actually
+            // picking ingredients — force both closed on the way out (to Minigame or a
+            // backtrack) instead of leaving them open until the next Changed/Cleared event.
+            if (_shakerPanels != null) _shakerPanels.HideMethod();
+            if (_visualCocktail != null) _visualCocktail.ResetVisualBars();
         }
 
         // ── Step 4 · Serve ─────────────────────────────────
