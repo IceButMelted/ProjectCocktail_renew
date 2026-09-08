@@ -165,7 +165,7 @@ public partial class CocktailSystemManager
             return false;
         }
 
-        _postItOrder.SetPostItOrderText("Order : " + text);
+        _postItOrder.SetPostItOrderText("Task\n* Make a " + text);
         return true;
     }
 }
