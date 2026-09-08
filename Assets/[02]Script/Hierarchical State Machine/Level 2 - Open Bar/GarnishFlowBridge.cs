@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace Bar410.GameFlow
 {
@@ -34,7 +35,14 @@ namespace Bar410.GameFlow
         [SerializeField] private ShakerContents _shakerContents;
         [SerializeField] private GlassPlacementZone _glassZone;
 
+        [Header("BTN Add Ice / Remove")]
+        [SerializeField] private GameObject _gb_btnAddIce;
+        [SerializeField] private GameObject _gb_btnRemoveIce;
+        private Button _btnAddIce => _gb_btnAddIce?.GetComponent<Button>();
+        private Button _btnRemoveIce => _gb_btnRemoveIce?.GetComponent<Button>();
+
         private bool _pourComplete;
+        private bool _hasPoured;
         private PlacedGlassInstance _pouringGlass;
 
         /// <summary>True once a pour has fully finished filling — <see cref="TryFinishGarnish"/> only succeeds when this is true.</summary>
@@ -69,6 +77,7 @@ namespace Bar410.GameFlow
         private void OnGarnishEntered()
         {
             _pourComplete = false;
+            _hasPoured = false;
 
             // The drink's identity (name/colour/etc.) is resolved against the recipe database
             // once mixing is done, not on every ingredient add — Garnish entry is that "done
@@ -79,6 +88,13 @@ namespace Bar410.GameFlow
 
         private void OnGarnishExited()
         {
+
+            //Reset the ice BTN to defualt state for next time the garnish state is entered
+            _gb_btnAddIce.SetActive(true);
+            _gb_btnRemoveIce.SetActive(false);
+            _btnAddIce.interactable = true;
+            _btnRemoveIce.interactable = true;
+
         }
 
         // ── Glass ──────────────────────────────────────────
@@ -92,13 +108,25 @@ namespace Bar410.GameFlow
 
             _glassZone.SetGlass(option);
             _pourComplete = false; // a freshly-placed glass has nothing poured into it yet
+            _hasPoured = false;
         }
 
         // ── Ice ────────────────────────────────────────────
 
-        /// <summary>Called by the Garnish "add ice" toggle. Sets the scored recipe flag and the glass visual together.</summary>
+        /// <summary>
+        /// Called by the Garnish "add ice"/"remove ice" buttons. Sets the scored recipe flag and
+        /// the glass visual together. Once <see cref="Pour"/> has been pressed, ice can only be
+        /// added, never removed — pulling ice back out of an already-poured drink doesn't make
+        /// sense visually, adding more does.
+        /// </summary>
         public void ToggleIce(bool enable)
         {
+            if (!enable && _hasPoured)
+            {
+                Debug.LogWarning("[GarnishFlowBridge] Already poured — ice can no longer be removed.", this);
+                return;
+            }
+
             if (_shakerContents != null) _shakerContents.SetIce(enable);
             _glassZone?.Occupant?.ApplyIce(enable);
         }
@@ -124,6 +152,11 @@ namespace Bar410.GameFlow
             }
 
             UnsubscribeFromPouringGlass(); // re-pouring into the same glass shouldn't double-subscribe
+
+            _hasPoured = true;
+
+            _btnAddIce.interactable = true;
+            _btnRemoveIce.interactable = false;
 
             var glass = _glassZone.Occupant;
             _pouringGlass = glass;

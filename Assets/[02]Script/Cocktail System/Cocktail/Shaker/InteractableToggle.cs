@@ -10,6 +10,7 @@
 // ============================================================
 
 using UnityEngine;
+using UnityEngine.UI;
 
 public static class InteractableToggle
 {
@@ -21,6 +22,7 @@ public static class InteractableToggle
     {
         if (target == null) return;
 
+        if (target.TryGetComponent<Button>(out var button)) button.interactable = interactable;
         if (target.TryGetComponent<Interactable_2_5DObject>(out var flat)) flat.Interactable = interactable;
         if (target.TryGetComponent<Interactable_3DObject>(out var solid)) solid.Interactable = interactable;
         if (target.TryGetComponent<DragableObject>(out var drag)) drag.Interactable = interactable;
@@ -49,6 +51,12 @@ public static class InteractableToggle
     {
         if (target == null) return;
         if (target.TryGetComponent<ScaleOnHover>(out var scale)) scale.Interactable = interactable;
+    }
+
+    public static void ApplyOnlyButton(GameObject target, bool interactable)
+    {
+        if (target == null) return;
+        if (target.TryGetComponent<Button>(out var button)) button.interactable = interactable;
     }
 
     /// <summary>
@@ -116,7 +124,8 @@ public static class InteractableToggle
         ApplyOnlyScaleOnHover(target, true);
         ApplyOnlyHoverTooltip(target, true);
         ApplyOnlyUIPointerSound(target, true);
-        ApplyOnlyBookUI(target, true);
+        //ApplyOnlyBookUI(target, true);
+        ApplyOnlyButton(target, true);
 
         ApplyOnlyBottleIngredientSource(target, true);
         ApplyOnlyFruitTraySlot(target, true);
@@ -133,7 +142,8 @@ public static class InteractableToggle
         ApplyOnlyScaleOnHover(target, false);
         ApplyOnlyHoverTooltip(target, false);
         ApplyOnlyUIPointerSound(target, false);
-        ApplyOnlyBookUI(target, true);
+        //ApplyOnlyBookUI(target, true);
+        ApplyOnlyButton(target, false);
 
         ApplyOnlyBottleIngredientSource(target, false);
         ApplyOnlyFruitTraySlot(target, false);

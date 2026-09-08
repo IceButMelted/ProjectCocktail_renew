@@ -1092,7 +1092,6 @@ GameObject:
   - component: {fileID: 4763544331722640606}
   - component: {fileID: 988060636470814413}
   - component: {fileID: 7742975386448524059}
-  - component: {fileID: 4219196970401535256}
   m_Layer: 9
   m_Name: Panel - Serve
   m_TagString: Untagged
@@ -1218,18 +1217,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.ContentSizeFitter
   m_HorizontalFit: 2
   m_VerticalFit: 2
---- !u!114 &4219196970401535256
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 761406268305808613}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 0bc8df65b57878848914d49225f19407, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ToggleActive
 --- !u!1 &790090836415518099
 GameObject:
   m_ObjectHideFlags: 0
@@ -5449,18 +5436,6 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 8210839688543131369}
-        m_TargetAssemblyTypeName: IngredientButtonUI, Assembly-CSharp
-        m_MethodName: AddIce
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
       - m_Target: {fileID: 3337184413516268344}
         m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
         m_MethodName: SetActive
@@ -5508,6 +5483,18 @@ MonoBehaviour:
           m_FloatArgument: 0
           m_StringArgument: 
           m_BoolArgument: 1
+        m_CallState: 2
+      - m_Target: {fileID: 1918563698124560258}
+        m_TargetAssemblyTypeName: Bar410.GameFlow.GarnishFlowBridge, Assembly-CSharp
+        m_MethodName: ToggleIce
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
         m_CallState: 2
 --- !u!114 &8210839688543131369
 MonoBehaviour:
@@ -7367,18 +7354,6 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 8752754241903682179}
-        m_TargetAssemblyTypeName: IngredientButtonUI, Assembly-CSharp
-        m_MethodName: AddIce
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
       - m_Target: {fileID: 3337184413516268344}
         m_TargetAssemblyTypeName: UnityEngine.GameObject, UnityEngine
         m_MethodName: SetActive
@@ -7422,6 +7397,18 @@ MonoBehaviour:
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
           m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 1
+        m_CallState: 2
+      - m_Target: {fileID: 1918563698124560258}
+        m_TargetAssemblyTypeName: Bar410.GameFlow.GarnishFlowBridge, Assembly-CSharp
+        m_MethodName: ToggleIce
+        m_Mode: 6
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: 
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -11751,6 +11738,8 @@ MonoBehaviour:
   _cocktail: {fileID: 8872214703517392345}
   _shakerContents: {fileID: 4080245901194107346}
   _glassZone: {fileID: 0}
+  _gb_btnAddIce: {fileID: 0}
+  _gb_btnRemoveIce: {fileID: 0}
 --- !u!1 &7373851907734301252
 GameObject:
   m_ObjectHideFlags: 0

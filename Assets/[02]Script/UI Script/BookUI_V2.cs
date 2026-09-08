@@ -76,6 +76,8 @@ public class BookUI_V2 : MonoBehaviour
 
     // ── Properties ────────────────────────────────────────────────────────────
 
+    private bool _hasOpenedOnce;
+
     public int CurrentSpreadIndex { get; private set; }
     public int SpreadCount => _spreads.Count;
     public bool IsOpen { get; private set; }
@@ -102,7 +104,10 @@ public class BookUI_V2 : MonoBehaviour
 
         if (open)
         {
-            GoToSpread(_startSpreadIndex);
+            // First open ever uses the authored start page; every open after that resumes
+            // wherever the book was left (CurrentSpreadIndex survives HideAllSpreads on close).
+            GoToSpread(_hasOpenedOnce ? CurrentSpreadIndex : _startSpreadIndex);
+            _hasOpenedOnce = true;
             OnBookOpened?.Invoke();
         }
         else
@@ -111,6 +116,8 @@ public class BookUI_V2 : MonoBehaviour
             OnBookClosed?.Invoke();
         }
     }
+
+    public void CloseBook() => SetActive(false);
 
     public void Toggle() => SetActive(!IsOpen);
 
