@@ -17,7 +17,6 @@ namespace Bar410.GameFlow
         [SerializeField] private GameLoopFSM _gameLoop;
 
         [Header("Level 1 · Game Loop")]
-        [SerializeField] private StateHooks _prepareBar = new StateHooks();
         [SerializeField] private StateHooks _openBar = new StateHooks();
         [SerializeField] private StateHooks _closingBar = new StateHooks();
 
@@ -33,7 +32,6 @@ namespace Bar410.GameFlow
 
         // ── Public Access ──────────────────────────────────
 
-        public StateHooks PrepareBar => _prepareBar;
         public StateHooks OpenBar => _openBar;
         public StateHooks ClosingBar => _closingBar;
         public StateHooks TalkingWithCustomer => _talkingWithCustomer;
@@ -57,7 +55,6 @@ namespace Bar410.GameFlow
             var openBar = _gameLoop.OpenBar;
             var prepareDrinks = openBar.PrepareDrinks;
 
-            _prepareBar.Bind(_gameLoop.PrepareBar);
             _openBar.Bind(openBar);
             _closingBar.Bind(_gameLoop.ClosingBar);
 
@@ -79,7 +76,6 @@ namespace Bar410.GameFlow
 
             var prepareDrinks = openBar.PrepareDrinks;
 
-            _prepareBar.Unbind(_gameLoop.PrepareBar);
             _openBar.Unbind(openBar);
             _closingBar.Unbind(_gameLoop.ClosingBar);
 

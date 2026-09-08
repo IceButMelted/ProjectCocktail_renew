@@ -1,4 +1,22 @@
-﻿using AYellowpaper.SerializedCollections;
+// ============================================================
+//  CocktailShakerData.cs — COMPATIBILITY SHIM.
+//
+//  Used to hold 5 unrelated jobs: live drink, glass visuals,
+//  ingredient-button roster, book-UI roster, hover tooltip. Plan §4.2
+//  splits those into ShakerContents / ShakerVisualPresenter /
+//  IngredientButtonGroup / ShakerTooltip, in Cocktail/Shaker/.
+//
+//  Still exists: 5 scenes/prefabs reference it by GUID and bind 8 of
+//  its methods to UnityEvents. Deleting it would turn those into
+//  Missing Script and silently drop their ingredient lists/glass table.
+//
+//  Now owns NO behaviour: keeps the scenes' serialized data, hands it
+//  to the real components on Awake, forwards every call. Delete once
+//  the manual migration in Docs/Bar410_CocktailSystem_Manual_Setup.md
+//  is done.
+// ============================================================
+
+using AYellowpaper.SerializedCollections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
@@ -6,23 +24,16 @@ using Yarn.Unity;
 using static E_Cocktail;
 using static WaterSlosh;
 
-// Runtime cocktail instance is created via ScriptableObject.CreateInstance in Awake —
-// a fresh in-memory object that never modifies a disk asset.
-
 [System.Serializable] public class AlcoholEvent : UnityEvent<BaseSpirit, int> { }
 [System.Serializable] public class LiqueurEvent : UnityEvent<Liqueur, int> { }
 [System.Serializable] public class MixerEvent : UnityEvent<Mixer, int> { }
 
 public class CocktailShakerData : MonoBehaviour, IIngredientReceiver, ITooltipProvider
 {
-    // ── Inspector ──────────────────────────────────────────
+    // ── Legacy serialized data (still authored in the scenes) ──
+
     [Header("Glass Cocktail")]
     public WaterSlosh glassWaterSlosh;
-    public void StartFill() => glassWaterSlosh.StartFilling();
-    public void StopFill() => glassWaterSlosh.StopFilling();
-    public void FinishFill() => glassWaterSlosh.FinishFilling(); 
-    
-
 
     [Header("Ingredient Events")]
     public AlcoholEvent OnAddAlcohol;
@@ -36,173 +47,185 @@ public class CocktailShakerData : MonoBehaviour, IIngredientReceiver, ITooltipPr
     public List<GameObject> bookUi = new List<GameObject>();
 
     [Header("Glass And Ice")]
+    [Tooltip("LEGACY. Author SO_GlassVisualTable instead and assign it below — see plan D5.")]
     [SerializedDictionary("Glass Type", "Visual")]
     public SerializableDictionary<GlassType, VisualCocktailGlass> GlassVisualData = new SerializableDictionary<GlassType, VisualCocktailGlass>();
-    // ── Runtime State ──────────────────────────────────────
 
-    /// <summary>Live drink in the shaker. Fresh instance, never an asset reference.</summary>
-    public S_Drink CurrentCocktail { get; private set; }
+    [Tooltip("Preferred source of glass visuals. When set, GlassVisualData above is ignored.")]
+    [SerializeField] private SO_GlassVisualTable _glassVisualTable;
+
+    // ── Real components ────────────────────────────────────
+
+    private ShakerContents _contents;
+    private ShakerVisualPresenter _visuals;
+    private IngredientButtonGroup _ingredientGroup;
+    private IngredientButtonGroup _bookGroup;
+
+    /// <summary>Live drink. Now owned by <see cref="ShakerContents"/>.</summary>
+    public S_Drink CurrentCocktail => _contents != null ? _contents.CurrentCocktail : null;
+
+    /// <summary>Most recent comparison against the recipe database.</summary>
+    public RecipeMatch LastMatch => _contents != null ? _contents.LastMatch : RecipeMatch.None;
+
+    public ShakerContents Contents => _contents;
+    public ShakerVisualPresenter Visuals => _visuals;
+    public IngredientButtonGroup IngredientGroup => _ingredientGroup;
+    public IngredientButtonGroup BookGroup => _bookGroup;
 
     // ── Unity Lifecycle ────────────────────────────────────
 
     private void Awake()
     {
-        CurrentCocktail = ScriptableObject.CreateInstance<S_Drink>();
-        ResetCocktailData();
+        _contents = GetOrAdd<ShakerContents>();
+
+        _visuals = GetComponent<ShakerVisualPresenter>();
+        if (_visuals == null) _visuals = gameObject.AddComponent<ShakerVisualPresenter>();
+        _visuals.Initialize(glassWaterSlosh, _glassVisualTable != null ? _glassVisualTable : BuildLegacyTable());
+
+        if (GetComponent<ShakerTooltip>() == null) gameObject.AddComponent<ShakerTooltip>();
+
+        ResolveButtonGroups();
     }
 
-    private void Update()
+    /// <summary>
+    /// Converts per-scene <see cref="GlassVisualData"/> into a throw-away table so an
+    /// unmigrated scene keeps its glass visuals. Null when nothing to convert.
+    /// </summary>
+    private SO_GlassVisualTable BuildLegacyTable()
     {
+        if (GlassVisualData == null || GlassVisualData.Count == 0) return null;
 
+        Debug.LogWarning(
+            "[CocktailShakerData] Falling back to this scene's own GlassVisualData. Author one " +
+            "SO_GlassVisualTable asset and assign it here so every scene shares a single source " +
+            "(Docs/Bar410_CocktailSystem_Manual_Setup.md).", this);
+
+        _runtimeTable = ScriptableObject.CreateInstance<SO_GlassVisualTable>();
+
+        foreach (var entry in GlassVisualData)
+        {
+            if (entry.Value == null) continue;
+
+            _runtimeTable.Table[entry.Key] = new GlassVisual
+            {
+                GlassSprite = entry.Value.GlassSprite,
+                WaterSprite = entry.Value.WaterSprite,
+                IceSprite = entry.Value.IceSprite
+            };
+        }
+
+        return _runtimeTable;
     }
+
+    private SO_GlassVisualTable _runtimeTable;
 
     private void OnDestroy()
     {
-        // Runtime ScriptableObject instances must be explicitly destroyed.
-        if (CurrentCocktail != null)
-            Destroy(CurrentCocktail);
+        if (_runtimeTable != null) Destroy(_runtimeTable);
     }
 
-    // ── Preparation Setters ────────────────────────────────
+    private T GetOrAdd<T>() where T : Component
+    {
+        var existing = GetComponent<T>();
+        return existing != null ? existing : gameObject.AddComponent<T>();
+    }
 
-    public void SetMethod(Method method) => CurrentCocktail.PreparationMethod = method;
-    public void SetMethodToShake() => CurrentCocktail.PreparationMethod = Method.Shaking;
-    public void SetMethodToMixing() => CurrentCocktail.PreparationMethod = Method.Stirring;
-    public void ToggleIce() => CurrentCocktail.AddIce = !CurrentCocktail.AddIce;
-    public void ToggleIce(bool enable) => CurrentCocktail.AddIce = enable;  
+    /// <summary>
+    /// Finds the two IngredientButtonGroups, creating them from legacy lists if unmigrated.
+    /// Two groups on one GameObject is unusual — migrated setup should split them across
+    /// shelf and book.
+    /// </summary>
+    private void ResolveButtonGroups()
+    {
+        var groups = GetComponents<IngredientButtonGroup>();
 
-    
+        if (groups.Length > 0) _ingredientGroup = groups[0];
+        if (groups.Length > 1) _bookGroup = groups[1];
+
+        if (_ingredientGroup == null)
+        {
+            _ingredientGroup = gameObject.AddComponent<IngredientButtonGroup>();
+            _ingredientGroup.SetRoster(ingredientButtons);
+        }
+
+        if (_bookGroup == null)
+        {
+            _bookGroup = gameObject.AddComponent<IngredientButtonGroup>();
+            _bookGroup.SetRoster(bookUi);
+        }
+    }
+
+    // ── Fill passthrough ───────────────────────────────────
+
+    public void StartFill() => _visuals.StartFill();
+    public void StopFill() => _visuals.StopFill();
+    public void FinishFill() => _visuals.FinishFill();
+
+    // ── Preparation ────────────────────────────────────────
+
+    public void SetMethod(Method method) => _contents.SetMethod(method);
+    public void SetMethodToShake() => _contents.SetMethodToShake();
+    public void SetMethodToMixing() => _contents.SetMethodToMixing();
+    public void ToggleIce() => _contents.ToggleIce();
+    public void ToggleIce(bool enable) => _contents.ToggleIce(enable);
 
     // ── IIngredientReceiver ────────────────────────────────
 
     public void TryToAddAlcohol(BaseSpirit alcohol, int amount = 1)
     {
-        DrinkUtility.TryToAddAlcohol(CurrentCocktail, alcohol, amount);
-        
+        _contents.TryToAddAlcohol(alcohol, amount);
         OnAddIngredient?.Invoke();
     }
 
     public void TryToAddLiqueur(Liqueur liqueur, int amount = 1)
     {
-        DrinkUtility.TryToAddLiqueur(CurrentCocktail, liqueur, amount);
-        
+        _contents.TryToAddLiqueur(liqueur, amount);
         OnAddIngredient?.Invoke();
     }
 
     public void TryToAddMixer(Mixer mixer, int amount = 1)
     {
-        DrinkUtility.TryToAddMixer(CurrentCocktail, mixer, amount);
-        
+        _contents.TryToAddMixer(mixer, amount);
         OnAddIngredient?.Invoke();
     }
 
-    // ── Cocktail Identity Update ───────────────────────────
+    // ── Identity ───────────────────────────────────────────
 
-    /// <summary>Derives name, price, and strength from current ingredients vs recipe list.</summary>
-    public void UpdateCocktailInShaker(IReadOnlyList<S_Drink> recipes)
-    {
-        DrinkUtility.UpdateTypeOfAlcohol(CurrentCocktail, recipes);
-        DrinkUtility.UpdateName(CurrentCocktail, recipes);
-        DrinkUtility.UpdatePrice(CurrentCocktail, recipes);
-        DrinkUtility.UpdateColorInGlass(CurrentCocktail, recipes);
-        DrinkUtility.UpdateGlassType(CurrentCocktail, recipes);
+    public void UpdateCocktailInShaker(IReadOnlyList<S_Drink> recipes) => _contents.UpdateIdentity(recipes);
 
-        SetColorAndGlass(glassWaterSlosh, CurrentCocktail);
-        
-    }
-
-    /// <summary>Returns the best-matching sprite, or <paramref name="fallback"/> if none found.</summary>
     public Sprite GetCurrentSprite(IReadOnlyList<S_Drink> recipes, Sprite fallback)
-        => DrinkUtility.GetCocktailSprite(CurrentCocktail, recipes) ?? fallback;
+    {
+        var match = DrinkDeviation.FindBestMatch(CurrentCocktail, recipes);
+        return match.IsRecognised ? (match.Recipe.CocktailSprite ?? fallback) : fallback;
+    }
 
     // ── Reset ──────────────────────────────────────────────
 
     /// <summary>Fires OnResetedCocktail for Inspector-wired listeners.</summary>
     public void ResetShaker() => OnResetedCocktail?.Invoke();
 
-    /// <summary>Clears all cocktail data to defaults. No UI side-effects.</summary>
+    /// <summary>Clears the drink and re-enables the ingredient buttons.</summary>
     public void ResetCocktailData()
     {
-        CurrentCocktail.Name = string.Empty;
-        CurrentCocktail.AlcoholStrength = TypeOfCocktail.None;
-        CurrentCocktail.PreparationMethod = Method.None;
-        CurrentCocktail.AddIce = false;
-        CurrentCocktail.Price = 0f;
-        CurrentCocktail.AlcoholList = new List<AlcoholIngredient>();
-        CurrentCocktail.LiqueurList = new List<LiqueurIngredient>();
-        CurrentCocktail.MixerList = new List<MixerIngredient>();
-        CurrentCocktail.CompatibleGlass = GlassType.None;
-
-        CurrentCocktail.waterColorTop = Color.clear;
-        CurrentCocktail.waterColorBottom = Color.clear;
-        
-        glassWaterSlosh.waterLevel = 0f;
-
+        _contents.Clear();
         SetIngredientActive(true);
     }
 
     // ── Ingredient Button Helpers ──────────────────────────
 
-    /// <summary>Disable all ingredient buttons once the 10-part cap is reached.</summary>
-    public void CanIngredientActive()
-        => SetIngredientActive(DrinkUtility.GetTotalIngredient(CurrentCocktail) < 10);
+    public void CanIngredientActive() => SetIngredientActive(_contents.HasRoom);
 
-    /// <summary>Enable or disable every ingredient button uniformly.</summary>
-    public void SetIngredientActive(bool active)
-    {
-        foreach (var btn in ingredientButtons)
-        {
-            if (btn == null) continue;
-            if (btn.TryGetComponent<Interactable_2_5DObject>(out var interactable)) interactable.Interactable = active;
-            if (btn.TryGetComponent<UIPointerSound>(out var sound)) sound.Interactable = active;
-            if (btn.TryGetComponent<DragableObject>(out var drag)) drag.Interactable = active;
-            if (btn.TryGetComponent<ScaleOnHover>(out var hover)) hover.Interactable = active;
-            if (btn.TryGetComponent<Interactable_3DObject>(out var objec)) objec.Interactable = active;
-            if (btn.TryGetComponent<HoverTooltip>(out var tooltip)) tooltip.Interactable = active;
-        }
-    }
+    public void SetIngredientActive(bool active) => _ingredientGroup.SetInteractable(active);
 
-    public void SetBookUiActive(bool active)
-    {
-        foreach (var btn in bookUi)
-        {
-            if (btn == null) continue;
-            if (btn.TryGetComponent<Interactable_2_5DObject>(out var interactable)) interactable.Interactable = active;
-            if (btn.TryGetComponent<UIPointerSound>(out var sound)) sound.Interactable = active;
-            if (btn.TryGetComponent<DragableObject>(out var drag)) drag.Interactable = active;
-            if (btn.TryGetComponent<ScaleOnHover>(out var hover)) hover.Interactable = active;
-            if (btn.TryGetComponent<Interactable_3DObject>(out var objec)) objec.Interactable = active;
-            if (btn.TryGetComponent<HoverTooltip>(out var tooltip)) tooltip.Interactable = active;
-            if (btn.TryGetComponent<BookUI_V2>(out var bookUI)) bookUI.SetActive(active);
-        }
-    }
+    public void SetBookUiActive(bool active) => _bookGroup.SetInteractable(active);
 
-    public void SetColorAndGlass(WaterSlosh d, S_Drink r) {
-        if (d == null) { Debug.LogWarning("WaterSlosh ref is null"); return; }
+    // ── Visuals ────────────────────────────────────────────
 
-        d.waterColorTop = r.waterColorTop;
-        d.waterColorBottom = r.waterColorBottom;
-        
-        GlassType compateGlass = r.CompatibleGlass;
-        GlassVisualData.TryGetValue(compateGlass, out var visualData);
+    public void SetColorAndGlass(WaterSlosh _, S_Drink drink) => _visuals.Apply(drink);
 
-        if (visualData != null)
-        {
-            d.UpdateVisual(visualData.IceSprite, visualData.GlassSprite, visualData.WaterSprite);
-        }
-        else
-        {
-            Debug.LogWarning($"No visual data found for glass type {compateGlass}");
-        }
+    public string GetTooltipText() => DrinkFormatter.GetCocktailIngredient(CurrentCocktail);
 
-        glassWaterSlosh.UpdateColor();
-    }
-
-    public string GetTooltipText()
-    {
-        return DrinkUtility.GetCocktailIngredient(CurrentCocktail);
-    }
-
+    /// <summary>LEGACY shape of <see cref="GlassVisualData"/>. Replaced by <see cref="GlassVisual"/>.</summary>
     [System.Serializable]
     public class VisualCocktailGlass
     {

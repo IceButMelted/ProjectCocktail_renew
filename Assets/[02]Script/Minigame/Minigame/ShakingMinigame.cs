@@ -38,55 +38,16 @@ public class ShakingMinigame : BaseMiniGame
 
     // ── Unity Lifecycle ────────────────────────────────────
 
-    protected override void Awake()
-    {
-        base.Awake();
-
-        _cfg = Setting as SO_ShakingSetting;
-        if (_cfg == null)
-        {
-            _cfg = ScriptableObject.CreateInstance<SO_ShakingSetting>();
-            Debug.LogWarning($"[{nameof(ShakingMinigame)}] No SO_ShakingSetting assigned — using default values.");
-        }
-    }
-
-    private void OnDestroy()
-    {
-        // Only destroy if it was runtime-created (not a saved asset).
-#if UNITY_EDITOR
-        if (_cfg != null && !UnityEditor.AssetDatabase.Contains(_cfg))
-            Destroy(_cfg);
-#else
-        Destroy(_cfg);
-#endif
-    }
+    private void Awake() => _cfg = ResolveSetting<SO_ShakingSetting>();
 
     // ── IMinigame ──────────────────────────────────────────
 
-    public override void StartGame()
-    {
-        _handleOriginalWidth = _targetZoneSlider.handleRect.sizeDelta.x;
-        InitTargetZone();
-        ResetGame();
-        base.StartGame();
-        Debug.Log("[ShakingMinigame] Started");
-    }
-
     /// <summary>
-    /// Processes one frame of shaking gameplay.
-    /// base.ProcessedGame() is called first — it guards IsRunning
-    /// and polls the input provider.
+    /// One frame of shaking gameplay. Only ever called during MinigamePhase.Play,
+    /// so there is nothing to guard against here.
     /// </summary>
-    public override void ProcessedGame()
+    protected override void OnTick(float dt)
     {
-        base.ProcessedGame();   // IsRunning guard + Input.Poll()
-        if(!IsRunning) return;
-
-        
-        
-
-        float dt = Time.deltaTime;
-
         // ── Click → raise gauge ───────────────────────────
         if (Input.IsClickedThisFrame)
         {
@@ -109,23 +70,11 @@ public class ShakingMinigame : BaseMiniGame
 
         // ── Win condition ─────────────────────────────────
         if (TimeInZone >= _cfg.Duration)
-        {
-            amc.StopAnimation();
-            CurrentSlidePhase = SlidePhase.RemoveMinigame;
-            IsRunning = false;
-        }
-
-        UpdateUI();
-    }
-
-    public override void EndGame()
-    {
-        base.EndGame();
-        Debug.Log($"[ShakingMinigame] Ended | Gauge={GaugeValue:F2} | Progress={TimeInZone:F2} | {CurrentState}");
+            Complete();
     }
 
     public override string GetGameState()
-        => $"Shaking | Gauge: {GaugeValue:P0} | Progress: {TimeInZone:F1}s/{_cfg.Duration:F1}s | {CurrentState}";
+        => $"Shaking | Gauge: {GaugeValue:P0} | Progress: {TimeInZone:F1}s/{_cfg.Duration:F1}s | {Phase}";
 
     // ── UI ─────────────────────────────────────────────────
 
@@ -140,19 +89,21 @@ public class ShakingMinigame : BaseMiniGame
 
     // ── FSM Hooks ──────────────────────────────────────────
 
-    protected override void OnProcessing() => UpdateUI();
-
-    protected override void ResetGame()
+    /// <summary>Entering Play — the intro is over, so the layout is settled and cacheable.</summary>
+    protected override void OnEnter()
     {
+        _handleOriginalWidth = _targetZoneSlider.handleRect.sizeDelta.x;
+
         GaugeValue = 0f;
         TimeInZone = 0f;
 
-        // Slide in only when starting fresh, not when replaying mid-session.
-        CurrentSlidePhase = IsRunning ? SlidePhase.None : SlidePhase.InitMinigame;
+        InitTargetZone();
 
-        Debug.Log("[ShakingMinigame] Reset");
-        base.ResetGame();
+        Debug.Log("[ShakingMinigame] Started");
     }
+
+    protected override void OnExit()
+        => Debug.Log($"[ShakingMinigame] Ended | Gauge={GaugeValue:F2} | Progress={TimeInZone:F2}");
 
     // ── Private Helpers ────────────────────────────────────
 
