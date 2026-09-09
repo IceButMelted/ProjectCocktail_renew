@@ -171,7 +171,7 @@ Player: One moment.
 <<Enable_InteractableObject SystemGame false>>
 <<Fix_Camera CamController true>>
 <<Reset_Camera CamController>>
-<<Switch_Camera CamController CenterCam>>
+<<Switch_Camera CamController FarRightCam>>
 
 <<if $satisfaction == Satisfaction.Perfect>>
     <<SetEmotion NPC_Name.Owen "happy">>
@@ -214,6 +214,9 @@ Owen: I take care of the forests and the wildlife.
 Owen: You got closer than Isla ever did.
 Owen: First time we met, she thought I was homeless.
 <<SetLookDirection NPC_Name.Isla LookDirection.Right>>
+
+<<Switch_Camera CamController NearRightCam>>
+
 Isla: [shake a=2]It's because you were climbing a tree behind my dorm![/shake]
 Isla: And you looked all scruffy.
 Owen: Because I climbed up to catch the raccoon.
@@ -248,6 +251,7 @@ Player: Get home safe!
 Isla: [bounce]Thanks! See you guys.[/bounce]
 <<SetEmotion NPC_Name.Owen "happy">>
 Owen: Yup, see you.
+<<Switch_Camera CamController "MainCam">>
 <<SetLookDirection NPC_Name.Owen LookDirection.Forward>>
 <<MoveOut NPC_Name.Isla>>
 <<jump D1_NL_08_Owen_Outro>>
@@ -273,10 +277,51 @@ Owen: Mostly quiet. Nothing much ever happens up there.
 Player: Sounds peaceful.
 Owen: Yeah.
 Owen: [fade]...It is.[/fade]
-<<jump D1_NL_09_Owen_Leave>>
+<<jump D1_NL_09_Owen_SecondOrder>>
 ===
 
-title: D1_NL_09_Owen_Leave
+title: D1_NL_09_Owen_SecondOrder
+---
+Owen: Actually, hold on before I head out.
+Owen: One more for the road, if that's alright.
+Owen: I'll have [order] {Order_Cocktail_ByName_OutName("Greyhound")}. [/order]
+Player: Coming right up.
+<<SetEmotion NPC_Name.Owen "neutral">>
+
+<<flow_prepare_drinks>>
+
+<<Reset_Camera CamController>>
+<<Switch_Camera CamController "MainCam">>
+<<Fix_Camera CamController false>>
+<<wait_for_task SystemGame>>
+
+//After Owen's second order
+<<Enable_InteractableObject SystemGame false>>
+<<Fix_Camera CamController true>>
+<<Reset_Camera CamController>>
+<<Switch_Camera CamController FarRightCam>>
+
+<<if $satisfaction == Satisfaction.Perfect>>
+    <<SetEmotion NPC_Name.Owen "happy">>
+    Owen: [bounce]Now THIS is how you send a guy off right.[/bounce]
+    Owen: I'll definitely be back for more.
+
+<<elseif $satisfaction == Satisfaction.Acceptable>>
+    Owen: Not bad for a nightcap.
+    Owen: [wiggle]Good enough to send me home happy.[/wiggle]
+
+<<elseif $satisfaction == Satisfaction.Fail>>
+    <<SetEmotion NPC_Name.Owen "upset">>
+    Owen: [shake]Hmm... maybe I should've quit while I was ahead.[/shake]
+<<endif>>
+
+<<Reset_Variable SystemGame>>
+
+<<SetEmotion NPC_Name.Owen "neutral">>
+<<jump D1_NL_10_Owen_Leave>>
+===
+
+title: D1_NL_10_Owen_Leave
 ---
 Owen: Anyway, I should head out too.
 Owen: Early morning tomorrow.
