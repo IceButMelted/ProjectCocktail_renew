@@ -38,6 +38,11 @@ namespace Bar410.GameFlow
         [Header("BTN Add Ice / Remove")]
         [SerializeField] private GameObject _gb_btnAddIce;
         [SerializeField] private GameObject _gb_btnRemoveIce;
+
+        [Header("SFX")]
+        [SerializeField] private string _sfxAddIce = "Add_Ice";
+        [SerializeField] private string _sfxRemoveIce = "Remove_Ice";
+
         private Button _btnAddIce => _gb_btnAddIce?.GetComponent<Button>();
         private Button _btnRemoveIce => _gb_btnRemoveIce?.GetComponent<Button>();
 
@@ -129,6 +134,8 @@ namespace Bar410.GameFlow
 
             if (_shakerContents != null) _shakerContents.SetIce(enable);
             _glassZone?.Occupant?.ApplyIce(enable);
+
+            TryPlay(enable ? _sfxAddIce : _sfxRemoveIce);
         }
 
         // ── Pour ───────────────────────────────────────────
@@ -191,6 +198,12 @@ namespace Bar410.GameFlow
             }
 
             if (_commands != null) _commands.GarnishDone();
+        }
+
+        private static void TryPlay(string id)
+        {
+            if (!string.IsNullOrEmpty(id))
+                ManagerSound.PlayEffect(id);
         }
     }
 }

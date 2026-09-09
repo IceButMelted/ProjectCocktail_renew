@@ -1,0 +1,303 @@
+title: D1_NL_00_Start
+---
+// Set cam
+<<Enable_InteractableObject SystemGame false>>
+<<Fix_Camera CamController true>>
+<<Reset_Camera CamController>>
+<<Switch_Camera CamController "MainCam">>
+
+<<jump D1_NL_01_Isla_Arrive>>
+===
+
+title: D1_NL_01_Isla_Arrive
+---
+<<MoveIn NPC_Name.Isla 2>>
+<<Switch_Camera CamController CenterCam>>
+<<SetEmotion NPC_Name.Isla "happy">>
+
+Isla: [wave]Good evening.[/wave]
+Isla: Oh, this place is new, isn't it? I don't think I've walked by here before.
+Player: Good evening. Yeah, I just opened up a few days ago.
+<<SetEmotion NPC_Name.Isla "neutral">>
+Isla: Well, it looks lovely. Mind if I take a seat?
+Player: Of course, make yourself comfortable.
+
+-> Rough day?
+    Player: You look like you've had a long one.
+    Isla: [wiggle]Is it that obvious?[/wiggle] Just got off a shift.
+-> First time here?
+    Player: First time in the neighborhood?
+    Isla: Something like that. I just never noticed this spot before.
+-> Take your time.
+    Player: Take your time, no rush tonight.
+    Isla: [wave]Thanks, I appreciate that.[/wave]
+-> Welcome in.
+    Player: Welcome in, glad to have you.
+    Isla: [wave]Glad to be here.[/wave]
+
+Isla: I'm Isla, by the way.
+Isla: I'm a nurse over at the local clinic, just down the road.
+Player: Nice to meet you, Isla. I bet that job keeps you busy.
+Isla: [wiggle]You have no idea.[/wiggle]
+Player: Well, you're in the right place to unwind. What can I get you?
+Isla: Do you have anything to recommend?
+<<jump D1_NL_02_Isla_Order>>
+===
+
+title: D1_NL_02_Isla_Order
+---
+Player: [swing]Everything is recommended here.[/swing]
+Isla: Umm...
+Isla: Okay, I'll have [order] {Order_Cocktail_ByName_OutName("Cranberry Fizz")} [/order].
+Player: Got it.
+
+<<SetEmotion NPC_Name.Isla "neutral">>
+
+<<flow_prepare_drinks>>
+
+<<Fix_Camera CamController false>>
+<<wait_for_task SystemGame>>
+
+//After Isla's order
+<<Enable_InteractableObject SystemGame false>>
+<<Fix_Camera CamController true>>
+<<Reset_Camera CamController>>
+<<Switch_Camera CamController CenterCam>>
+
+<<if $satisfaction == Satisfaction.Perfect>>
+    <<SetEmotion NPC_Name.Isla "happy">>
+    Isla: [bounce]Oh, wow... this is incredible.[/bounce]
+    Isla: [rainb]Seriously, you have magic hands.[/rainb]
+
+<<elseif $satisfaction == Satisfaction.Acceptable>>
+    Isla: Oh, it tastes... a bit different from what I expected.
+    Isla: But it's fine.
+
+<<elseif $satisfaction == Satisfaction.Fail>>
+    <<SetEmotion NPC_Name.Isla "upset">>
+    Isla: [shake]Uh... Bartender?[/shake]
+    Isla: I think you might have grabbed the wrong bottle.
+    Isla: It's definitely not what I asked for.
+
+<<endif>>
+
+<<Reset_Variable SystemGame>>
+
+<<SetEmotion NPC_Name.Isla "neutral">>
+<<jump D1_NL_03_Isla_Talk>>
+===
+
+title: D1_NL_03_Isla_Talk
+---
+Isla: Did you just move here?
+Player: Yes, just a few days ago.
+Isla: It's a nice little town, once you get used to the quiet.
+Isla: Actually, I'm not from around here either.
+Isla: I was transferred here for work.
+Player: How long have you been here?
+<<SetEmotion NPC_Name.Isla "happy">>
+Isla: [wiggle]Long enough to stop counting.[/wiggle]
+Isla: I just... ended up staying longer than I planned.
+Player: Sounds like this town has a way of doing that.
+Isla: [wave]Maybe it does.[/wave]
+<<jump D1_NL_04_Owen_Arrive>>
+===
+
+title: D1_NL_04_Owen_Arrive
+---
+//Owen come in
+<<Enable_InteractableObject SystemGame false>>
+<<Fix_Camera CamController true>>
+<<Switch_Camera CamController "MainCam">>
+
+<<MoveIn NPC_Name.Owen 3>>
+<<Switch_Camera CamController NearRightCam>>
+<<SetEmotion NPC_Name.Owen "happy">>
+
+Owen: [bounce a=3]Hey! hey!! Owen here![/bounce]
+<<SetLookDirection NPC_Name.Isla LookDirection.Right>>
+Isla: [wiggle]Ugh keep your voice down Owen.[/wiggle]
+<<SetLookDirection NPC_Name.Owen LookDirection.Left>>
+Owen: My bad, Isla. Nice to see you.
+Owen: [shake]Wait, wait, wait[/shake] — new face behind the bar?
+Owen: I thought I knew everyone in town.
+Owen: Since when did this place have a bartender?
+-> Hello!
+    Player: Hello. I'm a Bartender.
+    Player: I just opened a few days ago.
+    <<SetEmotion NPC_Name.Isla "happy">>
+    Owen: Newcomer? Glad to see you.
+-> Just the bartender.
+    Player: Just the bartender.
+    Owen: [swing]Just the bartender? No name, no story?[/swing]
+    Owen: Mysterious. I like it.
+-> Hey! Hey!!
+    Player: hey! Hey!! Bartender here!
+    <<SetEmotion NPC_Name.Isla "happy">>
+    Owen: [bounce]Now that's the spirit![/bounce]
+-> Good evening.
+    Player: Good evening. I'm Bartender, nice to meet you.
+    <<SetEmotion NPC_Name.Isla "neutral">>
+    Owen: [wiggle]Whoa, so formal. I'm speechless.[/wiggle]
+    Owen: Nice to meet you.
+
+Owen: Well, you picked the right town to open a bar.
+Owen: Looks like I've finally got a regular spot.
+<<SetLookDirection NPC_Name.Isla LookDirection.Right>>
+Isla: [wiggle]You show up everywhere, Owen.[/wiggle]
+<<SetLookDirection NPC_Name.Owen LookDirection.Left>>
+Owen: I'm easy-going. I'm fine with anywhere.
+<<jump D1_NL_05_Owen_Order>>
+===
+
+title: D1_NL_05_Owen_Order
+---
+<<SetLookDirection NPC_Name.Owen LookDirection.Forward>>
+<<SetLookDirection NPC_Name.Isla LookDirection.Forward>>
+
+Owen: Oh right, I should probably order before the bartender kicks me out.
+Owen: I'll have [order] {Order_Cocktail_ByName_OutName("Gin Fizz")}. [/order]
+Player: One moment.
+<<SetEmotion NPC_Name.Owen "neutral">>
+
+<<flow_prepare_drinks>>
+
+<<Reset_Camera CamController>>
+<<Switch_Camera CamController "MainCam">>
+<<Fix_Camera CamController false>>
+<<wait_for_task SystemGame>>
+
+//After Owen's order
+<<Enable_InteractableObject SystemGame false>>
+<<Fix_Camera CamController true>>
+<<Reset_Camera CamController>>
+<<Switch_Camera CamController CenterCam>>
+
+<<if $satisfaction == Satisfaction.Perfect>>
+    <<SetEmotion NPC_Name.Owen "happy">>
+    Owen: [shake][rainb]Unbelievable![/rainb][/shake] This is amazing.
+    Owen: [bounce]I should have gone to bartender school instead.[/bounce]
+
+<<elseif $satisfaction == Satisfaction.Acceptable>>
+    Owen: I'm not sure, but it feels like something's missing.
+    Owen: [wiggle]But it's better than not being able to drink.[/wiggle]
+
+<<elseif $satisfaction == Satisfaction.Fail>>
+    <<SetEmotion NPC_Name.Owen "upset">>
+    Owen: Hmm...[waitfor=0.2/] I hate to say it, but I think something went sideways here.
+<<endif>>
+
+<<Reset_Variable SystemGame>>
+
+<<SetEmotion NPC_Name.Owen "neutral">>
+<<jump D1_NL_06_Owen_Talk>>
+===
+
+title: D1_NL_06_Owen_Talk
+---
+Owen: Anyway.
+Owen: I didn't tell you what I do for a living, did I?
+Owen: Guess what I do for a living.
+Owen: The hint is nature.
+-> Gardener
+    Owen: [wiggle]Nope. Do I look like that?[/wiggle]
+-> Lumberjack
+    Owen: [shake]The opposite![/shake]
+-> Wildlife conservationist
+    Owen: [bounce]Close! You're actually the first person to get that close.[/bounce]
+-> You have a job?
+    Owen: [shake]Hey! What's that supposed to mean?[/shake]
+
+Owen: I'm a forest ranger.
+Owen: I take care of the forests and the wildlife.
+<<SetLookDirection NPC_Name.Owen LookDirection.Left>>
+Owen: You got closer than Isla ever did.
+Owen: First time we met, she thought I was homeless.
+<<SetLookDirection NPC_Name.Isla LookDirection.Right>>
+Isla: [shake a=2]It's because you were climbing a tree behind my dorm![/shake]
+Isla: And you looked all scruffy.
+Owen: Because I climbed up to catch the raccoon.
+Isla: [shake]Then you fell off the tree. I was shocked.[/shake]
+Owen: Luckily, it wasn't anything serious.
+<<SetEmotion NPC_Name.Owen "happy">>
+Isla: Your ankle sprained.
+Owen: At least it's not broken.
+Player: And what about the raccoon?
+<<SetEmotion NPC_Name.Owen "neutral">>
+Owen: It ran away before we could catch it.
+Owen: It was rummaging through the trash at Cole's house.
+<<SetEmotion NPC_Name.Isla "neutral">>
+Isla: [wiggle]That poor raccoon probably didn't know what hit him.[/wiggle]
+Owen: [wiggle]Hey, I was very gentle.[/wiggle]
+<<SetLookDirection NPC_Name.Owen LookDirection.Forward>>
+<<SetLookDirection NPC_Name.Isla LookDirection.Forward>>
+<<jump D1_NL_07_Isla_Leave>>
+===
+
+title: D1_NL_07_Isla_Leave
+---
+Isla: I think it's already getting late.
+Isla: I should probably head home.
+<<SetLookDirection NPC_Name.Owen LookDirection.Right>>
+Owen: [wiggle]Come on, I was enjoying the conversation.[/wiggle]
+<<SetLookDirection NPC_Name.Isla LookDirection.Left>>
+Isla: I have an early shift tomorrow.
+Owen: [dangle]Fine...[/dangle]
+Player: Get home safe!
+<<SetEmotion NPC_Name.Isla "happy">>
+Isla: [bounce]Thanks! See you guys.[/bounce]
+<<SetEmotion NPC_Name.Owen "happy">>
+Owen: Yup, see you.
+<<SetLookDirection NPC_Name.Owen LookDirection.Forward>>
+<<MoveOut NPC_Name.Isla>>
+<<jump D1_NL_08_Owen_Outro>>
+===
+
+title: D1_NL_08_Owen_Outro
+---
+//After Isla leaves
+<<SetEmotion NPC_Name.Owen "neutral">>
+Owen: [fade]...[/fade]
+Owen: It's become a lot quieter.
+Player: At least you still have me.
+Owen: Yeah, you're right.
+Player: So how's the job?
+Owen: Mine? Oh, it's alright.
+Player: What do you usually do?
+Owen: Sometimes I explore on foot, or I give educational presentations to tourists.
+Player: And also chase raccoons.
+Owen: [wiggle]Ha, that too.[/wiggle]
+Owen: But I mostly stay on the observation tower.
+Owen: Keep an eye out for signs of stray animals or watch out for wildfires.
+Owen: Mostly quiet. Nothing much ever happens up there.
+Player: Sounds peaceful.
+Owen: Yeah.
+Owen: [fade]...It is.[/fade]
+<<jump D1_NL_09_Owen_Leave>>
+===
+
+title: D1_NL_09_Owen_Leave
+---
+Owen: Anyway, I should head out too.
+Owen: Early morning tomorrow.
+Owen: The work never has a day off.
+Player: Good luck, see you again.
+Owen: Thanks, see you later.
+Owen: [bounce]Owen, signing out.[/bounce]
+<<SetLookDirection NPC_Name.Owen LookDirection.Left>>
+<<MoveOut NPC_Name.Owen>>
+
+Player: [fade]...Another quiet night.[/fade]
+Player: Guess it's about time to close up.
+
+<<Panel_FadeOut Panel_Transition>>
+<<wait 1.5>>
+
+<<Reset_Camera CamController>>
+<<Switch_Camera CamController "MainCam">>
+<<Fix_Camera CamController true>>
+
+<<Panel_FadeIn Panel_Transition>>
+
+<<jump D1_NL_00_Start>>
+===

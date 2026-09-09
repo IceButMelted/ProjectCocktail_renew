@@ -80,7 +80,8 @@ public partial class CocktailSystemManager
     [YarnCommand("wait_for_task")]
     public IEnumerator WaitForTask()
     {
-        if (_postItOrder != null) _postItOrder.ShowPostItForDefaultDuration();
+        //if (_postItOrder != null) _postItOrder.ShowPostItForDefaultDuration();
+        //if (_postItOrder != null) _postItOrder.ShowPostIt(); //in Gameloop Wire
         if (SceneLoaderBridge.IsSilentReplay) yield break;
 
         IsWaitingForTask = true;

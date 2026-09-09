@@ -44,6 +44,11 @@ public class IngredientButtonGroup : MonoBehaviour
     public void Disable() => SetInteractable(false);
 
     /// <summary>Enables or disables only one component type across every member.</summary>
+    public void EnableOnlyButton(bool enable) { 
+        for (int i = 0; i < _members.Count; i++)
+            InteractableToggle.ApplyOnlyButton(_members[i], enable);
+    }
+
     public void EnableOnlyDragDrop(bool enable) {
         for (int i = 0; i < _members.Count; i++)
             InteractableToggle.ApplyOnlyDragDrop(_members[i], enable);

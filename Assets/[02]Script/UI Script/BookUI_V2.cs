@@ -69,10 +69,17 @@ public class BookUI_V2 : MonoBehaviour
     [SerializeField] private TMP_Text _rightPageNumberLabel;
     [SerializeField] private string _pageNumberFormat = "{0}";
 
+    [Header("Sound")]
+    [SerializeField] private string _pageFlipSFX = "UI_PageFlip";
+    [SerializeField] private string _openBookSFX= "UI_PageFlip";
+    [SerializeField] private string _closeBookSFX = "UI_PageFlip";
+
     [Header("Events")]
     public UnityEvent<int> OnSpreadChanged;
     public UnityEvent OnBookOpened;
     public UnityEvent OnBookClosed;
+
+    
 
     // ── Properties ────────────────────────────────────────────────────────────
 
@@ -109,11 +116,13 @@ public class BookUI_V2 : MonoBehaviour
             GoToSpread(_hasOpenedOnce ? CurrentSpreadIndex : _startSpreadIndex);
             _hasOpenedOnce = true;
             OnBookOpened?.Invoke();
+            TryPlay(_openBookSFX);
         }
         else
         {
             HideAllSpreads();
             OnBookClosed?.Invoke();
+            TryPlay(_closeBookSFX);
         }
     }
 
@@ -150,6 +159,9 @@ public class BookUI_V2 : MonoBehaviour
         ApplyPreAuthoredContent(spread.rightPage);
         ShowSpread(spread);
         UpdatePageNumberLabels();
+
+        TryPlay(_pageFlipSFX);
+
 
         OnSpreadChanged?.Invoke(CurrentSpreadIndex);
     }
@@ -312,5 +324,11 @@ public class BookUI_V2 : MonoBehaviour
         if (index >= 0 && index < _spreads.Count) return true;
         Debug.LogWarning($"[BookUI] Spread index {index} is out of range (0 – {_spreads.Count - 1}).");
         return false;
+    }
+
+    private static void TryPlay(string id)
+    {
+        if (!string.IsNullOrEmpty(id))
+            ManagerSound.PlayEffect(id);
     }
 }
