@@ -22,9 +22,6 @@ namespace Bar410.GameFlow
         [SerializeField] private CocktailSystemManager _cocktail;
         [SerializeField] private Post_It_Order _postIt;
 
-        [Tooltip("Legacy always-in-scene glass — reset alongside the real dynamic glass on Serve.")]
-        [SerializeField] private WaterSlosh _legacyGlass;
-
         [Header("UI")]
         [SerializeField] private GameObject _panelServe;
         [SerializeField] private Button _btnServe;
@@ -67,7 +64,6 @@ namespace Bar410.GameFlow
         private void OnServeClicked()
         {
             _cocktail?.ServeDrink();
-            _legacyGlass?.ResetGlass();
             _commands?.ServeDone();
         }
 

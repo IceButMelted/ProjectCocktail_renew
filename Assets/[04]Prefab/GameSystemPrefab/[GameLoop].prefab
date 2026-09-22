@@ -6399,7 +6399,6 @@ GameObject:
   - component: {fileID: 6899712575772586118}
   - component: {fileID: 3050200324752374447}
   - component: {fileID: 4080245901194107346}
-  - component: {fileID: 8781622324717157228}
   - component: {fileID: 8588145331695426067}
   - component: {fileID: 5928635190388036596}
   - component: {fileID: 2379689312759654376}
@@ -6423,7 +6422,6 @@ Transform:
   m_LocalScale: {x: 0.15, y: 0.15, z: 0.15}
   m_ConstrainProportionsScale: 1
   m_Children:
-  - {fileID: 7056585757763031526}
   - {fileID: 8208818367480130927}
   - {fileID: 4615301243670684945}
   - {fileID: 1374538507405460636}
@@ -6648,20 +6646,6 @@ MonoBehaviour:
   IdentityResolved:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &8781622324717157228
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4250610043282730026}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 90176d009a6b187a8a29aa11d8acaf0f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::ShakerVisualPresenter
-  _glassWaterSlosh: {fileID: 8664438388157071578}
-  _glassVisuals: {fileID: 11400000, guid: 501cbd5c7c82a0df08be83eefe1b3903, type: 2}
 --- !u!114 &8588145331695426067
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10806,7 +10790,7 @@ MonoBehaviour:
   _panelVisualCocktail: {fileID: 7437655887941705277}
   _panelMethod: {fileID: 6354495852225320396}
   _legacyShakerDrag: {fileID: 3050200324752374447}
-  _legacyGlass: {fileID: 764355907762437032}
+  _legacyGlass: {fileID: 0}
 --- !u!114 &5508285943544454353
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -10851,18 +10835,16 @@ MonoBehaviour:
   _cameraSwitcher: {fileID: 5386111175212639213}
   _garnishCameraId: GranishCam
   _panelGarnishUI: {fileID: 3511644286977637854}
-  _glassChoices:
-  - Button: {fileID: 4572520572594111759}
-    Option: {fileID: 11400000, guid: d604270535b546d44b03588217e146f3, type: 2}
-  - Button: {fileID: 5544457479214885465}
-    Option: {fileID: 11400000, guid: f60b246ff6a5278448bd7712a755cffa, type: 2}
-  - Button: {fileID: 152798924335540103}
-    Option: {fileID: 11400000, guid: 2d40f4fb4753dc046b2996f10f16183a, type: 2}
-  - Button: {fileID: 9008916361796775007}
-    Option: {fileID: 11400000, guid: 11055fca477c6c241aa3caf43b1c1c8a, type: 2}
+  _panelGlassSelectionUI: {fileID: 0}
+  _panelGarnishItemUI: {fileID: 0}
+  _panelGarnishRimUI: {fileID: 0}
+  _glassGrid: {fileID: 0}
   _btnPour: {fileID: 3008694762659471615}
   _btnFinishGarnish: {fileID: 8527765289463574694}
   _btnResetGarnish: {fileID: 7096965408459789701}
+  _btnGarnishItem: {fileID: 0}
+  _btnGarnishRim: {fileID: 0}
+  _btnGlassSelection: {fileID: 0}
   _gb_btnAddIce: {fileID: 7140896777276798973}
   _gb_btnRemoveIce: {fileID: 5690214535719326935}
   _sfxAddIce: Add_Ice
@@ -10926,7 +10908,7 @@ MonoBehaviour:
   _commands: {fileID: 0}
   _cocktail: {fileID: 8872214703517392345}
   _postIt: {fileID: 2023415601741730665}
-  _legacyGlass: {fileID: 8664438388157071578}
+  _legacyGlass: {fileID: 0}
   _panelServe: {fileID: 761406268305808613}
   _btnServe: {fileID: 122723922957188788}
   _btnRemake: {fileID: 8292760065241878575}
@@ -13975,92 +13957,6 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8506954711286825912, guid: e80fe49564cc75745879beae1dd5b69d, type: 3}
   m_PrefabInstance: {fileID: 1680656283639896723}
   m_PrefabAsset: {fileID: 0}
---- !u!1001 &2034091363802419866
-PrefabInstance:
-  m_ObjectHideFlags: 0
-  serializedVersion: 2
-  m_Modification:
-    serializedVersion: 3
-    m_TransformParent: {fileID: 1560450541420858133}
-    m_Modifications:
-    - target: {fileID: 1630587789227895090, guid: 8923cca94731a314585296b6e8002106, type: 3}
-      propertyPath: m_Name
-      value: CocktailGrass
-      objectReference: {fileID: 0}
-    - target: {fileID: 1630587789227895090, guid: 8923cca94731a314585296b6e8002106, type: 3}
-      propertyPath: m_IsActive
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 3632862127736852898, guid: 8923cca94731a314585296b6e8002106, type: 3}
-      propertyPath: m_IsActive
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 9067025926640485244, guid: 8923cca94731a314585296b6e8002106, type: 3}
-      propertyPath: m_LocalPosition.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9067025926640485244, guid: 8923cca94731a314585296b6e8002106, type: 3}
-      propertyPath: m_LocalPosition.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9067025926640485244, guid: 8923cca94731a314585296b6e8002106, type: 3}
-      propertyPath: m_LocalPosition.z
-      value: 0.05
-      objectReference: {fileID: 0}
-    - target: {fileID: 9067025926640485244, guid: 8923cca94731a314585296b6e8002106, type: 3}
-      propertyPath: m_LocalRotation.w
-      value: 1
-      objectReference: {fileID: 0}
-    - target: {fileID: 9067025926640485244, guid: 8923cca94731a314585296b6e8002106, type: 3}
-      propertyPath: m_LocalRotation.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9067025926640485244, guid: 8923cca94731a314585296b6e8002106, type: 3}
-      propertyPath: m_LocalRotation.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9067025926640485244, guid: 8923cca94731a314585296b6e8002106, type: 3}
-      propertyPath: m_LocalRotation.z
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9067025926640485244, guid: 8923cca94731a314585296b6e8002106, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.x
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9067025926640485244, guid: 8923cca94731a314585296b6e8002106, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.y
-      value: 0
-      objectReference: {fileID: 0}
-    - target: {fileID: 9067025926640485244, guid: 8923cca94731a314585296b6e8002106, type: 3}
-      propertyPath: m_LocalEulerAnglesHint.z
-      value: 0
-      objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
-    m_AddedGameObjects: []
-    m_AddedComponents: []
-  m_SourcePrefab: {fileID: 100100000, guid: 8923cca94731a314585296b6e8002106, type: 3}
---- !u!1 &764355907762437032 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 1630587789227895090, guid: 8923cca94731a314585296b6e8002106, type: 3}
-  m_PrefabInstance: {fileID: 2034091363802419866}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &7056585757763031526 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 9067025926640485244, guid: 8923cca94731a314585296b6e8002106, type: 3}
-  m_PrefabInstance: {fileID: 2034091363802419866}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &8664438388157071578 stripped
-MonoBehaviour:
-  m_CorrespondingSourceObject: {fileID: 7207113588400345664, guid: 8923cca94731a314585296b6e8002106, type: 3}
-  m_PrefabInstance: {fileID: 2034091363802419866}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 764355907762437032}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: e31916d948d40fa4598eacf248384ee5, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::WaterSlosh
 --- !u!1001 &2210714369472291918
 PrefabInstance:
   m_ObjectHideFlags: 0

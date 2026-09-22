@@ -56,9 +56,6 @@ namespace Bar410.GameFlow
         [SerializeField] private Button _btnMethodReset;
         [SerializeField] private GameObject _panelVisualCocktail;
         [SerializeField] private GameObject _panelMethod;
-        [Tooltip("The always-in-scene legacy glass/shaker, still referenced by the Method panel's Reset button.")]
-        [SerializeField] private DragableObject _legacyShakerDrag;
-        [SerializeField] private GameObject _legacyGlass;
 
         // ── Unity ──────────────────────────────────────────
 
@@ -214,8 +211,6 @@ namespace Bar410.GameFlow
             _visualCocktail?.UpdateCocktailBars();
             _panelVisualCocktail?.SetActive(false);
             _panelMethod?.SetActive(false);
-            if (_legacyShakerDrag != null) _legacyShakerDrag.Interactable = true;
-            _legacyGlass?.SetActive(false);
         }
     }
 }
