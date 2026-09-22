@@ -35,6 +35,20 @@ namespace Bar410.GameFlow
             public SO_GlassOption Option;
         }
 
+        [Serializable]
+        public class GarnishItemChoiceButton
+        {
+            public Button Button;
+            public SO_GarnishItemOption Option;
+        }
+
+        [Serializable]
+        public class GarnishRimChoiceButton
+        {
+            public Button Button;
+            public SO_GarnishRimOption Option;
+        }
+
         [Header("Flow")]
         [SerializeField] private GameLoopFSM _gameLoop;
         [SerializeField] private GameFlowCommands _commands;
@@ -49,15 +63,27 @@ namespace Bar410.GameFlow
         [SerializeField] private CinimachineCameraSwitcher _cameraSwitcher;
         [SerializeField] private string _garnishCameraId = "GranishCam";
         [SerializeField] private GameObject _panelGarnishUI;
+        [SerializeField] private GameObject _panelGlassSelectionUI;
+        [SerializeField] private GameObject _panelGarnishItemUI;
+        [SerializeField] private GameObject _panelGarnishRimUI;
 
         [Header("Glass Choice Buttons")]
         [SerializeField] private List<GlassChoiceButton> _glassChoices = new List<GlassChoiceButton>();
         private List<Button> _glassButtons => _glassChoices.ConvertAll(choice => choice.Button);
 
+        [Header("Garnish Item / Rim Choice Buttons")]
+        [Tooltip("Fresh + Novelty garnishes — both fill whichever slot was last clicked on the glass itself (see GarnishSlotButton).")]
+        [SerializeField] private List<GarnishItemChoiceButton> _garnishItemChoices = new List<GarnishItemChoiceButton>();
+        [SerializeField] private List<GarnishRimChoiceButton> _garnishRimChoices = new List<GarnishRimChoiceButton>();
+
         [Header("BTN Pour / Finish / Reset")]
         [SerializeField] private Button _btnPour;
         [SerializeField] private Button _btnFinishGarnish;
         [SerializeField] private Button _btnResetGarnish;
+
+        [SerializeField] private Button _btnGarnishItem;
+        [SerializeField] private Button _btnGarnishRim;
+        [SerializeField] private Button _btnGlassSelection;
 
         [Header("BTN Add Ice / Remove")]
         [SerializeField] private GameObject _gb_btnAddIce;
@@ -74,6 +100,11 @@ namespace Bar410.GameFlow
         private bool _pourComplete;
         private bool _hasPoured;
         private PlacedGlassInstance _pouringGlass;
+
+        // Which of the placed glass's 2 garnish slots the next Garnish Item click fills —
+        // set by clicking a slot on the glass itself (GarnishSlotButton).
+        private int _activeGarnishSlot;
+        private PlacedGlassInstance _garnishSlotGlass;
 
         /// <summary>True once a pour has fully finished filling — <see cref="TryFinishGarnish"/> only succeeds when this is true.</summary>
         public bool CanFinishGarnish => _pourComplete;
@@ -100,14 +131,32 @@ namespace Bar410.GameFlow
             if (_btnPour != null) _btnPour.onClick.AddListener(Pour);
             if (_btnFinishGarnish != null) _btnFinishGarnish.onClick.AddListener(TryFinishGarnish);
             if (_btnResetGarnish != null) _btnResetGarnish.onClick.AddListener(OnResetGarnishClicked);
+            if (_btnGarnishItem != null) _btnGarnishItem.onClick.AddListener(ChangedToGarnishItem);
+            if (_btnGarnishRim != null) _btnGarnishRim.onClick.AddListener(ChangedToGarnishRim);
+            if (_btnGlassSelection != null) _btnGlassSelection.onClick.AddListener(ChangedToChooseGlass);
 
             if (_btnAddIce != null) _btnAddIce.onClick.AddListener(() => ToggleIce(true));
             if (_btnRemoveIce != null) _btnRemoveIce.onClick.AddListener(() => ToggleIce(false));
+
+            foreach (var choice in _garnishItemChoices)
+            {
+                if (choice?.Button == null) continue;
+                var option = choice.Option;
+                choice.Button.onClick.AddListener(() => ChooseGarnishItem(option));
+            }
+
+            foreach (var choice in _garnishRimChoices)
+            {
+                if (choice?.Button == null) continue;
+                var option = choice.Option;
+                choice.Button.onClick.AddListener(() => ChooseGarnishRim(option));
+            }
         }
 
         private void OnDestroy()
         {
             UnsubscribeFromPouringGlass();
+            UnsubscribeFromGarnishSlots();
 
             if (_btnPour != null) _btnPour.onClick.RemoveListener(Pour);
             if (_btnFinishGarnish != null) _btnFinishGarnish.onClick.RemoveListener(TryFinishGarnish);
@@ -126,7 +175,10 @@ namespace Bar410.GameFlow
         {
             _pourComplete = false;
             _hasPoured = false;
+            _activeGarnishSlot = 0;
             _glassButtons.ForEach(btn => btn.interactable = true); //enable all glass choice buttons for the new garnish step
+            ChangedToChooseGlass(); // Set default UI panel to choose glass when entering garnish state
+
 
             // The drink's identity (name/colour/etc.) is resolved against the recipe database
             // once mixing is done, not on every ingredient add — Garnish entry is that "done
@@ -167,10 +219,14 @@ namespace Bar410.GameFlow
             if (_hasPoured == true) return;
 
             UnsubscribeFromPouringGlass(); // the old glass is about to be destroyed — drop its fill subscription with it
+            UnsubscribeFromGarnishSlots();
 
             _glassZone.SetGlass(option);
             _pourComplete = false; // a freshly-placed glass has nothing poured into it yet
             _hasPoured = false;
+            _activeGarnishSlot = 0;
+
+            SubscribeToGarnishSlots();
         }
 
         // ── Ice ────────────────────────────────────────────
@@ -204,10 +260,15 @@ namespace Bar410.GameFlow
         // ── Garnish Decoration ──────────────────────────────
 
         /// <summary>
-        /// Called by a Fresh/Novelty garnish button in the Garnish UI. slotIndex picks which
-        /// of the glass's 2 shared slots this goes in — Fresh and Novelty share both, there's
-        /// no per-category restriction. Pass null to clear that slot.
+        /// Called by a Fresh/Novelty garnish button in the Garnish UI. Fills whichever of the
+        /// glass's 2 shared slots was last clicked directly on the glass (GarnishSlotButton) —
+        /// Fresh and Novelty share both slots, there's no per-category restriction. Pass null
+        /// to clear the active slot.
         /// </summary>
+        public void ChooseGarnishItem(SO_GarnishItemOption item)
+            => _glassZone?.Occupant?.ApplyGarnishItem(_activeGarnishSlot, item);
+
+        /// <summary>Explicit-slot overload — same as above but bypasses the "last clicked" slot.</summary>
         public void ChooseGarnishItem(int slotIndex, SO_GarnishItemOption item)
             => _glassZone?.Occupant?.ApplyGarnishItem(slotIndex, item);
 
@@ -215,6 +276,38 @@ namespace Bar410.GameFlow
         public void ChooseGarnishRim(SO_GarnishRimOption rim)
             => _glassZone?.Occupant?.ApplyGarnishRim(rim);
 
+        private void OnGarnishSlotClicked(int slotIndex) => _activeGarnishSlot = slotIndex;
+
+        private void SubscribeToGarnishSlots()
+        {
+            _garnishSlotGlass = _glassZone?.Occupant;
+            if (_garnishSlotGlass != null) _garnishSlotGlass.GarnishSlotClicked += OnGarnishSlotClicked;
+        }
+
+        private void UnsubscribeFromGarnishSlots()
+        {
+            if (_garnishSlotGlass == null) return;
+            _garnishSlotGlass.GarnishSlotClicked -= OnGarnishSlotClicked;
+            _garnishSlotGlass = null;
+        }
+
+        private void ChangedToChooseGlass() { 
+            _panelGarnishItemUI?.SetActive(false);
+            _panelGarnishRimUI?.SetActive(false);
+            _panelGlassSelectionUI?.SetActive(true);
+        }
+
+        private void ChangedToGarnishItem() { 
+            _panelGlassSelectionUI?.SetActive(false);
+            _panelGarnishRimUI?.SetActive(false);
+            _panelGarnishItemUI?.SetActive(true);
+        }
+
+        private void ChangedToGarnishRim() { 
+            _panelGlassSelectionUI?.SetActive(false);
+            _panelGarnishItemUI?.SetActive(false);
+            _panelGarnishRimUI?.SetActive(true);
+        }
         // ── Pour ───────────────────────────────────────────
 
         /// <summary>

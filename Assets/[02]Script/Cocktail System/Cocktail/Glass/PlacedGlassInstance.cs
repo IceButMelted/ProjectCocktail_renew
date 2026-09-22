@@ -20,9 +20,29 @@ public class PlacedGlassInstance : MonoBehaviour
     [Tooltip("Whole-rim treatment (salt/sugar/etc.) — one per glass, separate from the 2 slots above.")]
     [SerializeField] private SpriteRenderer _garnishRim;
 
+    /// <summary>Fires the clicked slot's index. GarnishFlowBridge listens to track which slot the next Garnish Item button targets.</summary>
+    public event Action<int> GarnishSlotClicked;
+
     public SO_GlassOption Option { get; private set; }
 
     private GlassPlacementZone _zone;
+
+    private void Awake()
+    {
+        if (_garnishSlots == null) return;
+
+        for (int i = 0; i < _garnishSlots.Length; i++)
+        {
+            var slot = _garnishSlots[i];
+            if (slot == null) continue;
+
+            var button = slot.GetComponent<GarnishSlotButton>();
+            if (button == null) continue;
+
+            int index = i; // capture per-iteration for the closure
+            button.Clicked += () => GarnishSlotClicked?.Invoke(index);
+        }
+    }
 
     /// <summary>Called once, right after Instantiate, by GlassPlacementZone.SetGlass.</summary>
     public void Initialize(SO_GlassOption option)
