@@ -1,5 +1,4 @@
 using System;
-using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -28,27 +27,6 @@ namespace Bar410.GameFlow
     [RequireComponent(typeof(GameLoopFSM))]
     public class GarnishFlowBridge : MonoBehaviour
     {
-        [Serializable]
-        public class GlassChoiceButton
-        {
-            public Button Button;
-            public SO_GlassOption Option;
-        }
-
-        [Serializable]
-        public class GarnishItemChoiceButton
-        {
-            public Button Button;
-            public SO_GarnishItemOption Option;
-        }
-
-        [Serializable]
-        public class GarnishRimChoiceButton
-        {
-            public Button Button;
-            public SO_GarnishRimOption Option;
-        }
-
         [Header("Flow")]
         [SerializeField] private GameLoopFSM _gameLoop;
         [SerializeField] private GameFlowCommands _commands;
@@ -67,14 +45,9 @@ namespace Bar410.GameFlow
         [SerializeField] private GameObject _panelGarnishItemUI;
         [SerializeField] private GameObject _panelGarnishRimUI;
 
-        [Header("Glass Choice Buttons")]
-        [SerializeField] private List<GlassChoiceButton> _glassChoices = new List<GlassChoiceButton>();
-        private List<Button> _glassButtons => _glassChoices.ConvertAll(choice => choice.Button);
-
-        [Header("Garnish Item / Rim Choice Buttons")]
-        [Tooltip("Fresh + Novelty garnishes — both fill whichever slot was last clicked on the glass itself (see GarnishSlotButton).")]
-        [SerializeField] private List<GarnishItemChoiceButton> _garnishItemChoices = new List<GarnishItemChoiceButton>();
-        [SerializeField] private List<GarnishRimChoiceButton> _garnishRimChoices = new List<GarnishRimChoiceButton>();
+        [Header("Glass Choice")]
+        [Tooltip("Paged button grid over the glass catalog — calls ChooseGlass itself. Locked here after a pour.")]
+        [SerializeField] private GlassChoiceGrid _glassGrid;
 
         [Header("BTN Pour / Finish / Reset")]
         [SerializeField] private Button _btnPour;
@@ -121,13 +94,6 @@ namespace Bar410.GameFlow
             garnish.Entered += OnGarnishEntered;
             garnish.Exited += OnGarnishExited;
 
-            foreach (var choice in _glassChoices)
-            {
-                if (choice?.Button == null) continue;
-                var option = choice.Option; // capture per-iteration for the closure
-                choice.Button.onClick.AddListener(() => ChooseGlass(option));
-            }
-
             if (_btnPour != null) _btnPour.onClick.AddListener(Pour);
             if (_btnFinishGarnish != null) _btnFinishGarnish.onClick.AddListener(TryFinishGarnish);
             if (_btnResetGarnish != null) _btnResetGarnish.onClick.AddListener(OnResetGarnishClicked);
@@ -137,20 +103,6 @@ namespace Bar410.GameFlow
 
             if (_btnAddIce != null) _btnAddIce.onClick.AddListener(() => ToggleIce(true));
             if (_btnRemoveIce != null) _btnRemoveIce.onClick.AddListener(() => ToggleIce(false));
-
-            foreach (var choice in _garnishItemChoices)
-            {
-                if (choice?.Button == null) continue;
-                var option = choice.Option;
-                choice.Button.onClick.AddListener(() => ChooseGarnishItem(option));
-            }
-
-            foreach (var choice in _garnishRimChoices)
-            {
-                if (choice?.Button == null) continue;
-                var option = choice.Option;
-                choice.Button.onClick.AddListener(() => ChooseGarnishRim(option));
-            }
         }
 
         private void OnDestroy()
@@ -176,7 +128,7 @@ namespace Bar410.GameFlow
             _pourComplete = false;
             _hasPoured = false;
             _activeGarnishSlot = 0;
-            _glassButtons.ForEach(btn => btn.interactable = true); //enable all glass choice buttons for the new garnish step
+            _glassGrid?.SetInteractable(true); // re-enable glass choice for the new garnish step
             ChangedToChooseGlass(); // Set default UI panel to choose glass when entering garnish state
 
 
@@ -331,7 +283,7 @@ namespace Bar410.GameFlow
             UnsubscribeFromPouringGlass(); // re-pouring into the same glass shouldn't double-subscribe
 
             _hasPoured = true;
-            _glassButtons.ForEach(btn => btn.interactable = false);
+            _glassGrid?.SetInteractable(false); // one glass per pour
 
             _btnAddIce.interactable = true;
             _btnRemoveIce.interactable = false;
