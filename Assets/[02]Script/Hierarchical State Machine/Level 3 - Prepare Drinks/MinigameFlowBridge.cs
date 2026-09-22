@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.UI;
 using static E_Cocktail;
 
 namespace Bar410.GameFlow
@@ -49,6 +50,14 @@ namespace Bar410.GameFlow
                  "such a button exists, or step 2.2 becomes a dead end.")]
         [SerializeField] private bool _autoAdvanceOnWin = true;
 
+        [Header("Cancel / Give-up Buttons")]
+        [Tooltip("The two 'BTN - Cancel Minigame' buttons (Shaking + Mixing canvases) — go back to AddIngredient through the HSM, keep the drink.")]
+        [SerializeField] private Button[] _btnCancel;
+        [Tooltip("BG_BTN/BTN_Reset — cancels the minigame directly (not through the HSM) AND clears the shaker. Give-up-the-drink button.")]
+        [SerializeField] private Button _btnGiveUp;
+        [Tooltip("BG_BTN/BTN_Next — cancels the minigame directly, keeps the drink. Ported as-is; the original scene wired 'Next' to a cancel call.")]
+        [SerializeField] private Button _btnCancelDirect;
+
         // ── Unity ──────────────────────────────────────────
 
         private void Awake()
@@ -63,6 +72,13 @@ namespace Bar410.GameFlow
 
             if (_minigames != null) _minigames.MinigameFinished += OnMinigameFinished;
             else Debug.LogWarning("[MinigameFlowBridge] No MinigameSystemManager assigned — step 2.2 will run nothing.", this);
+
+            if (_btnCancel != null)
+                foreach (var btn in _btnCancel)
+                    if (btn != null) btn.onClick.AddListener(OnCancelClicked);
+
+            if (_btnGiveUp != null) _btnGiveUp.onClick.AddListener(OnGiveUpClicked);
+            if (_btnCancelDirect != null) _btnCancelDirect.onClick.AddListener(OnCancelDirectClicked);
         }
 
         private void OnDestroy()
@@ -75,7 +91,24 @@ namespace Bar410.GameFlow
             }
 
             if (_minigames != null) _minigames.MinigameFinished -= OnMinigameFinished;
+
+            if (_btnCancel != null)
+                foreach (var btn in _btnCancel)
+                    if (btn != null) btn.onClick.RemoveListener(OnCancelClicked);
+
+            if (_btnGiveUp != null) _btnGiveUp.onClick.RemoveListener(OnGiveUpClicked);
+            if (_btnCancelDirect != null) _btnCancelDirect.onClick.RemoveListener(OnCancelDirectClicked);
         }
+
+        private void OnCancelClicked() => _commands?.AnotherIngredient();
+
+        private void OnGiveUpClicked()
+        {
+            _minigames?.CancelMinigame();
+            _shakerContents?.Clear();
+        }
+
+        private void OnCancelDirectClicked() => _minigames?.CancelMinigame();
 
         // ── Flow → Minigame ────────────────────────────────
 

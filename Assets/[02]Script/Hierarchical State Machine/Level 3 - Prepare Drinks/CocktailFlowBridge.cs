@@ -1,4 +1,6 @@
 using UnityEngine;
+using UnityEngine.UI;
+using static E_Cocktail;
 
 namespace Bar410.GameFlow
 {
@@ -20,6 +22,7 @@ namespace Bar410.GameFlow
     {
         [Header("Flow")]
         [SerializeField] private GameLoopFSM _gameLoop;
+        [SerializeField] private GameFlowCommands _commands;
 
         [Header("Cocktail Scene Objects")]
         [SerializeField] private CocktailSystemManager _cocktail;
@@ -37,11 +40,32 @@ namespace Bar410.GameFlow
         [Tooltip("Re-enable pouring whenever step 2.1 AddIngredient is entered.")]
         [SerializeField] private bool _driveIngredientButtons = true;
 
+        [Header("Camera / Book / Post-it")]
+        [SerializeField] private CameraController _camera;
+        [SerializeField] private CinimachineCameraSwitcher _cameraSwitcher;
+        [SerializeField] private string _prepareDrinksCameraId = "MainCam";
+        [SerializeField] private BookUI_V2 _bookUI;
+        [SerializeField] private Post_It_Order _postIt;
+
+        [Tooltip("Hidden defensively on AddIngredient entry — Serve is also always closed by ServeFlowBridge on its own Exit.")]
+        [SerializeField] private GameObject _panelServe;
+
+        [Header("Method Panel (2.1 — Shaking / Stirring / Reset)")]
+        [SerializeField] private Button _btnShaking;
+        [SerializeField] private Button _btnMixing;
+        [SerializeField] private Button _btnMethodReset;
+        [SerializeField] private GameObject _panelVisualCocktail;
+        [SerializeField] private GameObject _panelMethod;
+        [Tooltip("The always-in-scene legacy glass/shaker, still referenced by the Method panel's Reset button.")]
+        [SerializeField] private DragableObject _legacyShakerDrag;
+        [SerializeField] private GameObject _legacyGlass;
+
         // ── Unity ──────────────────────────────────────────
 
         private void Awake()
         {
             if (_gameLoop == null) _gameLoop = GetComponent<GameLoopFSM>();
+            if (_commands == null) _commands = GetComponent<GameFlowCommands>();
             _gameLoop.EnsureBuilt();
 
             var openBar = _gameLoop.OpenBar;
@@ -49,13 +73,22 @@ namespace Bar410.GameFlow
 
             openBar.TalkingWithCustomer.Exited += OnConversationExited;
             prepareDrinks.Entered += OnPrepareDrinksEntered;
+            prepareDrinks.Exited += OnPrepareDrinksExited;
             prepareDrinks.AddIngredient.Entered += OnAddIngredientEntered;
             prepareDrinks.AddIngredient.Exited += OnAddIngredientExited;
             openBar.Serve.Exited += OnServeExited;
+
+            if (_btnShaking != null) _btnShaking.onClick.AddListener(OnShakingClicked);
+            if (_btnMixing != null) _btnMixing.onClick.AddListener(OnMixingClicked);
+            if (_btnMethodReset != null) _btnMethodReset.onClick.AddListener(OnMethodResetClicked);
         }
 
         private void OnDestroy()
         {
+            if (_btnShaking != null) _btnShaking.onClick.RemoveListener(OnShakingClicked);
+            if (_btnMixing != null) _btnMixing.onClick.RemoveListener(OnMixingClicked);
+            if (_btnMethodReset != null) _btnMethodReset.onClick.RemoveListener(OnMethodResetClicked);
+
             if (_gameLoop == null || _gameLoop.OpenBar == null) return;
 
             var openBar = _gameLoop.OpenBar;
@@ -63,6 +96,7 @@ namespace Bar410.GameFlow
 
             openBar.TalkingWithCustomer.Exited -= OnConversationExited;
             prepareDrinks.Entered -= OnPrepareDrinksEntered;
+            prepareDrinks.Exited -= OnPrepareDrinksExited;
             prepareDrinks.AddIngredient.Entered -= OnAddIngredientEntered;
             prepareDrinks.AddIngredient.Exited -= OnAddIngredientExited;
             openBar.Serve.Exited -= OnServeExited;
@@ -94,7 +128,13 @@ namespace Bar410.GameFlow
             // Every customer starts with an empty table — a glass placed for the previous
             // order (or a Garnish backtrack) does not carry over.
             if (_glassZone != null) _glassZone.ClearAndDestroyOccupant();
+
+            _camera?.ResetRotaionAndMovement();
+            _cameraSwitcher?.SwitchCamera(_prepareDrinksCameraId);
+            _postIt?.Init();
         }
+
+        private void OnPrepareDrinksExited() => _bookUI?.CloseBook();
 
         // ── Step 2.1 · AddIngredient ───────────────────────
 
@@ -102,12 +142,23 @@ namespace Bar410.GameFlow
         {
             if (_driveIngredientButtons && _ingredients != null) _ingredients.SetInteractable(true);
 
+            // Phase-specific interactable policy (bottle drag + click) — was previously the
+            // GameFlowHooks-only half of this entry; ported here so nothing is lost.
+            _ingredients?.EnableInteractablePrepareDrinksPhase();
+
+            // Testing fallback: only fills in a target when dialogue hasn't placed a real one.
+            _cocktail?.RandomCocktailIfNoOrder();
+
             // Re-entering 2.1 with existing content (e.g. cancelling out of the minigame) needs
             // both panels back — they only otherwise react to the next Changed/Cleared event, and
             // nothing fires one on a bare state re-entry. Both no-op while the shaker is empty
             // (fresh PrepareDrinks entry already cleared it via OnPrepareDrinksEntered above).
             if (_shakerPanels != null) _shakerPanels.ShowMethod();
             if (_visualCocktail != null) _visualCocktail.UpdateCocktailBars();
+
+            // Defensive — ServeFlowBridge already closes this on its own Serve.Exited, but a
+            // stray Serve panel left open by any other path would strand the player mid-pour.
+            _panelServe?.SetActive(false);
         }
 
         private void OnAddIngredientExited()
@@ -139,6 +190,32 @@ namespace Bar410.GameFlow
 
             var result = _cocktail.Scoring.Score(_cocktail.Order, _shakerContents.CurrentCocktail);
             Debug.Log($"[CocktailFlowBridge] Scored on Serve exit → {result} (payout {_cocktail.Order.Payout})");
+        }
+
+        // ── Method panel · Shaking / Mixing / Reset ────────
+
+        private void OnShakingClicked()
+        {
+            _shakerContents?.SetMethod(Method.Shaking);
+            _commands?.SelectShaking();
+            _commands?.IngredientAdded();
+        }
+
+        private void OnMixingClicked()
+        {
+            _shakerContents?.SetMethod(Method.Stirring);
+            _commands?.SelectStiring();
+            _commands?.IngredientAdded();
+        }
+
+        private void OnMethodResetClicked()
+        {
+            _cocktail?.ResetCocktail();
+            _visualCocktail?.UpdateCocktailBars();
+            _panelVisualCocktail?.SetActive(false);
+            _panelMethod?.SetActive(false);
+            if (_legacyShakerDrag != null) _legacyShakerDrag.Interactable = true;
+            _legacyGlass?.SetActive(false);
         }
     }
 }

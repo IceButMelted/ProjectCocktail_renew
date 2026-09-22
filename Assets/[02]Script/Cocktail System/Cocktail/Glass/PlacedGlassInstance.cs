@@ -13,6 +13,13 @@ public class PlacedGlassInstance : MonoBehaviour
     [Tooltip("Optional. If assigned, this glass's sprites/water color are pushed onto it.")]
     [SerializeField] private WaterSlosh _waterSlosh;
 
+    [Header("Garnish")]
+    [Tooltip("The 2 slots Fresh and Novelty garnishes share — index 0/1, no per-category restriction.")]
+    [SerializeField] private SpriteRenderer[] _garnishSlots = new SpriteRenderer[2];
+
+    [Tooltip("Whole-rim treatment (salt/sugar/etc.) — one per glass, separate from the 2 slots above.")]
+    [SerializeField] private SpriteRenderer _garnishRim;
+
     public SO_GlassOption Option { get; private set; }
 
     private GlassPlacementZone _zone;
@@ -41,6 +48,29 @@ public class PlacedGlassInstance : MonoBehaviour
 
     /// <summary>Toggles the ice visual. Called by GarnishFlowBridge.ToggleIce.</summary>
     public void ApplyIce(bool enable) => _waterSlosh?.AddIce(enable);
+
+    /// <summary>
+    /// Sets one of the 2 shared Fresh/Novelty garnish slots. Pass null to clear that slot.
+    /// Out-of-range slotIndex is a no-op (logged) rather than an exception — this is called
+    /// from UI click handlers, which should never crash the game over a bad index.
+    /// </summary>
+    public void ApplyGarnishItem(int slotIndex, SO_GarnishItemOption item)
+    {
+        if (_garnishSlots == null || slotIndex < 0 || slotIndex >= _garnishSlots.Length)
+        {
+            Debug.LogWarning($"[PlacedGlassInstance] Garnish slot {slotIndex} out of range.", this);
+            return;
+        }
+
+        var slot = _garnishSlots[slotIndex];
+        if (slot != null) slot.sprite = item != null ? item.Sprite : null;
+    }
+
+    /// <summary>Sets the whole-rim garnish treatment. Pass null to clear it.</summary>
+    public void ApplyGarnishRim(SO_GarnishRimOption rim)
+    {
+        if (_garnishRim != null) _garnishRim.sprite = rim != null ? rim.Sprite : null;
+    }
 
     /// <summary>Starts the water-level-rising animation. Called by GarnishFlowBridge.Pour.</summary>
     public void StartFill() => _waterSlosh?.StartFilling();

@@ -120,11 +120,6 @@ public partial class CocktailSystemManager
     {
         if (SceneLoaderBridge.IsSilentReplay) return; // skip — UI side effect
 
-        // Both refs optional: a scene may drive the shaker via IngredientButtonGroup
-        // alone, no CocktailShaker. Yarn calls this 7x in Day1_Demo.yarn — an unassigned
-        // ref must not crash the conversation with a NullReferenceException.
-        if (_cocktailShaker != null) _cocktailShaker.Interactable = enable;
-
         if (IngredientButtons != null) IngredientButtons.SetInteractable(enable);
         else Debug.LogWarning("[CocktailSystemManager] No IngredientButtonGroup assigned — " +
                               "Enable_InteractableObject cannot lock the ingredient buttons.", this);

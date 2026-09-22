@@ -8,7 +8,7 @@ using UnityEngine;
 /// </summary>
 public class DebugCocktail : MonoBehaviour
 {
-    [SerializeField] private CocktailShaker        _shaker;
+    [SerializeField] private ShakerContents        _shaker;
     [SerializeField] private CocktailSystemManager _system;
 
     [Header("UI Text")]

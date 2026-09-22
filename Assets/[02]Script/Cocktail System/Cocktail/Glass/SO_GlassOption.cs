@@ -2,8 +2,10 @@
 //  SO_GlassOption.cs — One glass the player can drag from the shelf.
 //
 //  Replaces SO_GlassVisualTable: a flat list instead of a dictionary
-//  keyed by GlassType, since garnish look now travels with the choice
-//  and there's no longer a recipe-driven key to look entries up by.
+//  keyed by GlassType, since there's no longer a recipe-driven key to
+//  look entries up by. Garnish is a separate player choice made during
+//  the Garnish step (see SO_GarnishItemOption/SO_GarnishRimOption) —
+//  not baked into the glass itself.
 // ============================================================
 
 using UnityEngine;
@@ -17,8 +19,6 @@ public class SO_GlassOption : ScriptableObject
 
     [Tooltip("Cosmetic shape label only, reused from GlassType — no longer tied to any recipe.")]
     public GlassType Shape;
-
-    public GarnishLook Garnish;
 
     [Header("Visuals")]
     public Sprite GlassSprite;

@@ -29,38 +29,13 @@ public partial class CocktailSystemManager : MonoBehaviour
     [Tooltip("Ingredient buttons to lock while the player may not pour.")]
     [SerializeField] private IngredientButtonGroup _ingredientButtons;
 
-    [Tooltip("Optional. Only used by CocktailShaker-based scenes.")]
-    public CocktailShaker _cocktailShaker;
-
-    [Tooltip("LEGACY compatibility shim. Leave empty in migrated scenes — see the manual setup doc.")]
-    public CocktailShakerData _cocktailShakerData;
-
     // ── Shaker access ──────────────────────────────────────
-    // Resolved lazily, not in Awake: in an unmigrated scene real components are created by
-    // CocktailShakerData.Awake, and Awake order on one GameObject isn't guaranteed —
-    // reading eagerly can pick up null.
 
-    /// <summary>The drink in the glass, whichever way this scene is wired.</summary>
-    private ShakerContents Contents
-    {
-        get
-        {
-            if (_shakerContents != null) return _shakerContents;
-            if (_cocktailShakerData != null) _shakerContents = _cocktailShakerData.Contents;
-            return _shakerContents;
-        }
-    }
+    /// <summary>The drink in the glass.</summary>
+    private ShakerContents Contents => _shakerContents;
 
-    /// <summary>Ingredient buttons, whichever way this scene is wired.</summary>
-    private IngredientButtonGroup IngredientButtons
-    {
-        get
-        {
-            if (_ingredientButtons != null) return _ingredientButtons;
-            if (_cocktailShakerData != null) _ingredientButtons = _cocktailShakerData.IngredientGroup;
-            return _ingredientButtons;
-        }
-    }
+    /// <summary>Ingredient buttons.</summary>
+    private IngredientButtonGroup IngredientButtons => _ingredientButtons;
 
     // ── Character data ─────────────────────────────────────
     // Declared here, next to the Awake() that fills it. Read from the Yarn partial, but a

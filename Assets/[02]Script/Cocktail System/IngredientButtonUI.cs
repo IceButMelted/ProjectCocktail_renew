@@ -7,10 +7,7 @@ using static E_Cocktail;
 /// wire the click to <see cref="Invoke"/> — one connection, no manual swapping. Works from
 /// a UI Button or Interactable_2_5DObject.OnClicked.
 ///
-/// Talks to <see cref="ShakerContents"/>, the refactored owner of the live drink (used to
-/// talk to the CocktailShakerData shim, absent in migrated scenes — lookup returned null
-/// and every pour threw). Scenes still carrying the shim keep old behaviour: see
-/// <see cref="Legacy"/>.
+/// Talks to <see cref="ShakerContents"/>, the owner of the live drink.
 /// </summary>
 public class IngredientButtonUI : MonoBehaviour
 {
@@ -45,10 +42,7 @@ public class IngredientButtonUI : MonoBehaviour
 
     // ── Shaker resolution ─────────────────────────────────
 
-    /// <summary>
-    /// Resolved on first use, not Awake: in unmigrated scenes ShakerContents is added by
-    /// the CocktailShakerData shim during ITS Awake, and script execution order isn't fixed.
-    /// </summary>
+    /// <summary>Resolved on first use so Inspector-unassigned buttons still find the scene's ShakerContents.</summary>
     private ShakerContents Shaker
     {
         get
@@ -56,23 +50,12 @@ public class IngredientButtonUI : MonoBehaviour
             if (_shaker != null) return _shaker;
 
             _shaker = FindFirstObjectByType<ShakerContents>(FindObjectsInactive.Include);
-            if (_shaker == null && Legacy != null) _shaker = Legacy.Contents;
             if (_shaker == null)
                 Debug.LogWarning($"[IngredientButtonUI] No ShakerContents in the scene — '{name}' does nothing.", this);
 
             return _shaker;
         }
     }
-
-    /// <summary>
-    /// The compatibility shim, when the scene still has one. Its ingredient UnityEvents are
-    /// authored per scene (pour animation, sounds, the add itself), so where it exists they
-    /// stay the single path — calling ShakerContents directly too would pour twice.
-    /// </summary>
-    private CocktailShakerData Legacy
-        => _legacy != null ? _legacy : _legacy = FindFirstObjectByType<CocktailShakerData>(FindObjectsInactive.Include);
-
-    private CocktailShakerData _legacy;
 
     // ── Single entry-point (wire this to the click) ───────
 
@@ -94,25 +77,13 @@ public class IngredientButtonUI : MonoBehaviour
     // ── Individual methods (also available directly) ──────
 
     /// <summary>Add the assigned Mixer to the shaker.</summary>
-    public void AddMixer()
-    {
-        if (Legacy != null) { Legacy.OnAddMixer?.Invoke(_mixer, 1); return; }
-        Pour(() => Shaker.TryToAddMixer(_mixer, 1));
-    }
+    public void AddMixer() => Pour(() => Shaker.TryToAddMixer(_mixer, 1));
 
     /// <summary>Add the assigned Alcohol to the shaker.</summary>
-    public void AddAlcohol()
-    {
-        if (Legacy != null) { Legacy.OnAddAlcohol?.Invoke(_alcohol, 1); return; }
-        Pour(() => Shaker.TryToAddAlcohol(_alcohol, 1));
-    }
+    public void AddAlcohol() => Pour(() => Shaker.TryToAddAlcohol(_alcohol, 1));
 
     /// <summary>Add the assigned Liqueur to the shaker.</summary>
-    public void AddLiqueur()
-    {
-        if (Legacy != null) { Legacy.OnAddLiqueur?.Invoke(_liqueur, 1); return; }
-        Pour(() => Shaker.TryToAddLiqueur(_liqueur, 1));
-    }
+    public void AddLiqueur() => Pour(() => Shaker.TryToAddLiqueur(_liqueur, 1));
 
     /// <summary>Set preparation method to Shaking.</summary>
     public void SetShaking() => Shaker?.SetMethod(Method.Shaking);
@@ -123,15 +94,8 @@ public class IngredientButtonUI : MonoBehaviour
     /// <summary>Add or remove ice. The no-argument overload had an empty body and was deleted.</summary>
     public void AddIce(bool enable) => Shaker?.ToggleIce(enable);
 
-    /// <summary>
-    /// Empty the shaker. With the shim present, raises its OnResetedCocktail chain as before;
-    /// without it, the drink is cleared and ShakerContents.Cleared carries the news.
-    /// </summary>
-    public void ResetShaker()
-    {
-        if (Legacy != null) { Legacy.ResetShaker(); return; }
-        Shaker?.Clear();
-    }
+    /// <summary>Empty the shaker. ShakerContents.Cleared carries the news to listeners.</summary>
+    public void ResetShaker() => Shaker?.Clear();
 
     // ── Internal ──────────────────────────────────────────
 
