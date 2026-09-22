@@ -63,14 +63,6 @@ public partial class CocktailSystemManager : MonoBehaviour
     public OrderService Orders { get; private set; }
     public DrinkScoringService Scoring { get; private set; }
 
-    /// <summary>Legacy accessor. Prefer <see cref="Order"/>.</summary>
-    public S_Drink TargetCocktail
-    {
-        get => Order.Target;
-        set => Order.BeginOrder(Order.Customer, OrderMode.FixedByName, value,
-                                value != null ? AlcoholClassifier.Resolve(value) : TypeOfCocktail.None);
-    }
-
     // Unity Lifecycle
 
     private void Awake()

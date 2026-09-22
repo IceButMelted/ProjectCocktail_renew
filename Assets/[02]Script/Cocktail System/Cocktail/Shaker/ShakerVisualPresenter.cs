@@ -11,30 +11,13 @@ public class ShakerVisualPresenter : MonoBehaviour
     [Header("Glass")]
     [SerializeField] private WaterSlosh _glassWaterSlosh;
 
-    [Tooltip("LEGACY only. S_Drink no longer carries a glass, so this is never read for " +
-             "per-drink sprite switching — kept only so CocktailShakerData's Initialize " +
-             "call (unmigrated scenes) still compiles and can fill it.")]
-    [SerializeField] private SO_GlassVisualTable _glassVisuals;
-
     private ShakerContents _contents;
-
-    public WaterSlosh Glass => _glassWaterSlosh;
 
     private void Awake()
     {
         _contents = GetComponent<ShakerContents>();
         if (_glassWaterSlosh == null)
             Debug.LogWarning("[ShakerVisualPresenter] No WaterSlosh assigned — glass visuals will not update.", this);
-    }
-
-    /// <summary>
-    /// Seeds refs when created at runtime rather than authored in the scene. Used by the
-    /// CocktailShakerData compatibility shim; assign in the Inspector after migration.
-    /// </summary>
-    public void Initialize(WaterSlosh glass, SO_GlassVisualTable visuals)
-    {
-        if (_glassWaterSlosh == null) _glassWaterSlosh = glass;
-        if (_glassVisuals == null) _glassVisuals = visuals;
     }
 
     private void OnEnable()
@@ -50,12 +33,6 @@ public class ShakerVisualPresenter : MonoBehaviour
         _contents.IdentityResolved.RemoveListener(OnIdentityResolved);
         _contents.Cleared.RemoveListener(OnCleared);
     }
-
-    // ── Fill animation passthrough (bound from UnityEvents) ──
-
-    public void StartFill() { if (_glassWaterSlosh != null) _glassWaterSlosh.StartFilling(); }
-    public void StopFill() { if (_glassWaterSlosh != null) _glassWaterSlosh.StopFilling(); }
-    public void FinishFill() { if (_glassWaterSlosh != null) _glassWaterSlosh.FinishFilling(); }
 
     // ── Reactions ──────────────────────────────────────────
 

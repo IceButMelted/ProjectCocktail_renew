@@ -3,10 +3,8 @@
 //  CocktailDataValidator.cs — Bar410/Validate Cocktail Data
 //
 //  Phase 8 of the refactor plan is authoring work, not code: recipes
-//  must total 10 parts (S12) and the legacy glass visual table (kept
-//  only for scenes still on the CocktailShakerData shim) should stay
-//  complete (G1). This does not invent that data — it finds and lists
-//  exactly what is missing so a designer can fix it.
+//  must total 10 parts (S12). This does not invent that data — it
+//  finds and lists exactly what is missing so a designer can fix it.
 //
 //  CompatibleGlass was removed from S_Drink entirely (player now picks
 //  the serving glass at runtime) — this validator no longer checks it.
@@ -29,7 +27,6 @@ public static class CocktailDataValidator
         int problems = 0;
 
         problems += ValidateRecipes(report);
-        problems += ValidateGlassTables(report);
 
         string header = problems == 0
             ? "[Bar410] Cocktail data validation passed."
@@ -87,37 +84,6 @@ public static class CocktailDataValidator
         foreach (var l in d.LiqueurList) sb.Append('L').Append((int)l.Type).Append(':').Append(l.Amount).Append('|');
         foreach (var m in d.MixerList) sb.Append('M').Append((int)m.Type).Append(':').Append(m.Amount).Append('|');
         return sb.ToString();
-    }
-
-    // ── Glass visuals ──────────────────────────────────────
-
-    private static int ValidateGlassTables(StringBuilder report)
-    {
-        var guids = AssetDatabase.FindAssets("t:SO_GlassVisualTable");
-        if (guids.Length == 0)
-        {
-            report.AppendLine("\nNo SO_GlassVisualTable asset exists yet (plan D5). Every scene is still " +
-                              "using its own copy of the table — see Bar410_CocktailSystem_Manual_Setup.md.");
-            return 1;
-        }
-
-        int problems = 0;
-
-        foreach (var guid in guids)
-        {
-            string path = AssetDatabase.GUIDToAssetPath(guid);
-            var table = AssetDatabase.LoadAssetAtPath<SO_GlassVisualTable>(path);
-            if (table == null) continue;
-
-            var missing = table.MissingEntries();
-            if (missing.Count == 0) continue;
-
-            problems++;
-            report.AppendLine($"\n{path} has no entry for (gap G1):");
-            foreach (var type in missing) report.AppendLine($"  - {type}");
-        }
-
-        return problems;
     }
 
     // ── Output ─────────────────────────────────────────────

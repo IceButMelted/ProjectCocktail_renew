@@ -220,10 +220,6 @@ namespace Bar410.GameFlow
         public void ChooseGarnishItem(SO_GarnishItemOption item)
             => _glassZone?.Occupant?.ApplyGarnishItem(_activeGarnishSlot, item);
 
-        /// <summary>Explicit-slot overload — same as above but bypasses the "last clicked" slot.</summary>
-        public void ChooseGarnishItem(int slotIndex, SO_GarnishItemOption item)
-            => _glassZone?.Occupant?.ApplyGarnishItem(slotIndex, item);
-
         /// <summary>Called by a Rim garnish button in the Garnish UI. Pass null to clear it.</summary>
         public void ChooseGarnishRim(SO_GarnishRimOption rim)
             => _glassZone?.Occupant?.ApplyGarnishRim(rim);
