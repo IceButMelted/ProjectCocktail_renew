@@ -1,8 +1,9 @@
 // ============================================================
 //  PlacedGlassInstance.cs — The one glass currently on the table.
 //  Carries its own SO_GlassOption visuals (no lookup table — each
-//  option bundles its own sprites). Spawned already placed by
-//  GlassPlacementZone.SetGlass; destroyed once served, never dragged.
+//  option bundles its own sprites). Spawned at a fixed point by
+//  PlacedGlassInstance.Spawn (GlassPlacementZone kept but unused);
+//  destroyed once served, never dragged.
 // ============================================================
 
 using System;
@@ -24,6 +25,41 @@ public class PlacedGlassInstance : MonoBehaviour
     public event Action<int> GarnishSlotClicked;
 
     public SO_GlassOption Option { get; private set; }
+
+    /// <summary>The one serving glass in the scene (last one initialized), or null.</summary>
+    public static PlacedGlassInstance Current { get; private set; }
+
+    /// <summary>
+    /// Destroys the current glass (if any) and spawns <paramref name="option"/>'s prefab at
+    /// <paramref name="point"/>. Returns the new glass, or null if the option/prefab is invalid.
+    /// </summary>
+    public static PlacedGlassInstance Spawn(SO_GlassOption option, Transform point)
+    {
+        if (option == null || option.PlacedPrefab == null || point == null)
+        {
+            Debug.LogWarning("[PlacedGlassInstance] Spawn needs an SO_GlassOption with a PlacedPrefab and a spawn point.");
+            return null;
+        }
+
+        DestroyCurrent();
+
+        var instance = Instantiate(option.PlacedPrefab, point.position, point.rotation);
+        var glass = instance.GetComponent<PlacedGlassInstance>();
+        if (glass == null)
+        {
+            Debug.LogWarning($"[PlacedGlassInstance] '{option.PlacedPrefab.name}' has no PlacedGlassInstance component.");
+            Destroy(instance);
+            return null;
+        }
+
+        glass.Initialize(option);
+        return glass;
+    }
+
+    public static void DestroyCurrent()
+    {
+        if (Current != null) Destroy(Current.gameObject);
+    }
 
     private GlassPlacementZone _zone;
 
@@ -48,6 +84,7 @@ public class PlacedGlassInstance : MonoBehaviour
     public void Initialize(SO_GlassOption option)
     {
         Option = option;
+        Current = this;
 
         if (_waterSlosh != null && option != null)
             _waterSlosh.UpdateVisual(option.IceSprite, option.GlassSprite, option.WaterSprite);
@@ -108,6 +145,7 @@ public class PlacedGlassInstance : MonoBehaviour
 
     private void OnDestroy()
     {
+        if (Current == this) Current = null;
         if (_zone != null) _zone.ClearOccupant(this);
     }
 }

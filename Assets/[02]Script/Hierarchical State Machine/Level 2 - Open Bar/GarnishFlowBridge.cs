@@ -12,8 +12,8 @@ namespace Bar410.GameFlow
     ///
     /// Glass, ice, and pouring are all UI-button-driven here (Bar410 gameplay revision, see
     /// docs/adr/0002-glass-pour-fixed-position-buttons.md): the player picks a glass from a list
-    /// (<see cref="ChooseGlass"/>), which spawns already placed in the shared
-    /// GlassPlacementZone; the mixing vessel is fixed beside it and poured with a button
+    /// (<see cref="ChooseGlass"/>), which spawns already placed at _glassSpawnPoint
+    /// (GlassPlacementZone is no longer used); the mixing vessel is fixed beside it and poured with a button
     /// (<see cref="Pour"/>) instead of dragged. A successful pour locks the drink's visuals onto
     /// the glass and gates the existing GarnishDone() flow command — call
     /// <see cref="TryFinishGarnish"/> from the "done" button/UI instead of
@@ -34,7 +34,8 @@ namespace Bar410.GameFlow
         [Header("Cocktail Scene Objects")]
         [SerializeField] private CocktailSystemManager _cocktail;
         [SerializeField] private ShakerContents _shakerContents;
-        [SerializeField] private GlassPlacementZone _glassZone;
+        [Tooltip("Where the chosen serving glass spawns (position + rotation).")]
+        [SerializeField] private Transform _glassSpawnPoint;
         [SerializeField] private IngredientButtonGroup _ingredients;
 
         [Header("Camera / Panel")]
@@ -167,13 +168,13 @@ namespace Bar410.GameFlow
         /// <summary>Called by a glass-option button in the Garnish UI (one button per SO_GlassOption).</summary>
         public void ChooseGlass(SO_GlassOption option)
         {
-            if (_glassZone == null) return;
+            if (_glassSpawnPoint == null) return;
             if (_hasPoured == true) return;
 
             UnsubscribeFromPouringGlass(); // the old glass is about to be destroyed — drop its fill subscription with it
             UnsubscribeFromGarnishSlots();
 
-            _glassZone.SetGlass(option);
+            PlacedGlassInstance.Spawn(option, _glassSpawnPoint);
             _pourComplete = false; // a freshly-placed glass has nothing poured into it yet
             _hasPoured = false;
             _activeGarnishSlot = 0;
@@ -198,7 +199,7 @@ namespace Bar410.GameFlow
             }
 
             if (_shakerContents != null) _shakerContents.SetIce(enable);
-            _glassZone?.Occupant?.ApplyIce(enable);
+            PlacedGlassInstance.Current?.ApplyIce(enable);
 
             // Icon swap lives here (not a second Inspector listener) so the click always does
             // both atomically — a lone listener toggling only one half was the exact shape of
@@ -218,17 +219,17 @@ namespace Bar410.GameFlow
         /// to clear the active slot.
         /// </summary>
         public void ChooseGarnishItem(SO_GarnishItemOption item)
-            => _glassZone?.Occupant?.ApplyGarnishItem(_activeGarnishSlot, item);
+            => PlacedGlassInstance.Current?.ApplyGarnishItem(_activeGarnishSlot, item);
 
         /// <summary>Called by a Rim garnish button in the Garnish UI. Pass null to clear it.</summary>
         public void ChooseGarnishRim(SO_GarnishRimOption rim)
-            => _glassZone?.Occupant?.ApplyGarnishRim(rim);
+            => PlacedGlassInstance.Current?.ApplyGarnishRim(rim);
 
         private void OnGarnishSlotClicked(int slotIndex) => _activeGarnishSlot = slotIndex;
 
         private void SubscribeToGarnishSlots()
         {
-            _garnishSlotGlass = _glassZone?.Occupant;
+            _garnishSlotGlass = PlacedGlassInstance.Current;
             if (_garnishSlotGlass != null) _garnishSlotGlass.GarnishSlotClicked += OnGarnishSlotClicked;
         }
 
@@ -264,7 +265,7 @@ namespace Bar410.GameFlow
         /// </summary>
         public void Pour()
         {
-            if (_glassZone == null || _glassZone.Occupant == null)
+            if (PlacedGlassInstance.Current == null)
             {
                 Debug.LogWarning("[GarnishFlowBridge] No glass placed yet — choose a glass before pouring.", this);
                 return;
@@ -285,7 +286,7 @@ namespace Bar410.GameFlow
             _btnRemoveIce.interactable = false;
             if (_btnPour != null) _btnPour.interactable = false; // one pour per glass — re-enabled on the next Garnish entry
 
-            var glass = _glassZone.Occupant;
+            var glass = PlacedGlassInstance.Current;
             _pouringGlass = glass;
             glass.OnFillComplete += OnPourFillComplete;
 

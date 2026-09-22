@@ -31,11 +31,6 @@ namespace Bar410.GameFlow
         [SerializeField] private IngredientButtonGroup _ingredients;
         [SerializeField] private VisualizeCocktail _visualCocktail;
 
-        [Header("Serving Glass")]
-        [Tooltip("The tabletop zone a glass is placed in. Available across steps 2.1 and 3 (Garnish) alike — " +
-                 "its occupant is destroyed on a PrepareDrinks (re)entry, so every customer starts with an empty table.")]
-        [SerializeField] private GlassPlacementZone _glassZone;
-
         [Header("Behaviour")]
         [Tooltip("Re-enable pouring whenever step 2.1 AddIngredient is entered.")]
         [SerializeField] private bool _driveIngredientButtons = true;
@@ -124,7 +119,7 @@ namespace Bar410.GameFlow
 
             // Every customer starts with an empty table — a glass placed for the previous
             // order (or a Garnish backtrack) does not carry over.
-            if (_glassZone != null) _glassZone.ClearAndDestroyOccupant();
+            PlacedGlassInstance.DestroyCurrent();
 
             _camera?.ResetRotaionAndMovement();
             _cameraSwitcher?.SwitchCamera(_prepareDrinksCameraId);
@@ -174,9 +169,9 @@ namespace Bar410.GameFlow
         private void OnServeExited()
         {
             // The served glass never carries over — the next customer always gets a fresh one
-            // from GlassPlacementZone.SetGlass. Unconditional, independent of the scoring guard
+            // from GarnishFlowBridge.ChooseGlass. Unconditional, independent of the scoring guard
             // below, so it still runs even when scoring already happened via the legacy path.
-            if (_glassZone != null) _glassZone.ClearAndDestroyOccupant();
+            PlacedGlassInstance.DestroyCurrent();
 
             // Closes the TODO in ServeState.cs and Bar410_StateMachine_Implementation.md §3.2
             // ("scoring moved to ServeState.OnExit"). Guarded because the existing Serve
