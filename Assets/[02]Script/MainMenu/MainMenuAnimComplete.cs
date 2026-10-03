@@ -4,7 +4,7 @@ using UnityEngine;
 /// Attach to the CAMERA GameObject (Cam1) — same reason as DoorSequence:
 /// Animation Events only reach components on the object the clip is playing on.
 /// </summary>
-public class CameraZoomComplete : MonoBehaviour
+public class MainMenuAnimComplete : MonoBehaviour
 {
     [SerializeField] private Animator doorAnimator;
     [SerializeField] private SceneLoader sceneLoader;
@@ -13,6 +13,7 @@ public class CameraZoomComplete : MonoBehaviour
     // Animation Event: call at the frame in Cam1's clip where the door should start opening.
     public void PlayDoorOpen()
     {
+        doorAnimator.enabled = true;
         doorAnimator.SetTrigger("Open");
     }
 
