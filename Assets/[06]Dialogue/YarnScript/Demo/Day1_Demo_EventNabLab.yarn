@@ -16,12 +16,14 @@ title: D1_NL_01_Isla_Arrive
 <<SetEmotion NPC_Name.Isla "happy">>
 
 Isla: [wave]Good evening.[/wave]
+Owen: My bad, Isla. Nice to see you.
+Walter: Good.
+
 Isla: Oh, this place is new, isn't it? I don't think I've walked by here before.
 Player: Good evening. Yeah, I just opened up a few days ago.
 <<SetEmotion NPC_Name.Isla "neutral">>
 Isla: Well, it looks lovely. Mind if I take a seat?
 Player: Of course, make yourself comfortable.
-
 -> Rough day?
     Player: You look like you've had a long one.
     Isla: [wiggle]Is it that obvious?[/wiggle] Just got off a shift.
@@ -31,7 +33,7 @@ Player: Of course, make yourself comfortable.
 -> Take your time.
     Player: Take your time, no rush tonight.
     Isla: [wave]Thanks, I appreciate that.[/wave]
--> Welcome in.
+-> Welcome in. 
     Player: Welcome in, glad to have you.
     Isla: [wave]Glad to be here.[/wave]
 
