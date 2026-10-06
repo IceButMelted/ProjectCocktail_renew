@@ -187,6 +187,15 @@ public class SoundManager : MonoBehaviour
     public void SetUIVolume(float vol) => SetVolume(m_SoundSettings.UIVolumeName, vol, m_SliderUIVolume);
     public void SetVoiceVolume(float vol) => SetVolume(m_SoundSettings.VoiceVolumeName, vol, m_SliderVoiceVolume);
 
+    // Current user-set volumes (0-1) for UI that lives outside this scene (e.g. an additive Settings page).
+    public float GetMasterVolume() => Load(m_SoundSettings.MasterVolumeName, m_SoundSettings.MasterVolume);
+    public float GetMusicVolume() => Load(m_SoundSettings.MusicVolumeName, m_SoundSettings.MusicVolume);
+    public float GetAmbientVolume() => Load(m_SoundSettings.AmbientVolumeName, m_SoundSettings.AmbientVolume);
+    public float GetMasterSFXVolume() => Load(m_SoundSettings.MasterSFXVolumeName, m_SoundSettings.MasterSFXVolume);
+    public float GetSFXVolume() => Load(m_SoundSettings.SFXVolumeName, m_SoundSettings.SFXVolume);
+    public float GetUIVolume() => Load(m_SoundSettings.UIVolumeName, m_SoundSettings.UIVolume);
+    public float GetVoiceVolume() => Load(m_SoundSettings.VoiceVolumeName, m_SoundSettings.VoiceVolume);
+
     private void SetVolume(string param, float vol, Slider slider)
     {
         vol = Mathf.Clamp01(vol);
