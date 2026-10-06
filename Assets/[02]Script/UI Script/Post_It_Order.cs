@@ -76,6 +76,12 @@ public class Post_It_Order : MonoBehaviour
         _autoHideCoroutine = StartCoroutine(AutoHideRoutine(duration));
     }
 
+    public void ShowPostIt() {
+        CancelAutoHide();
+        SetOutScreen(false);
+        SetPostItVisible(true);
+    }
+
     public void ShowPostItForDefaultDuration() => ShowPostItForDuration(autoHideDuration);
 
     private IEnumerator AutoHideRoutine(float duration)

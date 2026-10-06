@@ -14,8 +14,6 @@ public class MixingMinigame : BaseMiniGame
     /// <summary>Resolved once in Awake — never null after that.</summary>
     private SO_MixingSetting _cfg;
 
-    private bool _cfgIsRuntimeCreated;
-
     // ── Inspector ──────────────────────────────────────────
 
     [Header("UI")]
@@ -82,108 +80,47 @@ public class MixingMinigame : BaseMiniGame
 
     // ── Unity Lifecycle ────────────────────────────────────
 
-    protected override void Awake()
-    {
-        base.Awake();
-
-        _cfg = Setting as SO_MixingSetting;
-        if (_cfg == null)
-        {
-            _cfg = ScriptableObject.CreateInstance<SO_MixingSetting>();
-            _cfgIsRuntimeCreated = true;
-            Debug.LogWarning($"[{nameof(MixingMinigame)}] No SO_MixingSetting assigned — using default values.");
-        }
-    }
-
-    private void OnDestroy()
-    {
-        if (_cfg != null && _cfgIsRuntimeCreated)
-            Destroy(_cfg);
-    }
+    private void Awake() => _cfg = ResolveSetting<SO_MixingSetting>();
 
     // ── IMinigame ──────────────────────────────────────────
 
-    public override void StartGame()
-    {
-        
-        _targetZoneRect = _targetZoneSlider.transform as RectTransform;
-        _cachedHandleRect = _targetZoneSlider.handleRect;
-        _cachedTrackWidth = _targetZoneRect.rect.width;
-
-        _requiredHitsInverse = _cfg.RequiredHits > 0 ? 1f / _cfg.RequiredHits : 0f;
-
-        _handleOriginalHeight = _cachedHandleRect.sizeDelta.y;
-
-        ResetGame();
-        UpdateUI();
-        base.StartGame();
-        Debug.Log("[MixingMinigame] Started");
-    }
-
     /// <summary>
-    /// Processes one frame of mixing gameplay.
-    /// base.ProcessedGame() is called first — it guards IsRunning
-    /// and polls the input provider.
+    /// One frame of mixing gameplay. Only ever called during MinigamePhase.Play,
+    /// so there is nothing to guard against here.
     /// </summary>
-    public override void ProcessedGame()
+    protected override void OnTick(float dt)
     {
-        
-        base.ProcessedGame();
-        if (_isNeedleFrozen) // if frozen on miss, skip needle movement but still not allow input and zone hide timer to run
-            return;
+        // Frozen on a miss: needle holds still and clicks are ignored,
+        // but the zone-hide timer keeps running.
+        if (_isNeedleFrozen) return;
 
-        UpdateUI();
-
-        if (!IsRunning) return;
-
-        float dt = Time.deltaTime;
-
-        // ── Move needle (skipped while frozen on miss) ────
+        // ── Move needle ───────────────────────────────────
         NeedlePosition += _needleSpeed * _needleDirection * dt;
 
         if (NeedlePosition >= 1f) { NeedlePosition = 1f; _needleDirection = -1f; }
         else if (NeedlePosition <= 0f) { NeedlePosition = 0f; _needleDirection = 1f; }
 
-
         // ── Register click ────────────────────────────────
         if (Input.IsClickedThisFrame && _isZoneVisible)
         {
-            float zMin = ZoneMin;
-            float zMax = ZoneMax;
-
-            bool inZone = NeedlePosition >= zMin && NeedlePosition <= zMax;
-            if (inZone) {
+            bool inZone = NeedlePosition >= ZoneMin && NeedlePosition <= ZoneMax;
+            if (inZone)
+            {
                 //amc = Animation Minagame Controller
                 amc.PlayAnimation();
-                OnHit(); 
+                OnHit();
             }
             else OnMiss();
-
-            //Debug.Log($"[MixingMinigame] {(inZone ? "HIT" : "MISS")} | " +
-            //          $"Needle: {NeedlePosition:P0} | Zone: [{zMin:F2}–{zMax:F2}] | " +
-            //          $"Hits: {Hits}/{_cfg.RequiredHits} | Speed: {_needleSpeed:F2}");
         }
 
         // ── Win condition ─────────────────────────────────
         if (Hits >= _cfg.RequiredHits)
-        {
-            CurrentSlidePhase = SlidePhase.RemoveMinigame;
-            amc.StopAnimation();
-            IsRunning = false;
-        }
-
-        
-    }
-
-    public override void EndGame()
-    {
-        base.EndGame();
-        Debug.Log($"[MixingMinigame] Ended | Hits: {Hits}/{_cfg.RequiredHits} | {CurrentState}");
+            Complete();
     }
 
     public override string GetGameState()
         => $"Mixing | Needle: {NeedlePosition:P0} | Zone: [{ZoneMin:F2}–{ZoneMax:F2}] | " +
-           $"Hits: {Hits}/{_cfg.RequiredHits} | Speed: {_needleSpeed:F2} | {CurrentState}";
+           $"Hits: {Hits}/{_cfg.RequiredHits} | Speed: {_needleSpeed:F2} | {Phase}";
 
     // ── UI ─────────────────────────────────────────────────
 
@@ -197,12 +134,17 @@ public class MixingMinigame : BaseMiniGame
 
     // ── FSM Hooks ──────────────────────────────────────────
 
-    protected override void OnProcessing() => UpdateUI();
-
-    protected override void ResetGame()
+    /// <summary>Entering Play — the intro is over, so the layout is settled and cacheable.</summary>
+    protected override void OnEnter()
     {
-        if (_zonehideCoroutine != null) { StopCoroutine(_zonehideCoroutine); _zonehideCoroutine = null; }
-        if (_needleFreezeCoroutine != null) { StopCoroutine(_needleFreezeCoroutine); _needleFreezeCoroutine = null; }
+        _targetZoneRect = _targetZoneSlider.transform as RectTransform;
+        _cachedHandleRect = _targetZoneSlider.handleRect;
+        _cachedTrackWidth = _targetZoneRect.rect.width;
+        _handleOriginalHeight = _cachedHandleRect.sizeDelta.y;
+
+        _requiredHitsInverse = _cfg.RequiredHits > 0 ? 1f / _cfg.RequiredHits : 0f;
+
+        StopAllTimers();
 
         _isZoneVisible = true;
         _zoneVisibilityDirty = true; // force a SetActive(true) on next UpdateUI
@@ -219,11 +161,20 @@ public class MixingMinigame : BaseMiniGame
 
         RandomizeZonePosition();
 
-        // Slide in only when starting fresh, not when replaying mid-session.
-        CurrentSlidePhase = IsRunning ? SlidePhase.None : SlidePhase.Closing;
+        Debug.Log("[MixingMinigame] Started");
+    }
 
-        Debug.Log("[MixingMinigame] Reset");
-        base.ResetGame();
+    protected override void OnExit()
+    {
+        StopAllTimers();
+        Debug.Log($"[MixingMinigame] Ended | Hits: {Hits}/{_cfg.RequiredHits}");
+    }
+
+    private void StopAllTimers()
+    {
+        if (_zonehideCoroutine != null) { StopCoroutine(_zonehideCoroutine); _zonehideCoroutine = null; }
+        if (_needleFreezeCoroutine != null) { StopCoroutine(_needleFreezeCoroutine); _needleFreezeCoroutine = null; }
+        if (_hitsProgressCoroutine != null) { StopCoroutine(_hitsProgressCoroutine); _hitsProgressCoroutine = null; }
     }
 
     // ── Private: Hit / Miss ────────────────────────────────

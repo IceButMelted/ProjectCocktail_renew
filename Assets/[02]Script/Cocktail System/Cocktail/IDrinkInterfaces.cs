@@ -1,18 +1,15 @@
 // ============================================================
-//  IDrinkInterfaces.cs — Abstractions for the cocktail system.
+//  IDrinkInterfaces.cs — abstractions for the cocktail system.
 //
-//  SOLID — I (Interface Segregation):
-//    Two focused interfaces instead of one fat one.
-//    Consumers only depend on the slice they actually need.
+//  SOLID — I (Interface Segregation): two focused interfaces instead
+//  of one fat one; consumers depend only on the slice they need.
 //
-//  SOLID — D (Dependency Inversion):
-//    High-level modules (CocktailSystemManager) depend on these
-//    abstractions, not on concrete types like SO_CocktailList.
-//    Swap implementations freely without touching consumers.
+//  SOLID — D (Dependency Inversion): high-level modules
+//  (CocktailSystemManager) depend on these abstractions, not concrete
+//  types like SO_CocktailList; swap implementations freely.
 //
-//  SOLID — O (Open / Closed):
-//    New data sources (e.g. server-fetched recipes) implement
-//    IDrinkRepository without modifying any existing class.
+//  SOLID — O (Open/Closed): new data sources (e.g. server-fetched
+//  recipes) implement IDrinkRepository without modifying existing code.
 // ============================================================
 
 using System.Collections.Generic;
@@ -37,6 +34,13 @@ public interface IDrinkRepository
     /// Falls back to a completely random drink if none match.
     /// </summary>
     S_Drink GetRandom(TypeOfCocktail type);
+
+    /// <summary>
+    /// Case-insensitive lookup by drink name, for "customer orders a specific drink" Yarn
+    /// modes (GDD §12 modes 1-2). Keeps name search out of the Yarn layer, which used to
+    /// run its own LINQ query over a cached list.
+    /// </summary>
+    bool TryGetByName(string name, out S_Drink drink);
 }
 
 // ── Ingredient Receiver ────────────────────────────────────
