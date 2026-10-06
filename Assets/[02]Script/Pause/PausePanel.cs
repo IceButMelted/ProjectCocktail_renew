@@ -19,7 +19,13 @@ public class PausePanel : MonoBehaviour
     [Tooltip("Music/Ambient play at full volume while this panel is open (Settings, so volume changes are audible).")]
     [SerializeField] private bool m_ReleaseMusicDuck;
 
+    [Tooltip("Name PauseManager.OpenPanel(key) uses to open this layer directly (e.g. Settings from MainMenu). Empty = the GameObject name.")]
+    [SerializeField] private string m_Key;
+
     public bool IsBase => m_IsBase;
+
+    public bool Matches(string key) =>
+        string.Equals(string.IsNullOrEmpty(m_Key) ? name : m_Key, key, System.StringComparison.OrdinalIgnoreCase);
 
     public static bool AnyOpen => s_Open.Count > 0;
 

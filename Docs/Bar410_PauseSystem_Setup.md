@@ -91,7 +91,8 @@ EventSystem                  (ของทดสอบเดี่ยว ๆ —
 | ฟิลด์ | ความหมาย | ค่าใน scene เกม | ค่าใน MainMenu |
 |---|---|---|---|
 | **Pause Time** | หยุดเวลาและ pause SFX/Voice ตอนมี layer เปิด | ✔ เปิด | ✘ ปิด |
-| **Pause Scene** | ชื่อ additive scene ที่ preload แล้วซ่อน | `PauseScene` | **ว่าง** (ลบข้อความออก) |
+| **Pause Scene** | ชื่อ additive scene ที่ preload แล้วซ่อน | `PauseScene` | `PauseScene` (MainMenu เปิด Settings จาก scene เดียวกัน) |
+| **Esc Opens Pause Menu** | `Esc` เปิดเมนู Pause เมื่อไม่มีอะไรเปิดอยู่ | ✔ เปิด | ✘ ปิด (`Esc` ปิดเฉพาะสิ่งที่เปิดอยู่) |
 
 ### B2. วางใน scene เกม (`New Drag Drop System`)
 
@@ -99,7 +100,7 @@ EventSystem                  (ของทดสอบเดี่ยว ๆ —
 
 ### B3. วางใน `MainMenu`
 
-ลาก `[PauseManager]` เข้า scene ตั้ง **Pause Time ✘** และ **ลบชื่อใน Pause Scene ให้ว่าง** (MainMenu ไม่มี additive scene จึงไม่มีการเปิด Pause ด้วย `Esc` เหลือแค่ปิด layer ที่เปิดอยู่)
+ลาก `[PauseManager]` เข้า scene (เมนูปัจจุบันคือ `MainMenu_V2`) ตั้ง **Pause Time ✘** และ **Esc Opens Pause Menu ✘** ปล่อย Pause Scene เป็น `PauseScene` MainMenu จะ preload scene เดียวกับในเกมแล้วใช้ปุ่ม `OpenPanelButton` เปิดไปที่ Settings ตรง ๆ (ดู C5) ไม่ผ่านเมนู Pause
 
 ### B4. ห้ามวางใน `LoadingScene`
 
@@ -180,15 +181,19 @@ EventSystem                  (ของทดสอบเดี่ยว ๆ —
 - refresh รายการ slot ใน `OnEnable`
 - `SaveLoadManager` มีอยู่เฉพาะใน scene เกม
 
-### C5. ใช้ layer เดียวกันใน MainMenu (ทำเมื่อพร้อม ยังไม่ได้ทำ)
+### C5. Settings จาก MainMenu (ข้ามหน้า Pause) ✅
 
-layer ใน `PauseScene` เป็นลูกของ Canvas ใน scene นั้น การเอาไปใช้ใน MainMenu ต้องแยกเป็น prefab ก่อน:
+`MainMenu_V2` ใช้ layer Settings ตัวเดียวกับในเกม ไม่ต้องทำ UI ซ้ำ โดย `PauseManager` ใน MainMenu preload `PauseScene` เหมือนในเกม แต่เปิดตรงไปที่ layer Settings และไม่แสดงเมนู Pause:
 
-1. แยก `Panel - Setting` (และ `Panel - SaveLoad` ถ้าต้องการ) เป็น prefab ไว้ที่ `Assets/[04]Prefab/UI/Pause/` (ลากจาก Hierarchy ลงโฟลเดอร์) แล้วใช้ prefab นั้นใน `PauseScene` ด้วย เพื่อให้ทั้งสองที่แก้ที่เดียว
-2. ใน `MainMenu` สร้าง **Canvas ใหม่สำหรับ layer นี้** (Overlay, Canvas Scaler Scale With Screen Size 1920×1080 Match 0.5, `sortingOrder` สูงกว่า Canvas เดิมของ MainMenu เช่น 10000) ห้ามวางใต้ Canvas เดิมของ MainMenu เพราะเป็น Constant Pixel Size 800×600 layout จะเพี้ยน แล้ววาง prefab เป็นลูก **ปิด active** ไว้ก่อน
-3. ปุ่ม Settings ของ MainMenu: `Button.onClick` → instance ของ prefab ใน scene → `PausePanel.Show()` ปุ่ม Back (ถ้ามี) ผูก `PausePanel.Hide()` และ `Esc` ปิด layer บนสุดให้
-4. ใน MainMenu `PauseManager` ปิด Pause Time และเว้น Pause Scene ว่างไว้ เปิด Settings จึงไม่หยุดเวลาและเสียง
-5. **ปุ่ม Load ที่ใช้งานได้จริงใน MainMenu ยังทำไม่ได้** ต้องแก้โค้ดเพิ่ม: `SaveLoadManager` ไม่มีใน MainMenu และ `LoadFromFile` เรียก `ReloadCurrentScene()` (จะโหลด MainMenu ซ้ำ) ส่วน `SaveMetaData` ไม่เก็บชื่อ scene เกม ตอนนี้ใช้เป็น UI mock หรือซ่อนปุ่ม Load ไว้
+1. `[PauseManager]` ใน `MainMenu_V2`: **Pause Time ✘**, **Esc Opens Pause Menu ✘**, Pause Scene `PauseScene` (ตั้งไว้แล้ว)
+2. ปุ่ม `BTN_Setting` มี component **`OpenPanelButton`** (Key = `Settings`) กดแล้วเรียก `PauseManager.OpenPanel("Settings")` ซึ่งเปิด root ของ `PauseScene` แล้วแสดงเฉพาะ layer ที่มี **Key** ตรงกัน (ไม่แสดง layer ฐาน `Panel - Pause`)
+3. layer `Panel - Setting` ใน `PauseScene` ตั้ง **Key = `Settings`** (ถ้าเว้นว่างจะใช้ชื่อ GameObject แทน)
+4. ปิด: ซ่อน layer Settings (ปุ่ม Back ที่ผูก `PausePanel.Hide()` หรือ `Esc`) แล้ว `PauseManager` ซ่อน backdrop เองในเฟรมถัดไป กลับมาที่หน้าเมนู
+5. ใน MainMenu เวลาและเสียงไม่ถูก pause (Pause Time ปิด) slider ใช้ `SoundManager` ของ MainMenu
+6. **`Panel - Setting` ยังไม่มีปุ่ม Back** ใน MainMenu ผู้เล่นที่ใช้เมาส์อย่างเดียวจะออกจากหน้า Settings ไม่ได้ (`Esc` ใช้ได้) ให้เพิ่มปุ่ม Back ใน layer นี้แล้วผูก `Button.onClick` → `Panel - Setting` → `PausePanel.Hide()` (ปุ่มเดียวใช้ได้ทั้งในเกมและ MainMenu)
+7. **ปุ่ม Load ที่ใช้งานได้จริงใน MainMenu ยังทำไม่ได้** ต้องแก้โค้ดเพิ่ม: `SaveLoadManager` ไม่มีใน MainMenu และ `LoadFromFile` เรียก `ReloadCurrentScene()` (จะโหลด MainMenu ซ้ำ) ส่วน `SaveMetaData` ไม่เก็บชื่อ scene เกม ตอนนี้ใช้เป็น UI mock หรือซ่อนปุ่ม Load ไว้
+
+เปิด layer อื่นจาก MainMenu ในอนาคต: แปะ `OpenPanelButton` บนปุ่มแล้วตั้ง Key ให้ตรงกับ **Key** ของ layer (หรือชื่อ GameObject) และเปิดได้ทีละ layer
 
 ### C6. เช็กลิสต์ก่อนส่งงาน (ต่อ layer)
 
