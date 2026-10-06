@@ -4,6 +4,9 @@ using UnityEngine;
 using UnityEngine.Audio;
 using UnityEngine.UI;
 
+/// <summary>The volume sliders SoundManager owns (not the same as <see cref="SoundChannel"/>, which categorises clips).</summary>
+public enum VolumeChannel { Master, Music, Ambient, MasterSFX, SFX, UI, Voice }
+
 /// <summary>
 /// Plays every sound through MainMixer. Volumes are mixer exposed params (SoundSettings),
 /// per-clip gain stays in SoundData. One persistent instance; scene duplicates self-destruct.
@@ -16,6 +19,11 @@ public class SoundManager : MonoBehaviour
     [SerializeField] private SoundSettings m_SoundSettings;
     [SerializeField] private string m_BGMStart;
     [SerializeField, Min(1)] private int m_MaxSFXCount = 5;
+
+    [Header("Pause")]
+    [Tooltip("Music/Ambient volume multiplier while the game is paused")]
+    [SerializeField, Range(0f, 1f)] private float m_PauseDuck = 0.3f;
+    [SerializeField, Min(0f)] private float m_PauseDuckFade = 0.25f;
 
     [Header("Optional UI (0-1 sliders, may stay empty)")]
     [SerializeField] private Slider m_SliderMasterVolume;
@@ -50,6 +58,10 @@ public class SoundManager : MonoBehaviour
     private AudioSource m_UiSfxSrc;
     private AudioSource m_VoiceSrc;
     private AudioSource[] m_SfxPool;
+    private bool m_Paused;
+    private float m_Duck = 1f;          // current Music/Ambient multiplier (fades to m_DuckTarget)
+    private float m_DuckTarget = 1f;
+    private Coroutine m_DuckRoutine;
     private int m_SfxOldest;    // ponytail: ring-buffer index, oldest = next to evict
 
     // ── Unity Lifecycle ───────────────────────────────────────────────────────
@@ -196,6 +208,34 @@ public class SoundManager : MonoBehaviour
     public float GetUIVolume() => Load(m_SoundSettings.UIVolumeName, m_SoundSettings.UIVolume);
     public float GetVoiceVolume() => Load(m_SoundSettings.VoiceVolumeName, m_SoundSettings.VoiceVolume);
 
+    /// <summary>One entry per exposed mixer volume; lets UI pick a channel without knowing the 14 per-channel methods.</summary>
+    public float GetVolume(VolumeChannel channel) => channel switch
+    {
+        VolumeChannel.Master => GetMasterVolume(),
+        VolumeChannel.Music => GetMusicVolume(),
+        VolumeChannel.Ambient => GetAmbientVolume(),
+        VolumeChannel.MasterSFX => GetMasterSFXVolume(),
+        VolumeChannel.SFX => GetSFXVolume(),
+        VolumeChannel.UI => GetUIVolume(),
+        VolumeChannel.Voice => GetVoiceVolume(),
+        _ => throw new System.ArgumentOutOfRangeException(nameof(channel), channel, null)
+    };
+
+    public void SetVolume(VolumeChannel channel, float vol)
+    {
+        switch (channel)
+        {
+            case VolumeChannel.Master: SetMasterVolume(vol); break;
+            case VolumeChannel.Music: SetMusicVolume(vol); break;
+            case VolumeChannel.Ambient: SetAmbientVolume(vol); break;
+            case VolumeChannel.MasterSFX: SetMasterSFXVolume(vol); break;
+            case VolumeChannel.SFX: SetSFXVolume(vol); break;
+            case VolumeChannel.UI: SetUIVolume(vol); break;
+            case VolumeChannel.Voice: SetVoiceVolume(vol); break;
+            default: throw new System.ArgumentOutOfRangeException(nameof(channel), channel, null);
+        }
+    }
+
     private void SetVolume(string param, float vol, Slider slider)
     {
         vol = Mathf.Clamp01(vol);
@@ -206,7 +246,7 @@ public class SoundManager : MonoBehaviour
     private void ApplyVolume(string param, float vol, Slider slider)
     {
         vol = Mathf.Clamp01(vol);
-        if (!m_SoundSettings.AudioMixer.SetFloat(param, ToDecibel(vol)))
+        if (!m_SoundSettings.AudioMixer.SetFloat(param, ToDecibel(vol * DuckFor(param))))
             Debug.LogWarning($"[SoundManager] mixer ไม่มี exposed param '{param}'", this);
 
         if (slider != null) slider.SetValueWithoutNotify(vol);
@@ -218,6 +258,65 @@ public class SoundManager : MonoBehaviour
 
     /// <summary>Global mute (AudioListener) — independent of the mixer volumes.</summary>
     public void SetMute(bool mute) => AudioListener.volume = mute ? 0f : 1f;
+
+    // ── Pause (called by PauseManager) ────────────────────────────────────────
+
+    /// <summary>
+    /// Pause: SFX (pool + loops) and Voice are paused; Music/Ambient duck to m_PauseDuck unless duckMusic is false
+    /// (Settings open, so volume changes are audible). UI SFX keeps playing. Idempotent; resume reverses everything.
+    /// </summary>
+    public void SetPaused(bool paused, bool duckMusic = true)
+    {
+        if (m_Paused != paused)
+        {
+            m_Paused = paused;
+            foreach (var src in m_SfxPool) SetSourcePaused(src, paused);
+            foreach (var src in m_LoopingSfx.Values) SetSourcePaused(src, paused);
+            SetSourcePaused(m_VoiceSrc, paused);
+        }
+
+        DuckTo(paused && duckMusic ? m_PauseDuck : 1f);
+    }
+
+    private static void SetSourcePaused(AudioSource src, bool paused)
+    {
+        if (paused) src.Pause(); else src.UnPause();
+    }
+
+    private float DuckFor(string param) =>
+        param == m_SoundSettings.MusicVolumeName || param == m_SoundSettings.AmbientVolumeName ? m_Duck : 1f;
+
+    private void DuckTo(float target)
+    {
+        if (Mathf.Approximately(target, m_DuckTarget)) return;
+        m_DuckTarget = target;
+
+        if (m_DuckRoutine != null) StopCoroutine(m_DuckRoutine);
+        m_DuckRoutine = StartCoroutine(DoDuck(target));
+    }
+
+    private IEnumerator DoDuck(float target)
+    {
+        float start = m_Duck;
+        for (float t = 0f; t < m_PauseDuckFade; t += Time.unscaledDeltaTime)    // unscaled: runs while paused
+        {
+            m_Duck = Mathf.Lerp(start, target, t / m_PauseDuckFade);
+            ApplyDuckedVolumes();
+            yield return null;
+        }
+
+        m_Duck = target;
+        ApplyDuckedVolumes();
+        m_DuckRoutine = null;
+    }
+
+    // Re-push Music/Ambient with the current duck; user volumes always live in PlayerPrefs (SetVolume writes them).
+    private void ApplyDuckedVolumes()
+    {
+        var s = m_SoundSettings;
+        ApplyVolume(s.MusicVolumeName, GetMusicVolume(), m_SliderMusicVolume);
+        ApplyVolume(s.AmbientVolumeName, GetAmbientVolume(), m_SliderAmbientVolume);
+    }
 
     // ── Fade / Crossfade ──────────────────────────────────────────────────────
 
@@ -295,6 +394,7 @@ public class SoundManager : MonoBehaviour
 
     public void PlaySFX(string id)
     {
+        if (m_Paused) return;       // a paused pool source would be treated as free and clobbered
         var e = Find(m_Sfx, SoundChannel.SFX, id);
         if (e == null) return;
 
@@ -318,7 +418,7 @@ public class SoundManager : MonoBehaviour
 
     public void LoopSFX(string id)
     {
-        if (m_LoopingSfx.ContainsKey(id)) return;   // already playing
+        if (m_Paused || m_LoopingSfx.ContainsKey(id)) return;   // paused, or already playing
         var e = Find(m_Sfx, SoundChannel.SFX, id);
         if (e == null) return;
 
@@ -360,6 +460,7 @@ public class SoundManager : MonoBehaviour
 
     public void PlayVoice(string id)
     {
+        if (m_Paused) return;
         var e = Find(m_Voice, SoundChannel.Voice, id);
         if (e != null) m_VoiceSrc.PlayOneShot(e.clip, e.volume);
     }
