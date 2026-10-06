@@ -18,12 +18,12 @@ public class UIPointerSound : PointerInteractableBase
     // ── Inspector ─────────────────────────────────────────────────────────────
 
     [Header("Pointer Sound IDs")]
-    [SerializeField] private string _onEnterID;
-    [SerializeField] private string _onExitID;
-    [SerializeField] private string _onDownID;
-    [SerializeField] private string _onUpID;
-    [SerializeField] private string _onDragID;
-    [SerializeField] private string _onEndDragID;
+    [SerializeField, SoundId(SoundChannel.SFX)] private string _onEnterID;
+    [SerializeField, SoundId(SoundChannel.SFX)] private string _onExitID;
+    [SerializeField, SoundId(SoundChannel.SFX)] private string _onDownID;
+    [SerializeField, SoundId(SoundChannel.SFX)] private string _onUpID;
+    [SerializeField, SoundId(SoundChannel.SFX)] private string _onDragID;
+    [SerializeField, SoundId(SoundChannel.SFX)] private string _onEndDragID;
 
     [Header("Drag Throttle")]
     [SerializeField, Min(0f)] private float _dragInterval = 0.08f;
@@ -130,6 +130,6 @@ public class UIPointerSound : PointerInteractableBase
     private static void TryPlay(string id)
     {
         if (!string.IsNullOrEmpty(id))
-            ManagerSound.PlayEffect(id);
+            SoundManager.Instance?.PlaySFX(id);
     }
 }

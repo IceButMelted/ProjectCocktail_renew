@@ -1215,41 +1215,14 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1459622315}
-  - component: {fileID: 1459622314}
-  - component: {fileID: 1459622313}
+  - component: {fileID: 1459622316}
   m_Layer: 0
-  m_Name: '[SoundSystem]'
+  m_Name: '[SoundManager]'
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1459622313
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1459622312}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 87911d35fb392d14ba9a7ceeaae4c9bb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RegisterSound
-  soundData: {fileID: 11400000, guid: 9e12c7a2aba2038478434e1bdc8168aa, type: 2}
-  BGMStart: 
---- !u!114 &1459622314
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1459622312}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: edb0f380c539e3845b825b0a65e829c9, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SoundRunner
 --- !u!4 &1459622315
 Transform:
   m_ObjectHideFlags: 0
@@ -1265,6 +1238,29 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1459622316
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1459622312}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 58f9a00a77a7ba24d87d274b8b491784, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::SoundManager
+  m_SoundData: {fileID: 11400000, guid: 9e12c7a2aba2038478434e1bdc8168aa, type: 2}
+  m_SoundSettings: {fileID: 11400000, guid: 99d44bdb1f5eb2445ac7a164c958dca5, type: 2}
+  m_BGMStart: 
+  m_MaxSFXCount: 5
+  m_SliderMasterVolume: {fileID: 0}
+  m_SliderMusicVolume: {fileID: 0}
+  m_SliderAmbientVolume: {fileID: 0}
+  m_SliderMasterSFXVolume: {fileID: 0}
+  m_SliderSFXVolume: {fileID: 0}
+  m_SliderUIVolume: {fileID: 0}
+  m_SliderVoiceVolume: {fileID: 0}
 --- !u!1 &1509839125
 GameObject:
   m_ObjectHideFlags: 0

@@ -324,7 +324,7 @@ namespace Bar410.GameFlow
         private static void TryPlay(string id)
         {
             if (!string.IsNullOrEmpty(id))
-                ManagerSound.PlayEffect(id);
+                SoundManager.Instance?.PlaySFX(id);
         }
     }
 }
