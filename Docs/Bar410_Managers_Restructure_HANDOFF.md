@@ -1,8 +1,11 @@
 # Bar410 · Managers Restructure · HANDOFF
 
-เขียนเมื่อ 2026-10-13 หลังจบ Stage 4b · branch `GameFlow/Managers` (แตกจาก `GameFlow/Main` ที่ `1962402`, **ยังไม่ push**)
+เขียนเมื่อ 2026-10-13 หลังจบ **Stage 7** · branch `GameFlow/Managers` (แตกจาก `GameFlow/Main` ที่ `1962402`, **ยังไม่ push, ไม่มี PR**)
 
-> **อัปเดตหลังเขียน:** Stage 5 (`e61fc99`), Stage 6 (`6621bd2` `754daee` `eb63d71` `e5601e2`) และ **Stage 7 (`be40a89` `01e7e2d` `a931465` `e7bc9ad`)** ทำเสร็จ ตรวจแล้ว และ commit แล้ว (ยังไม่ push) **Stage 7d เปลี่ยนสิ่งที่ผู้เล่นเห็น**: dialogue รอการเสิร์ฟจริงแล้ว (ดู §3 และ §8 ข้อ 10) revert ได้ทีเดียวด้วย `e7bc9ad`
+> **เรื่องที่ต้องรู้ก่อนทำอะไรต่อ (สั้นที่สุด)**
+> 1. Stage 0–7 เสร็จและ commit แล้วทั้งหมด งานที่เหลือคือ Stage 8, 9, (10 optional)
+> 2. **Stage 7d (`e7bc9ad`) เปลี่ยนสิ่งที่ผู้เล่นเห็น**: `.yarn` เรียก `SystemGame` ซึ่งไม่มีใน scene แล้ว ทุก command ของ cocktail เคยล้ม ตอนนี้ทำงาน (dialogue รอการเสิร์ฟจริง) **user ยังไม่ได้เล่นจริง** (§8 ข้อ 1) revert ได้ด้วย commit เดียว
+> 3. ตัวตรวจ `flow_trace` เรียก `onClick.Invoke()` ซึ่งไม่ดู `interactable` เคยพลาด regression ของ 4b จึงมี lever ที่กดจริง (§6.1) ใช้ให้ตรงกับสิ่งที่แก้
 
 เอกสารนี้ให้คนที่รับงานต่อ (หรือ session ใหม่) ทำงานต่อได้โดยไม่ต้องอ่าน chat เดิม อ่านตามลำดับ §1 → §2 → §6 แล้วเริ่มที่ §7
 
@@ -24,25 +27,21 @@
 | working tree | สะอาด ยกเว้น `ProjectSettings/Packages/dev.yarnspinner/Assembly-CSharp-generated.ysls.json` ซึ่ง Yarn สร้างเอง **ไม่ใช่งานของเรา ไม่ต้อง stage** |
 | ตรวจล่าสุด | flow trace (ยกเว้น `cam=` ของ S00 ซึ่ง snippet ถอดออกแล้ว ดู §6.3 ข้อ 14), lock fingerprint, `serve_commit` เหมือน baseline; `garnish_ui`, `customer_yarn` (ยกเว้นส่วน A4 ที่ตั้งใจให้เปลี่ยน), `dialogue_wait` ผ่าน; Yarn contract exit 0; console error 0 |
 
-ตัวเลขเทียบ (wiring dump, scene `New Drag Drop System`)
+ตัวเลขเทียบ (`wiring_dump.snippet.cs`, scene `New Drag Drop System`, นับใต้ `[GameLoop]`)
 
-| | Stage 0 | หลัง 4b |
-|---|---|---|
-| components / MonoBehaviour | 933 / 410 | 916 / 402 |
-| scene ref (ไม่นับ UI built-in) | 246 | 215 |
-| ref ข้าม child | 76 | **65** |
-| Inspector UnityEvent call | 28 | **19** |
-| ref ออกนอก prefab | 1 (`DialogueRunner`) | 1 |
-| script บน `[GameLoop]` root | 10 | 8 |
-| root → Canvas / `[CocktailSystem]` / `[MiniGameSystem]` / CamController | 33 / 16 / 5 / 4 | 29 / 17 / 5 / 4 |
+| | Stage 0 | หลัง 4b | หลัง 5 | หลัง 6 | หลัง 7 |
+|---|---|---|---|---|---|
+| components | 933 | 916 | 885 | 891 | 891 |
+| MonoBehaviour | 410 | 402 | 386 | 389 | 389 |
+| scene ref (ไม่นับ UI built-in) | 246 | 215 | 211 | 207 | 208 |
+| **ref ข้าม child** | **76** | 65 | 61 | 40 | **41** |
+| ref ใน child เดียวกัน | 170 | 150 | 150 | 167 | 167 |
+| Inspector UnityEvent call | 28 | 19 | 19 | 19 | 19 |
+| ref ออกนอก prefab | 1 | 1 | 1 | 1 | 1 (ย้ายจาก Cocktail ไป bridge) |
+| script บน `[GameLoop]` root | 10 | 8 | 8 | 8 | 8 |
 
-หลัง Stage 5 (`wiring_dump.after_stage5.txt`): ref ข้าม child **61** (root → `[MiniGameSystem]` 5 → 1 เพราะปุ่ม cancel ย้ายไปอยู่ใน manager เอง), ref ใน child เดียวกัน 150 เท่าเดิม, scene ref 215 → 211, comps 916 → 885 / MonoBehaviour 402 → 386 (ลบ `BG_BTN` 7 object และ `IngredientButtonUI` ซาก 2 ตัว), UnityEvent 19 เท่าเดิม (UnityEvent ที่ลบเป็นตัวว่าง)
-
-หลัง Stage 6 (`wiring_dump.after_stage6.txt`): ref ข้าม child **40** (76 → 61 → 40: root → `Canvas` 29 → 12 เพราะ Garnish/Serve UI ย้ายออกจาก `Canvas`, root → `[GarnishSystem]` 2), ref ใน child เดียวกัน 150 → 167, scene ref 211 → 207, comps 885 → 891 / MonoBehaviour 386 → 389 (`GarnishManager` + CanvasScaler/GraphicRaycaster ของ `Canvas_Garnish`), UnityEvent 19 เท่าเดิม, script บน root 8 เท่าเดิม `GarnishFlowBridge` 20 slot → 7, `ServeFlowBridge` 7 slot → 5
-
-หลัง Stage 7 (`wiring_dump.after_stage7.txt`): ref ข้าม child 41 (+1: ref `root → TalkToCustomerManager` ที่อยู่นอก `[GameLoop]` แทน ref `[CocktailSystem] → DialogueRunner` เดิม) scene ref 208, `CocktailSystemManager` ไม่มี ref ออกนอก prefab แล้ว (D4/D6 สำเร็จ) ตัวเลขของ Stage 7 วัดที่ฝั่ง `[GameLoop]` ไม่ครบ: NPC อยู่นอกต้นไม้นี้ ดูผลจริงที่ `customer_yarn`
-
-ไฟล์เต็ม: `Docs/baseline/managers/wiring_dump.txt` (Stage 0) และ `wiring_dump.after_stage4b.txt`
+`GarnishFlowBridge` 20 → 7 slot, `ServeFlowBridge` 7 → 5, `MinigameFlowBridge` 8 → 4 `CocktailSystemManager` ไม่มี ref ออกนอก prefab แล้ว (D4/D6) ไฟล์: `wiring_dump.txt` (Stage 0), `wiring_dump.after_stage{4b,5,6,7}.txt`
+ตัวเลขของ Stage 7 ฝั่ง NPC วัดจากต้นไม้ `[GameLoop]` ไม่ได้ (NPC อยู่นอกต้นไม้) ดูผลจริงที่ `customer_yarn`
 
 ---
 
@@ -69,6 +68,7 @@
 | `01e7e2d` | 7b | `TalkToCustomerManager` (ใหม่, บน `NPCs_And_Set`) ถือ NPC lookup + Yarn command `SetEmotion`/`SetLookDirection`/`MoveIn`/`MoveOut` (static, ชื่อเดิม, ผ่าน `Current`); `NPC_Base` เหลือพฤติกรรมของตัวเอง; `SaveLoadManager` ใช้ `Snapshot()`/`Restore()` | static `_registry` + save แตะ property ตรง |
 | `a931465` | 7c | manager เป็นผู้เขียนตัวแปร Yarn คนเดียว ถือ `DialogueRunner`/roster/`CharacterData`; Cocktail ส่ง `OrderScored`/`OrderCleared` + รับ `UsePreferences`; `TalkingWithCustomerBridge` ต่อสองฝั่ง | Cocktail ถือ DialogueRunner + roster + `CharacterData` (ซึ่ง `GetComponent` ได้ null) |
 | `e7bc9ad` | 7d | `wait_for_task`/`Enable_InteractableObject`/`Reset_Variable`/`Can_End_Shift` เป็น static ไม่สนชื่อ object (ชื่อ command เดิม) | `.yarn` เรียก `SystemGame` ซึ่งไม่มีใน scene แล้ว ทุกคำสั่งล้ม `wait_for_task` ไม่เคยรอ |
+| `c3cc94b` `29aa520` `7a34927` `66cf0a3` | docs | บันทึก decision (D9, D11), HANDOFF และ baseline log ของ Stage 6/7 | |
 
 ---
 
@@ -151,8 +151,9 @@
 | placement drag | `placement_drag.snippet.cs` → `placement_drag.txt` | ลากขวด 2 ตัวผ่าน `PointerEventData` + `IngredientHoverDetector` | เหมือนข้างบน |
 | lock fingerprint | `lock_fingerprint.snippet.cs` → `lock_fingerprint.txt` | สถานะ lock ของ 19 object (ขวด 17, shaker, ปุ่ม book) × 9 จุด (ครบทุก writer) | เหมือนข้างบน |
 | wiring dump | `wiring_dump.snippet.cs` | จำนวน ref/UnityEvent/ข้าม child | รันใน Edit mode, ตั้ง `tag` ให้ชื่อไฟล์ |
-| F6 give-up / cancel-direct | `f6_giveup.snippet.cs` → `f6_giveup.after_stage5.txt` (`f6_giveup.txt` = ก่อนแก้) | ปุ่ม `BG_BTN/BTN_Reset`/`BTN_Next` ใน 2.2 แล้วลอง `IngredientAdded()` ต่อ | เหมือนข้างบน |
+| F6 give-up / cancel-direct (**obsolete**: `BG_BTN` ถูกลบแล้ว snippet รันไม่ได้ เก็บเป็นหลักฐาน) | `f6_giveup.snippet.cs` → `f6_giveup.after_stage5.txt` (`f6_giveup.txt` = ก่อนแก้) | ปุ่ม `BG_BTN/BTN_Reset`/`BTN_Next` ใน 2.2 แล้วลอง `IngredientAdded()` ต่อ | เหมือนข้างบน |
 | minigame type resolution | `resolve_priority.snippet.cs` → `resolve_priority.txt` | default / method ของ drink / เลือกเอง (trace อื่นทุกตัวเรียก `SelectShaking` ก่อนจึงไม่ครอบคลุม) | เหมือนข้างบน |
+| ปุ่ม back ของ minigame | `back_button.snippet.cs` → `back_button.txt` | กดปุ่ม `BTN - Cancel Minigame` จริง → 2.1 (drink ถูกเก็บ, shaker ปลด lock) → เข้า 2.2 ซ้ำได้ | เหมือนข้างบน |
 | กดปุ่ม Method จริง | `method_buttons_click.snippet.cs` → `method_buttons_click.txt` | Shake/Stir ด้วย pointer click ผ่าน EventSystem ตอน drink เต็ม (ดู `interactable`) | เหมือนข้างบน; ต้องรันเมื่อย้าย object ใต้ `[CocktailSystem]` |
 | Garnish UI | `garnish_ui.snippet.cs` → `garnish_ui.txt` | tab, glass swap, ice round trip, slot/item/rim, finish/pour gating, remove ice/swap glass หลัง pour, Reset, default ตอนเข้าใหม่, ปุ่ม Serve และตำแหน่ง ด้วย pointer click จริง หา object ด้วยชื่อ | เหมือนข้างบน; `diff` กับ `garnish_ui.txt` ต้องเหมือนทุกไบต์ |
 | customer / Yarn | `customer_yarn.snippet.cs` → `customer_yarn.txt` | คำสั่ง NPC และคำสั่ง cocktail ผ่าน dispatcher จริง, save → load ของ NPC, ตัวแปร Yarn ตอนให้คะแนน (ตั้ง NPC กลับจุดเริ่มก่อน เพราะ chapter dialogue วิ่งก่อนที่ snippet จะหยุดมัน) | เหมือนข้างบน |
@@ -187,6 +188,9 @@
 12. **`Button.onClick.Invoke()` ไม่ดู `interactable`** trace/snippet ที่เรียกแบบนี้พิสูจน์ได้แค่ว่า handler ทำงาน ไม่ใช่ว่าผู้เล่นกดได้ สำหรับปุ่มที่ lock ได้ให้ใช้ `ExecuteEvents.Execute(go, PointerEventData, pointerClickHandler)` (ดู `method_buttons_click.snippet.cs`)
 13. **ย้าย object เข้าใต้ `[CocktailSystem]` ต้องรัน lock fingerprint ซ้ำ** `IngredientButtonGroup` เก็บสมาชิกด้วย `GetComponentsInChildren<IngredientButtonUI>` ตามตำแหน่ง จึงเก็บของที่ย้ายเข้ามาเงียบๆ (4b พลาดตรงนี้: README ระบุว่า fingerprint "เหมือนก่อนแก้" แต่เป็นของ 4a) 4b-fix แก้ด้วยการลบ `IngredientButtonUI` ซากออกจากปุ่ม Shake/Stir ดังนั้นตอนนี้ **ทุก `IngredientButtonUI` ใต้ `[CocktailSystem]` คือสมาชิกที่ถูก lock** ถ้าจะเติม component นี้บนปุ่มที่ไม่ใช่ขวดต้องรู้ว่ามันจะถูก lock ตอน drink เต็ม
 14. **chapter dialogue วิ่งก่อน snippet จะหยุดมัน** ระยะที่มันไปถึง (กล้อง, NPC เดิน/เปลี่ยนหน้า) ขึ้นกับว่า editor ใช้เวลาเข้า Play นานแค่ไหน ตั้งแต่ 7d คำสั่งในบรรทัดแรกๆ ทำงานจริง จึงเห็นผลชัดขึ้น snippet ที่อ่านสถานะที่ dialogue แตะได้ (กล้อง, ตำแหน่ง/หน้า NPC) ต้องตั้งค่ากลับก่อน (`customer_yarn`) หรือไม่เอาค่านั้นมาเทียบ (`flow_trace` S00 ไม่พิมพ์ `cam=`)
+15. **heredoc ใน bash ที่มีข้อความไทย/อัญประกาศปนกันพังได้** (`unexpected EOF while looking for matching`) แก้ไฟล์ด้วยสคริปต์ python ที่เขียนลงไฟล์ด้วย Write tool แล้วค่อยรัน (สคริปต์ที่ใช้ทั้งหมดเป็นแบบ `edit(path, [(old, new), ...])` ที่ assert ว่า `old` มีอยู่) และเก็บ CRLF/LF ของไฟล์เดิม
+16. **Yarn instance command หา target ด้วย `GameObject.Find(ชื่อ)`** `<<cmd Name ...>>` จึงผูกกับชื่อ object ใน scene เปลี่ยนชื่อ object แล้ว command ล้ม (`TargetMissingComponent`) แต่ dialogue **ไม่หยุดทันที** ยังต่อได้ ถ้าจะเพิ่ม/ย้าย command ให้ทำเป็น static (+ รับ target เป็น `string target = ""` ที่ไม่ใช้) แบบ `CocktailSystemManager.Yarn_*` ตรวจด้วย `customer_yarn` (A4) ว่า status เป็น `Succeeded`
+17. **`DialogueRunner.CommandDispatcher` เป็น internal** lever เรียกผ่าน reflection: property `CommandDispatcher` → interface `ICommandDispatcher.DispatchCommand(string, MonoBehaviour)` (explicit implementation) → field `Status` ของ struct ผลลัพธ์ (ดู `customer_yarn.snippet.cs`)
 
 ---
 
@@ -203,13 +207,6 @@
 - F6 (`f6_giveup.txt` ก่อน → `.after_stage5.txt` หลัง): ก่อนแก้ Give-up/Cancel-direct ทิ้ง flow ค้างที่ 2.2; ผมแก้ให้ออกผ่าน HSM แล้ว user สั่งลบ `BG_BTN` ทั้งกลุ่ม (`BTN_Reset`, `BTN_Next`, `BTN_AddIce`: ปิดไว้ทั้ง scene + prefab, ไม่มีอะไรเปิด, 7 object) F6 จึงไม่มีให้เกิดอีกทาง UI เหลือแค่ Shift+B ใน editor ที่ตั้งใจให้ยกเลิกตรง ผู้เล่นรีเซ็ต drink ได้จากปุ่ม Reset ของ Method panel เหมือนเดิม
 - ตัวตรวจทางออกที่เหลือ: `back_button` (กดปุ่ม back จริง → 2.1 → เข้า 2.2 ซ้ำได้, drink ถูกเก็บ, shaker ปลด lock)
 
-ที่วางแผนไว้เดิม (เก็บไว้ดูว่าตัดสินอะไร):
-- **ย้ายเข้า manager**: การเลือก type (`explicit > ShakerContents.RequiredMinigame > _defaultType`, อยู่ใน `MinigameFlowBridge.Resolve`), ปุ่ม cancel 4 ตัว (`_btnCancel[2]` = `BTN - Cancel Minigame` ใน Canvas_ShakingMinigame/Canvas_MixingMinigame, `_btnGiveUp` = `BG_BTN/BTN_Reset`, `_btnCancelDirect` = `BG_BTN/BTN_Next`), `LastOutcome`
-- **single source of truth**: ตอนนี้ "minigame ไหน" อยู่ 3 ที่ (`MinigameState.PendingType`, `ShakerContents.RequiredMinigame`, `_defaultType`) และ `LastOutcome` อยู่ที่ `MinigameState` — Yarn `flow_minigame_type`/`flow_minigame_result`/`flow_minigame` อ่าน/เขียนตรงนี้ (ชื่อห้ามเปลี่ยน)
-- **F6 (ยังไม่ได้ยืนยัน)**: Give-up / Cancel-direct เรียก `CancelMinigame()` โดยไม่ผ่าน HSM → `Cancelled` แค่บันทึก flow ค้างที่ 2.2 และ `ShakerContents.Clear()` ทำให้ `OnShakerCleared` เปิด ingredient ทั้งที่ยังอยู่ 2.2 **ต้องจำลองให้เห็นก่อนแก้** (Play → PrepareDrinks → pour → Shake → รอ `Play` → กด give-up → ดู `flow_step`)
-- **เศษที่ต้องตรวจก่อนลบ**: `MinigameSystemManager._cocktailCamera` เป็น null (`ResetCamera()` เป็น no-op), `OnStartedMinigame`/`OnEndedGame` ไม่มี listener ใน `New Drag Drop System` แต่**ต้องเช็ก `New Cocktail System.unity` และ `Garnish Mockup.unity`** ก่อนลบ field; `Update()` เรียก `ProcessedGame()` ทุกเฟรมแม้ Idle และเตือน "No active minigame" ถ้าไม่มี
-- ตัวตรวจ: flow trace (S03, S04, S08) + ตัวใหม่สำหรับ give-up/cancel-direct + Yarn contract
-
 ### Stage 6 · Garnish Manager (**เสร็จ**, 4 commit)
 
 ที่ทำจริง
@@ -223,17 +220,6 @@
 - `GlassPlacementZone` คงไว้ใต้ `[GarnishSystem]/Garnish_Plate` (D9) ไม่มีใครเรียก (`SetGlass`, static `_occupant`) ถ้าจะลบเป็นการตัดสินใจ design
 - `Bar410DialogueOrderTest` ใช้ `GarnishManager` แล้ว (ต่อ `_garnish` ใน scene แล้ว) ยังไม่ได้รันจริง (ต้องมี dialogue)
 - `IngredientButtonUI._action` ยังมีค่า `SetShaking`/`SetMixing`/`AddIce`/`ResetShaker` ที่ไม่มีใครใช้ (ปุ่ม method มี `MethodPanel` แล้ว) ถ้าจะตัดเป็นงานเล็กแยก
-- ดูข้อ "ที่วางแผนไว้เดิม" ด้านล่างเฉพาะเมื่อต้องรู้ว่าตัดสินอะไรไปจากแผน (ข้อสรุปอยู่ใน §3)
-
-ที่วางแผนไว้เดิม
-- แยก `GarnishManager` + `Canvas_Garnish` ออกจาก `GarnishFlowBridge` (330 บรรทัด, 20 slots): tabs (3 ปุ่ม + 3 panel, ควร reset ที่ `OnEnable`), ice toggle (2 ปุ่ม, `OnEnable` → สถานะ "add"), pour/finish/reset, glass choice; `GarnishChoice` = glass + garnish item + rim (**ไม่รวม ice**)
-- **Serve panel ย้ายเข้า `Canvas_Garnish`** (D2): Garnish ส่ง `ServeClicked`/`RemakeClicked`; การให้คะแนนอยู่ที่ Cocktail แล้ว (4f) ปุ่ม Serve แค่ `ServeDone()`; ตัด `ShakerPanelController._serveUI`
-- **ice (D5, 4e)**: flag อยู่ที่ `CurrentCocktail.AddIce`; Garnish ส่ง `IceToggled(bool)` → `Cocktail.SetIce` → `IceChanged(bool)` กลับ ต้องไม่ยิง `Changed` (`ShakerContents.SetIce` ตั้งใจไม่ยิง กัน UI toggle เด้ง); ตรวจก่อนว่า recipe match ขึ้นกับ `AddIce` ไหม (`UpdateCocktailInShaker` รันตอนเข้า Garnish ก่อนเลือก ice)
-- `PlacedGlassInstance.Current` static → instance ของ Garnish; `DestroyCurrent()` ถูกเรียกจาก `CocktailFlowBridge` 2 จุด (`OnPrepareDrinksEntered`, `OnServeExited`) ย้ายให้ Garnish เป็นเจ้าของ
-- `GlassChoiceGrid`/`GarnishItemChoiceGrid`/`GarnishRimChoiceGrid` ถือ `_garnishBridge` (วงกลมกับ `_glassGrid`) → หา manager ด้วย `GetComponentInParent`, grid ฟัง `PourStarted`
-- `GlassPlacementZone` (บน `[CocktailSystem]/Garnish_Plate`) คงไว้ใต้ Garnish (D9, ยังไม่ยืนยัน) ไม่มี script ใดอ้างถึง
-- เก็บกวาดใน `GarnishFlowBridge`: lambda ปุ่ม ice/tab ไม่ถูก unsubscribe, `_btnAddIce`/`_btnRemoveIce` เรียก `GetComponent` ทุกครั้ง, `OnGarnishExited` ไม่มี null guard
-- ตัวตรวจ: flow trace (S05–S12), lock fingerprint (L7), `serve_commit`, + ตัวใหม่สำหรับ ice round-trip/ปุ่ม tab
 
 ### Stage 7 · TalkToCustomer Manager (**เสร็จ**, 4 commit)
 
@@ -251,15 +237,9 @@
 - `Demo_KeysShortCut` บน `NPCs_And_Set` (R → โหลด scene ใหม่) ยังอยู่ เป็นปุ่ม dev
 - `.yarn` ยังมี `Fix_Camera`/`Reset_Camera`/`Switch_Camera CamController ...` ซึ่งยังเป็น instance command ผูกกับชื่อ object `CamController` (ยังพอดีเพราะชื่อไม่ถูกเปลี่ยน) เป็นของ Stage 8 ให้ทำแบบเดียวกับ 7d
 
-ที่วางแผนไว้เดิม
-- `NPC_Base` ใช้ static `_registry` + Yarn command static (`SetEmotion`, `SetLookDirection`, `MoveIn`, `MoveOut`) → registry แบบ instance, **ชื่อ command เดิม**; ในฉาก NPC 3 ตัว (Walter, Owen, Isla) ใต้ `NPCs_And_Set` (อยู่นอก `[GameLoop]`)
-- `SaveLoadManager.CollectNPCData/ApplyNPCData` ใช้ `FindObjectsByType<NPC_Base>` และแตะ `CurrentWaypointIndex`/`CurrentLookDirection` ตรงๆ → `Snapshot()`/`Restore()`
-- รับ `YarnVariableSync` + `_dialogueRunner` + `_customerRoster` จาก `CocktailSystemManager` (ref เดียวที่ออกนอก prefab); `Cocktail.UsePreferences(ICustomerPreferences)` ผ่าน seam; `OrderScored` เป็น event แบบ **synchronous** (`wait_for_task` รอ `IsScored` — ห้าม defer ข้ามเฟรม)
-- `CharacterData` (legacy) บน `NPCs_And_Set` + `Demo_KeysShortCut` ตัวที่สองอยู่ที่นั่น (live: R → `LoadScene`)
-- roster ขาด Cole, Freya (design data อย่าเดา)
-- ตัวตรวจ: **ต้องทดสอบ save → load จริง** (ยังไม่มีตัวตรวจ), `Bar410DialogueOrderTest` (`[Bar410DialogueOrderTest]`, ContextMenu "Run Order Test") ใช้เสริมได้
-
 ### Stage 8 · Camera Manager + presenter + book
+- **คำสั่งกล้องของ Yarn ผูกชื่อ object**: `Fix_Camera CamController true`, `Reset_Camera CamController`, `Switch_Camera CamController "MainCam"` (36 + 29 + 21 ครั้งใน `.yarn`) เป็น instance command ที่หา `CamController` ด้วยชื่อ ตอนนี้ยังพอดีเพราะชื่อไม่ถูกเปลี่ยน แต่เป็นกับดักเดียวกับ 7d: ทำเป็น static + รับ target ที่ไม่ใช้ (ดู §6.3 ข้อ 16) พร้อม lever ที่เรียกผ่าน dispatcher จริง
+- **ตั้งแต่ 7d chapter dialogue วิ่งจริง** (มันสลับกล้อง, เดิน NPC, ล็อก ingredient ก่อนที่ snippet จะหยุดมัน) ระวังว่าสถานะกล้องตอนเริ่ม Play ไม่คงที่ ใช้เทียบไม่ได้ (§6.3 ข้อ 14)
 - ตอนนี้: `CinimachineCameraSwitcher` (singleton + referenced + Yarn `Switch_Camera`/`Cut_Camera`) + `CameraController` (381 บรรทัด, Yarn `Fix_Camera`/`Reset_Camera`) + camera ID 3 ที่ (`MainCam` ใน `CocktailFlowBridge`, `GranishCam` ใน `GarnishFlowBridge`, `PrepareCam` ใน `CocktailFlowBridge._fullDrinkCameraId`) → ID table เดียว
 - `TalkingWithCustomerBridge` ไม่สลับ camera (ปล่อยให้ Yarn ทำ) — หลังกลับ Talking camera ยังเป็น `GranishCam` ถ้าไม่มี Yarn (baseline S12–S14)
 - `CinimachineCameraSwitcher.ApplyTransition`: comment บอก "disable previous camera" แต่โค้ด `previousVcam.enabled = true` — อย่าแก้โดยไม่ทดสอบ (เปลี่ยน blend)
@@ -277,19 +257,17 @@
 
 ## 8. คำถามที่ยังเปิด / ต้องการคำตอบจาก user
 
-~~1. Level 1 ให้ใครขับ~~ **ตอบแล้ว (D11)**: ปุ่ม/hotkey ตามเดิม
-~~2. D9 `GlassPlacementZone`~~ **ตอบแล้ว**: อยู่กับ Garnish
+ตัดสินแล้ว (ไม่ต้องถามอีก): L1 ขับด้วยปุ่ม/hotkey (D11), `GlassPlacementZone` อยู่ Garnish (D9), ลบ `BG_BTN`, แก้ 4b ด้วยวิธี B, commit Stage 5 เป็น commit เดียว
 
-3. **`Canvas_Cocktail` match 0.5** ตั้งใจเดิมเป็น 0 หรือเปล่า (ผมเปลี่ยนใน 4b) — ยังไม่ได้คำตอบ
-4. **Shell** เป็น `Canvas_Shell` ที่ไม่มี manager ใช่ไหม (default)
-5. **F6** — ยังไม่เคยทดสอบด้วยมือ (Give-up ค้างใน 2.2?) ถ้า user รู้อยู่แล้วบอกได้ จะข้ามขั้นจำลอง
-6. ทดสอบด้วยเมาส์จริงที่ MCP ทำไม่ได้: ลากขวดลง shaker, ลากผลไม้จาก tray, Shift+1/2 hotkey ขอให้ user ลองสั้นๆ หลัง Stage 5/6
-7. ~~commit ได้หรือยัง~~ **ตอบแล้ว: commit เดียว** (Stage 5 + `4b-fix` + ลบ `BG_BTN`) ทำแล้ว
-8. ~~`BG_BTN`~~ **ตอบแล้ว: ลบทิ้ง** (user 2026-10-13) ทั้งใน scene และ prefab
-10. ~~วิธีแก้ regression 4b~~ **ตอบแล้ว: วิธี B** (user 2026-10-13) ลบ `IngredientButtonUI` ซากออกจากปุ่ม Shake/Stir ทำแล้วและตรวจแล้ว
-9. ~~warning `SystemGame doesn't have the correct component`~~ **แก้แล้วใน 7d** (ดู §3)
-10. **ตรวจ 7d ด้วยการเล่นจริง** dialogue ตอนนี้รอการเสิร์ฟที่ `wait_for_task` และบรรทัดแรกของ Day 1 (`Enable_InteractableObject`, `Fix_Camera`, `Switch_Camera`) ทำงานจริง ลองเล่นจากต้นให้ครบหนึ่งรอบเพื่อดูว่าเป็นไปตามที่ writer ออกแบบ ถ้าไม่ตรงให้ revert `e7bc9ad` (ต้นเหตุคือชื่อ object ใน scene ไม่ตรงกับ `.yarn`)
-11. **save ควรเก็บอะไรของ NPC** ตอนนี้เก็บตำแหน่ง/waypoint แต่ไม่เก็บหน้า (emotion) และทิศมอง ต้องให้ user ตัดสิน เพราะต้องปรับทั้ง save format และ restore
+1. **เล่น Day 1 จริงหนึ่งรอบเพื่อตรวจ 7d** dialogue ตอนนี้รอการเสิร์ฟที่ `wait_for_task` และคำสั่งบรรทัดแรก (`Enable_InteractableObject`, `Fix_Camera`, `Switch_Camera`) ทำงานจริง ถ้าไม่ตรงกับที่ writer ออกแบบให้ revert `e7bc9ad` (ต้นเหตุ: ชื่อ object ใน scene ไม่ตรงกับ `.yarn`)
+2. **save ควรเก็บอะไรของ NPC** ตอนนี้เก็บตำแหน่ง/waypoint แต่ไม่เก็บหน้า (emotion) และทิศมอง (`_currentLookDirection` ไม่เคยถูกเซ็ต) ต้องให้ user ตัดสิน เพราะต้องปรับ save format และ restore
+3. **save → load จริงข้าม scene + silent replay** ยังไม่เคยทดสอบ (`customer_yarn` ครอบคลุมแค่ `Collect`/`Apply` ในฉากเดียว) ถ้า Stage 9 จะแตะ `SceneLoaderBridge` ต้องมีตัวตรวจนี้ก่อน
+4. **`Canvas_Cocktail` CanvasScaler match 0.5** ผมเปลี่ยนจาก 0 ใน 4b ตั้งใจเดิมเป็น 0 หรือเปล่า (ยังไม่ได้คำตอบ)
+5. **Shell** (Hub, EndShift, Thx, Transition) เป็น `Canvas_Shell` ที่ไม่มี manager ใช่ไหม (default)
+6. **ลำดับวาดของ `Canvas_Garnish`/`Canvas_Cocktail`** อยู่ก่อน `Canvas` จึงถูก Hub/BookUI/Transition วาดทับ ถ้าเห็นว่า Hub บัง panel ให้ปรับ `sortingOrder`
+7. **ทดสอบด้วยเมาส์จริงที่ MCP ทำไม่ได้**: ลากขวดลง shaker, ลากผลไม้จาก tray, Shift+1/2 hotkey ขอให้ user ลองสั้นๆ
+8. **`CharacterData` (legacy)** บน `NPCs_And_Set` ไม่ถูกใช้แล้ว (roster ต่อไว้) แต่ scene ยังมีข้อมูล ตัดสินตอน Stage 9 ว่าจะลบไหม และ `Demo_KeysShortCut` (R → โหลด scene ใหม่)
+9. **push / เปิด PR** ยังไม่ทำ ตามที่ user สั่ง (branch นำ `GameFlow/Main` อยู่ ~30 commit)
 
 ---
 
