@@ -32,6 +32,9 @@ string On(Transform t) { return t == null ? "missing" : (t.gameObject.activeSelf
 string Panel(string path) { return On(root.transform.Find(path)); }
 var methodPanel = root.GetComponentInChildren<MethodPanel>(true);   // found by type so moving the panel does not change the trace
 UnityEngine.UI.Button Btn(string path) { var t = root.transform.Find(path); return t == null ? null : t.GetComponent<UnityEngine.UI.Button>(); }
+// Serve / Garnish panels are looked up by name so the trace survives moving them between canvases (Stage 6).
+Transform FindDeep(string n) { foreach (var t in root.GetComponentsInChildren<Transform>(true)) if (t.name == n) return t; return null; }
+UnityEngine.UI.Button BtnN(string n) { var t = FindDeep(n); return t == null ? null : t.GetComponent<UnityEngine.UI.Button>(); }
 string Snap(string label) {
   var o = cocktail.Order;
   var gin = root.transform.Find("[CocktailSystem]/Base Spirits/BaseSpirit - Gin");
@@ -58,7 +61,7 @@ string Snap(string label) {
     + " src=" + (src != null ? src.enabled.ToString() : "none")
     + " shaker3D=" + (shaker3D != null ? shaker3D.Interactable.ToString() : "none")
     + " bookBtn=" + (book != null ? book.interactable.ToString() : "none")
-    + " | method=" + On(methodPanel != null ? methodPanel.transform : null) + " serve=" + Panel("Canvas/Panel - Serve") + " garnish=" + Panel("Canvas/Panel - Granish UI")
+    + " | method=" + On(methodPanel != null ? methodPanel.transform : null) + " serve=" + On(FindDeep("Panel - Serve")) + " garnish=" + On(FindDeep("Panel - Granish UI"))
     + " visWS=" + Panel("[CocktailSystem]/CocktailShaker/Canvas - World Space/PanelWS - VisurlCocktail")
     + " book=" + Panel("Canvas/Panel - BookUI") + " postit=" + On(postIt != null ? postIt.transform : null)
     + " | dialogue=" + (runner != null && runner.IsDialogueRunning);
@@ -127,7 +130,7 @@ System.Collections.IEnumerator Run() {
   garnish.TryFinishGarnish();
   yield return Log("S09_serveStep", true);
 
-  Btn("Canvas/Panel - Serve/BTN_Reset (2)")?.onClick.Invoke();
+  BtnN("BTN_Reset (2)")?.onClick.Invoke();
   yield return Log("S10_remakeFromServe", true);
 
   Pour();
@@ -141,7 +144,7 @@ System.Collections.IEnumerator Run() {
   garnish.TryFinishGarnish();
   yield return Log("S11_serveStep_again");
 
-  Btn("Canvas/Panel - Serve/BTN_Serving")?.onClick.Invoke();
+  BtnN("BTN_Serving")?.onClick.Invoke();
   yield return Until(() => cocktail.Order.IsScored, 5f, "order scored");
   yield return Log("S12_served", true);
 

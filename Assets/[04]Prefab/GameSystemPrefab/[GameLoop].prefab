@@ -1088,7 +1088,7 @@ RectTransform:
   m_Children:
   - {fileID: 1558145977210497788}
   - {fileID: 7264998573125753861}
-  m_Father: {fileID: 5659759673118777575}
+  m_Father: {fileID: 3708795020187337970}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -5810,7 +5810,7 @@ RectTransform:
   - {fileID: 3201169949852358447}
   - {fileID: 3878017973097908669}
   - {fileID: 3315903195927260585}
-  m_Father: {fileID: 5659759673118777575}
+  m_Father: {fileID: 3708795020187337970}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
@@ -7825,6 +7825,109 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!1 &4496057840086891621
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3708795020187337970}
+  - component: {fileID: 3230668827514485701}
+  - component: {fileID: 8912492693045257713}
+  - component: {fileID: 5318482933548033379}
+  m_Layer: 0
+  m_Name: Canvas_Garnish
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!224 &3708795020187337970
+RectTransform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4496057840086891621}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 0, y: 0, z: 0}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 3716518868179699833}
+  - {fileID: 9187836199716307180}
+  m_Father: {fileID: 7589327764082641628}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 0, y: 0}
+  m_Pivot: {x: 0, y: 0}
+--- !u!223 &3230668827514485701
+Canvas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4496057840086891621}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_RenderMode: 0
+  m_Camera: {fileID: 0}
+  m_PlaneDistance: 100
+  m_PixelPerfect: 0
+  m_ReceivesEvents: 1
+  m_OverrideSorting: 0
+  m_OverridePixelPerfect: 0
+  m_SortingBucketNormalizedSize: 0
+  m_VertexColorAlwaysGammaSpace: 0
+  m_AdditionalShaderChannelsFlag: 0
+  m_UpdateRectTransformForStandalone: 0
+  m_SortingLayerID: 0
+  m_SortingOrder: 0
+  m_TargetDisplay: 0
+--- !u!114 &8912492693045257713
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4496057840086891621}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0cd44c1031e13a943bb63640046fad76, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.CanvasScaler
+  m_UiScaleMode: 1
+  m_ReferencePixelsPerUnit: 100
+  m_ScaleFactor: 1
+  m_ReferenceResolution: {x: 1920, y: 1080}
+  m_ScreenMatchMode: 0
+  m_MatchWidthOrHeight: 0.5
+  m_PhysicalUnit: 3
+  m_FallbackScreenDPI: 96
+  m_DefaultSpriteDPI: 96
+  m_DynamicPixelsPerUnit: 1
+  m_PresetInfoIsWorld: 0
+--- !u!114 &5318482933548033379
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4496057840086891621}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: dc42784cf147c0c48a680349fa168899, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: UnityEngine.UI::UnityEngine.UI.GraphicRaycaster
+  m_IgnoreReversedGraphics: 1
+  m_BlockingObjects: 0
+  m_BlockingMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
 --- !u!1 &4664985319728921749
 GameObject:
   m_ObjectHideFlags: 0
@@ -8407,6 +8510,39 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
+--- !u!1 &4997203804334677511
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 7589327764082641628}
+  m_Layer: 0
+  m_Name: '[GarnishSystem]'
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &7589327764082641628
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4997203804334677511}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children:
+  - {fileID: 3708795020187337970}
+  - {fileID: 1172353782875719178}
+  m_Father: {fileID: 7943527777282448937}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &5143448140072700822
 GameObject:
   m_ObjectHideFlags: 0
@@ -11121,9 +11257,7 @@ RectTransform:
   - {fileID: 2386931257033122081}
   - {fileID: 4870945455702872730}
   - {fileID: 391915039231812647}
-  - {fileID: 3716518868179699833}
   - {fileID: 5963294022178661111}
-  - {fileID: 9187836199716307180}
   - {fileID: 2556428320250545738}
   - {fileID: 3789021588429336530}
   m_Father: {fileID: 7943527777282448937}
@@ -11497,13 +11631,13 @@ Transform:
   m_GameObject: {fileID: 6809454911659840485}
   serializedVersion: 2
   m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 7.062, y: 0.944, z: 4.769}
+  m_LocalPosition: {x: 7.062, y: 0.944, z: 5.037}
   m_LocalScale: {x: 0.021727225, y: 0.021727225, z: 0.021727225}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 5374072729873305417}
   - {fileID: 638045166168345834}
-  m_Father: {fileID: 4295522173131506398}
+  m_Father: {fileID: 7589327764082641628}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!33 &424216976614305141
 MeshFilter:
@@ -12693,6 +12827,7 @@ Transform:
   - {fileID: 4295522173131506398}
   - {fileID: 7896012762689536445}
   - {fileID: 1528817890915037004}
+  - {fileID: 7589327764082641628}
   - {fileID: 5659759673118777575}
   - {fileID: 867237989182312175}
   m_Father: {fileID: 0}
@@ -16232,7 +16367,6 @@ Transform:
   - {fileID: 7676938259657951967}
   - {fileID: 2873461253897628409}
   - {fileID: 6802185643234053321}
-  - {fileID: 1172353782875719178}
   m_Father: {fileID: 7943527777282448937}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!114 &8872214703517392345

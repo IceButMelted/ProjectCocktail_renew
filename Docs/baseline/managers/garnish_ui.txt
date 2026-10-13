@@ -1,0 +1,29 @@
+# garnish ui behaviour, real pointer clicks
+G0 start | step=TalkingWithCustomer | panels: garnish=off glass=on item=off rim=off serve=off | pour=T finish=T reset=T | ice: add=on/T remove=off/T flag=False | glassGrid=TTTT | glass=none visualIce=- - | canFinish=False
+G1 garnish entered | step=Garnish | panels: garnish=on glass=on item=off rim=off serve=off | pour=T finish=T reset=T | ice: add=on/T remove=off/T flag=False | glassGrid=TTTT | glass=none visualIce=- - | canFinish=False
+G2a tab item | step=Garnish | panels: garnish=on glass=off item=on rim=off serve=off | pour=T finish=T reset=T | ice: add=on/T remove=off/T flag=False | glassGrid=TTTT | glass=none visualIce=- - | canFinish=False
+G2b tab rim | step=Garnish | panels: garnish=on glass=off item=off rim=on serve=off | pour=T finish=T reset=T | ice: add=on/T remove=off/T flag=False | glassGrid=TTTT | glass=none visualIce=- - | canFinish=False
+G2c tab glass | step=Garnish | panels: garnish=on glass=on item=off rim=off serve=off | pour=T finish=T reset=T | ice: add=on/T remove=off/T flag=False | glassGrid=TTTT | glass=none visualIce=- - | canFinish=False
+G3a glass HiBall | step=Garnish | panels: garnish=on glass=on item=off rim=off serve=off | pour=T finish=T reset=T | ice: add=on/T remove=off/T flag=False | glassGrid=TTTT | glass=Hi-Ball visualIce=False slot0=Square slot1=Square rim=Square | canFinish=False
+G3b glass Martini (swap) | step=Garnish | panels: garnish=on glass=on item=off rim=off serve=off | pour=T finish=T reset=T | ice: add=on/T remove=off/T flag=False | glassGrid=TTTT | glass=Martini visualIce=False slot0=Square slot1=Square rim=Square | canFinish=False
+G4a ice added | step=Garnish | panels: garnish=on glass=on item=off rim=off serve=off | pour=T finish=T reset=T | ice: add=off/T remove=on/T flag=True | glassGrid=TTTT | glass=Martini visualIce=True slot0=Square slot1=Square rim=Square | canFinish=False
+G4b ice removed | step=Garnish | panels: garnish=on glass=on item=off rim=off serve=off | pour=T finish=T reset=T | ice: add=on/T remove=off/T flag=False | glassGrid=TTTT | glass=Martini visualIce=False slot0=Square slot1=Square rim=Square | canFinish=False
+G4c ice added again | step=Garnish | panels: garnish=on glass=on item=off rim=off serve=off | pour=T finish=T reset=T | ice: add=off/T remove=on/T flag=True | glassGrid=TTTT | glass=Martini visualIce=True slot0=Square slot1=Square rim=Square | canFinish=False
+   garnish slot buttons on glass: 2
+G5a item on slot 1 | step=Garnish | panels: garnish=on glass=off item=on rim=off serve=off | pour=T finish=T reset=T | ice: add=off/T remove=on/T flag=True | glassGrid=TTTT | glass=Martini visualIce=True slot0=Square slot1=PalleteMap_4 rim=Square | canFinish=False
+G5b rim | step=Garnish | panels: garnish=on glass=off item=off rim=on serve=off | pour=T finish=T reset=T | ice: add=off/T remove=on/T flag=True | glassGrid=TTTT | glass=Martini visualIce=True slot0=Square slot1=PalleteMap_4 rim=PalleteMap_60 | canFinish=False
+G6 finish before pour (refused) | step=Garnish | panels: garnish=on glass=on item=off rim=off serve=off | pour=T finish=T reset=T | ice: add=off/T remove=on/T flag=True | glassGrid=TTTT | glass=Martini visualIce=True slot0=Square slot1=PalleteMap_4 rim=PalleteMap_60 | canFinish=False
+G7a pour pressed | step=Garnish | panels: garnish=on glass=on item=off rim=off serve=off | pour=F finish=T reset=T | ice: add=off/T remove=on/F flag=True | glassGrid=FFFF | glass=Martini visualIce=True slot0=Square slot1=PalleteMap_4 rim=PalleteMap_60 | canFinish=False
+G7b pour finished | step=Garnish | panels: garnish=on glass=on item=off rim=off serve=off | pour=F finish=T reset=T | ice: add=off/T remove=on/F flag=True | glassGrid=FFFF | glass=Martini visualIce=True slot0=Square slot1=PalleteMap_4 rim=PalleteMap_60 | canFinish=True
+G7c remove ice after pour (refused) | step=Garnish | panels: garnish=on glass=on item=off rim=off serve=off | pour=F finish=T reset=T | ice: add=off/T remove=on/F flag=True | glassGrid=FFFF | glass=Martini visualIce=True slot0=Square slot1=PalleteMap_4 rim=PalleteMap_60 | canFinish=True
+G7d swap glass after pour (refused) | step=Garnish | panels: garnish=on glass=on item=off rim=off serve=off | pour=F finish=T reset=T | ice: add=off/T remove=on/F flag=True | glassGrid=FFFF | glass=Martini visualIce=True slot0=Square slot1=PalleteMap_4 rim=PalleteMap_60 | canFinish=True
+G8 reset pressed | step=AddIngredient | panels: garnish=off glass=on item=off rim=off serve=off | pour=F finish=T reset=T | ice: add=on/T remove=off/T flag=False | glassGrid=FFFF | glass=none visualIce=- - | canFinish=True
+G9 garnish re-entered | step=Garnish | panels: garnish=on glass=on item=off rim=off serve=off | pour=T finish=T reset=T | ice: add=on/T remove=off/T flag=False | glassGrid=TTTT | glass=none visualIce=- - | canFinish=False
+G10 finish pressed | step=Serve | panels: garnish=off glass=on item=off rim=off serve=on | pour=F finish=T reset=T | ice: add=on/T remove=off/T flag=False | glassGrid=FFFF | glass=Hi-Ball visualIce=False slot0=Square slot1=Square rim=Square | canFinish=True
+   serve button positions: serving=(772.6, 567.0, 0.0) remake=(772.6, 468.4, 0.0)
+G11 remake from serve | step=AddIngredient | panels: garnish=off glass=on item=off rim=off serve=off | pour=F finish=T reset=T | ice: add=on/T remove=off/T flag=False | glassGrid=FFFF | glass=none visualIce=- - | canFinish=True
+console: errors=0 warnings=3
+  warning: [CocktailFlowBridge] Leaving the conversation with no order placed — the .yarn node should call an Order_Cocktail_* function.
+  warning: [SoundManager] ไม่พบ SFX id 'Remove_Ice' ใน SoundData
+  warning: [GarnishFlowBridge] Nothing has been poured yet — pour before finishing.
+DONE

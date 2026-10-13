@@ -21,6 +21,8 @@ var outPath = System.IO.Path.GetFullPath(System.IO.Path.Combine(Application.data
 System.IO.File.WriteAllText(outPath, "# serve scoring check: what each way of leaving step 4 commits to Yarn\n");
 void Line(string s) { System.IO.File.AppendAllText(outPath, s + "\n"); }
 UnityEngine.UI.Button Btn(string path) { var t = root.transform.Find(path); return t == null ? null : t.GetComponent<UnityEngine.UI.Button>(); }
+// Serve buttons are looked up by name so the lever survives moving the panel between canvases (Stage 6).
+UnityEngine.UI.Button BtnN(string n) { foreach (var t2 in root.GetComponentsInChildren<Transform>(true)) if (t2.name == n) return t2.GetComponent<UnityEngine.UI.Button>(); return null; }
 string State(string label) {
   bool done; float sat, type;
   runner.VariableStorage.TryGetValue("$task_done", out done);
@@ -74,11 +76,11 @@ System.Collections.IEnumerator Run() {
   runner.VariableStorage.SetValue("$task_done", false);
   yield return ToServe();
   Line(State("B  at Serve"));
-  Btn("Canvas/Panel - Serve/BTN_Reset (2)")?.onClick.Invoke();
+  BtnN("BTN_Reset (2)")?.onClick.Invoke();
   yield return null; yield return null;
   Line(State("B1 after remake from Serve"));
   yield return ToServe();
-  Btn("Canvas/Panel - Serve/BTN_Serving")?.onClick.Invoke();
+  BtnN("BTN_Serving")?.onClick.Invoke();
   yield return null; yield return null;
   Line(State("B2 after the Serve button"));
   Line("DONE");
