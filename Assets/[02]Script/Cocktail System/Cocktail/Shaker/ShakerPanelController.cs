@@ -4,7 +4,7 @@
 //
 //  Split out of CocktailShaker, which was an interactable AND a panel
 //  state machine. The HSM cares: each flow state decides what the
-//  player may do, and CocktailFlowBridge (plan §6.2) drives these
+//  player may do, and FlowWiring (plan §6.2) drives these
 //  flags on state entry, not whichever button fired last.
 // ============================================================
 

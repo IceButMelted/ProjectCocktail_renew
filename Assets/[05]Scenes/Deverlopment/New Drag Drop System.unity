@@ -6800,24 +6800,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 514287613874400007}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1322866041647825757
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7365518877833284460}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f264c3edd917d8b4ebe1b3519bcbc408, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Bar410.GameFlow.TalkingWithCustomerBridge
-  _gameLoop: {fileID: 0}
-  _ingredients: {fileID: 6049133883410967789}
-  _cameras: {fileID: 1321084322}
-  _bookUI: {fileID: 1405869133}
-  _cocktail: {fileID: 8872214704051886353}
-  _customers: {fileID: 9194944203317526871}
 --- !u!114 &1332642415283588300
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18784,8 +18766,6 @@ GameObject:
   - component: {fileID: 7943527777821137633}
   - component: {fileID: 5740347442567854999}
   - component: {fileID: 7227755909219274211}
-  - component: {fileID: 7947671018981094586}
-  - component: {fileID: 1322866041647825757}
   - component: {fileID: 7947671018981094587}
   m_Layer: 0
   m_Name: '[GameLoop]'
@@ -19759,31 +19739,6 @@ Transform:
   - {fileID: 539247817}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &7947671018981094586
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7365518877833284460}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a221c21443ec1c96e9dca03c5f1e5120, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Bar410.GameFlow.CocktailFlowBridge
-  _gameLoop: {fileID: 5740347442567854999}
-  _commands: {fileID: 7227755909219274211}
-  _cocktail: {fileID: 8872214704051886353}
-  _shakerContents: {fileID: 4080245900655418650}
-  _shakerPanels: {fileID: 8588145332230479579}
-  _ingredients: {fileID: 6049133883410967789}
-  _visualCocktail: {fileID: 974337863640375313}
-  _driveIngredientButtons: 1
-  _cameras: {fileID: 1321084322}
-  _bookUI: {fileID: 1405869133}
-  _postIt: {fileID: 2023415601206712225}
-  _btnBook: {fileID: 653714615255478872}
-  _methodPanel: {fileID: 9061270629617664791}
 --- !u!114 &7947671018981094587
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -19799,9 +19754,15 @@ MonoBehaviour:
   _cocktail: {fileID: 8872214704051886353}
   _minigames: {fileID: 7437440570615746227}
   _garnish: {fileID: 536261336}
+  _customers: {fileID: 9194944203317526871}
   _cameras: {fileID: 1321084322}
   _shakerContents: {fileID: 4080245900655418650}
+  _shakerPanels: {fileID: 8588145332230479579}
   _ingredients: {fileID: 6049133883410967789}
+  _visualCocktail: {fileID: 974337863640375313}
+  _methodPanel: {fileID: 9061270629617664791}
+  _bookUI: {fileID: 1405869133}
+  _btnBook: {fileID: 653714615255478872}
   _postIt: {fileID: 2023415601206712225}
 --- !u!1 &7950363188708236408
 GameObject:

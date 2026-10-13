@@ -12855,9 +12855,7 @@ GameObject:
   - component: {fileID: 2166370490895119538}
   - component: {fileID: 5740347443106578271}
   - component: {fileID: 7227755909753768235}
-  - component: {fileID: 7947671018446565490}
   - component: {fileID: 173320216533135447}
-  - component: {fileID: 1322866041113331605}
   - component: {fileID: 5400002024741991438}
   m_Layer: 0
   m_Name: '[GameLoop]'
@@ -12927,31 +12925,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Bar410.GameFlow.GameFlowCommands
   _gameLoop: {fileID: 5740347443106578271}
---- !u!114 &7947671018446565490
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7365518877294038948}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: a221c21443ec1c96e9dca03c5f1e5120, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Bar410.GameFlow.CocktailFlowBridge
-  _gameLoop: {fileID: 5740347443106578271}
-  _commands: {fileID: 7227755909753768235}
-  _cocktail: {fileID: 8872214703517392345}
-  _shakerContents: {fileID: 4080245901194107346}
-  _shakerPanels: {fileID: 8588145331695426067}
-  _ingredients: {fileID: 6049133883945461797}
-  _visualCocktail: {fileID: 974337863101129945}
-  _driveIngredientButtons: 1
-  _cameras: {fileID: 5386111175212639213}
-  _bookUI: {fileID: 7933774315266148633}
-  _postIt: {fileID: 2023415601741730665}
-  _btnBook: {fileID: 0}
-  _methodPanel: {fileID: 6185912478383533967}
 --- !u!114 &173320216533135447
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -12979,24 +12952,6 @@ MonoBehaviour:
           m_StringArgument: 
           m_BoolArgument: 0
         m_CallState: 2
---- !u!114 &1322866041113331605
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7365518877294038948}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f264c3edd917d8b4ebe1b3519bcbc408, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Bar410.GameFlow.TalkingWithCustomerBridge
-  _gameLoop: {fileID: 0}
-  _ingredients: {fileID: 6049133883945461797}
-  _cameras: {fileID: 5386111175212639213}
-  _bookUI: {fileID: 7933774315266148633}
-  _cocktail: {fileID: 0}
-  _customers: {fileID: 0}
 --- !u!114 &5400002024741991438
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13012,9 +12967,15 @@ MonoBehaviour:
   _cocktail: {fileID: 8872214703517392345}
   _minigames: {fileID: 7437440570077022843}
   _garnish: {fileID: 671426686590414340}
+  _customers: {fileID: 0}
   _cameras: {fileID: 5386111175212639213}
   _shakerContents: {fileID: 4080245901194107346}
+  _shakerPanels: {fileID: 8588145331695426067}
   _ingredients: {fileID: 6049133883945461797}
+  _visualCocktail: {fileID: 974337863101129945}
+  _methodPanel: {fileID: 6185912478383533967}
+  _bookUI: {fileID: 7933774315266148633}
+  _btnBook: {fileID: 0}
   _postIt: {fileID: 2023415601741730665}
 --- !u!1 &7437655887941705277
 GameObject:
