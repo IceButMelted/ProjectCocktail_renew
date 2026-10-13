@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace Bar410.GameFlow
 {
@@ -7,9 +6,10 @@ namespace Bar410.GameFlow
 
     /// <summary>
     /// The only place ServeState touches scene objects — companion to CocktailFlowBridge/
-    /// GarnishFlowBridge/TalkingWithCustomerBridge. Owns the Serve panel and its two
-    /// buttons: BTN_Serving (hand the drink over) and the remake button (backtrack to
-    /// Prepare Drinks with the drink unfinished).
+    /// GarnishFlowBridge/TalkingWithCustomerBridge. The Serve panel and its two buttons belong to
+    /// <see cref="GarnishManager"/>; this bridge opens and closes the panel with step 4 and turns
+    /// the two button events into flow commands: serve (hand the drink over) and remake
+    /// (backtrack to Prepare Drinks with the drink unfinished).
     /// </summary>
     [RequireComponent(typeof(GameLoopFSM))]
     public class ServeFlowBridge : MonoBehaviour
@@ -18,14 +18,10 @@ namespace Bar410.GameFlow
         [SerializeField] private GameLoopFSM _gameLoop;
         [SerializeField] private GameFlowCommands _commands;
 
-        [Header("Cocktail Scene Objects")]
+        [Header("Scene Objects")]
+        [SerializeField] private GarnishManager _garnish;
         [SerializeField] private CocktailSystemManager _cocktail;
         [SerializeField] private Post_It_Order _postIt;
-
-        [Header("UI")]
-        [SerializeField] private GameObject _panelServe;
-        [SerializeField] private Button _btnServe;
-        [SerializeField] private Button _btnRemake;
 
         private void Awake()
         {
@@ -36,14 +32,20 @@ namespace Bar410.GameFlow
             serve.Entered += OnEntered;
             serve.Exited += OnExited;
 
-            if (_btnServe != null) _btnServe.onClick.AddListener(OnServeClicked);
-            if (_btnRemake != null) _btnRemake.onClick.AddListener(OnRemakeClicked);
+            if (_garnish != null)
+            {
+                _garnish.ServeRequested += OnServeRequested;
+                _garnish.RemakeRequested += OnRemakeRequested;
+            }
         }
 
         private void OnDestroy()
         {
-            if (_btnServe != null) _btnServe.onClick.RemoveListener(OnServeClicked);
-            if (_btnRemake != null) _btnRemake.onClick.RemoveListener(OnRemakeClicked);
+            if (_garnish != null)
+            {
+                _garnish.ServeRequested -= OnServeRequested;
+                _garnish.RemakeRequested -= OnRemakeRequested;
+            }
 
             if (_gameLoop == null || _gameLoop.OpenBar == null) return;
 
@@ -52,20 +54,20 @@ namespace Bar410.GameFlow
             serve.Exited -= OnExited;
         }
 
-        private void OnEntered() => _panelServe?.SetActive(true);
+        private void OnEntered() => _garnish?.OpenServe();
 
         private void OnExited()
         {
-            _panelServe?.SetActive(false);
+            _garnish?.CloseServe();
             _postIt?.Out();
         }
 
         // Scoring is not done here: leaving Serve for the conversation scores the drink
         // (CocktailFlowBridge.OnOpenBarTransition), so every way of finishing the step commits
         // the same result.
-        private void OnServeClicked() => _commands?.ServeDone();
+        private void OnServeRequested() => _commands?.ServeDone();
 
-        private void OnRemakeClicked()
+        private void OnRemakeRequested()
         {
             _cocktail?.ResetCocktail();
             _commands?.RemakeDrink();

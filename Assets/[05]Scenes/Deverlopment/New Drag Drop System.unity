@@ -1019,6 +1019,9 @@ MonoBehaviour:
   _btnReset: {fileID: 7096965408994840909}
   _btnAddIce: {fileID: 6545920609835826682}
   _btnRemoveIce: {fileID: 5089860153755036676}
+  _panelServe: {fileID: 761406268844529709}
+  _btnServe: {fileID: 122723922422168188}
+  _btnRemake: {fileID: 8292760064707384551}
   _sfxAddIce: Add_Ice
   _sfxRemoveIce: Remove_Ice
 --- !u!1 &538860978
@@ -19785,7 +19788,6 @@ MonoBehaviour:
   _prepareDrinksCameraId: MainCam
   _bookUI: {fileID: 1405869133}
   _postIt: {fileID: 2023415601206712225}
-  _panelServe: {fileID: 761406268844529709}
   _fullDrinkCameraId: PrepareCam
   _btnBook: {fileID: 653714615255478872}
   _methodPanel: {fileID: 9061270629617664791}
@@ -20058,11 +20060,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Bar410.GameFlow.ServeFlowBridge
   _gameLoop: {fileID: 0}
   _commands: {fileID: 0}
+  _garnish: {fileID: 536261336}
   _cocktail: {fileID: 8872214704051886353}
   _postIt: {fileID: 2023415601206712225}
-  _panelServe: {fileID: 761406268844529709}
-  _btnServe: {fileID: 122723922422168188}
-  _btnRemake: {fileID: 8292760064707384551}
 --- !u!224 &8092587686482396379
 RectTransform:
   m_ObjectHideFlags: 0
@@ -21040,12 +21040,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ShakerPanelController
   _methodUI: {fileID: 6354495852764008708}
-  _serveUI: {fileID: 761406268844529709}
   _addIceUI: {fileID: 0}
   _shakerContents: {fileID: 4080245900655418650}
   _canShowMethodUI: 1
   _canShowAddIceUI: 0
-  _canShowServeUI: 0
 --- !u!222 &8644879517990181407
 CanvasRenderer:
   m_ObjectHideFlags: 0

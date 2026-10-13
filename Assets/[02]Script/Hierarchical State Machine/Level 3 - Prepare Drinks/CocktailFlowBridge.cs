@@ -43,9 +43,6 @@ namespace Bar410.GameFlow
         [SerializeField] private BookUI_V2 _bookUI;
         [SerializeField] private Post_It_Order _postIt;
 
-        [Tooltip("Hidden defensively on AddIngredient entry — Serve is also always closed by ServeFlowBridge on its own Exit.")]
-        [SerializeField] private GameObject _panelServe;
-
         [Header("Shaker events (were Inspector UnityEvents on ShakerContents)")]
         [Tooltip("Camera that frames the shaker once the drink is full and the method panel opens.")]
         [SerializeField] private string _fullDrinkCameraId = "PrepareCam";
@@ -197,10 +194,6 @@ namespace Bar410.GameFlow
             // (fresh PrepareDrinks entry already cleared it via OnPrepareDrinksEntered above).
             if (_shakerPanels != null) _shakerPanels.ShowMethod();
             if (_visualCocktail != null) _visualCocktail.UpdateCocktailBars();
-
-            // Defensive — ServeFlowBridge already closes this on its own Serve.Exited, but a
-            // stray Serve panel left open by any other path would strand the player mid-pour.
-            _panelServe?.SetActive(false);
         }
 
         private void OnAddIngredientExited()

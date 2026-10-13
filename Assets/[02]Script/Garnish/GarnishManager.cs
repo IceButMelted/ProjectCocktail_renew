@@ -44,6 +44,12 @@ public class GarnishManager : MonoBehaviour
     [SerializeField] private Button _btnAddIce;
     [SerializeField] private Button _btnRemoveIce;
 
+    [Header("Serve panel (step 4)")]
+    [Tooltip("The hand-over panel. It lives on this canvas because the glass it serves sits on this plate.")]
+    [SerializeField] private GameObject _panelServe;
+    [SerializeField] private Button _btnServe;
+    [SerializeField] private Button _btnRemake;
+
     [Header("SFX")]
     [SerializeField] private string _sfxAddIce = "Add_Ice";
     [SerializeField] private string _sfxRemoveIce = "Remove_Ice";
@@ -67,6 +73,12 @@ public class GarnishManager : MonoBehaviour
 
     /// <summary>The player pressed reset: throw the drink away and start it again.</summary>
     public event Action ResetRequested;
+
+    /// <summary>The serve button was pressed: the drink is handed over.</summary>
+    public event Action ServeRequested;
+
+    /// <summary>The remake button on the serve panel was pressed: back to preparing the drink.</summary>
+    public event Action RemakeRequested;
 
     // ── State ──────────────────────────────────────────────
 
@@ -99,6 +111,8 @@ public class GarnishManager : MonoBehaviour
         Listen(_btnReset, OnResetClicked);
         Listen(_btnAddIce, OnAddIceClicked);
         Listen(_btnRemoveIce, OnRemoveIceClicked);
+        Listen(_btnServe, OnServeClicked);
+        Listen(_btnRemake, OnRemakeClicked);
     }
 
     private void OnDisable()
@@ -111,6 +125,8 @@ public class GarnishManager : MonoBehaviour
         Unlisten(_btnReset, OnResetClicked);
         Unlisten(_btnAddIce, OnAddIceClicked);
         Unlisten(_btnRemoveIce, OnRemoveIceClicked);
+        Unlisten(_btnServe, OnServeClicked);
+        Unlisten(_btnRemake, OnRemakeClicked);
     }
 
     private void OnDestroy()
@@ -315,6 +331,21 @@ public class GarnishManager : MonoBehaviour
     }
 
     private void OnResetClicked() => ResetRequested?.Invoke();
+
+    // ── Serve panel ────────────────────────────────────────
+
+    public void OpenServe()
+    {
+        if (_panelServe != null) _panelServe.SetActive(true);
+    }
+
+    public void CloseServe()
+    {
+        if (_panelServe != null) _panelServe.SetActive(false);
+    }
+
+    private void OnServeClicked() => ServeRequested?.Invoke();
+    private void OnRemakeClicked() => RemakeRequested?.Invoke();
 
     private static void TryPlay(string id)
     {

@@ -14,7 +14,6 @@ public class ShakerPanelController : MonoBehaviour
 {
     [Header("UI Panels")]
     [SerializeField] private GameObject _methodUI;
-    [SerializeField] private GameObject _serveUI;
     [SerializeField] private GameObject _addIceUI;
 
     [Tooltip("Optional. When set, ShowMethod() stays closed while the shaker is empty — " +
@@ -25,32 +24,22 @@ public class ShakerPanelController : MonoBehaviour
     [Header("Initial Permissions")]
     [SerializeField] private bool _canShowMethodUI = true;
     [SerializeField] private bool _canShowAddIceUI = false;
-    [SerializeField] private bool _canShowServeUI = false;
 
     /// <summary>
     /// Seeds panel refs when created at runtime by the CocktailShaker compatibility
     /// shim. Assign in the Inspector after migrating.
     /// </summary>
-    public void Initialize(GameObject methodUI, GameObject addIceUI, GameObject serveUI)
+    public void Initialize(GameObject methodUI, GameObject addIceUI)
     {
         if (_methodUI == null) _methodUI = methodUI;
         if (_addIceUI == null) _addIceUI = addIceUI;
-        if (_serveUI == null) _serveUI = serveUI;
     }
 
     public bool CanShowMethodUI => _canShowMethodUI;
     public bool CanShowAddIceUI => _canShowAddIceUI;
-    public bool CanShowServeUI => _canShowServeUI;
 
     public void SetCanShowMethodUI(bool allowed) => _canShowMethodUI = allowed;
     public void SetCanShowAddIceUI(bool allowed) => _canShowAddIceUI = allowed;
-    public void SetCanShowServeUI(bool allowed) => _canShowServeUI = allowed;
-
-    /// <summary>Show or hide the serve panel outright.</summary>
-    public void SetActiveServe(bool active)
-    {
-        if (_serveUI != null) _serveUI.gameObject.SetActive(active);
-    }
 
     /// <summary>Shows the method panel, but only while step 2.1 is actually allowed to display it.</summary>
     public void ShowMethod()
@@ -70,7 +59,6 @@ public class ShakerPanelController : MonoBehaviour
     {
         if (_canShowMethodUI && _methodUI != null) _methodUI.gameObject.SetActive(!_methodUI.gameObject.activeSelf);
         if (_canShowAddIceUI && _addIceUI != null) _addIceUI.gameObject.SetActive(!_addIceUI.gameObject.activeSelf);
-        if (_canShowServeUI && _serveUI != null) _serveUI.gameObject.SetActive(!_serveUI.gameObject.activeSelf);
     }
 
     
@@ -80,7 +68,6 @@ public class ShakerPanelController : MonoBehaviour
     {
         _canShowMethodUI = true;
         _canShowAddIceUI = false;
-        _canShowServeUI = false;
     }
 
     /// <summary>Locks every panel. Used when the flow leaves the drink-building steps.</summary>
@@ -88,6 +75,5 @@ public class ShakerPanelController : MonoBehaviour
     {
         _canShowMethodUI = false;
         _canShowAddIceUI = false;
-        _canShowServeUI = false;
     }
 }
