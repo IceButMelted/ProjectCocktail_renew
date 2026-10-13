@@ -1,6 +1,6 @@
 using UnityEngine;
 
-public class AnimationEvent : MonoBehaviour
+public class AnimationEventCocktail : MonoBehaviour
 {
     public void PlaySound(string IdSFX) {
         if (IdSFX != null || IdSFX == string.Empty)
