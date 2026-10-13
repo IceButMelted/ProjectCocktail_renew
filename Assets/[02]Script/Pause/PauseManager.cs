@@ -176,7 +176,7 @@ public class PauseManager : MonoBehaviour
 
         m_Preloading = false;
         Apply();
-    }
+    }  
 
     private static bool EscapePressed()
     {
