@@ -152,6 +152,14 @@ namespace YarnSpinner.Custom
             return YarnTask.CompletedTask;
         }
 
+        // The box is hidden by fading it out, from several places here and in Yarn's own effects.
+        // An invisible box must not catch clicks meant for the bar behind it, so the two are tied
+        // together in this one spot instead of at every fade.
+        private void LateUpdate()
+        {
+            if (canvasGroup != null) canvasGroup.blocksRaycasts = canvasGroup.alpha > 0f;
+        }
+
         private void Awake()
         {
             if (characterNameContainer == null && characterNameText != null)
