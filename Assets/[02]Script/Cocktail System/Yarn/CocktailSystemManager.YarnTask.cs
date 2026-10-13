@@ -56,7 +56,7 @@ public partial class CocktailSystemManager
         EnableButtonInYarn(false);
         OrderScored?.Invoke(Order);
 
-        if (_postItOrder != null) _postItOrder.SetOutScreen(true);
+        if (_postItOrder != null) _postItOrder.ClearOrder();
     }
 
     /// <summary>Scores what is in the shaker, then publishes the result. Entry point from ServeDrink().</summary>
@@ -89,8 +89,6 @@ public partial class CocktailSystemManager
     /// </summary>
     public IEnumerator WaitForTask()
     {
-        //if (_postItOrder != null) _postItOrder.ShowPostItForDefaultDuration();
-        //if (_postItOrder != null) _postItOrder.ShowPostIt(); //in Gameloop Wire
         if (SceneLoaderBridge.IsSilentReplay) yield break;
 
         IsWaitingForTask = true;

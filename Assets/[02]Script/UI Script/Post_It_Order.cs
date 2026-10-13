@@ -1,143 +1,254 @@
-﻿using System.Collections;
+// ============================================================
+//  Post_It_Order.cs — The order note (Panel - OrderDirnks).
+//
+//  When an order is placed the note pops open: it grows out of its
+//  corner, then the text fades in. After a moment it folds away and
+//  a small button takes its place. Pressing the button unfolds the
+//  note again; pressing the note folds it back.
+//
+//  The button only exists while the player is making the drink
+//  (SetAvailable, driven by FlowWiring). The pop-up at order time
+//  shows regardless, since the order is placed during the talk.
+//
+//  It sits in the top-right corner, and moves to the top-left for
+//  the steps whose own UI fills the right of the screen (SetSide).
+// ============================================================
+
+using System.Collections;
 using TMPro;
 using UnityEngine;
-using Yarn.Unity;
-using YarnSpinner.Custom;
+using UnityEngine.UI;
 
 public class Post_It_Order : MonoBehaviour
 {
     [SerializeField] TextMeshProUGUI OrderText;
-    [SerializeField] BubblePresenter presenter;
 
-    [SerializeField] private Animator animator;
+    [Header("Parts")]
+    [Tooltip("The full note. Grows from, and folds back into, its pivot corner.")]
+    [SerializeField] private RectTransform _panel;
+
+    [Tooltip("On the note: pressing it folds the note into the button.")]
+    [SerializeField] private Button _btnClose;
+
+    [Tooltip("The folded note. Pressing it unfolds the note.")]
+    [SerializeField] private Button _btnOpen;
+
+    [Header("Timing")]
+    [Tooltip("Seconds the note stays open after an order pops it up.")]
     [SerializeField] private float autoHideDuration = 3f;
+    [SerializeField] private float _scaleDuration = 0.25f;
+    [SerializeField] private float _textFadeDuration = 0.2f;
 
-    [Tooltip("The button on the post-it that opens and closes it.")]
-    [SerializeField] private UnityEngine.UI.Button _btnToggle;
+    private enum Shape { Hidden, Button, Panel }
 
-
-    private bool _isPostItVisible = false;
-    private bool _isOutScreen = true;
-    private Coroutine _autoHideCoroutine;
-
-    public bool IsPostItVisible => _isPostItVisible;
-    public bool IsOutScreen => _isOutScreen;
+    private bool _hasOrder;
+    private bool _available;
+    private bool _open;
+    private bool _dirty;
+    private bool _left;      // the corner the note is in now
+    private bool _wantLeft;  // the corner it should be in
+    private Vector2 _margin; // gap to the screen corner, taken from the authored position
+    private Shape _shown = Shape.Hidden;
+    private Coroutine _morph;
+    private Coroutine _autoFold;
 
     private void Awake()
     {
-        if (animator == null)
-        {
-            animator = GetComponent<Animator>();
-        }
-        if(presenter != null)
-            presenter = FindAnyObjectByType<BubblePresenter>();
+        if (_btnOpen != null) _btnOpen.onClick.AddListener(Unfold);
+        if (_btnClose != null) _btnClose.onClick.AddListener(Fold);
 
-        if (_btnToggle != null) _btnToggle.onClick.AddListener(TogglePostIt);
+        SetScale(_panel, 0f);
+        if (_btnOpen != null) SetScale(_btnOpen.transform, 0f);
+        if (OrderText != null) OrderText.alpha = 0f;
+
+        Vector2 authored = ((RectTransform)transform).anchoredPosition;
+        _margin = new Vector2(Mathf.Abs(authored.x), Mathf.Abs(authored.y));
+        ApplySide(false);
     }
 
     private void OnDestroy()
     {
-        if (_btnToggle != null) _btnToggle.onClick.RemoveListener(TogglePostIt);
+        if (_btnOpen != null) _btnOpen.onClick.RemoveListener(Unfold);
+        if (_btnClose != null) _btnClose.onClick.RemoveListener(Fold);
     }
 
-    // ─── Core Visibility (Open / Close) ───────────────────────────────────────
-    public void SetPostItOrderText() {
-        //OrderText.text = presenter.CurrentLine.TextWithoutCharacterName.ToString();
-    }
+    // ── In ─────────────────────────────────────────────────
 
-    public void SetPostItOrderText(string Order) { 
-        OrderText.text = Order;
-    }
-
-    public void SetPostItVisible(bool visible)
+    /// <summary>An order was placed: writes it on the note and pops the note open for a moment.</summary>
+    public void SetPostItOrderText(string Order)
     {
-        _isPostItVisible = visible;
-        animator.SetBool("IsVisible", visible);
-        OnVisibleChange();
-    }
+        if (OrderText != null) OrderText.text = Order;
+        _hasOrder = true;
 
-    public void TogglePostIt()
-    {
-        CancelAutoHide();
-        SetPostItVisible(!_isPostItVisible);
-    }
-
-    // ─── Out Screen ────────────────────────────────────────────────────────────
-
-    public void SetOutScreen(bool outScreen)
-    {
-        _isOutScreen = outScreen;
-        animator.SetBool("IsOutScreen", outScreen);
-        OnOutScreenChange();
-    }
-
-    public void ToggleOutScreen()
-    {
-        SetOutScreen(!_isOutScreen);
-    }
-
-    // ─── Auto Hide ─────────────────────────────────────────────────────────────
-
-    public void ShowPostItForDuration(float duration)
-    {
-        CancelAutoHide();
-        SetOutScreen(false);
-        SetPostItVisible(true);
-        _autoHideCoroutine = StartCoroutine(AutoHideRoutine(duration));
-    }
-
-    public void ShowPostIt() {
-        CancelAutoHide();
-        SetOutScreen(false);
-        SetPostItVisible(true);
-    }
-
-    public void ShowPostItForDefaultDuration() => ShowPostItForDuration(autoHideDuration);
-
-    private IEnumerator AutoHideRoutine(float duration)
-    {
-        yield return new WaitForSeconds(duration);
-        SetPostItVisible(false);
-        _autoHideCoroutine = null;
-    }
-
-    private void CancelAutoHide()
-    {
-        if (_autoHideCoroutine != null)
+        // Replaying a save re-runs the order commands; the note should not pop up for those.
+        if (!SceneLoaderBridge.IsSilentReplay)
         {
-            StopCoroutine(_autoHideCoroutine);
-            _autoHideCoroutine = null;
+            _open = true;
+            CancelAutoFold();
+            _autoFold = StartCoroutine(AutoFold());
         }
+
+        _dirty = true;
     }
 
-    // ─── Callbacks ─────────────────────────────────────────────────────────────
-
-    public void OnVisibleChange()
+    /// <summary>The order is over (served and scored): nothing is shown until the next one.</summary>
+    public void ClearOrder()
     {
-        Debug.Log($"Post-it is now: {(_isPostItVisible ? "Open" : "Closed")}");
+        _hasOrder = false;
+        _open = false;
+        CancelAutoFold();
+        _dirty = true;
     }
 
-    public void OnOutScreenChange()
+    /// <summary>Whether the folded button may be on screen — true only while the drink is being made.</summary>
+    public void SetAvailable(bool available)
     {
-        Debug.Log($"Post-it is now: {(_isOutScreen ? "Out of Screen" : "On Screen")}");
+        _available = available;
+        _dirty = true;
     }
 
-    [ContextMenu("Open Menu")]
-    public void Init() { 
-        SetOutScreen(false);
-        SetPostItVisible(true);
-    }
-
-    [ContextMenu("Open Init Ani")]
-    public void OpenInit() { 
-        SetOutScreen(false);
-        ShowPostItForDefaultDuration();
-    }
-
-    [ContextMenu("Out")]
-    public void Out()
+    /// <summary>Top-left (true) or top-right (false). A note on screen folds away, moves and comes back.</summary>
+    public void SetSide(bool left)
     {
-        SetOutScreen(true);
-        SetPostItVisible(false);
+        _wantLeft = left;
+        _dirty = true;
+    }
+
+    private void Unfold()
+    {
+        CancelAutoFold(); // opened by hand: it stays until folded by hand
+        _open = true;
+        _dirty = true;
+    }
+
+    private void Fold()
+    {
+        CancelAutoFold();
+        _open = false;
+        _dirty = true;
+    }
+
+    // ── Shape ──────────────────────────────────────────────
+
+    // Resolved once per frame, so a step change that turns the button off and straight back on
+    // (Prepare Drinks → Garnish) never makes it flicker.
+    private void LateUpdate()
+    {
+        if (!_dirty) return;
+        _dirty = false;
+
+        Shape wanted = !_hasOrder ? Shape.Hidden
+            : _open ? Shape.Panel
+            : _available ? Shape.Button
+            : Shape.Hidden;
+
+        bool moving = _wantLeft != _left;
+        if (wanted == _shown && !moving) return;
+        _shown = wanted;
+
+        if (_morph != null) StopCoroutine(_morph);
+        _morph = StartCoroutine(Morph(wanted, moving));
+    }
+
+    // Always from wherever the parts are now, so an interrupted change carries on smoothly.
+    private IEnumerator Morph(Shape to, bool moving)
+    {
+        Transform button = _btnOpen != null ? _btnOpen.transform : null;
+
+        if (to != Shape.Panel || moving)
+        {
+            yield return FadeText(0f);
+            yield return ScaleTo(_panel, 0f);
+        }
+
+        if (to != Shape.Button || moving) yield return ScaleTo(button, 0f);
+
+        // Everything is folded to nothing here, so the jump to the other corner is never seen.
+        if (moving) ApplySide(_wantLeft);
+
+        if (to == Shape.Panel)
+        {
+            yield return ScaleTo(_panel, 1f);
+            yield return FadeText(1f);
+        }
+
+        if (to == Shape.Button) yield return ScaleTo(button, 1f);
+
+        _morph = null;
+    }
+
+    private IEnumerator ScaleTo(Transform target, float to)
+    {
+        if (target == null) yield break;
+
+        float from = target.localScale.x;
+        if (Mathf.Approximately(from, to)) yield break;
+
+        for (float e = 0f; e < _scaleDuration; e += Time.deltaTime)
+        {
+            float t = e / _scaleDuration;
+            // Growing overshoots a little (ease-out-back) so it pops; shrinking just eases.
+            float eased = to > from ? 1f + 2.70158f * Mathf.Pow(t - 1f, 3f) + 1.70158f * Mathf.Pow(t - 1f, 2f) : t * t;
+            SetScale(target, Mathf.LerpUnclamped(from, to, eased));
+            yield return null;
+        }
+        SetScale(target, to);
+    }
+
+    private IEnumerator FadeText(float to)
+    {
+        if (OrderText == null) yield break;
+
+        float from = OrderText.alpha;
+        if (Mathf.Approximately(from, to)) yield break;
+
+        for (float e = 0f; e < _textFadeDuration; e += Time.deltaTime)
+        {
+            OrderText.alpha = Mathf.Lerp(from, to, e / _textFadeDuration);
+            yield return null;
+        }
+        OrderText.alpha = to;
+    }
+
+    // A part folded to nothing is switched off, so it cannot catch a click.
+    private static void SetScale(Transform target, float scale)
+    {
+        if (target == null) return;
+
+        target.localScale = new Vector3(scale, scale, 1f);
+        target.gameObject.SetActive(scale > 0f);
+    }
+
+    // The root and both parts are pinned to the same top corner, so they grow out of it.
+    private void ApplySide(bool left)
+    {
+        _left = left;
+        var corner = new Vector2(left ? 0f : 1f, 1f);
+
+        Pin((RectTransform)transform, corner, new Vector2(left ? _margin.x : -_margin.x, -_margin.y));
+        Pin(_panel, corner, Vector2.zero);
+        if (_btnOpen != null) Pin((RectTransform)_btnOpen.transform, corner, Vector2.zero);
+    }
+
+    private static void Pin(RectTransform rect, Vector2 corner, Vector2 position)
+    {
+        if (rect == null) return;
+
+        rect.anchorMin = rect.anchorMax = rect.pivot = corner;
+        rect.anchoredPosition = position;
+    }
+
+    private IEnumerator AutoFold()
+    {
+        yield return new WaitForSeconds(autoHideDuration);
+        _autoFold = null;
+        _open = false;
+        _dirty = true;
+    }
+
+    private void CancelAutoFold()
+    {
+        if (_autoFold != null) StopCoroutine(_autoFold);
+        _autoFold = null;
     }
 }
