@@ -129,6 +129,17 @@ public class PourController : MonoBehaviour
         IsPouring = false;
     }
 
+    // Abandons the pour where it is. Call before destroying or resetting the glass mid-pour.
+    public void Cancel()
+    {
+        StopAllCoroutines();
+        streamRoutine = tailRoutine = null;
+        stream.enabled = false;
+        SetBottleAlpha(0f);
+        glass = null; // the clip keeps playing hidden; its StartStream event is ignored without a glass
+        IsPouring = false;
+    }
+
     public void OnStartStream()
     {
         if (glass != null && streamRoutine == null) streamRoutine = StartCoroutine(StreamRoutine());

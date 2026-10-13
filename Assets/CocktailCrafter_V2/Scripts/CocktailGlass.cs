@@ -123,7 +123,9 @@ public class CocktailGlass : MonoBehaviour
     {
         proxyRoot = new GameObject(name + " (Ice Proxy)").transform;
         proxyRoot.position = new Vector3(2000f + 20f * proxyCount++, 2000f, 0f);
-        proxyRoot.localScale = transform.lossyScale;
+        // Unit scale: ice simulates in glass-local units whatever the glass's world size. A glass
+        // scaled far down would otherwise put the ice below Physics2D's contact offset and it
+        // would stack with visible gaps.
 
         staging = new GameObject("Staging").transform;
         staging.SetParent(proxyRoot, false);

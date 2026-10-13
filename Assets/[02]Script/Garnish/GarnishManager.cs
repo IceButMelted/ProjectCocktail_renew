@@ -2,10 +2,11 @@
 //  GarnishManager.cs — The garnish station: pick a glass, add ice,
 //  decorate, pour, then hand the drink over.
 //
-//  Owns its own canvas (Canvas_Garnish): the glass / item / rim tabs,
-//  the ice buttons and the Pour / Finish / Reset buttons, plus the one
-//  glass on the table and the rules around it (one pour per glass, no
-//  glass swap and no ice removal after the pour).
+//  Owns its own canvas (Canvas_Garnish): the glass / item / rim grids
+//  (all three on screen at once), the ice buttons and the Pour /
+//  Finish / Reset buttons, plus the one glass on the table and the
+//  rules around it (glass first — nothing else works without one; one
+//  pour per glass, no glass swap and no ice removal after the pour).
 //
 //  It knows nothing about the game flow, the cocktail or the camera.
 //  What it needs comes in as an argument (Pour takes the drink) and
@@ -14,6 +15,7 @@
 // ============================================================
 
 using System;
+using System.Collections;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -23,17 +25,15 @@ public class GarnishManager : MonoBehaviour
     [Tooltip("Where the chosen serving glass spawns (position + rotation).")]
     [SerializeField] private Transform _glassSpawnPoint;
 
+    [Tooltip("The pour (shaker, stream) that fills the glass on the plate.")]
+    [SerializeField] private PourVisual _pour;
+
+    [Tooltip("The picture of the glass on the canvas (the glass is drawn by its own camera). Shown only while a glass exists, so it never blocks clicks on the bar the rest of the time.")]
+    [SerializeField] private GameObject _glassView;
+
     [Header("Panels")]
     [Tooltip("The whole garnish panel. Opened by Open(), closed by Close().")]
     [SerializeField] private GameObject _panel;
-    [SerializeField] private GameObject _panelGlassSelection;
-    [SerializeField] private GameObject _panelGarnishItem;
-    [SerializeField] private GameObject _panelGarnishRim;
-
-    [Header("Tabs")]
-    [SerializeField] private Button _btnGlassSelection;
-    [SerializeField] private Button _btnGarnishItem;
-    [SerializeField] private Button _btnGarnishRim;
 
     [Header("Buttons")]
     [SerializeField] private Button _btnPour;
@@ -50,6 +50,12 @@ public class GarnishManager : MonoBehaviour
     [SerializeField] private Button _btnServe;
     [SerializeField] private Button _btnRemake;
 
+    [Tooltip("Seconds the garnish panel takes to slide off, and the glass to slide to the middle.")]
+    [SerializeField] private float _slideDuration = 0.4f;
+
+    [Tooltip("Seconds the finished glass is shown on its own before the serve buttons appear.")]
+    [SerializeField] private float _serveButtonsDelay = 1.2f;
+
     [Header("SFX")]
     [SerializeField] private string _sfxAddIce = "Add_Ice";
     [SerializeField] private string _sfxRemoveIce = "Remove_Ice";
@@ -64,6 +70,9 @@ public class GarnishManager : MonoBehaviour
 
     /// <summary>A pour started on the glass. Grids lock on this: one glass per pour.</summary>
     public event Action PourStarted;
+
+    /// <summary>A glass was put on the plate (true) or taken off it (false). The item and rim grids follow this.</summary>
+    public event Action<bool> GlassChanged;
 
     /// <summary>Ice was added (true) or removed (false). The listener records it on the drink.</summary>
     public event Action<bool> IceToggled;
@@ -91,6 +100,14 @@ public class GarnishManager : MonoBehaviour
     private int _activeGarnishSlot;
     private PlacedGlassInstance _garnishSlotGlass;
 
+    // Where the panel and the glass picture sit while garnishing; they slide away from / back to these.
+    private RectTransform _panelRect;
+    private RectTransform _glassViewRect;
+    private Vector2 _panelHome;
+    private Vector2 _glassViewHome;
+    private Coroutine _panelSlide;
+    private Coroutine _serveReveal;
+
     /// <summary>True once a pour has fully finished filling — <see cref="TryFinish"/> only succeeds then.</summary>
     public bool CanFinish => _pourComplete;
 
@@ -102,13 +119,25 @@ public class GarnishManager : MonoBehaviour
 
     // ── Unity ──────────────────────────────────────────────
 
+    private void Awake()
+    {
+        if (_panel != null)
+        {
+            _panelRect = (RectTransform)_panel.transform;
+            _panelHome = _panelRect.anchoredPosition;
+        }
+
+        if (_glassView != null)
+        {
+            _glassViewRect = (RectTransform)_glassView.transform;
+            _glassViewHome = _glassViewRect.anchoredPosition;
+        }
+    }
+
     // The buttons belong to this manager's canvas, so it wires them itself. The panel starts
     // inactive, but onClick listeners can be added to an inactive button just the same.
     private void OnEnable()
     {
-        Listen(_btnGlassSelection, ShowGlassTab);
-        Listen(_btnGarnishItem, ShowItemTab);
-        Listen(_btnGarnishRim, ShowRimTab);
         Listen(_btnPour, OnPourClicked);
         Listen(_btnFinish, TryFinish);
         Listen(_btnReset, OnResetClicked);
@@ -120,9 +149,6 @@ public class GarnishManager : MonoBehaviour
 
     private void OnDisable()
     {
-        Unlisten(_btnGlassSelection, ShowGlassTab);
-        Unlisten(_btnGarnishItem, ShowItemTab);
-        Unlisten(_btnGarnishRim, ShowRimTab);
         Unlisten(_btnPour, OnPourClicked);
         Unlisten(_btnFinish, TryFinish);
         Unlisten(_btnReset, OnResetClicked);
@@ -150,36 +176,44 @@ public class GarnishManager : MonoBehaviour
 
     // ── Open / close ───────────────────────────────────────
 
-    /// <summary>A fresh garnish step: glass tab first, nothing poured, pour button live.</summary>
+    /// <summary>A fresh garnish step: nothing poured, and nothing but the glass grid usable until a glass is chosen.</summary>
     public void Open()
     {
         _pourComplete = false;
         _hasPoured = false;
         _activeGarnishSlot = 0;
 
-        ShowGlassTab();
-        if (_btnPour != null) _btnPour.interactable = true;
+        StopSlide(ref _panelSlide);
+        if (_panelRect != null) _panelRect.anchoredPosition = _panelHome;
         if (_panel != null) _panel.SetActive(true);
+        RefreshButtons();
 
         Opened?.Invoke();
+        GlassChanged?.Invoke(Glass != null);
     }
 
-    /// <summary>Hides the panel and puts the ice buttons back to "add" for the next time.</summary>
+    /// <summary>Slides the panel off the screen and puts the ice buttons back to "add" for the next time.</summary>
     public void Close()
     {
-        if (_panel != null) _panel.SetActive(false);
+        StopSlide(ref _panelSlide);
+        if (_panel != null && _panel.activeInHierarchy && isActiveAndEnabled)
+            _panelSlide = StartCoroutine(SlidePanelOut());
+        else if (_panel != null)
+            _panel.SetActive(false);
 
-        if (_btnAddIce != null)
-        {
-            _btnAddIce.gameObject.SetActive(true);
-            _btnAddIce.interactable = true;
-        }
+        if (_btnAddIce != null) _btnAddIce.gameObject.SetActive(true);
+        if (_btnRemoveIce != null) _btnRemoveIce.gameObject.SetActive(false);
+    }
 
-        if (_btnRemoveIce != null)
-        {
-            _btnRemoveIce.gameObject.SetActive(false);
-            _btnRemoveIce.interactable = true;
-        }
+    // The one place the glass-first rule is applied to this manager's own buttons.
+    private void RefreshButtons()
+    {
+        bool hasGlass = Glass != null;
+
+        if (_btnPour != null) _btnPour.interactable = hasGlass && !_hasPoured; // one pour per glass
+        if (_btnFinish != null) _btnFinish.interactable = hasGlass && _pourComplete;
+        if (_btnAddIce != null) _btnAddIce.interactable = hasGlass;
+        if (_btnRemoveIce != null) _btnRemoveIce.interactable = hasGlass && !_hasPoured;
     }
 
     // ── Glass ──────────────────────────────────────────────
@@ -209,11 +243,14 @@ public class GarnishManager : MonoBehaviour
 
         glass.Initialize(option);
         Glass = glass;
+        if (_glassView != null) _glassView.SetActive(true);
         _pourComplete = false; // a freshly-placed glass has nothing poured into it yet
         _hasPoured = false;
         _activeGarnishSlot = 0;
 
         SubscribeToGarnishSlots();
+        RefreshButtons();
+        GlassChanged?.Invoke(true);
     }
 
     /// <summary>
@@ -222,11 +259,16 @@ public class GarnishManager : MonoBehaviour
     /// </summary>
     public void ClearGlass()
     {
+        if (_pouringGlass != null && _pour != null) _pour.Cancel(); // the pour must let go of the glass before it dies
+
         UnsubscribeFromPouringGlass();
         UnsubscribeFromGarnishSlots();
 
         if (Glass != null) Destroy(Glass.gameObject);
         Glass = null;
+        if (_glassView != null) _glassView.SetActive(false);
+        RefreshButtons();
+        GlassChanged?.Invoke(false);
     }
 
     // ── Ice ────────────────────────────────────────────────
@@ -287,25 +329,12 @@ public class GarnishManager : MonoBehaviour
         _garnishSlotGlass = null;
     }
 
-    // ── Tabs ───────────────────────────────────────────────
-
-    private void ShowGlassTab() => ShowTab(glass: true, item: false, rim: false);
-    private void ShowItemTab() => ShowTab(glass: false, item: true, rim: false);
-    private void ShowRimTab() => ShowTab(glass: false, item: false, rim: true);
-
-    private void ShowTab(bool glass, bool item, bool rim)
-    {
-        if (_panelGlassSelection != null) _panelGlassSelection.SetActive(glass);
-        if (_panelGarnishItem != null) _panelGarnishItem.SetActive(item);
-        if (_panelGarnishRim != null) _panelGarnishRim.SetActive(rim);
-    }
-
     // ── Pour ───────────────────────────────────────────────
 
     private void OnPourClicked() => PourRequested?.Invoke();
 
     /// <summary>
-    /// Plays the glass's water-rising fill with <paramref name="drink"/>'s colours.
+    /// Pours <paramref name="drink"/>'s colours into the glass.
     /// <see cref="TryFinish"/> only succeeds once the fill has finished.
     /// </summary>
     public void Pour(S_Drink drink)
@@ -322,21 +351,19 @@ public class GarnishManager : MonoBehaviour
         _hasPoured = true;
         PourStarted?.Invoke(); // one glass per pour
 
-        if (_btnAddIce != null) _btnAddIce.interactable = true;
-        if (_btnRemoveIce != null) _btnRemoveIce.interactable = false;
-        if (_btnPour != null) _btnPour.interactable = false; // one pour per glass — live again on the next Open()
+        RefreshButtons();
 
         _pouringGlass = glass;
         glass.OnFillComplete += OnPourFillComplete;
 
-        glass.ApplyDrink(drink);
-        glass.StartFill();
+        glass.Pour(_pour, drink);
     }
 
     private void OnPourFillComplete()
     {
         UnsubscribeFromPouringGlass();
         _pourComplete = true;
+        RefreshButtons();
     }
 
     private void UnsubscribeFromPouringGlass()
@@ -365,14 +392,62 @@ public class GarnishManager : MonoBehaviour
 
     // ── Serve panel ────────────────────────────────────────
 
+    /// <summary>
+    /// The finished glass takes the middle of the screen on its own; the serve buttons follow
+    /// after <see cref="_serveButtonsDelay"/>.
+    /// </summary>
     public void OpenServe()
     {
-        if (_panelServe != null) _panelServe.SetActive(true);
+        StopSlide(ref _serveReveal);
+        if (isActiveAndEnabled) _serveReveal = StartCoroutine(RevealServe());
+        else if (_panelServe != null) _panelServe.SetActive(true);
     }
 
     public void CloseServe()
     {
+        StopSlide(ref _serveReveal);
         if (_panelServe != null) _panelServe.SetActive(false);
+        if (_glassViewRect != null) _glassViewRect.anchoredPosition = _glassViewHome;
+    }
+
+    private IEnumerator SlidePanelOut()
+    {
+        // Off the edge it is anchored to: one panel-width further out.
+        yield return Slide(_panelRect, _panelHome + new Vector2(_panelRect.rect.width, 0f));
+        _panel.SetActive(false);
+        _panelSlide = null;
+    }
+
+    private IEnumerator RevealServe()
+    {
+        if (_glassViewRect != null)
+        {
+            // GlassView is anchored to the left edge: centre it in its parent.
+            float centred = (((RectTransform)_glassViewRect.parent).rect.width - _glassViewRect.rect.width) * 0.5f;
+            yield return Slide(_glassViewRect, new Vector2(centred, _glassViewHome.y));
+        }
+
+        yield return new WaitForSeconds(_serveButtonsDelay);
+
+        if (_panelServe != null) _panelServe.SetActive(true);
+        _serveReveal = null;
+    }
+
+    private IEnumerator Slide(RectTransform rect, Vector2 to)
+    {
+        Vector2 from = rect.anchoredPosition;
+        for (float e = 0f; e < _slideDuration; e += Time.deltaTime)
+        {
+            rect.anchoredPosition = Vector2.Lerp(from, to, Mathf.SmoothStep(0f, 1f, e / _slideDuration));
+            yield return null;
+        }
+        rect.anchoredPosition = to;
+    }
+
+    private void StopSlide(ref Coroutine routine)
+    {
+        if (routine != null) StopCoroutine(routine);
+        routine = null;
     }
 
     private void OnServeClicked() => ServeRequested?.Invoke();

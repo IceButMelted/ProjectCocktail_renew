@@ -1,8 +1,8 @@
 // ============================================================
 //  PlacedGlassInstance.cs — The glass on the table.
-//  Carries its own SO_GlassOption visuals (no lookup table — each
-//  option bundles its own sprites). GarnishManager spawns it at a
-//  fixed point, owns the reference and destroys it once served;
+//  Its prefab carries the glass's own sprites, liquid mask and
+//  markers (one prefab per SO_GlassOption). GarnishManager spawns it
+//  at a fixed point, owns the reference and destroys it once served;
 //  it is never dragged (GlassPlacementZone kept but unused).
 // ============================================================
 
@@ -11,8 +11,8 @@ using UnityEngine;
 
 public class PlacedGlassInstance : MonoBehaviour
 {
-    [Tooltip("Optional. If assigned, this glass's sprites/water color are pushed onto it.")]
-    [SerializeField] private WaterSlosh _waterSlosh;
+    [Tooltip("The liquid, surface and ice of this glass (CocktailCrafter_V2).")]
+    [SerializeField] private CocktailGlass _liquid;
 
     [Header("Garnish")]
     [Tooltip("The 2 slots Fresh and Novelty garnishes share — index 0/1, no per-category restriction.")]
@@ -27,6 +27,7 @@ public class PlacedGlassInstance : MonoBehaviour
     public SO_GlassOption Option { get; private set; }
 
     private GlassPlacementZone _zone;
+    private bool _hasIce;
 
     private void Awake()
     {
@@ -46,29 +47,23 @@ public class PlacedGlassInstance : MonoBehaviour
     }
 
     /// <summary>Called once, right after Instantiate, by GarnishManager.ChooseGlass.</summary>
-    public void Initialize(SO_GlassOption option)
-    {
-        Option = option;
-
-        if (_waterSlosh != null && option != null)
-            _waterSlosh.UpdateVisual(option.IceSprite, option.GlassSprite, option.WaterSprite);
-    }
+    public void Initialize(SO_GlassOption option) => Option = option;
 
     /// <summary>Called by the zone once this instance is assigned as its occupant.</summary>
     public void NotifyPlaced(GlassPlacementZone zone) => _zone = zone;
 
-    /// <summary>Pushes the served drink's colour onto this glass. Called by GarnishManager on pour.</summary>
-    public void ApplyDrink(S_Drink drink)
+    /// <summary>
+    /// Drops ice in, or takes it back out. Taking it out empties the whole glass, so it is only
+    /// valid before the pour — GarnishManager.ToggleIce enforces that.
+    /// </summary>
+    public void ApplyIce(bool enable)
     {
-        if (_waterSlosh == null || drink == null) return;
+        if (_liquid == null || enable == _hasIce) return;
 
-        _waterSlosh.waterColorTop = drink.waterColorTop;
-        _waterSlosh.waterColorBottom = drink.waterColorBottom;
-        _waterSlosh.UpdateColor();
+        _hasIce = enable;
+        if (enable) _liquid.DropIce();
+        else _liquid.ResetGlass();
     }
-
-    /// <summary>Toggles the ice visual. Called by GarnishManager.ToggleIce.</summary>
-    public void ApplyIce(bool enable) => _waterSlosh?.AddIce(enable);
 
     /// <summary>
     /// Sets one of the 2 shared Fresh/Novelty garnish slots. Pass null to clear that slot.
@@ -93,19 +88,16 @@ public class PlacedGlassInstance : MonoBehaviour
         if (_garnishRim != null) _garnishRim.sprite = rim != null ? rim.Sprite : null;
     }
 
-    /// <summary>Starts the water-level-rising animation. Called by GarnishManager.Pour.</summary>
-    public void StartFill() => _waterSlosh?.StartFilling();
-
-    /// <summary>
-    /// Fires once the pour animation finishes raising the water level. Pass-through to the
-    /// sibling WaterSlosh so callers (GarnishManager) react to the fill finishing instead of
-    /// polling a boolean every frame.
-    /// </summary>
-    public event Action OnFillComplete
+    /// <summary>Pours <paramref name="drink"/>'s colours into this glass. Called by GarnishManager.Pour.</summary>
+    public void Pour(PourVisual pour, S_Drink drink)
     {
-        add { if (_waterSlosh != null) _waterSlosh.OnFillComplete += value; }
-        remove { if (_waterSlosh != null) _waterSlosh.OnFillComplete -= value; }
+        if (_liquid == null || pour == null || drink == null) return;
+
+        pour.Pour(_liquid, drink.waterColorTop, drink.waterColorBottom, null, () => OnFillComplete?.Invoke());
     }
+
+    /// <summary>Fires once the pour has finished and the glass is full.</summary>
+    public event Action OnFillComplete;
 
     private void OnDestroy()
     {
