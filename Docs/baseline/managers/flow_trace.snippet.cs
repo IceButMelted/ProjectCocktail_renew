@@ -58,7 +58,7 @@ string Snap(string label) {
     + " shaker3D=" + (shaker3D != null ? shaker3D.Interactable.ToString() : "none")
     + " bookBtn=" + (book != null ? book.interactable.ToString() : "none")
     + " | method=" + Panel("Canvas/Panel - Method") + " serve=" + Panel("Canvas/Panel - Serve") + " garnish=" + Panel("Canvas/Panel - Granish UI")
-    + " visScreen=" + Panel("Canvas/Panel - VisurlCocktail") + " visWS=" + Panel("[CocktailSystem]/CocktailShaker/Canvas - World Space/PanelWS - VisurlCocktail")
+    + " visWS=" + Panel("[CocktailSystem]/CocktailShaker/Canvas - World Space/PanelWS - VisurlCocktail")
     + " book=" + Panel("Canvas/Panel - BookUI") + " postit=" + On(postIt != null ? postIt.transform : null)
     + " | dialogue=" + (runner != null && runner.IsDialogueRunning);
 }

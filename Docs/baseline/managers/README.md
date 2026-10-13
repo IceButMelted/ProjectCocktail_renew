@@ -80,3 +80,4 @@ order ถูกสุ่มด้วย `UnityEngine.Random` ตอนเข้�
 - `RecipeBook` และ `Architexturebook` ไม่อยู่แล้ว (Interactable_3DObject เหลือ 1, `DragableObject` 12, `ScaleOnHover` 17)
 - `GranishCam` อยู่ใต้ `[CocktailSystem]/Garnish_Plate`
 | 4d | ดู `git log` | trace เหมือนไฟล์ใน git ทุกไบต์ (รวม camera `PrepareCam`, lock, method panel ตอนเต็ม และตอน Clear), Yarn contract exit 0, console errors 0 |
+| 4c-VisualizeCocktail | ดู `git log` | ลบ screen-space panel; trace เหมือนเดิมทุกบรรทัด ยกเว้นฟิลด์ `visScreen=` ที่ถูกถอดออกจาก snippet และจากไฟล์ baseline (ตัว object ไม่มีแล้ว) |

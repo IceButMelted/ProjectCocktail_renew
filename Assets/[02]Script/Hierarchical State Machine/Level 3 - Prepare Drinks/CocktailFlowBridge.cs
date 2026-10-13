@@ -57,7 +57,6 @@ namespace Bar410.GameFlow
         [SerializeField] private Button _btnShaking;
         [SerializeField] private Button _btnMixing;
         [SerializeField] private Button _btnMethodReset;
-        [SerializeField] private GameObject _panelVisualCocktail;
         [SerializeField] private GameObject _panelMethod;
 
         // ── Unity ──────────────────────────────────────────
@@ -252,7 +251,6 @@ namespace Bar410.GameFlow
         {
             _cocktail?.ResetCocktail();
             _visualCocktail?.UpdateCocktailBars();
-            _panelVisualCocktail?.SetActive(false);
             _panelMethod?.SetActive(false);
         }
     }
