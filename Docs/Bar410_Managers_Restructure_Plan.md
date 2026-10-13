@@ -204,7 +204,7 @@ baseline อยู่ที่ `Docs/baseline/managers/` (README ในโฟล
 
 **Stage 8 · Camera Manager** ✅ ทำแล้ว 2026-10-13 (3 commit: 8a ตัวตรวจ, 8b manager + Yarn static, 8c ลบ `ResetCamera` ที่ตาย) `CinimachineCameraSwitcher` เปลี่ยนเป็น `CameraManager` (GUID เดิม) เก็บ `CameraEntry` เอง ตั้งชื่อ shot ที่ flow ขอ (`ShowBar`/`ShowShaker`/`ShowGarnish`) และถือ `CameraController` (`SetLookFixed`/`ResetLook`); `Switch_Camera`/`Cut_Camera`/`Fix_Camera`/`Reset_Camera` เป็น static ชื่อเดิม ไม่ผูกชื่อ object `CamController`; `_cocktailCamera`/`ResetCamera()` ถูกลบ **ไม่ทำ** (D12): presenter/`FlowStep`, ส่ง `Camera` ให้ Placement รายละเอียดใน HANDOFF §7
 
-**Stage 9 · Shell + cleanup bridge** `LoadSceneButton`, `Canvas_Shell`, ลบ bridge ที่ว่างแล้วทีละตัว (`TalkingWithCustomerBridge`, `ServeFlowBridge`, `UIFlowBridge`, `CocktailFlowBridge`, `MinigameFlowBridge`, `GarnishFlowBridge`)
+**Stage 9 · Shell + cleanup bridge** ✅ ทำแล้ว 2026-10-13 (4 commit: 9a-0 ตัวตรวจ shell, 9a shell + `Canvas_Shell`, 9b `FlowWiring` + minigame/garnish/serve, 9c cocktail/talking) `UIFlowBridge` หายไป (แต่ละ panel ผูกปุ่มเอง + `LoadSceneButton`), bridge ที่เหลือ 5 ตัวรวมเป็น `FlowWiring` ไฟล์เดียว บน root เหลือ `GameLoopFSM` + `GameFlowCommands` + `FlowWiring`; กฎ step → book/post-it/ingredient/camera (D12) อยู่ใน `FlowWiring` จัดกลุ่มตาม step; `CharacterData` คงไว้ตาม D6 รายละเอียดใน HANDOFF §7
 
 **Stage 10 · (optional) Level 1 เป็น enum** ลดโค้ดราว 130 บรรทัด มีค่าน้อย (D11: L1 ขับด้วยปุ่ม/hotkey ตามเดิม ไม่ต้องรอ Yarn)
 
@@ -232,6 +232,7 @@ baseline อยู่ที่ `Docs/baseline/managers/` (README ในโฟล
 | D10 | ลบ `Canvas/Panel - VisurlCocktail` (screen-space) เหลือ world-space ตัวเดียว ลบ `_panelVisualCocktail` ด้วย | ยืนยันแล้ว 2026-10-13 หลังตรวจว่าไม่มีอะไรเปิดมัน |
 | D11 | **Level 1 (Open ⇄ Close) ขับด้วยปุ่ม/hotkey ตามเดิม** ไม่เพิ่ม `flow_close_bar`/`flow_next_day` ใน `.yarn` | ยืนยันแล้ว 2026-10-13 ไม่มีงานแก้ L1 ใน stage ใด; Stage 10 ยังเป็น optional (ลดโค้ด ไม่จำเป็นต่อเป้าหมาย) |
 | D12 | **ไม่สร้าง presenter / flat `FlowStep` enum ใน Stage 8** กฎ step → book/post-it/ingredient (ประมาณ 15 บรรทัดใน 5 bridge) รวมที่ `FlowWiring` ตอน Stage 9 พร้อมการรวม bridge; **`N_InputManager._sceneCamera` คงเป็น ref ที่ serialize** ไม่ส่งผ่าน Camera manager | ตัดสินโดย Claude 2026-10-13 เป็นค่า default รอ user ยืนยัน: presenter จะเป็น bridge ตัวที่ 6 ที่ต้องรู้ FSM เหมือนเดิม ผลต่อผู้เล่นเป็นศูนย์ และ Stage 9 ต้องรวม bridge อยู่แล้ว; การส่ง `Camera` ต้องเพิ่ม wiring เพื่อแลกกับ ref ตัวเดียว |
+| D13 | **Stage 9: รวม bridge ทั้งหมดเป็น `FlowWiring` ไฟล์เดียว** แต่ละ panel ผูกปุ่มของตัวเอง (book, post-it), ปุ่มโหลด scene เป็น `LoadSceneButton`, `Canvas` → `Canvas_Shell` | ตัดสินโดย Claude 2026-10-13 ตามแผน + default ที่บันทึกไว้ (Shell เป็น `Canvas_Shell` ไม่มี manager) |
 
 ### ยังเปิดอยู่ (มีค่า default)
 

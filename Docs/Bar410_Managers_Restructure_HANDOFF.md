@@ -1,9 +1,9 @@
 # Bar410 · Managers Restructure · HANDOFF
 
-เขียนเมื่อ 2026-10-13 หลังจบ **Stage 8** · branch `GameFlow/Managers` (แตกจาก `GameFlow/Main` ที่ `1962402`, **ยังไม่ push, ไม่มี PR**)
+เขียนเมื่อ 2026-10-13 หลังจบ **Stage 9** · branch `GameFlow/Managers` (แตกจาก `GameFlow/Main` ที่ `1962402`, **ยังไม่ push, ไม่มี PR**)
 
 > **เรื่องที่ต้องรู้ก่อนทำอะไรต่อ (สั้นที่สุด)**
-> 1. Stage 0–8 เสร็จและ commit แล้วทั้งหมด งานที่เหลือคือ Stage 9, (10 optional)
+> 1. Stage 0–9 เสร็จและ commit แล้วทั้งหมด งานที่เหลือมีแค่ Stage 10 (optional) และการตัดสินใจเรื่อง push / PR
 > 2. **Stage 7d (`e7bc9ad`) เปลี่ยนสิ่งที่ผู้เล่นเห็น**: `.yarn` เรียก `SystemGame` ซึ่งไม่มีใน scene แล้ว ทุก command ของ cocktail เคยล้ม ตอนนี้ทำงาน (dialogue รอการเสิร์ฟจริง) **user ยังไม่ได้เล่นจริง** (§8 ข้อ 1) revert ได้ด้วย commit เดียว
 > 3. ตัวตรวจ `flow_trace` เรียก `onClick.Invoke()` ซึ่งไม่ดู `interactable` เคยพลาด regression ของ 4b จึงมี lever ที่กดจริง (§6.1) ใช้ให้ตรงกับสิ่งที่แก้
 
@@ -21,26 +21,26 @@
 | | |
 |---|---|
 | เป้าหมาย | แยก `[GameLoop]` เป็น Manager อิสระต่อกัน (Cocktail, Minigame, Garnish, TalkToCustomer, Camera, Placement) แต่ละตัวมี Canvas ของตัวเอง ข้อมูลที่ใช้ร่วมกันมีเจ้าของเดียว FSM คุมแค่ Level 2–3 |
-| ทำเสร็จ (commit แล้ว) | Stage 0, 1, 3, 4a, 4b, 4c (เฉพาะ VisualizeCocktail), 4d, 4f, **5**, **6** (6a–6d), **7** (7a–7d), **8** (8a–8c) |
-| ข้าม | Stage 2 (`FlowWiring` ว่างเปล่า), Stage 4c ส่วน book (ย้ายไป Stage 9 พร้อม presenter, D12) |
-| เหลือ | Stage 9 Shell + ลบ bridge (+ `FlowWiring`, กฎ step → book/post-it/ingredient, `CharacterData`), 10 (optional) |
+| ทำเสร็จ (commit แล้ว) | Stage 0, 1, 3, 4a, 4b, 4c, 4d, 4f, **5**, **6**, **7**, **8**, **9** (9a–9c) |
+| ข้าม | Stage 2 (`FlowWiring` ว่างเปล่าในตอนนั้น; มันถูกสร้างจริงใน 9b) |
+| เหลือ | Stage 10 (optional, ไม่จำเป็นต่อเป้าหมาย), push / PR (รอ user) |
 | working tree | สะอาด ยกเว้น `ProjectSettings/Packages/dev.yarnspinner/Assembly-CSharp-generated.ysls.json` ซึ่ง Yarn สร้างเอง **ไม่ใช่งานของเรา ไม่ต้อง stage** |
-| ตรวจล่าสุด | flow trace (ยกเว้น `cam=` ของ S00 ซึ่ง snippet ถอดออกแล้ว ดู §6.3 ข้อ 14) และ `back_button` เหมือน baseline ทุกไบต์ หลัง 8c; `camera_yarn` (ส่วน B ตั้งใจให้เปลี่ยน), Yarn contract exit 0; console error 0. lock fingerprint / `garnish_ui` / `customer_yarn` ผ่านล่าสุดที่ Stage 7 (Stage 8 ไม่แตะ) |
+| ตรวจล่าสุด | หลัง 9c: flow trace, lock fingerprint, `serve_commit` (หลัง 9b), `back_button` (หลัง 9b), `method_buttons_click`, `customer_yarn`, `shell_ui` เหมือน baseline ทุกไบต์; `camera_yarn` เหมือน Stage 8; Yarn contract exit 0; console error 0 ไม่ได้รัน `garnish_ui`/`dialogue_wait`/`placement_drag` ซ้ำใน Stage 9 (ไม่ได้แตะ) |
 
 ตัวเลขเทียบ (`wiring_dump.snippet.cs`, scene `New Drag Drop System`, นับใต้ `[GameLoop]`)
 
-| | Stage 0 | หลัง 4b | หลัง 5 | หลัง 6 | หลัง 7 | หลัง 8 |
-|---|---|---|---|---|---|---|
-| components | 933 | 916 | 885 | 891 | 891 | 891 |
-| MonoBehaviour | 410 | 402 | 386 | 389 | 389 | 389 |
-| scene ref (ไม่นับ UI built-in) | 246 | 215 | 211 | 207 | 208 | 208 |
-| **ref ข้าม child** | **76** | 65 | 61 | 40 | **41** | **40** |
-| ref ใน child เดียวกัน | 170 | 150 | 150 | 167 | 167 | 168 |
-| Inspector UnityEvent call | 28 | 19 | 19 | 19 | 19 | 19 |
-| ref ออกนอก prefab | 1 | 1 | 1 | 1 | 1 (ย้ายจาก Cocktail ไป bridge) | 1 |
-| script บน `[GameLoop]` root | 10 | 8 | 8 | 8 | 8 | 8 |
+| | Stage 0 | หลัง 4b | หลัง 5 | หลัง 6 | หลัง 7 | หลัง 8 | หลัง 9 |
+|---|---|---|---|---|---|---|---|
+| components | 933 | 916 | 885 | 891 | 891 | 891 | 888 |
+| MonoBehaviour | 410 | 402 | 386 | 389 | 389 | 389 | 386 |
+| scene ref (ไม่นับ UI built-in) | 246 | 215 | 211 | 207 | 208 | 208 | 185 |
+| **ref ข้าม child** | **76** | 65 | 61 | 40 | **41** | **40** | **17** |
+| ref ใน child เดียวกัน | 170 | 150 | 150 | 167 | 167 | 168 | 168 |
+| Inspector UnityEvent call | 28 | 19 | 19 | 19 | 19 | 19 | 19 |
+| ref ออกนอก prefab | 1 | 1 | 1 | 1 | 1 (ย้ายจาก Cocktail ไป bridge) | 1 | 1 |
+| script บน `[GameLoop]` root | 10 | 8 | 8 | 8 | 8 | 8 | **3** |
 
-`GarnishFlowBridge` 20 → 7 slot, `ServeFlowBridge` 7 → 5, `MinigameFlowBridge` 8 → 4, ส่วน camera: 3 bridge ถือ `CameraManager` อย่างละ 1 slot (เดิมรวม 4 slot + id string 3 ตัว) `CocktailSystemManager` ไม่มี ref ออกนอก prefab แล้ว (D4/D6) ไฟล์: `wiring_dump.txt` (Stage 0), `wiring_dump.after_stage{4b,5,6,7,8}.txt`
+ตอนจบ Stage 9: ไม่มี bridge เหลือ (`FlowWiring` ตัวเดียว) เดิม 6 bridge serialize ตัวจัดการ/object ที่ใช้ร่วมรวม ~38 slot (`_cocktail` ×4, `_ingredients` ×4, `_bookUI` ×3, `_cameras` ×3 ...) ตอนนี้ serialize ครั้งเดียว slot จาก root ไป child 36 → 13 ไฟล์: `wiring_dump.txt` (Stage 0), `wiring_dump.after_stage{4b,5,6,7,8,9}.txt`
 ตัวเลขของ Stage 7 ฝั่ง NPC วัดจากต้นไม้ `[GameLoop]` ไม่ได้ (NPC อยู่นอกต้นไม้) ดูผลจริงที่ `customer_yarn`
 
 ---
@@ -71,6 +71,10 @@
 | `6a92f8a` | 8a | lever `camera_yarn` + baseline (ไม่แก้โค้ด) | ไม่มีตัวตรวจคำสั่งกล้องของ Yarn; baseline แสดงว่าเปลี่ยนชื่อ `CamController` แล้วทุกคำสั่งล้ม |
 | `89b76e8` | 8b | `CinimachineCameraSwitcher` → `CameraManager` (GUID เดิม) เก็บ `CameraEntry` เอง, shot ชื่อ `ShowBar`/`ShowShaker`/`ShowGarnish`, ถือ look (`SetLookFixed`/`ResetLook`); `Switch_Camera`/`Cut_Camera`/`Fix_Camera`/`Reset_Camera` static ชื่อเดิม; 3 bridge เหลือ slot `_cameras`; sync prefab เก่า | id กล้อง 3 ที่ + instance command ผูกชื่อ object (กับดักเดียวกับ 7d) |
 | `9f8278f` | 8c | ลบ `MinigameSystemManager._cocktailCamera` + `IMinigameContext.ResetCamera()` + call ใน `BaseMiniGame` | null ทั้ง scene และ prefab ไม่เคยทำอะไร; มุมมองถูก reset ตอนเข้า step 2 อยู่แล้ว |
+| `4ae4329` | 9a-0 | lever `shell_ui` + baseline (ไม่แก้โค้ด) | ไม่มีตัวตรวจปุ่ม shell; พบว่าปุ่ม toggle ของ post-it ไม่ interactable |
+| `2d4f4b2` | 9a | ลบ `UIFlowBridge`: `BookUI_V2`/`Post_It_Order` ผูกปุ่มเอง, `LoadSceneButton` ×2, ปุ่มเปิด book ที่ `CocktailFlowBridge`; `Canvas` → `Canvas_Shell` | panel ผูกปุ่มของตัวเอง (กฎ 4) |
+| `793b54b` | 9b | `FlowWiring` ใหม่ รับ Minigame + Garnish + Serve bridge | bridge 3 ตัวถือ slot ซ้ำ + `_gameLoop`/`_commands` ซ้ำ |
+| `e295690` | 9c | `FlowWiring` รับ Cocktail + Talking bridge; ไม่มี bridge เหลือ | กฎ step → UI อยู่ในไฟล์เดียว (D12) |
 | `c3cc94b` `29aa520` `7a34927` `66cf0a3` | docs | บันทึก decision (D9, D11), HANDOFF และ baseline log ของ Stage 6/7 | |
 
 ---
@@ -103,6 +107,11 @@
 | Stage 8 `FlowStep` flat enum + presenter (กล้อง, ingredient policy, book, post-it) | **ไม่ทำ** กฎไปรวมที่ `FlowWiring` ใน Stage 9 (D12) | presenter ต้องรู้ FSM เหมือน bridge จึงเป็น bridge ตัวที่ 6; กฎมีแค่ ~15 บรรทัด; Stage 9 ต้องรวม bridge อยู่แล้ว; ผลต่อผู้เล่นเป็นศูนย์ ถ้า user อยากได้ enum ให้บอก |
 | Stage 8 ส่ง `Camera` ให้ Placement ผ่าน Camera manager | คง `N_InputManager._sceneCamera` เป็น ref | ต้องมีใครสักคนเรียก `SetCamera` (wiring เพิ่ม) เพื่อแลกกับ ref ตัวเดียวที่ไม่เปลี่ยนชื่อได้ (D12) |
 | Stage 8 `CameraManager` เป็น class ใหม่ + รวม `CameraController` | เปลี่ยนชื่อ `CinimachineCameraSwitcher` (GUID เดิม) ให้ถือ `CameraController` | `CameraController` เป็นพฤติกรรมเมาส์ล้วน (381 บรรทัด) รวมไฟล์เดียวเปลี่ยน diff เยอะโดยไม่ลด wiring; GUID เดิมทำให้ scene/prefab เก็บค่าที่ serialize ไว้ |
+| Stage 9 เริ่มด้วย `LoadSceneButton` บน EndShift/Thanks (ตามที่ HANDOFF เดิมเขียนว่ามี) | สร้างใหม่ (ไม่เคยมีมาก่อน) | HANDOFF/plan เขียนเหมือนมีอยู่แล้ว `SceneLoader` มีแค่ `LoadScene(string)` ปุ่มสองปุ่มถูกผูกจาก `UIFlowBridge` |
+| Stage 9 ทุก panel ผูกปุ่มเอง (รวมปุ่มเปิด book) | ปุ่มเปิด book ผูกที่ `FlowWiring` | `Panel - BookUI` ปิดตัวเองใน `Awake` และปุ่มเปิดอยู่ใน Hub นอก panel จึงฟังเองไม่ได้ ส่วน next/previous/close เป็นลูกของ panel ผูกเองได้ |
+| Stage 9 รวม bridge ทีละตัว (6 commit) | รวม 5 ตัวเป็น 2 commit (9b, 9c) | แต่ละตัวมี verify ตรงกัน (flow trace + lever เฉพาะจุด) และ `FlowWiring` ต้องมี slot ร่วม จึงแยกเป็น 6 ไม่ได้ผลเพิ่ม |
+| Stage 9 `CharacterData` ตัดสินว่าจะลบไหม | คงไว้ (D6 ที่ user ยืนยันไว้) | ไม่มีใครใช้นอกจาก fallback ของ roster; user ตัดสิน D6 ไว้แล้ว |
+| Stage 9 `_autoAdvanceOnWin` / `_driveIngredientButtons` (Inspector toggle) | ลบ | เป็น `true` ทั้งใน scene และ prefab; ปิดได้ก็ทำให้ flow ค้าง (tooltip เดิมเขียนว่า) |
 
 ---
 
@@ -122,6 +131,7 @@
 | D10 | ลบ screen-space `VisualizeCocktail` เหลือ world-space ตัวเดียว | ยืนยัน |
 | D11 | Level 1 (Open ⇄ Close) ขับด้วยปุ่ม/hotkey ตามเดิม ไม่เพิ่ม `flow_close_bar`/`flow_next_day` ใน `.yarn` | ยืนยัน 2026-10-13 ไม่มีงานแก้ L1 |
 | D12 | ไม่สร้าง presenter/`FlowStep` ใน Stage 8 (กฎ step → UI ไปที่ `FlowWiring` ตอน Stage 9); `N_InputManager._sceneCamera` คงเป็น ref | **ค่า default ของ Claude รอ user ยืนยัน** (ดู §3) |
+| D13 | Stage 9: bridge ทั้งหมดรวมเป็น `FlowWiring`, panel ผูกปุ่มเอง, `LoadSceneButton`, `Canvas` → `Canvas_Shell` | ค่า default ของ Claude ตามแผน (ดู §3) |
 
 ค่า default ที่ยังไม่ยืนยัน: Shell (Hub, EndShift, Thx, Transition) เป็น `Canvas_Shell` ไม่มี manager; Placement เข้าถึงผ่าน `Current`; `RecipeBook` หายไปจาก scene แล้ว (ไม่ต้องตัดสิน)
 
@@ -167,6 +177,7 @@
 | customer / Yarn | `customer_yarn.snippet.cs` → `customer_yarn.txt` | คำสั่ง NPC และคำสั่ง cocktail ผ่าน dispatcher จริง, save → load ของ NPC, ตัวแปร Yarn ตอนให้คะแนน (ตั้ง NPC กลับจุดเริ่มก่อน เพราะ chapter dialogue วิ่งก่อนที่ snippet จะหยุดมัน) | เหมือนข้างบน |
 | dialogue จริง | `dialogue_wait.snippet.cs` → `dialogue_wait.txt` | node `D1_02_Walter_Order` จอดรอ `wait_for_task` จนให้คะแนน แล้วเดินต่อ | เหมือนข้างบน |
 | คำสั่งกล้องของ Yarn | `camera_yarn.snippet.cs` → `camera_yarn.txt` (ก่อน 8b) / `camera_yarn.after_stage8.txt` (หลัง) | ผ่าน dispatcher จริง: ปกติ, เปลี่ยนชื่อ `CamController`, และสิ่งที่ flow ทำกับกล้อง/มุมมอง; ตั้ง `Fix_Camera true` กลับก่อนช่วงที่ไม่ได้ดู เพราะมุมมองที่ไม่ fixed ตามเมาส์จริง | เหมือนข้างบน ค่าที่ต้องเทียบคือ `cam=`/`fixed=`/`dir=` ต่อบรรทัด |
+| ปุ่ม shell (book, post-it, โหลด scene) | `shell_ui.snippet.cs` → `shell_ui.{endshift,thanks}.txt` | pointer click จริงที่ book next/previous/close, post-it, และปุ่มโหลด scene (อ่าน `SceneLoaderBridge.TargetScene` แล้วปิดไฟล์ก่อน Unity ออก scene) | ตั้ง `which` เป็น `endshift` แล้ว `thanks` ใน Play ใหม่ทั้งสองครั้ง; ผลต้องเหมือนกันทุกบรรทัด |
 
 ทุก snippet รันเป็น body ของ `mcp__unityMCP__execute_code` ใน Play mode **เริ่มจาก Play session ใหม่** (stop → play) และทุกตัวหยุด chapter dialogue ของฉากก่อน
 
@@ -202,12 +213,15 @@
 17. **`DialogueRunner.CommandDispatcher` เป็น internal** lever เรียกผ่าน reflection: property `CommandDispatcher` → interface `ICommandDispatcher.DispatchCommand(string, MonoBehaviour)` (explicit implementation) → field `Status` ของ struct ผลลัพธ์ (ดู `customer_yarn.snippet.cs`)
 18. **`git add` ที่มี path ผิดเพียงตัวเดียวไม่ stage อะไรเลย แต่ `git commit` ต่อท้ายยังทำงาน** และ commit สิ่งที่ stage ไว้ก่อนหน้า (เช่น rename จาก `git mv`) ให้ตรวจ `git show --stat HEAD` ทุกครั้ง; ถ้าพลาดและยังไม่ push ใช้ `git add <ที่เหลือ>` แล้ว `git commit --amend --no-edit`
 19. **ไฟล์ .cs ในโปรเจกต์มีทั้ง LF และ CRLF ปนกัน** และ `Write` tool ตัดช่องว่างท้ายบรรทัดออก pattern ที่มี `{ ` + ขึ้นบรรทัดใหม่จึงไม่ match ใช้ `Edit` tool ตรงๆ สำหรับจุดที่มีช่องว่างท้ายบรรทัด และเรียงลำดับ: เปลี่ยนชื่อไฟล์ด้วย `git mv` ทั้ง `.cs` และ `.meta` (GUID คงเดิม) แล้วค่อย `refresh_unity`
+20. **flow trace ขึ้นกับเวลา** snippet เดิมถ่าย screenshot ทุก step ซึ่งช้าพอให้ outro ของ minigame ที่ถูก cancel (>15 วินาที) จบก่อน `IngredientAdded()` ถัดไป พอตัด screenshot ออก (หรือเครื่องเร็วขึ้น) จะขึ้น `StartGame ignored — already in Outro` และ `TIMEOUT waiting for minigame Play` snippet ตอนนี้รอ `mgPhase == Idle` ก่อนทุก `IngredientAdded()` และก่อน `NextDay()` (S14 รายงานผลของ run สุดท้าย) ถ้า trace ต่างจาก baseline แค่ท้ายไฟล์ ให้ดูตรงนี้ก่อน
+21. **`BookUI_V2.Awake` ปิด panel ตัวเองตอนโหลด scene** panel จึงปิดอยู่เสมอ ปุ่มที่เป็นลูกของมัน (next/previous/close) ผูกใน `Awake` ได้ (รันตอนโหลด ขณะ active) แต่ปุ่มเปิดที่อยู่ใน Hub ผูกจาก panel ไม่ได้ ใช้ `Button.onClick.AddListener` ใน `Awake` ไม่ใช่ `OnEnable` เพราะ `Awake` ของ object ที่ inactive ตั้งแต่ต้นจะไม่รันจนกว่าจะ active
+22. **ปุ่มที่ปิด `interactable` ไว้ใน scene จะไม่รับ `ExecuteEvents` click** (post-it toggle เป็นแบบนี้) lever ที่ต้องการให้ปุ่มทำงานต้องเข้า step ที่เปิดมันก่อน ปุ่ม book ล็อกตอนลูกค้าคุย (ต้อง `PrepareDrinks()` ก่อน)
 
 ---
 
 ## 7. งานที่เหลือ (ละเอียดต่อ stage)
 
-### Stage 4c · book (เลื่อนไป Stage 9, D12)
+### Stage 4c · book (**เสร็จใน Stage 9**)
 ปุ่ม `Canvas/Panel - Hub/BTN - Open_CloseBook` ถูกเขียนจาก 4 จุด: `IngredientButtonGroup` (lock), `CocktailFlowBridge._btnBook` (เปิดกลับตอน `OnFulled`), `UIFlowBridge` (onClick → `BookUI_V2`), `TalkingWithCustomerBridge`/`CocktailFlowBridge` (ปิด book) กฎ "step ไหนกดได้" กระจายอยู่ จึงเลื่อนไปทำพร้อม presenter/`FlowStep` ใน Stage 8
 
 ### Stage 5 · Minigame Manager (**เสร็จ**)
@@ -266,10 +280,21 @@
 - prefab `[GameLoop].prefab` (dev scene) ถูก sync เรื่องกล้อง และได้ field ที่ค้างจาก Stage 7 (`_cocktail`/`_customers` บน `TalkingWithCustomerBridge`, ลบ `_customerRoster`/`_dialogueRunner`)
 - `.yarn` ใช้ `Switch_Camera` 36, `Fix_Camera` 29, `Reset_Camera` 21 ครั้ง (id ที่ใช้: `MainCam`, `CenterCam`, `NearLeftCam`, `NearRightCam`, `FarRightCam`, `SummaryCam`); `Cut_Camera` ไม่มีใครใช้ แต่ชื่อคงไว้
 
-### Stage 9 · Shell + ลบ bridge
-- **กฎ step → book / post-it / ingredient ที่กระจายอยู่ (D12) รวมที่นี่**: `TalkingWithCustomerBridge` เข้า → ingredient ล็อก + look fixed + ปิด book; `CocktailFlowBridge` เข้า step 2 → reset look + `ShowBar` + `Post_It_Order.Init`, ออก → ปิด book, เข้า 2.1/ออก 2.1 → `SetInteractable` + `EnableInteractablePrepareDrinksPhase`, drink เต็ม → ingredient ล็อก + **เปิดปุ่ม book กลับ** (ปุ่ม book เป็นสมาชิกของ `IngredientButtonGroup` จึงถูกล็อกไปด้วย) + `ShowShaker`; `GarnishFlowBridge` → ingredient ล็อก + `ShowGarnish`; `ServeFlowBridge` → `Post_It_Order.Out`; `UIFlowBridge` → ปุ่ม book/post-it ของ Hub
-- ปุ่ม book: ถ้าจะเอาออกจากกลุ่มต้องเขียนกฎ "เปิดเฉพาะ 2.1 และตอน drink เต็ม" เป็น 3–4 จุด ซึ่งมากกว่า hack บรรทัดเดียวใน `OnShakerFull` ตอนนี้ ให้ตัดสินตอนรวมที่ `FlowWiring` และรัน lock fingerprint (ปุ่ม book เป็น 1 ใน 19 object)
-`LoadSceneButton` บน `EndShiftButton` และ `Panel_Thx` (มี Button + `SceneLoader` ใน GameObject เดียวกันแล้ว), `Canvas_Shell`, ลบ bridge ที่ว่างทีละตัว (`TalkingWithCustomerBridge`, `ServeFlowBridge`, `UIFlowBridge`, `CocktailFlowBridge`, `MinigameFlowBridge`, `GarnishFlowBridge`) รวมเป็น `FlowWiring` ไฟล์เดียวถ้ายังจำเป็น; ลบ slot `_gameLoop`/`_commands` ที่ซ้ำ (3 ตัวเป็น null อยู่แล้วและทุกอย่างยังทำงาน)
+### Stage 9 · Shell + ลบ bridge (**เสร็จ**, 4 commit)
+
+ที่ทำจริง
+- **9a-0** lever `shell_ui` (ปุ่ม book, post-it, โหลด scene ด้วย pointer click จริง) baseline
+- **9a** `UIFlowBridge` หายไป: `BookUI_V2` ผูกปุ่ม next/previous/close (ลูกของ panel) เอง, `Post_It_Order` ผูกปุ่ม toggle เอง, `LoadSceneButton` (ใหม่, `Assets/[02]Script/SceneLoader/`) บน `EndShiftButton` และ `Panel_Thx/Image/Button`, ปุ่มเปิด book ผูกที่ bridge ที่ถือกฎล็อกของมัน; `[GameLoop]/Canvas` → `Canvas_Shell` (มีแต่ Hub, book, EndShift, Thx, Transition อยู่แล้ว)
+- **9b** `FlowWiring` (`Assets/[02]Script/Hierarchical State Machine/FlowWiring.cs`) รับ Minigame + Garnish + Serve bridge: subscribe event ของ step, เรียก verb ของ manager, แปลง event ของ manager กลับเป็น flow command; ถือ manager/object ที่ใช้ร่วมครั้งเดียว หา `GameLoopFSM`/`GameFlowCommands` ด้วย `GetComponent`
+- **9c** `FlowWiring` รับ Cocktail + Talking bridge; ตอนนี้ `[GameLoop]` root มี `GameLoopFSM` + `GameFlowCommands` + `FlowWiring` (เดิม 8 script) ไฟล์เดียวอ่านกฎของทุก step ได้ ไล่ตาม §: 1 Talking, 2 Prepare, 2.1 AddIngredient, 2.2 Minigame, 3 Garnish, 4 Serve
+- ตัวตรวจ: ดู README stage log (9a-0, 9a, 9b, 9c, 9 รวม)
+
+ค้าง/สังเกต
+- **ปุ่ม toggle ของ post-it ไม่ interactable ใน scene** กดแล้วไม่เกิดอะไร (มี listener แต่ผู้เล่นกดไม่ได้) พฤติกรรมเดิม ถ้าตั้งใจให้ post-it เปิด/ปิดเองโดย flow ก็ลบปุ่มกับ `_btnToggle` ได้ ถ้าไม่ใช่ต้องเปิด `interactable` (การตัดสินใจ design)
+- `CharacterData` คงไว้ตาม D6 (fallback ของ roster ไม่ถูกใช้) และ `Demo_KeysShortCut` (R → โหลด scene ใหม่) ยังอยู่บน `NPCs_And_Set`
+- `FlowWiring` ไม่ได้ถูก unit test ในโหมด Edit (ต้องมี scene); ตรวจผ่าน lever ใน Play เท่านั้น
+- ไม่ได้แตะ `SceneLoaderBridge` จึงไม่ต้องมีตัวตรวจ save → load ข้าม scene สำหรับ stage นี้ (§8 ข้อ 3 ยังค้างไว้ถ้าจะแตะในอนาคต)
+- `Bar410DialogueOrderTest` ยังไม่ได้รันจริง
 
 ### Stage 10 (optional) · Level 1 เป็น enum
 ลดโค้ดราว 130 บรรทัด มีค่าน้อย ไม่จำเป็นต่อเป้าหมาย: ไม่มี `.yarn` ไฟล์ไหนเรียก `flow_close_bar`/`flow_next_day` (ใช้แค่ `flow_prepare_drinks` 9 ครั้ง) และ user ตัดสินแล้ว (D11) ให้ L1 ขับด้วยปุ่ม/hotkey ตามเดิม ไม่ต้องให้ writer เพิ่ม command
@@ -284,13 +309,15 @@
 2. **save ควรเก็บอะไรของ NPC** ตอนนี้เก็บตำแหน่ง/waypoint แต่ไม่เก็บหน้า (emotion) และทิศมอง (`_currentLookDirection` ไม่เคยถูกเซ็ต) ต้องให้ user ตัดสิน เพราะต้องปรับ save format และ restore
 3. **save → load จริงข้าม scene + silent replay** ยังไม่เคยทดสอบ (`customer_yarn` ครอบคลุมแค่ `Collect`/`Apply` ในฉากเดียว) ถ้า Stage 9 จะแตะ `SceneLoaderBridge` ต้องมีตัวตรวจนี้ก่อน
 4. **`Canvas_Cocktail` CanvasScaler match 0.5** ผมเปลี่ยนจาก 0 ใน 4b ตั้งใจเดิมเป็น 0 หรือเปล่า (ยังไม่ได้คำตอบ)
-5. **Shell** (Hub, EndShift, Thx, Transition) เป็น `Canvas_Shell` ที่ไม่มี manager ใช่ไหม (default)
+5. **Shell เป็น `Canvas_Shell` ไม่มี manager**: ทำแล้วใน 9a (default); ถ้าอยากได้ manager สำหรับ Hub/Transition บอกได้
 6. **ลำดับวาดของ `Canvas_Garnish`/`Canvas_Cocktail`** อยู่ก่อน `Canvas` จึงถูก Hub/BookUI/Transition วาดทับ ถ้าเห็นว่า Hub บัง panel ให้ปรับ `sortingOrder`
 7. **ทดสอบด้วยเมาส์จริงที่ MCP ทำไม่ได้**: ลากขวดลง shaker, ลากผลไม้จาก tray, Shift+1/2 hotkey ขอให้ user ลองสั้นๆ
-8. **`CharacterData` (legacy)** บน `NPCs_And_Set` ไม่ถูกใช้แล้ว (roster ต่อไว้) แต่ scene ยังมีข้อมูล ตัดสินตอน Stage 9 ว่าจะลบไหม และ `Demo_KeysShortCut` (R → โหลด scene ใหม่)
+8. **`CharacterData` (legacy)** คงไว้ตาม D6 แต่ไม่ถูกใช้ (roster ต่อไว้) ถ้าจะลบให้ลบ component บน `NPCs_And_Set` + fallback ใน `TalkToCustomerManager` และ `Demo_KeysShortCut` (R → โหลด scene ใหม่) ยังอยู่
 9. **push / เปิด PR** ยังไม่ทำ ตามที่ user สั่ง (branch นำ `GameFlow/Main` อยู่ ~30 commit)
 10. **เล่นจริงดูกล้อง** chapter dialogue ใช้ `Switch_Camera`/`Fix_Camera`/`Reset_Camera` ผ่าน static command ใหม่ ผมตรวจผ่าน dispatcher แต่ยังไม่เห็นด้วยตาว่า shot/blend ตอนคุยตรงกับที่ writer ต้องการ (ถ้าไม่ตรง คือ 7d ทำให้คำสั่งทำงานจริงเป็นครั้งแรก ไม่ใช่ 8b)
 11. **ยืนยัน D12**: ไม่ทำ presenter/`FlowStep` และไม่ส่ง `Camera` ให้ Placement ถ้าต้องการ enum ให้ทำที่ Stage 9
+12. **ปุ่ม toggle ของ post-it** ไม่ interactable (ดู §7 Stage 9 ค้าง/สังเกต) ตั้งใจหรือเปล่า
+13. **รวมเข้า `GameFlow/Main`**: branch นำอยู่ ~45 commit ยังไม่ push ถ้าจะเปิด PR ให้บอก (ผมจะไม่ push เอง)
 
 ---
 
@@ -299,10 +326,10 @@
 | ไฟล์ | ใช้ทำอะไร |
 |---|---|
 | `Assets/[02]Script/Hierarchical State Machine/GameFlowCommands.cs` | Yarn/UI entry; `CommandTarget()` guard |
-| `…/Level 3 - Prepare Drinks/CocktailFlowBridge.cs` | seam ที่โตที่สุด: shaker events, scoring trigger, Method panel handler, glass cleanup |
+| `Assets/[02]Script/Hierarchical State Machine/FlowWiring.cs` | **ที่เดียวที่ flow กับ manager เจอกัน** (Stage 9): กฎ step → book/post-it/ingredient/camera, minigame, garnish, serve, ส่งผลให้คะแนนเข้าตัวแปร Yarn |
 | `Assets/[02]Script/Garnish/GarnishManager.cs` | Garnish manager: glass, ice, ตกแต่ง, pour, Serve panel (Stage 6) |
-| `…/Level 2 - Open Bar/GarnishFlowBridge.cs` | seam ของ step 3: เปิด/ปิด station, ส่ง drink, ice flag, finish/reset, เคลียร์ glass |
-| `…/Level 3 - Prepare Drinks/MinigameFlowBridge.cs` | Stage 5 |
+| `Assets/[02]Script/SceneLoader/LoadSceneButton.cs` | ปุ่มที่โหลด scene ผ่าน `SceneLoader` (EndShift, Thanks) |
+| `Assets/[02]Script/UI Script/BookUI_V2.cs` / `Post_It_Order.cs` | panel ที่ผูกปุ่มของตัวเอง (Stage 9) |
 | `Assets/[02]Script/Cocktail System/Cocktail/CocktailSystemManager.cs` (+ `Yarn/*.cs` partial) | Cocktail manager; `ServeDrink()` idempotent; `BindShaker` |
 | `Assets/[02]Script/Cocktail System/Cocktail/Shaker/IngredientButtonGroup.cs` | auto-collect ขวด |
 | `Assets/[02]Script/Cocktail System/MethodPanel.cs` | panel ที่ดูแลปุ่มตัวเอง (pattern ที่จะใช้ต่อกับ Serve/Garnish panel) |
@@ -317,6 +344,6 @@
 
 ## 10. คำสั่งเริ่ม session ใหม่
 
-> อ่าน `Docs/Bar410_Managers_Restructure_HANDOFF.md` แล้วทำต่อที่ Stage 9 (Shell `Canvas_Shell` + รวม bridge เป็น `FlowWiring` + กฎ step → book/post-it/ingredient ตาม §7) ตาม §6 และ §7 ก่อนแก้อะไร ให้ตรวจว่าอยู่ branch `GameFlow/Managers` และ working tree สะอาด (ยกเว้น `ysls.json`) จากนั้นรัน `check_yarn_contract.py --check`, flow trace, `garnish_ui`, `customer_yarn`, `camera_yarn` และ lock fingerprint เพื่อยืนยันว่า baseline ยังผ่าน (รอให้ Play พร้อมก่อนรัน snippet ดู §6.3 ข้อ 11; ข้อ 14 เรื่อง dialogue) Stage 9 แตะทุก bridge จึงควรทำเป็น commit ย่อยทีละ bridge และต้องมีตัวตรวจ save → load ข้าม scene ก่อนแตะ `SceneLoaderBridge` (§8 ข้อ 3)
+> อ่าน `Docs/Bar410_Managers_Restructure_HANDOFF.md` ก่อน Stage 0–9 เสร็จหมดแล้ว งานที่เหลือต้องให้ user เลือก: (ก) Stage 10 (Level 1 เป็น enum, optional, ลดโค้ด ~130 บรรทัด), (ข) ตอบคำถามค้างใน §8 (โดยเฉพาะ 1, 10, 12 ที่ต้องเล่นจริง), (ค) push / เปิด PR `GameFlow/Managers` → `GameFlow/Main` ก่อนแก้อะไร ให้ตรวจว่าอยู่ branch `GameFlow/Managers` และ working tree สะอาด (ยกเว้น `ysls.json`) จากนั้นรัน `check_yarn_contract.py --check`, flow trace, `shell_ui`, `camera_yarn`, `customer_yarn` และ lock fingerprint เพื่อยืนยันว่า baseline ยังผ่าน (รอให้ Play พร้อมก่อนรัน snippet ดู §6.3 ข้อ 11, 14, 20)
 
 ผู้ใช้เป็นคนไทย ตอบไทยกระชับ ชื่อเทคนิคเป็นอังกฤษ; ตัดสินใจทุกอย่างผ่าน decision log; คุ้นกับ Unity MCP; ไม่ push/ไม่เปิด PR จนกว่าจะบอก
