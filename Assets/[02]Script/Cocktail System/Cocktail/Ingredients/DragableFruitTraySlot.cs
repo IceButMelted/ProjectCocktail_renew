@@ -86,6 +86,13 @@ public class DragableFruitTraySlot : DragableObject
             return;
         }
 
+        // A plain click (no piece pulled out, tray itself not dragged) gets the same burst a
+        // pull-out plays — the hijacked branch above returns first, so a drag never plays twice.
+        if (_hijackEnabled && Interactable && !IsDragging
+            && eventData.button == PointerEventData.InputButton.Left && _piecePrefab != null
+            && _piecePrefab.TryGetComponent(out FruitPieceInstance piece))
+            piece.PlayPullOutVfxAt(transform);
+
         base.OnPointerUp(eventData);
     }
 
