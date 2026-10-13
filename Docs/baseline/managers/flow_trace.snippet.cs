@@ -30,6 +30,7 @@ Application.logMessageReceived += hook;
 
 string On(Transform t) { return t == null ? "missing" : (t.gameObject.activeSelf ? "on" : "off"); }
 string Panel(string path) { return On(root.transform.Find(path)); }
+var methodPanel = root.GetComponentInChildren<MethodPanel>(true);   // found by type so moving the panel does not change the trace
 UnityEngine.UI.Button Btn(string path) { var t = root.transform.Find(path); return t == null ? null : t.GetComponent<UnityEngine.UI.Button>(); }
 string Snap(string label) {
   var o = cocktail.Order;
@@ -57,7 +58,7 @@ string Snap(string label) {
     + " src=" + (src != null ? src.enabled.ToString() : "none")
     + " shaker3D=" + (shaker3D != null ? shaker3D.Interactable.ToString() : "none")
     + " bookBtn=" + (book != null ? book.interactable.ToString() : "none")
-    + " | method=" + Panel("Canvas/Panel - Method") + " serve=" + Panel("Canvas/Panel - Serve") + " garnish=" + Panel("Canvas/Panel - Granish UI")
+    + " | method=" + On(methodPanel != null ? methodPanel.transform : null) + " serve=" + Panel("Canvas/Panel - Serve") + " garnish=" + Panel("Canvas/Panel - Granish UI")
     + " visWS=" + Panel("[CocktailSystem]/CocktailShaker/Canvas - World Space/PanelWS - VisurlCocktail")
     + " book=" + Panel("Canvas/Panel - BookUI") + " postit=" + On(postIt != null ? postIt.transform : null)
     + " | dialogue=" + (runner != null && runner.IsDialogueRunning);
@@ -92,7 +93,7 @@ System.Collections.IEnumerator Run() {
   Pour();
   yield return Log("S02_ingredientsPoured", true);
 
-  Btn("Canvas/Panel - Method/BTN_Shaking")?.onClick.Invoke();
+  methodPanel.transform.Find("BTN_Shaking").GetComponent<UnityEngine.UI.Button>().onClick.Invoke();
   yield return Until(() => minigames.ActivePhase == MinigamePhase.Play, 8f, "minigame Play");
   yield return Log("S03_minigameRunning", true);
 

@@ -54,10 +54,8 @@ namespace Bar410.GameFlow
         [SerializeField] private Button _btnBook;
 
         [Header("Method Panel (2.1 — Shaking / Stirring / Reset)")]
-        [SerializeField] private Button _btnShaking;
-        [SerializeField] private Button _btnMixing;
-        [SerializeField] private Button _btnMethodReset;
-        [SerializeField] private GameObject _panelMethod;
+        [Tooltip("Owns the three buttons. This bridge only decides what each press means.")]
+        [SerializeField] private MethodPanel _methodPanel;
 
         // ── Unity ──────────────────────────────────────────
 
@@ -84,9 +82,12 @@ namespace Bar410.GameFlow
                 _shakerContents.OnFulled.AddListener(OnShakerFull);
             }
 
-            if (_btnShaking != null) _btnShaking.onClick.AddListener(OnShakingClicked);
-            if (_btnMixing != null) _btnMixing.onClick.AddListener(OnMixingClicked);
-            if (_btnMethodReset != null) _btnMethodReset.onClick.AddListener(OnMethodResetClicked);
+            if (_methodPanel != null)
+            {
+                _methodPanel.ShakingChosen += OnShakingClicked;
+                _methodPanel.MixingChosen += OnMixingClicked;
+                _methodPanel.ResetChosen += OnMethodResetClicked;
+            }
         }
 
         private void OnDestroy()
@@ -98,9 +99,12 @@ namespace Bar410.GameFlow
                 _shakerContents.OnFulled.RemoveListener(OnShakerFull);
             }
 
-            if (_btnShaking != null) _btnShaking.onClick.RemoveListener(OnShakingClicked);
-            if (_btnMixing != null) _btnMixing.onClick.RemoveListener(OnMixingClicked);
-            if (_btnMethodReset != null) _btnMethodReset.onClick.RemoveListener(OnMethodResetClicked);
+            if (_methodPanel != null)
+            {
+                _methodPanel.ShakingChosen -= OnShakingClicked;
+                _methodPanel.MixingChosen -= OnMixingClicked;
+                _methodPanel.ResetChosen -= OnMethodResetClicked;
+            }
 
             if (_gameLoop == null || _gameLoop.OpenBar == null) return;
 
@@ -251,7 +255,7 @@ namespace Bar410.GameFlow
         {
             _cocktail?.ResetCocktail();
             _visualCocktail?.UpdateCocktailBars();
-            _panelMethod?.SetActive(false);
+            _methodPanel?.Hide();
         }
     }
 }

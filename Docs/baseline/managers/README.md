@@ -82,4 +82,5 @@ order ถูกสุ่มด้วย `UnityEngine.Random` ตอนเข้�
 - `GranishCam` อยู่ใต้ `[CocktailSystem]/Garnish_Plate`
 | 4d | `f5ca4c9` | trace เหมือนไฟล์ใน git ทุกไบต์ (รวม camera `PrepareCam`, lock, method panel ตอนเต็ม และตอน Clear), Yarn contract exit 0, console errors 0 |
 | 4c-VisualizeCocktail | `91ef84e` | ลบ screen-space panel; trace เหมือนเดิมทุกบรรทัด ยกเว้นฟิลด์ `visScreen=` ที่ถูกถอดออกจาก snippet และจากไฟล์ baseline (ตัว object ไม่มีแล้ว) |
-| 4a | ดู `git log` | lock fingerprint เหมือนก่อนแก้ทั้ง 9 จุด (21 object), ขวดที่ถือ `ShakerContents` ตั้งแต่เริ่ม 3 → 19 จาก 19, trace เหมือนไฟล์ใน git ทุกไบต์, Yarn contract exit 0, console errors 0 |
+| 4a | `c4865fe` | lock fingerprint เหมือนก่อนแก้ทั้ง 9 จุด (21 object), ขวดที่ถือ `ShakerContents` ตั้งแต่เริ่ม 3 → 19 จาก 19, trace เหมือนไฟล์ใน git ทุกไบต์, Yarn contract exit 0, console errors 0 |
+| 4b | ดู `git log` | trace เหมือนไฟล์ใน git ทุกไบต์ (snippet หา panel ด้วย type แล้ว), ตำแหน่งปุ่มใน Canvas_Cocktail กับ Canvas เหมือนกัน (1009.34, 430.47) หลัง camera blend จบ, ปุ่ม Reset ล้าง shaker และปิด panel, ปุ่ม Stir ไป Minigame ด้วย Stiring, ภาพต่างจากก่อนแก้ไม่เกิน 0.24% ของ pixel (ขยับตามเฟรมของ animation), Yarn contract exit 0, console errors 0 |

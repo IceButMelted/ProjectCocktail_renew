@@ -1166,6 +1166,7 @@ RectTransform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 2029109557809018546}
+  - {fileID: 391915039771058415}
   m_Father: {fileID: 4295522172596979222}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
@@ -1219,7 +1220,7 @@ MonoBehaviour:
   m_ScaleFactor: 1
   m_ReferenceResolution: {x: 1920, y: 1080}
   m_ScreenMatchMode: 0
-  m_MatchWidthOrHeight: 0
+  m_MatchWidthOrHeight: 0.5
   m_PhysicalUnit: 3
   m_FallbackScreenDPI: 96
   m_DefaultSpriteDPI: 96
@@ -4510,7 +4511,7 @@ RectTransform:
   - {fileID: 5055500957852347137}
   - {fileID: 2679329875084635779}
   - {fileID: 1496475025953754428}
-  m_Father: {fileID: 5659759673657992239}
+  m_Father: {fileID: 639127513}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
@@ -16191,7 +16192,6 @@ RectTransform:
   m_Children:
   - {fileID: 8540157023144461502}
   - {fileID: 2386931256493876713}
-  - {fileID: 391915039771058415}
   - {fileID: 3716518867640978609}
   - {fileID: 1405869134}
   - {fileID: 9187836199181780004}
@@ -17451,6 +17451,7 @@ GameObject:
   - component: {fileID: 8548017268865619813}
   - component: {fileID: 4550535100246640635}
   - component: {fileID: 1085815153693238109}
+  - component: {fileID: 9061270629617664791}
   m_Layer: 9
   m_Name: Panel - Method
   m_TagString: Untagged
@@ -20536,10 +20537,7 @@ MonoBehaviour:
   _panelServe: {fileID: 761406268844529709}
   _fullDrinkCameraId: PrepareCam
   _btnBook: {fileID: 653714615255478872}
-  _btnShaking: {fileID: 1813103946349313516}
-  _btnMixing: {fileID: 4363117676914697572}
-  _btnMethodReset: {fileID: 5936304511771913311}
-  _panelMethod: {fileID: 6354495852764008708}
+  _methodPanel: {fileID: 9061270629617664791}
 --- !u!1 &7950363188708236408
 GameObject:
   m_ObjectHideFlags: 0
@@ -22968,6 +22966,21 @@ MonoBehaviour:
   _target: {fileID: 1560450540881612765}
   _screenOffset: {x: 0, y: 0}
   _hideWhenBehindCamera: 1
+--- !u!114 &9061270629617664791
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6354495852764008708}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: fbecc62468c6f80448f5f903b7447c31, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::MethodPanel
+  _btnShaking: {fileID: 1813103946349313516}
+  _btnMixing: {fileID: 4363117676914697572}
+  _btnReset: {fileID: 5936304511771913311}
 --- !u!1 &9070946987199131838
 GameObject:
   m_ObjectHideFlags: 0
