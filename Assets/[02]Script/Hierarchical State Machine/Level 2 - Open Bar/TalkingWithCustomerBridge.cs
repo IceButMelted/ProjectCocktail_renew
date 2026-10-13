@@ -24,7 +24,6 @@ namespace Bar410.GameFlow
         private void Awake()
         {
             if (_gameLoop == null) _gameLoop = GetComponent<GameLoopFSM>();
-            _gameLoop.EnsureBuilt();
 
             _gameLoop.OpenBar.TalkingWithCustomer.Entered += OnEntered;
         }

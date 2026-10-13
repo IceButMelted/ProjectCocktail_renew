@@ -64,7 +64,6 @@ namespace Bar410.GameFlow
         {
             if (_gameLoop == null) _gameLoop = GetComponent<GameLoopFSM>();
             if (_commands == null) _commands = GetComponent<GameFlowCommands>();
-            _gameLoop.EnsureBuilt();
 
             var minigameState = _gameLoop.OpenBar.PrepareDrinks.Minigame;
             minigameState.OnStartRequested += OnStartRequested;
@@ -162,8 +161,9 @@ namespace Bar410.GameFlow
             _gameLoop.OpenBar.PrepareDrinks.Minigame.ReportResult(outcome);
 
             // Cancelling means the player backed out, so the shaker has to become grabbable
-            // again — the scene locks it when the panel opens (OnStartedMinigame) and only
-            // the Serve/Reset buttons unlock it, which a cancelled run never reaches.
+            // again. It is a member of IngredientButtonGroup, which locks it when the drink
+            // fills; re-entering 2.1 normally unlocks it, but the direct cancel buttons stay
+            // in 2.2 and never get there.
             // A Completed run is left locked: the drink is finished and the glass takes over.
             if (outcome == MinigameOutcome.Cancelled && _shakerContents != null)
                 InteractableToggle.Apply(_shakerContents.gameObject, true);

@@ -34,7 +34,6 @@ namespace Bar410.GameFlow
         private void Awake()
         {
             if (_gameLoop == null) _gameLoop = GetComponent<GameLoopFSM>();
-            _gameLoop.EnsureBuilt();
 
             if (Instance != null && Instance != this)
             {
@@ -132,24 +131,29 @@ namespace Bar410.GameFlow
 
         // ── Yarn Commands ──────────────────────────────────
         // Static so .yarn can call them without naming a target GameObject.
+        //
+        // Every command goes through CommandTarget(). While a save is replayed silently the
+        // dialogue is only being fast-forwarded to the saved line, so a flow command must not
+        // move the machines. The Yarn functions below still answer, so <<if>> branches replay
+        // the way they ran the first time.
 
         [YarnCommand("flow_next_day")]
-        public static void Yarn_NextDay() => Resolve()?.NextDay();
+        public static void Yarn_NextDay() => CommandTarget()?.NextDay();
 
         [YarnCommand("flow_prepare_drinks")]
-        public static void Yarn_PrepareDrinks() => Resolve()?.PrepareDrinks();
+        public static void Yarn_PrepareDrinks() => CommandTarget()?.PrepareDrinks();
 
         [YarnCommand("flow_close_bar")]
-        public static void Yarn_CloseBar() => Resolve()?.CloseBar();
+        public static void Yarn_CloseBar() => CommandTarget()?.CloseBar();
 
         [YarnCommand("flow_garnish_done")]
-        public static void Yarn_GarnishDone() => Resolve()?.GarnishDone();
+        public static void Yarn_GarnishDone() => CommandTarget()?.GarnishDone();
 
         [YarnCommand("flow_serve_done")]
-        public static void Yarn_ServeDone() => Resolve()?.ServeDone();
+        public static void Yarn_ServeDone() => CommandTarget()?.ServeDone();
 
         [YarnCommand("flow_remake_drink")]
-        public static void Yarn_RemakeDrink() => Resolve()?.RemakeDrink();
+        public static void Yarn_RemakeDrink() => CommandTarget()?.RemakeDrink();
 
         /// <summary>
         /// <c>&lt;&lt;flow_ingredient_added&gt;&gt;</c> keeps the previously selected minigame;
@@ -158,7 +162,7 @@ namespace Bar410.GameFlow
         [YarnCommand("flow_ingredient_added")]
         public static void Yarn_IngredientAdded(string minigameType = "")
         {
-            var flow = Resolve();
+            var flow = CommandTarget();
             if (flow == null) return;
 
             if (!string.IsNullOrWhiteSpace(minigameType)) flow.SelectMinigame(minigameType);
@@ -167,13 +171,13 @@ namespace Bar410.GameFlow
 
         /// <summary>Selects the minigame without transitioning: <c>&lt;&lt;flow_minigame Shaking&gt;&gt;</c>.</summary>
         [YarnCommand("flow_minigame")]
-        public static void Yarn_SelectMinigame(string type) => Resolve()?.SelectMinigame(type);
+        public static void Yarn_SelectMinigame(string type) => CommandTarget()?.SelectMinigame(type);
 
         [YarnCommand("flow_another_ingredient")]
-        public static void Yarn_AnotherIngredient() => Resolve()?.AnotherIngredient();
+        public static void Yarn_AnotherIngredient() => CommandTarget()?.AnotherIngredient();
 
         [YarnCommand("flow_drink_complete")]
-        public static void Yarn_DrinkComplete() => Resolve()?.DrinkComplete();
+        public static void Yarn_DrinkComplete() => CommandTarget()?.DrinkComplete();
 
         // ── Yarn Functions ─────────────────────────────────
         // For branching in dialogue: <<if flow_phase() == "Open">>
@@ -248,6 +252,10 @@ namespace Bar410.GameFlow
             Debug.LogWarning($"[GameFlowCommands] '{raw}' is not a minigame type — selection unchanged.");
             return false;
         }
+
+        /// <summary>The live instance for a Yarn command, or null while a save replays silently.</summary>
+        private static GameFlowCommands CommandTarget()
+            => SceneLoaderBridge.IsSilentReplay ? null : Resolve();
 
         private static GameFlowCommands Resolve()
         {

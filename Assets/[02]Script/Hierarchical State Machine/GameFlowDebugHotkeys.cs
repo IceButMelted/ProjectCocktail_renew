@@ -12,6 +12,9 @@ namespace Bar410.GameFlow
     /// 2 PrepareDrinks · 3 IngredientAdded · 4 AnotherIngredient ·
     /// 5 DrinkComplete · 6 GarnishDone · 7 ServeDone · 8 RemakeDrink · 9 CloseBar ·
     /// 0 NextDay
+    ///
+    /// Ignored while Shift is held: Shift + 1/2 belong to MinigameSystemManager's own editor
+    /// hotkeys, and a plain number press must not fire both.
     /// </summary>
     public class GameFlowDebugHotkeys : MonoBehaviour
     {
@@ -20,6 +23,8 @@ namespace Bar410.GameFlow
 
         private void Update()
         {
+            if (Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift)) return;
+
             if (Input.GetKeyDown(KeyCode.Alpha2)) Run("2 PrepareDrinks", f => f.PrepareDrinks());
             else if (Input.GetKeyDown(KeyCode.Alpha3)) Run("3 IngredientAdded", f => f.IngredientAdded());
             else if (Input.GetKeyDown(KeyCode.Alpha4)) Run("4 AnotherIngredient", f => f.AnotherIngredient());

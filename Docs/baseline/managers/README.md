@@ -55,7 +55,18 @@
 
 ## หมายเหตุ determinism
 
-order ถูกสุ่มด้วย `UnityEngine.Random` ตอนเข้า step 2 ก่อนหน้านี้ใส่ seed ตอนต้น snippet แล้ว order ยังต่างกันระหว่าง run (มี consumer อื่นของ Random ระหว่างนั้น) จึงย้าย `InitState(410)` ไปไว้ทันทีก่อน `PrepareDrinks()` ซึ่งเลือก order ใน call เดียวกันแบบ synchronous ตามตรรกะควรได้ order เดิมทุกครั้ง **ยังไม่ได้ยืนยันด้วยการรันซ้ำหลังแก้** ถ้าบรรทัดอื่นนอกจาก `target=` เหมือนกัน ถือว่าผ่าน
+order ถูกสุ่มด้วย `UnityEngine.Random` ตอนเข้า step 2 ใน call เดียวกับ `PrepareDrinks()` snippet จึงเรียก `InitState(410)` ทันทีก่อน call นั้น ตรวจแล้วที่ Stage 1 ว่า run 2 ครั้งติดกันให้ trace เหมือนกันทุกไบต์ (`target=Sex On The Beach`) ดังนั้น `flow_trace.txt` ใน git ควร diff แล้วว่างเมื่อไม่มีการเปลี่ยนพฤติกรรม
+
+## ข้อควรระวังเมื่อ save scene
+
+อย่า save `New Drag Drop System.unity` จาก editor แล้ว commit ตรงๆ ให้ดู `git diff` ก่อน Cinemachine Brain ทำงานใน edit mode และเขียน FOV, far clip, ตำแหน่ง/การหมุนของ camera ลงไฟล์ scene ตอน save (Stage 1 เจอ 3 hunk) ถ้าเจอให้ตัดเฉพาะ hunk ที่ตั้งใจเปลี่ยน (`git diff` → กรอง → `git apply`)
+
+## Stage log
+
+| Stage | commit | ผลเทียบ baseline |
+|---|---|---|
+| 0 | `0b6b3f7` | สร้าง baseline |
+| 1 | ดู `git log` | trace เหมือน baseline ทุกบรรทัด (ยกเว้น `target=` ที่ตอนนี้ถูกตรึงด้วย seed), Yarn contract exit 0, console errors 0 |
 
 ## เมื่อโครงสร้างใน scene เปลี่ยนจากตอน audit (2026-10-05)
 

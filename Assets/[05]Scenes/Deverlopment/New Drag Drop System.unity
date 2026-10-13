@@ -2924,6 +2924,7 @@ GameObject:
   m_Component:
   - component: {fileID: 1549835004}
   - component: {fileID: 1549835003}
+  - component: {fileID: 1549835005}
   m_Layer: 0
   m_Name: '[Debug]'
   m_TagString: Untagged
@@ -2961,6 +2962,19 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1549835005
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1549835002}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f0b9840547635614a8759ad01364395c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Bar410.GameFlow.GameFlowDebugHotkeys
+  _showOverlay: 0
 --- !u!1 &1615261728
 GameObject:
   m_ObjectHideFlags: 0
@@ -4055,33 +4069,6 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
---- !u!114 &173320217072350367
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7365518877833284460}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: b9fdfb62b4209be43b583080898c9180, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Demo_KeysShortCut
-  OnPressReset:
-    m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 0}
-        m_TargetAssemblyTypeName: SceneLoader, Assembly-CSharp
-        m_MethodName: ReloadCurrentScene
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
 --- !u!114 &179154401290104251
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8588,19 +8575,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &2166370491430170746
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7365518877833284460}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f0b9840547635614a8759ad01364395c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Bar410.GameFlow.GameFlowDebugHotkeys
-  _showOverlay: 0
 --- !u!33 &2166899575161529551
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -19983,13 +19957,11 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7943527777821137633}
-  - component: {fileID: 2166370491430170746}
   - component: {fileID: 5740347442567854999}
   - component: {fileID: 7227755909219274211}
   - component: {fileID: 7947671018981094586}
   - component: {fileID: 5508285943005239321}
   - component: {fileID: 1918563697585345354}
-  - component: {fileID: 173320217072350367}
   - component: {fileID: 1322866041647825757}
   - component: {fileID: 8071046044819168113}
   - component: {fileID: 9217307720875085894}

@@ -173,11 +173,15 @@ public class MinigameSystemManager : MonoBehaviour, IMinigameContext
     }
 
 #if UNITY_EDITOR
+    // Shift + key only. The bare number row belongs to GameFlowDebugHotkeys and R to
+    // Demo_KeysShortCut, so a single press used to fire two unrelated tools.
     private void HandleEditorHotkeys()
     {
+        if (!Input.GetKey(KeyCode.LeftShift) && !Input.GetKey(KeyCode.RightShift)) return;
+
         if (Input.GetKeyDown(KeyCode.Alpha1)) SwitchTo(_registry.GetValueOrDefault(Enum_MiniGameType.Shaking));
         else if (Input.GetKeyDown(KeyCode.Alpha2)) SwitchTo(_registry.GetValueOrDefault(Enum_MiniGameType.Stiring));
-        else if (Input.GetKeyDown(KeyCode.R) || Input.GetKeyDown(KeyCode.B)) _activeMinigame?.EndGame();
+        else if (Input.GetKeyDown(KeyCode.B)) _activeMinigame?.EndGame();
         else if (Input.GetKeyDown(KeyCode.V)) _activeMinigame?.StartGame();
     }
 #endif

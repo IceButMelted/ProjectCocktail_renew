@@ -89,7 +89,6 @@ namespace Bar410.GameFlow
         {
             if (_gameLoop == null) _gameLoop = GetComponent<GameLoopFSM>();
             if (_commands == null) _commands = GetComponent<GameFlowCommands>();
-            _gameLoop.EnsureBuilt();
 
             var garnish = _gameLoop.OpenBar.Garnish;
             garnish.Entered += OnGarnishEntered;

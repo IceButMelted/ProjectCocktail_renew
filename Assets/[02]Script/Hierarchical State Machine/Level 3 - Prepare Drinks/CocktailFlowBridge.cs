@@ -9,9 +9,10 @@ namespace Bar410.GameFlow
     /// <summary>
     /// Connects the Open Bar flow (steps 1-4 and 2.1-2.2) to the cocktail scene objects.
     ///
-    /// Companion to <see cref="BarSetupBridge"/> and MinigameFlowBridge; between them these
-    /// three are the only places the flow layer and the gameplay layer meet. The states
-    /// stay plain C# and keep knowing nothing about UnityEngine.
+    /// Companion to MinigameFlowBridge, GarnishFlowBridge, ServeFlowBridge and
+    /// TalkingWithCustomerBridge; between them these are the only places the flow layer and
+    /// the gameplay layer meet. The states stay plain C# and keep knowing nothing about
+    /// UnityEngine.
     ///
     /// This is deliberately NOT where minigames are started — that is MinigameFlowBridge's
     /// job (Bar410_Minigame_Integration_Plan §3.3). Doing it in both would give the
@@ -58,7 +59,6 @@ namespace Bar410.GameFlow
         {
             if (_gameLoop == null) _gameLoop = GetComponent<GameLoopFSM>();
             if (_commands == null) _commands = GetComponent<GameFlowCommands>();
-            _gameLoop.EnsureBuilt();
 
             var openBar = _gameLoop.OpenBar;
             var prepareDrinks = openBar.PrepareDrinks;

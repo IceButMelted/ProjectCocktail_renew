@@ -12,6 +12,7 @@
 
 baseline อยู่ที่ `Docs/baseline/managers/` (README ในโฟลเดอร์อธิบายวิธีเช็กทุก stage) สรุปที่มีผลต่อแผนนี้
 
+- **`[GameLoop]` ใน `New Drag Drop System.unity` เป็นสำเนาที่ unpack แล้ว ไม่ได้ผูกกับ prefab** (scene นี้อยู่ใน Build Settings) `[04]Prefab/GameSystemPrefab/[GameLoop].prefab` จึงเก่ากว่า scene และถูกใช้เฉพาะ dev scene `New Cocktail System` กับ `Garnish Mockup` (ไม่อยู่ใน build) ทุก stage แก้ที่ object ใน scene จริง ไม่แก้ prefab แล้วคาดว่า scene จะตาม
 - **ชื่อ child เปลี่ยนแล้ว** `SystemGame` → `[CocktailSystem]`, `MiniGameSystem` → `[MiniGameSystem]`, `PlacmentSystem` → `[PlacmentSystem]` เอกสารนี้ยังใช้ชื่อเดิมในบางที่ ให้อ่านตามชื่อใหม่
 - **`[CocktailSystem]/Canvas_Cocktail` มีอยู่แล้ว** ตอนนี้มีแค่ post-it (`Panel - OrderDirnks`) ดังนั้นงาน post-it ใน Stage 4c ย้ายเสร็จแล้ว เหลือ book, Method panel, `VisualizeCocktail` (screen-space)
 - `RecipeBook` และ `Architexturebook` ถูกลบจาก prefab แล้ว ตัดข้อ `RecipeBook` ออกจากรายการที่ยังเปิดอยู่
