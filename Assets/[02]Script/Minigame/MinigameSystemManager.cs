@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Events;
+using UnityEngine.UI;
 using static E_Cocktail;
 
 public class MinigameSystemManager : MonoBehaviour, IMinigameContext
@@ -11,20 +11,25 @@ public class MinigameSystemManager : MonoBehaviour, IMinigameContext
     [Header("Dependencies")]
     [SerializeField] private CameraController _cocktailCamera;
 
-    [Header("Events")]
-    public UnityEvent OnStartedMinigame;
-    public UnityEvent OnEndedGame;
+    [Header("Selection")]
+    [Tooltip("Runs when nothing was selected and the drink has no preparation method yet.")]
+    [SerializeField] private Enum_MiniGameType _defaultType = Enum_MiniGameType.Shaking;
+
+    [Header("Buttons (this manager's own canvas)")]
+    [Tooltip("Leave the minigame and keep the drink: the 'BTN - Cancel Minigame' button of each " +
+             "minigame canvas.")]
+    [SerializeField] private Button[] _btnBack;
 
     // ── Game-flow seam (HSM) ───────────────────────────────
-    // Reserved for Bar410.GameFlow. Nothing subscribes yet — MinigameFlowBridge
-    // (see Bar410_Minigame_Integration_Plan.md §3.3) is the intended and only listener.
+    // MinigameFlowBridge (see Bar410_Minigame_Integration_Plan.md §3.3) is the only listener.
     //
-    //   MinigameState.OnStartRequested(type) ──> StartMinigame(type)
+    //   MinigameState.OnStartRequested(type) ──> StartMinigame(Resolve(type, ...))
     //   MinigameFinished(type, outcome)      ──> MinigameState.ReportResult(outcome)
     //   MinigameState.OnStopRequested        ──> CancelMinigame()
+    //   BackRequested                        ──> GameFlowCommands.AnotherIngredient()
     //
-    // Kept as a plain C# event, not a UnityEvent: the flow layer subscribes in code
-    // and must not be re-pointable from the Inspector.
+    // Plain C# events, not UnityEvents: the flow layer subscribes in code and must not be
+    // re-pointable from the Inspector.
 
     /// <summary>
     /// Raised once per run, when the outro has finished.
@@ -35,6 +40,9 @@ public class MinigameSystemManager : MonoBehaviour, IMinigameContext
 
     /// <summary>Raised when a run begins, before the intro plays.</summary>
     public event Action<Enum_MiniGameType> MinigameStarted;
+
+    /// <summary>The player pressed a back button: leave the minigame, keep the drink.</summary>
+    public event Action BackRequested;
 
     /// <summary>Which game the manager is currently driving. <c>None</c> if there is none.</summary>
     public Enum_MiniGameType ActiveType
@@ -74,6 +82,26 @@ public class MinigameSystemManager : MonoBehaviour, IMinigameContext
             _activeMinigame = GetComponents<BaseMiniGame>()[0];
     }
 
+    // The buttons are wired here, not in the flow layer: the manager owns its canvas and only
+    // reports which one was pressed. What a press means is decided by whoever listens.
+    private void OnEnable()
+    {
+        if (_btnBack == null) return;
+
+        foreach (var btn in _btnBack)
+            if (btn != null) btn.onClick.AddListener(OnBackClicked);
+    }
+
+    private void OnDisable()
+    {
+        if (_btnBack == null) return;
+
+        foreach (var btn in _btnBack)
+            if (btn != null) btn.onClick.RemoveListener(OnBackClicked);
+    }
+
+    private void OnBackClicked() => BackRequested?.Invoke();
+
     private void Update()
     {
 #if UNITY_EDITOR
@@ -97,8 +125,7 @@ public class MinigameSystemManager : MonoBehaviour, IMinigameContext
     void IMinigameContext.NotifyGameEnded(Enum_MiniGameType type, MinigameOutcome outcome)
     {
         Debug.Log($"[MinigameSystemManager] {type} finished: {outcome}");
-        MinigameFinished?.Invoke(type, outcome);   // flow layer (typed)
-        OnEndedGame?.Invoke();                     // scene listeners (designer-facing)
+        MinigameFinished?.Invoke(type, outcome);
     }
 
     /// <summary>
@@ -133,8 +160,18 @@ public class MinigameSystemManager : MonoBehaviour, IMinigameContext
 
         SwitchTo(game);
         game.StartGame();
-        MinigameStarted?.Invoke(type);   // flow layer (typed)
-        OnStartedMinigame?.Invoke();     // scene listeners (designer-facing)
+        MinigameStarted?.Invoke(type);
+    }
+
+    /// <summary>
+    /// Which minigame to run: an explicit selection wins, then the one the drink's own
+    /// preparation method calls for, then <see cref="_defaultType"/>. The caller supplies both
+    /// inputs — the selection is flow state and the method belongs to the cocktail.
+    /// </summary>
+    public Enum_MiniGameType Resolve(Enum_MiniGameType selected, Enum_MiniGameType fromDrink)
+    {
+        if (selected != Enum_MiniGameType.None) return selected;
+        return fromDrink != Enum_MiniGameType.None ? fromDrink : _defaultType;
     }
 
     /// <summary>

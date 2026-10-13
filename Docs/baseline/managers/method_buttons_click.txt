@@ -1,0 +1,6 @@
+# real pointer click on the method panel buttons
+M1 drink full | step=AddIngredient mgPhase=Idle panel=on BTN_Shaking.interactable=True BTN_Mixing.interactable=True BTN_Reset.interactable=True
+M2 after pointer click on BTN_Shaking | step=Minigame mgPhase=Intro panel=off BTN_Shaking.interactable=True BTN_Mixing.interactable=True BTN_Reset.interactable=True
+M3 back in 2.1 | step=AddIngredient mgPhase=Idle panel=on BTN_Shaking.interactable=True BTN_Mixing.interactable=True BTN_Reset.interactable=True
+M4 after pointer click on BTN_Mixing | step=Minigame mgPhase=Intro panel=off BTN_Shaking.interactable=True BTN_Mixing.interactable=True BTN_Reset.interactable=True
+DONE

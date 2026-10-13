@@ -2,6 +2,8 @@
 
 เขียนเมื่อ 2026-10-13 หลังจบ Stage 4b · branch `GameFlow/Managers` (แตกจาก `GameFlow/Main` ที่ `1962402`, **ยังไม่ push**)
 
+> **อัปเดตหลังเขียน:** Stage 5 (Minigame) ทำเสร็จและตรวจแล้ว พร้อมแก้ regression ของ 4b (`4b-fix`) และลบ `BG_BTN` ทั้งหมดอยู่ใน **commit เดียว** (user สั่ง) ดูแถว "Stage 5 commit" ใน §2 รายละเอียดใน §7 และ §6.3 ข้อ 11–13
+
 เอกสารนี้ให้คนที่รับงานต่อ (หรือ session ใหม่) ทำงานต่อได้โดยไม่ต้องอ่าน chat เดิม อ่านตามลำดับ §1 → §2 → §6 แล้วเริ่มที่ §7
 
 เอกสารที่เกี่ยวข้อง
@@ -16,11 +18,11 @@
 | | |
 |---|---|
 | เป้าหมาย | แยก `[GameLoop]` เป็น Manager อิสระต่อกัน (Cocktail, Minigame, Garnish, TalkToCustomer, Camera, Placement) แต่ละตัวมี Canvas ของตัวเอง ข้อมูลที่ใช้ร่วมกันมีเจ้าของเดียว FSM คุมแค่ Level 2–3 |
-| ทำเสร็จ | Stage 0, 1, 3, 4a, 4b, 4c (เฉพาะ VisualizeCocktail), 4d, 4f (รวม 9 commit) |
+| ทำเสร็จ (commit แล้ว) | Stage 0, 1, 3, 4a, 4b, 4c (เฉพาะ VisualizeCocktail), 4d, 4f, **5** (Stage 5 + `4b-fix` + ลบ `BG_BTN` อยู่ใน commit เดียว) |
 | ข้าม | Stage 2 (`FlowWiring` ว่างเปล่า), Stage 4c ส่วน book (เลื่อนไป Stage 8) |
-| เหลือ | Stage 5 Minigame, 6 Garnish, 7 TalkToCustomer, 8 Camera (+ presenter, book/post-it), 9 Shell + ลบ bridge, 10 (optional) |
+| เหลือ | Stage 6 Garnish, 7 TalkToCustomer, 8 Camera (+ presenter, book/post-it, `ResetCamera`), 9 Shell + ลบ bridge, 10 (optional) |
 | working tree | สะอาด ยกเว้น `ProjectSettings/Packages/dev.yarnspinner/Assembly-CSharp-generated.ysls.json` ซึ่ง Yarn สร้างเอง **ไม่ใช่งานของเรา ไม่ต้อง stage** |
-| ตรวจล่าสุด | ทุก stage ผ่าน: flow trace เหมือน baseline, Yarn contract exit 0, console error 0 |
+| ตรวจล่าสุด | flow trace เหมือน baseline ทุกไบต์, lock fingerprint: 19 object ที่เหลือเหมือน baseline ทุกจุดทุกค่า (ไฟล์ regenerate), กดปุ่ม Shake/Stir และปุ่ม back ด้วย pointer click จริงผ่าน, Yarn contract exit 0, console error 0 (1 warning เดิม) |
 
 ตัวเลขเทียบ (wiring dump, scene `New Drag Drop System`)
 
@@ -33,6 +35,8 @@
 | ref ออกนอก prefab | 1 (`DialogueRunner`) | 1 |
 | script บน `[GameLoop]` root | 10 | 8 |
 | root → Canvas / `[CocktailSystem]` / `[MiniGameSystem]` / CamController | 33 / 16 / 5 / 4 | 29 / 17 / 5 / 4 |
+
+หลัง Stage 5 (`wiring_dump.after_stage5.txt`): ref ข้าม child **61** (root → `[MiniGameSystem]` 5 → 1 เพราะปุ่ม cancel ย้ายไปอยู่ใน manager เอง), ref ใน child เดียวกัน 150 เท่าเดิม, scene ref 215 → 211, comps 916 → 885 / MonoBehaviour 402 → 386 (ลบ `BG_BTN` 7 object และ `IngredientButtonUI` ซาก 2 ตัว), UnityEvent 19 เท่าเดิม (UnityEvent ที่ลบเป็นตัวว่าง)
 
 ไฟล์เต็ม: `Docs/baseline/managers/wiring_dump.txt` (Stage 0) และ `wiring_dump.after_stage4b.txt`
 
@@ -51,6 +55,8 @@
 | `91ef84e` | 4c-Vis | **ลบ** `Canvas/Panel - VisurlCocktail` (screen-space) + `_panelVisualCocktail` (decision D10) | ไม่มีโค้ด/event ใดเปิดมัน; ผู้เล่นเห็นแต่ตัว world-space |
 | `c4865fe` | 4a | `IngredientButtonGroup` เก็บขวดจาก `IngredientButtonUI` ใต้ตัวเอง (list ใน scene 20 → 2: shaker, ปุ่ม book) + `BindShaker` จาก `CocktailSystemManager.Awake` | ขวดถือ `ShakerContents` ตั้งแต่เริ่ม 3 → 19 จาก 19 |
 | `3fe82b2` | 4b | `MethodPanel` (component ใหม่) เป็นเจ้าของปุ่ม Shake/Stir/Reset ส่ง event; bridge เหลือ 1 slot (เดิม 4); ย้าย panel ไป `[CocktailSystem]/Canvas_Cocktail`; `Canvas_Cocktail` CanvasScaler match 0 → 0.5; prefab เก่าได้ component เดียวกัน | panel ดูแลตัวเอง |
+| Stage 5 commit | 4b-fix | ลบ `IngredientButtonUI` (`action=None`, ไม่มี call) ออกจาก `BTN_Shaking`/`BTN_Mixing` ใน scene + prefab; `IngredientButtonGroup.Members` กลับเป็น `GetComponentsInChildren<IngredientButtonUI>` ล้วน (ไม่มี special-case) | 4b ย้าย panel เข้าใต้ `[CocktailSystem]` สองปุ่มนี้เลยกลายเป็นสมาชิกของกลุ่มที่ `OnFulled` lock → ผู้เล่นกด Shake/Stir ตอน drink เต็มไม่ได้ trace มองไม่เห็นเพราะเรียก `onClick.Invoke()` |
+| Stage 5 commit | 5 | `MinigameSystemManager` ถือปุ่ม back ×2 + `Resolve()` + `_defaultType` (ส่ง `BackRequested`); bridge เหลือ slot `_gameLoop`/`_commands`/`_minigames`/`_shakerContents`; ลบ `OnStartedMinigame`/`OnEndedGame`; **ลบ `BG_BTN` ทั้งกลุ่ม** (user สั่ง) จึงไม่มี give-up/cancel-direct/F6 อีก | ปุ่ม cancel อยู่ใน bridge ที่ root; ปุ่ม dev ที่ปิดไว้และตายทั้งกลุ่ม |
 
 ---
 
@@ -66,6 +72,9 @@
 | 4e ice API ใน Stage 4 | ย้ายไป Stage 6 | ผู้เรียกคือ Garnish |
 | baseline trace มีฟิลด์ `visScreen=` | ถอดออกจาก snippet + ไฟล์ baseline | object ไม่มีแล้ว |
 | ตั้ง `Canvas_Cocktail` CanvasScaler | match 0.5 (เดิม 0) | ให้เท่า `Canvas` เดิม ไม่งั้น Method panel/post-it สเกลต่างเมื่อจอไม่ใช่ 16:9 ถ้า user ตั้ง 0 ไว้จริงให้คืน |
+| Stage 5 ย้าย `PendingType`/`LastOutcome` เข้า manager | ไม่ย้าย | เป็น state ระดับ flow ที่ Yarn อ่าน (`flow_minigame_type`/`flow_minigame_result`) และ `LastOutcome` ถูกล้างทุกครั้งที่เข้า 2.2 การย้ายต้องให้ `GameFlowCommands` ถือ ref ไป manager ซึ่งข้ามชั้น; ย้ายเฉพาะส่วนที่เป็นของ manager จริง (ปุ่ม, ลำดับเลือก, default) |
+| Stage 5 ลบ `_cocktailCamera`/`ResetCamera()` | เลื่อนไป Stage 8 | null ทั้ง scene และ prefab (no-op) แต่เป็น seam ที่ออกแบบไว้ "snap กล้องตอนเริ่มเกม" เป็นเรื่องของ Camera manager ให้ตัดสินตอนนั้นว่าต่อหรือลบ |
+| Stage 5 แก้ F6 ให้ Give-up/Cancel-direct ออกผ่าน HSM | ลบปุ่มทั้งคู่ (`BG_BTN`) | หลักฐานใน `f6_giveup.txt`: ค้างที่ 2.2 แล้ว `IngredientAdded()` ถูกปฏิเสธ ปุ่มอยู่ใน `BG_BTN` ที่ปิดไว้และไม่มีอะไรเปิด ผมแก้ให้ออกผ่าน HSM ก่อน (ผ่าน `f6_giveup.after_stage5.txt`) แล้ว user สั่งลบทั้งกลุ่ม จึงถอดโค้ด give-up ออกด้วย |
 
 ---
 
@@ -119,8 +128,11 @@
 | flow trace | `flow_trace.snippet.cs` → `flow_trace.txt` | 15 step ผ่าน HSM + ปุ่มจริง: ชนะ minigame, ยกเลิก, remake จาก Garnish/Serve, Serve, close bar, next day | Play ใหม่ → วาง snippet ใน `execute_code` → รอบรรทัด `DONE` → `git diff Docs/baseline/managers/flow_trace.txt` ต้องว่าง |
 | serve commit | `serve_commit.snippet.cs` → `serve_commit.txt` | ออกจาก Serve 3 ทาง แล้วดู `$task_done`/`$satisfaction` | เหมือนข้างบน |
 | placement drag | `placement_drag.snippet.cs` → `placement_drag.txt` | ลากขวด 2 ตัวผ่าน `PointerEventData` + `IngredientHoverDetector` | เหมือนข้างบน |
-| lock fingerprint | `lock_fingerprint.snippet.cs` → `lock_fingerprint.txt` | สถานะ lock ของ 21 object × 9 จุด (ครบทุก writer) | เหมือนข้างบน |
+| lock fingerprint | `lock_fingerprint.snippet.cs` → `lock_fingerprint.txt` | สถานะ lock ของ 19 object (ขวด 17, shaker, ปุ่ม book) × 9 จุด (ครบทุก writer) | เหมือนข้างบน |
 | wiring dump | `wiring_dump.snippet.cs` | จำนวน ref/UnityEvent/ข้าม child | รันใน Edit mode, ตั้ง `tag` ให้ชื่อไฟล์ |
+| F6 give-up / cancel-direct | `f6_giveup.snippet.cs` → `f6_giveup.after_stage5.txt` (`f6_giveup.txt` = ก่อนแก้) | ปุ่ม `BG_BTN/BTN_Reset`/`BTN_Next` ใน 2.2 แล้วลอง `IngredientAdded()` ต่อ | เหมือนข้างบน |
+| minigame type resolution | `resolve_priority.snippet.cs` → `resolve_priority.txt` | default / method ของ drink / เลือกเอง (trace อื่นทุกตัวเรียก `SelectShaking` ก่อนจึงไม่ครอบคลุม) | เหมือนข้างบน |
+| กดปุ่ม Method จริง | `method_buttons_click.snippet.cs` → `method_buttons_click.txt` | Shake/Stir ด้วย pointer click ผ่าน EventSystem ตอน drink เต็ม (ดู `interactable`) | เหมือนข้างบน; ต้องรันเมื่อย้าย object ใต้ `[CocktailSystem]` |
 
 ทุก snippet รันเป็น body ของ `mcp__unityMCP__execute_code` ใน Play mode **เริ่มจาก Play session ใหม่** (stop → play) และทุกตัวหยุด chapter dialogue ของฉากก่อน
 
@@ -147,6 +159,9 @@
 8. **hotkey ใน editor**: `2`–`0` = flow command (`GameFlowDebugHotkeys` บน `[Debug]`), Shift+`1`/`2`/`B`/`V` = minigame (`MinigameSystemManager`), `R` = reload scene (`Demo_KeysShortCut` บน `NPCs_And_Set`)
 9. **ชื่อ child เปลี่ยนไปแล้ว**: `SystemGame` → `[CocktailSystem]`, `MiniGameSystem` → `[MiniGameSystem]`, `PlacmentSystem` → `[PlacmentSystem]` เอกสารเก่าบางที่ยังใช้ชื่อเดิม
 10. Unity MCP อาจหลุด (`MCP server disconnected`) → ตรวจ editor state ก่อนแก้ต่อ
+11. **หลัง `manage_editor play` ต้องรอให้พร้อมก่อนรัน snippet** ถ้ารันทันที snippet อาจติดอยู่ก่อน domain reload ของ Play mode: `GameFlowCommands.Instance` เป็น null ภายหลัง, `BaseMiniGame.Input` เป็น null (NRE ใน `ProcessedGame`), trace ค้างกลางทาง (เจอตอน Stage 5 ครั้งแรก) เช็กก่อนว่า `Instance != null` และ `GetComponent<ShakingMinigame>()` มี `Input` แล้ว (snippet ทุกตัวเริ่มต้นด้วยเช็กนี้ได้) และ **ห้ามแก้ .cs ระหว่างอยู่ใน Play**
+12. **`Button.onClick.Invoke()` ไม่ดู `interactable`** trace/snippet ที่เรียกแบบนี้พิสูจน์ได้แค่ว่า handler ทำงาน ไม่ใช่ว่าผู้เล่นกดได้ สำหรับปุ่มที่ lock ได้ให้ใช้ `ExecuteEvents.Execute(go, PointerEventData, pointerClickHandler)` (ดู `method_buttons_click.snippet.cs`)
+13. **ย้าย object เข้าใต้ `[CocktailSystem]` ต้องรัน lock fingerprint ซ้ำ** `IngredientButtonGroup` เก็บสมาชิกด้วย `GetComponentsInChildren<IngredientButtonUI>` ตามตำแหน่ง จึงเก็บของที่ย้ายเข้ามาเงียบๆ (4b พลาดตรงนี้: README ระบุว่า fingerprint "เหมือนก่อนแก้" แต่เป็นของ 4a) 4b-fix แก้ด้วยการลบ `IngredientButtonUI` ซากออกจากปุ่ม Shake/Stir ดังนั้นตอนนี้ **ทุก `IngredientButtonUI` ใต้ `[CocktailSystem]` คือสมาชิกที่ถูก lock** ถ้าจะเติม component นี้บนปุ่มที่ไม่ใช่ขวดต้องรู้ว่ามันจะถูก lock ตอน drink เต็ม
 
 ---
 
@@ -155,7 +170,15 @@
 ### Stage 4c · book (เลื่อนไป Stage 8)
 ปุ่ม `Canvas/Panel - Hub/BTN - Open_CloseBook` ถูกเขียนจาก 4 จุด: `IngredientButtonGroup` (lock), `CocktailFlowBridge._btnBook` (เปิดกลับตอน `OnFulled`), `UIFlowBridge` (onClick → `BookUI_V2`), `TalkingWithCustomerBridge`/`CocktailFlowBridge` (ปิด book) กฎ "step ไหนกดได้" กระจายอยู่ จึงเลื่อนไปทำพร้อม presenter/`FlowStep` ใน Stage 8
 
-### Stage 5 · Minigame Manager (ถัดไป)
+### Stage 5 · Minigame Manager (**เสร็จ**)
+
+ที่ทำจริง
+- `MinigameSystemManager` ถือ `_btnBack[2]` (`BTN - Cancel Minigame` ของ Shaking/Mixing canvas) ผูก listener ใน `OnEnable`/`OnDisable` ส่ง event `BackRequested`; `Resolve(selected, fromDrink)` + `_defaultType` ย้ายมาจาก bridge (ค่า serialized 1 = Shaking เท่าเดิม); ลบ `OnStartedMinigame`/`OnEndedGame` (UnityEvent ว่าง ไม่มี listener ทั้ง scene, prefab, dev scene)
+- `MinigameFlowBridge`: `OnBackRequested` → `AnotherIngredient()`; ลบ warning "no minigame to run" (ซ้ำกับ `StartMinigame` และ default คือ Shaking)
+- F6 (`f6_giveup.txt` ก่อน → `.after_stage5.txt` หลัง): ก่อนแก้ Give-up/Cancel-direct ทิ้ง flow ค้างที่ 2.2; ผมแก้ให้ออกผ่าน HSM แล้ว user สั่งลบ `BG_BTN` ทั้งกลุ่ม (`BTN_Reset`, `BTN_Next`, `BTN_AddIce`: ปิดไว้ทั้ง scene + prefab, ไม่มีอะไรเปิด, 7 object) F6 จึงไม่มีให้เกิดอีกทาง UI เหลือแค่ Shift+B ใน editor ที่ตั้งใจให้ยกเลิกตรง ผู้เล่นรีเซ็ต drink ได้จากปุ่ม Reset ของ Method panel เหมือนเดิม
+- ตัวตรวจทางออกที่เหลือ: `back_button` (กดปุ่ม back จริง → 2.1 → เข้า 2.2 ซ้ำได้, drink ถูกเก็บ, shaker ปลด lock)
+
+ที่วางแผนไว้เดิม (เก็บไว้ดูว่าตัดสินอะไร):
 - **ย้ายเข้า manager**: การเลือก type (`explicit > ShakerContents.RequiredMinigame > _defaultType`, อยู่ใน `MinigameFlowBridge.Resolve`), ปุ่ม cancel 4 ตัว (`_btnCancel[2]` = `BTN - Cancel Minigame` ใน Canvas_ShakingMinigame/Canvas_MixingMinigame, `_btnGiveUp` = `BG_BTN/BTN_Reset`, `_btnCancelDirect` = `BG_BTN/BTN_Next`), `LastOutcome`
 - **single source of truth**: ตอนนี้ "minigame ไหน" อยู่ 3 ที่ (`MinigameState.PendingType`, `ShakerContents.RequiredMinigame`, `_defaultType`) และ `LastOutcome` อยู่ที่ `MinigameState` — Yarn `flow_minigame_type`/`flow_minigame_result`/`flow_minigame` อ่าน/เขียนตรงนี้ (ชื่อห้ามเปลี่ยน)
 - **F6 (ยังไม่ได้ยืนยัน)**: Give-up / Cancel-direct เรียก `CancelMinigame()` โดยไม่ผ่าน HSM → `Cancelled` แค่บันทึก flow ค้างที่ 2.2 และ `ShakerContents.Clear()` ทำให้ `OnShakerCleared` เปิด ingredient ทั้งที่ยังอยู่ 2.2 **ต้องจำลองให้เห็นก่อนแก้** (Play → PrepareDrinks → pour → Shake → รอ `Play` → กด give-up → ดู `flow_step`)
@@ -205,6 +228,10 @@
 4. **Shell** เป็น `Canvas_Shell` ที่ไม่มี manager ใช่ไหม (default)
 5. **F6** — ยังไม่เคยทดสอบด้วยมือ (Give-up ค้างใน 2.2?) ถ้า user รู้อยู่แล้วบอกได้ จะข้ามขั้นจำลอง
 6. ทดสอบด้วยเมาส์จริงที่ MCP ทำไม่ได้: ลากขวดลง shaker, ลากผลไม้จาก tray, Shift+1/2 hotkey ขอให้ user ลองสั้นๆ หลัง Stage 5/6
+7. ~~commit ได้หรือยัง~~ **ตอบแล้ว: commit เดียว** (Stage 5 + `4b-fix` + ลบ `BG_BTN`) ทำแล้ว
+8. ~~`BG_BTN`~~ **ตอบแล้ว: ลบทิ้ง** (user 2026-10-13) ทั้งใน scene และ prefab
+10. ~~วิธีแก้ regression 4b~~ **ตอบแล้ว: วิธี B** (user 2026-10-13) ลบ `IngredientButtonUI` ซากออกจากปุ่ม Shake/Stir ทำแล้วและตรวจแล้ว
+9. warning เดิมที่ไม่ใช่ของเรา: `Can't call command <<Enable_InteractableObject SystemGame false>>, because SystemGame doesn't have the correct component` — `.yarn` ยังเรียกชื่อ `SystemGame` ซึ่งเปลี่ยนเป็น `[CocktailSystem]` แล้ว (ตรวจว่ามี object ชื่อนั้นเหลือไหม และ writer ควรเปลี่ยนเป็นชื่อใหม่ไหม) ชื่อ command ห้ามแตะ แต่ argument ใน `.yarn` เป็นของ writer
 
 ---
 
@@ -228,6 +255,6 @@
 
 ## 10. คำสั่งเริ่ม session ใหม่
 
-> อ่าน `Docs/Bar410_Managers_Restructure_HANDOFF.md` แล้วทำต่อที่ Stage 5 (Minigame Manager) ตาม §6 และ §7 ก่อนแก้อะไร ให้ตรวจว่าอยู่ branch `GameFlow/Managers` และ working tree สะอาด (ยกเว้น `ysls.json`) จากนั้นรัน `check_yarn_contract.py --check` และ flow trace เพื่อยืนยันว่า baseline ยังผ่าน
+> อ่าน `Docs/Bar410_Managers_Restructure_HANDOFF.md` แล้วทำต่อที่ Stage 6 (Garnish Manager) ตาม §6 และ §7 ก่อนแก้อะไร ให้ตรวจว่าอยู่ branch `GameFlow/Managers` และ working tree สะอาด (ยกเว้น `ysls.json`) จากนั้นรัน `check_yarn_contract.py --check`, flow trace และ lock fingerprint เพื่อยืนยันว่า baseline ยังผ่าน (รอให้ Play พร้อมก่อนรัน snippet ดู §6.3 ข้อ 11)
 
 ผู้ใช้เป็นคนไทย ตอบไทยกระชับ ชื่อเทคนิคเป็นอังกฤษ; ตัดสินใจทุกอย่างผ่าน decision log; คุ้นกับ Unity MCP; ไม่ push/ไม่เปิด PR จนกว่าจะบอก

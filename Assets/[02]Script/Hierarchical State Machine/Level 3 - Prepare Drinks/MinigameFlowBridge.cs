@@ -1,5 +1,4 @@
 using UnityEngine;
-using UnityEngine.UI;
 using static E_Cocktail;
 
 namespace Bar410.GameFlow
@@ -37,26 +36,15 @@ namespace Bar410.GameFlow
         [SerializeField] private MinigameSystemManager _minigames;
 
         [Tooltip("Optional. Supplies the fallback type from the drink's preparation method, " +
-                 "and is the object locked while a minigame is on screen.")]
+                 "and is the object unlocked again when a run is cancelled.")]
         [SerializeField] private ShakerContents _shakerContents;
 
         [Header("Behaviour")]
-        [Tooltip("Used when nothing was selected and the shaker has no method yet.")]
-        [SerializeField] private Enum_MiniGameType _defaultType = Enum_MiniGameType.Shaking;
-
         [Tooltip("On (design, 2026-08-21): winning the minigame finishes the drink — 2.2 exits " +
-                 "straight to step 3 Garnish. This is the only thing that leaves 2.2 today; no " +
-                 "scene button calls AnotherIngredient or DrinkComplete. Turn off only once " +
-                 "such a button exists, or step 2.2 becomes a dead end.")]
+                 "straight to step 3 Garnish. Leaving by cancel goes back to 2.1 through the " +
+                 "manager's back / give-up buttons. Turn off only once a scene button calls " +
+                 "DrinkComplete, or winning leaves step 2.2 a dead end.")]
         [SerializeField] private bool _autoAdvanceOnWin = true;
-
-        [Header("Cancel / Give-up Buttons")]
-        [Tooltip("The two 'BTN - Cancel Minigame' buttons (Shaking + Mixing canvases) — go back to AddIngredient through the HSM, keep the drink.")]
-        [SerializeField] private Button[] _btnCancel;
-        [Tooltip("BG_BTN/BTN_Reset — cancels the minigame directly (not through the HSM) AND clears the shaker. Give-up-the-drink button.")]
-        [SerializeField] private Button _btnGiveUp;
-        [Tooltip("BG_BTN/BTN_Next — cancels the minigame directly, keeps the drink. Ported as-is; the original scene wired 'Next' to a cancel call.")]
-        [SerializeField] private Button _btnCancelDirect;
 
         // ── Unity ──────────────────────────────────────────
 
@@ -69,15 +57,12 @@ namespace Bar410.GameFlow
             minigameState.OnStartRequested += OnStartRequested;
             minigameState.OnStopRequested += OnStopRequested;
 
-            if (_minigames != null) _minigames.MinigameFinished += OnMinigameFinished;
+            if (_minigames != null)
+            {
+                _minigames.MinigameFinished += OnMinigameFinished;
+                _minigames.BackRequested += OnBackRequested;
+            }
             else Debug.LogWarning("[MinigameFlowBridge] No MinigameSystemManager assigned — step 2.2 will run nothing.", this);
-
-            if (_btnCancel != null)
-                foreach (var btn in _btnCancel)
-                    if (btn != null) btn.onClick.AddListener(OnCancelClicked);
-
-            if (_btnGiveUp != null) _btnGiveUp.onClick.AddListener(OnGiveUpClicked);
-            if (_btnCancelDirect != null) _btnCancelDirect.onClick.AddListener(OnCancelDirectClicked);
         }
 
         private void OnDestroy()
@@ -89,25 +74,19 @@ namespace Bar410.GameFlow
                 minigameState.OnStopRequested -= OnStopRequested;
             }
 
-            if (_minigames != null) _minigames.MinigameFinished -= OnMinigameFinished;
-
-            if (_btnCancel != null)
-                foreach (var btn in _btnCancel)
-                    if (btn != null) btn.onClick.RemoveListener(OnCancelClicked);
-
-            if (_btnGiveUp != null) _btnGiveUp.onClick.RemoveListener(OnGiveUpClicked);
-            if (_btnCancelDirect != null) _btnCancelDirect.onClick.RemoveListener(OnCancelDirectClicked);
+            if (_minigames != null)
+            {
+                _minigames.MinigameFinished -= OnMinigameFinished;
+                _minigames.BackRequested -= OnBackRequested;
+            }
         }
 
-        private void OnCancelClicked() => _commands?.AnotherIngredient();
+        // ── Minigame buttons → Flow ────────────────────────
+        // Every way out of the minigame goes through the HSM. Cancelling the run directly left
+        // the flow sitting in 2.2 with nothing running, and the next IngredientAdded() was an
+        // "Illegal transition Minigame -> Minigame" (F6, docs/baseline/managers/f6_giveup.txt).
 
-        private void OnGiveUpClicked()
-        {
-            _minigames?.CancelMinigame();
-            _shakerContents?.Clear();
-        }
-
-        private void OnCancelDirectClicked() => _minigames?.CancelMinigame();
+        private void OnBackRequested() => _commands?.AnotherIngredient();
 
         // ── Flow → Minigame ────────────────────────────────
 
@@ -115,15 +94,11 @@ namespace Bar410.GameFlow
         {
             if (_minigames == null) return;
 
-            var type = Resolve(selected);
-            if (type == Enum_MiniGameType.None)
-            {
-                Debug.LogWarning("[MinigameFlowBridge] Entered step 2.2 with no minigame to run — " +
-                                 "select one with <<flow_minigame ...>> or give the drink a preparation method.", this);
-                return;
-            }
+            var fromDrink = _shakerContents != null
+                ? _shakerContents.RequiredMinigame
+                : Enum_MiniGameType.None;
 
-            _minigames.StartMinigame(type);
+            _minigames.StartMinigame(_minigames.Resolve(selected, fromDrink));
         }
 
         private void OnStopRequested()
@@ -134,21 +109,6 @@ namespace Bar410.GameFlow
             if (_minigames.ActivePhase == MinigamePhase.Idle) return;
 
             _minigames.CancelMinigame();
-        }
-
-        /// <summary>
-        /// Explicit selection wins; otherwise the drink's own preparation method decides;
-        /// the Inspector default is the last resort.
-        /// </summary>
-        private Enum_MiniGameType Resolve(Enum_MiniGameType selected)
-        {
-            if (selected != Enum_MiniGameType.None) return selected;
-
-            var fromShaker = _shakerContents != null
-                ? _shakerContents.RequiredMinigame
-                : Enum_MiniGameType.None;
-
-            return fromShaker != Enum_MiniGameType.None ? fromShaker : _defaultType;
         }
 
         // ── Minigame → Flow ────────────────────────────────

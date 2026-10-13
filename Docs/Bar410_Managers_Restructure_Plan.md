@@ -192,7 +192,11 @@ baseline อยู่ที่ `Docs/baseline/managers/` (README ในโฟล
 - 4e `SetIce`/`IceChanged` เป็น API ของ Cocktail ย้ายไปทำพร้อม Stage 6 เพราะผู้เรียกคือ Garnish
 - `FlowWiring` ไม่จำเป็นใน stage นี้ bridge เดิมทำหน้าที่ seam ได้ จะรวมเป็นไฟล์เดียวตอนล้าง bridge (Stage 9)
 
-**Stage 5 · Minigame Manager** ย้ายการเลือก type, cancel buttons, `LastOutcome` เข้ามา แก้ F6 หลังจำลองให้เห็นก่อน
+**Stage 5 · Minigame Manager** ✅ ทำแล้ว 2026-10-13 (commit เดียวกับ 4b-fix และการลบ `BG_BTN`)
+- ย้ายเข้า `MinigameSystemManager`: ปุ่ม back 2 ตัว (`BTN - Cancel Minigame` ของแต่ละ minigame canvas, ส่ง event `BackRequested`), ลำดับเลือก type (`Resolve(selected, fromDrink)`, `_defaultType`), ลบ `OnStartedMinigame`/`OnEndedGame` ที่ไม่มี listener
+- F6 จำลองแล้ว (`baseline/managers/f6_giveup.txt`): Give-up/Cancel-direct เรียก `CancelMinigame()` ตรงๆ ทิ้ง flow ค้างที่ 2.2 แล้ว `IngredientAdded()` ได้ `Illegal transition Minigame -> Minigame` ปุ่มสองตัวนี้อยู่ใน `BG_BTN` ที่ `activeSelf=false` ทั้ง scene และ prefab และไม่มีโค้ด/animation เปิด ผู้เล่นจึงไม่เคยถึง F6 ทาง UI — user ตัดสิน (2026-10-13) ให้**ลบ `BG_BTN` ทั้งกลุ่ม** (`BTN_Reset`, `BTN_Next`, `BTN_AddIce`) F6 จึงหายไปพร้อมปุ่ม; ทางเดียวที่ยังเข้าถึงได้คือ Shift+B ใน editor (debug hotkey ตั้งใจให้ยกเลิกตรง)
+- **ไม่ย้าย** `PendingType`/`LastOutcome` ออกจาก `MinigameState`: เป็น state ระดับ flow ที่ Yarn อ่าน (`flow_minigame_type`/`flow_minigame_result`) และ `LastOutcome` ถูกล้างทุกครั้งที่เข้า 2.2 การย้ายต้องให้ `GameFlowCommands` รู้จัก manager (flow → gameplay) ซึ่งเพิ่ม ref ข้ามชั้น
+- **เลื่อน** `_cocktailCamera`/`IMinigameContext.ResetCamera()` (null ใน scene และ prefab ทำงานเป็น no-op) ไป Stage 8 ที่ต้องตัดสินว่าจะต่อกับ Camera manager หรือลบ
 
 **Stage 6 · Garnish Manager** แยก `GarnishManager` + `Canvas_Garnish` (tabs, ice toggle เป็น component ของ panel เอง, **Serve panel ย้ายเข้า**) + `GarnishChoice`, `PlacedGlassInstance` เลิก static, grid หา manager ด้วย `GetComponentInParent`, `GlassPlacementZone` อยู่ใต้ Garnish, ตัด `ShakerPanelController._serveUI`
 

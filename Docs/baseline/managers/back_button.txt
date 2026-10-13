@@ -1,0 +1,6 @@
+# minigame back button, real pointer click
+B1 minigame running | step=Minigame mgPhase=Play mgResult= parts=10 shaker3D=False methodPanel=off
+B2a right after back click | step=AddIngredient mgPhase=Outro mgResult= parts=10 shaker3D=True methodPanel=on
+B2b outro finished | step=AddIngredient mgPhase=Idle mgResult=Cancelled parts=10 shaker3D=True methodPanel=on
+B3 second run | step=Minigame mgPhase=Play mgResult= parts=10 shaker3D=False methodPanel=off
+DONE
