@@ -13,6 +13,7 @@ namespace Bar410.GameFlow
     /// <see cref="GarnishManager"/>; it reports what happened and this bridge decides what the
     /// flow, the cocktail and the camera do about it:
     ///   step entered      → resolve the drink, frame the plate, lock the ingredients, open the panel
+    ///   table reset       → take the glass off the plate (a new drink starts, or the old one was served)
     ///   pour requested    → hand the drink in
     ///   ice toggled       → record it on the drink (the cocktail owns the flag)
     ///   finish requested  → GarnishDone()
@@ -55,6 +56,12 @@ namespace Bar410.GameFlow
             garnishStep.Entered += OnGarnishEntered;
             garnishStep.Exited += OnGarnishExited;
 
+            // Every customer starts with an empty table: a glass placed for the previous order (or
+            // a backtrack from Garnish/Serve) does not carry over, and neither does the served one.
+            // Both run on every way in, remake included.
+            _gameLoop.OpenBar.PrepareDrinks.Entered += OnTableReset;
+            _gameLoop.OpenBar.Serve.Exited += OnTableReset;
+
             if (_garnish != null)
             {
                 _garnish.PourRequested += OnPourRequested;
@@ -80,6 +87,8 @@ namespace Bar410.GameFlow
             var garnishStep = _gameLoop.OpenBar.Garnish;
             garnishStep.Entered -= OnGarnishEntered;
             garnishStep.Exited -= OnGarnishExited;
+            _gameLoop.OpenBar.PrepareDrinks.Entered -= OnTableReset;
+            _gameLoop.OpenBar.Serve.Exited -= OnTableReset;
         }
 
         // ── Step 3 · Garnish ───────────────────────────────
@@ -98,6 +107,8 @@ namespace Bar410.GameFlow
         }
 
         private void OnGarnishExited() => _garnish?.Close();
+
+        private void OnTableReset() => _garnish?.ClearGlass();
 
         // ── Garnish → game ─────────────────────────────────
 

@@ -69,7 +69,6 @@ namespace Bar410.GameFlow
             prepareDrinks.Exited += OnPrepareDrinksExited;
             prepareDrinks.AddIngredient.Entered += OnAddIngredientEntered;
             prepareDrinks.AddIngredient.Exited += OnAddIngredientExited;
-            openBar.Serve.Exited += OnServeExited;
             openBar.Sub.OnTransition += OnOpenBarTransition;
 
             if (_shakerContents != null)
@@ -113,7 +112,6 @@ namespace Bar410.GameFlow
             prepareDrinks.Exited -= OnPrepareDrinksExited;
             prepareDrinks.AddIngredient.Entered -= OnAddIngredientEntered;
             prepareDrinks.AddIngredient.Exited -= OnAddIngredientExited;
-            openBar.Serve.Exited -= OnServeExited;
             openBar.Sub.OnTransition -= OnOpenBarTransition;
         }
 
@@ -164,10 +162,6 @@ namespace Bar410.GameFlow
             if (_shakerPanels != null) _shakerPanels.ResetPermissions();
             if (_cocktail != null) _cocktail.Order.ClearResult();
 
-            // Every customer starts with an empty table — a glass placed for the previous
-            // order (or a Garnish backtrack) does not carry over.
-            PlacedGlassInstance.DestroyCurrent();
-
             _camera?.ResetRotaionAndMovement();
             _cameraSwitcher?.SwitchCamera(_prepareDrinksCameraId);
             _postIt?.Init();
@@ -208,13 +202,6 @@ namespace Bar410.GameFlow
         }
 
         // ── Step 4 · Serve ─────────────────────────────────
-
-        private void OnServeExited()
-        {
-            // The served glass never carries over — the next customer always gets a fresh one
-            // from GarnishManager.ChooseGlass. Runs on every way out of Serve, remake included.
-            PlacedGlassInstance.DestroyCurrent();
-        }
 
         /// <summary>
         /// The one place a drink is scored. Serve → Talking is the only transition that means

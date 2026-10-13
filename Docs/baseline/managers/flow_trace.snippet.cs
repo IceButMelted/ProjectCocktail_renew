@@ -54,7 +54,7 @@ string Snap(string label) {
     + " mgPhase=" + minigames.ActivePhase
     + " | order.has=" + o.HasOrder + " scored=" + o.IsScored + " result=" + o.Result + " target=" + o.TargetName
     + " | shaker.parts=" + shaker.TotalParts + " ice=" + shaker.CurrentCocktail.AddIce + " method=" + shaker.CurrentCocktail.PreparationMethod
-    + " | glass=" + (PlacedGlassInstance.Current != null) + " canFinish=" + garnish.CanFinish
+    + " | glass=" + (garnish.Glass != null) + " canFinish=" + garnish.CanFinish
     + " | cam=" + cam
     + " | lock: bottle=" + (flat != null ? flat.Interactable.ToString() : "none")
     + " drag=" + (drag != null ? drag.Interactable.ToString() : "none")

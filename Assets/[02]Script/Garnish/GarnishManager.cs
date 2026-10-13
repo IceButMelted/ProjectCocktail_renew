@@ -97,6 +97,9 @@ public class GarnishManager : MonoBehaviour
     /// <summary>True from the moment the pour button was accepted until the next <see cref="Open"/>.</summary>
     public bool HasPoured => _hasPoured;
 
+    /// <summary>The one serving glass on the plate, or null. Owned here; nothing else keeps a reference.</summary>
+    public PlacedGlassInstance Glass { get; private set; }
+
     // ── Unity ──────────────────────────────────────────────
 
     // The buttons belong to this manager's canvas, so it wires them itself. The panel starts
@@ -187,15 +190,43 @@ public class GarnishManager : MonoBehaviour
         if (_glassSpawnPoint == null) return;
         if (_hasPoured) return;
 
-        UnsubscribeFromPouringGlass(); // the old glass is about to be destroyed — drop its fill subscription with it
-        UnsubscribeFromGarnishSlots();
+        if (option == null || option.PlacedPrefab == null)
+        {
+            Debug.LogWarning("[GarnishManager] ChooseGlass needs an SO_GlassOption with a PlacedPrefab.", this);
+            return;
+        }
 
-        PlacedGlassInstance.Spawn(option, _glassSpawnPoint);
+        ClearGlass(); // the old glass is about to be replaced — drop its subscriptions with it
+
+        var instance = Instantiate(option.PlacedPrefab, _glassSpawnPoint.position, _glassSpawnPoint.rotation);
+        var glass = instance.GetComponent<PlacedGlassInstance>();
+        if (glass == null)
+        {
+            Debug.LogWarning($"[GarnishManager] '{option.PlacedPrefab.name}' has no PlacedGlassInstance component.", this);
+            Destroy(instance);
+            return;
+        }
+
+        glass.Initialize(option);
+        Glass = glass;
         _pourComplete = false; // a freshly-placed glass has nothing poured into it yet
         _hasPoured = false;
         _activeGarnishSlot = 0;
 
         SubscribeToGarnishSlots();
+    }
+
+    /// <summary>
+    /// Takes the glass off the table. Leaves the poured flags alone: they belong to the step
+    /// and are reset by <see cref="Open"/>.
+    /// </summary>
+    public void ClearGlass()
+    {
+        UnsubscribeFromPouringGlass();
+        UnsubscribeFromGarnishSlots();
+
+        if (Glass != null) Destroy(Glass.gameObject);
+        Glass = null;
     }
 
     // ── Ice ────────────────────────────────────────────────
@@ -213,7 +244,7 @@ public class GarnishManager : MonoBehaviour
             return;
         }
 
-        PlacedGlassInstance.Current?.ApplyIce(enable);
+        if (Glass != null) Glass.ApplyIce(enable);
 
         // The icon swap happens here with the glass, in one place, so the two can never drift
         // apart (a lone Inspector listener flipping only one half was a past desync bug).
@@ -235,17 +266,17 @@ public class GarnishManager : MonoBehaviour
     /// (GarnishSlotButton). Fresh and Novelty share both slots. Null clears the active slot.
     /// </summary>
     public void ChooseGarnishItem(SO_GarnishItemOption item)
-        => PlacedGlassInstance.Current?.ApplyGarnishItem(_activeGarnishSlot, item);
+        => Glass?.ApplyGarnishItem(_activeGarnishSlot, item);
 
     /// <summary>Sets the whole-rim treatment. Null clears it.</summary>
     public void ChooseGarnishRim(SO_GarnishRimOption rim)
-        => PlacedGlassInstance.Current?.ApplyGarnishRim(rim);
+        => Glass?.ApplyGarnishRim(rim);
 
     private void OnGarnishSlotClicked(int slotIndex) => _activeGarnishSlot = slotIndex;
 
     private void SubscribeToGarnishSlots()
     {
-        _garnishSlotGlass = PlacedGlassInstance.Current;
+        _garnishSlotGlass = Glass;
         if (_garnishSlotGlass != null) _garnishSlotGlass.GarnishSlotClicked += OnGarnishSlotClicked;
     }
 
@@ -279,7 +310,7 @@ public class GarnishManager : MonoBehaviour
     /// </summary>
     public void Pour(S_Drink drink)
     {
-        var glass = PlacedGlassInstance.Current;
+        var glass = Glass;
         if (glass == null)
         {
             Debug.LogWarning("[GarnishManager] No glass placed yet — choose a glass before pouring.", this);
