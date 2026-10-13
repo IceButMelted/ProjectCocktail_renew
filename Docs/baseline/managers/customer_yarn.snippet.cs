@@ -55,6 +55,17 @@ System.Collections.IEnumerator Cmd(string text) {
 }
 System.Collections.IEnumerator Run() {
   yield return new WaitForSeconds(1f);
+  // The scene's chapter dialogue runs until this snippet stops it, so how far it got (it moves and dresses Isla) depends
+  // on how long the editor took to get here. Put every NPC back where the scene starts so runs are comparable.
+  foreach (var npc in UnityEngine.Object.FindObjectsByType<NPC_Base>(FindObjectsInactive.Include, FindObjectsSortMode.None)) {
+    if (npc.Name == E_Cocktail.NPC_Name.None) continue;
+    npc.StopAllCoroutines();
+    npc.CurrentWaypointIndex = -1;
+    npc.transform.position = npc.Name == E_Cocktail.NPC_Name.Isla ? new Vector3(2.77f, 0.91f, 7.66f) : new Vector3(2.77f, 0.80f, 7.66f);
+    var sr = npc.SpriteRenderer != null ? npc.SpriteRenderer : npc.GetComponentInChildren<SpriteRenderer>();
+    if (sr != null && npc._neutralSprite != null) sr.sprite = npc._neutralSprite;
+  }
+  yield return Frames();
   Line("A0 initial | " + All());
 
   Line("A1 emotion"); yield return Cmd("SetEmotion Walter happy"); Line("   " + State("Walter"));
