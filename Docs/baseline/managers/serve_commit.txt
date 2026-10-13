@@ -1,0 +1,8 @@
+# serve scoring check: what each way of leaving step 4 commits to Yarn
+start | step=TalkingWithCustomer scored=False result=None | yarn: $task_done=False $satisfaction=0 $type_of_cocktail=0
+A  at Serve | step=Serve scored=False result=None | yarn: $task_done=False $satisfaction=0 $type_of_cocktail=0
+A  after ServeDone() with no button | step=TalkingWithCustomer scored=True result=Acceptable | yarn: $task_done=True $satisfaction=2 $type_of_cocktail=1
+B  at Serve | step=Serve scored=False result=None | yarn: $task_done=False $satisfaction=2 $type_of_cocktail=1
+B1 after remake from Serve | step=AddIngredient scored=False result=None | yarn: $task_done=False $satisfaction=2 $type_of_cocktail=1
+B2 after the Serve button | step=TalkingWithCustomer scored=True result=Acceptable | yarn: $task_done=True $satisfaction=2 $type_of_cocktail=1
+DONE

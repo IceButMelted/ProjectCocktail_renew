@@ -60,11 +60,10 @@ namespace Bar410.GameFlow
             _postIt?.Out();
         }
 
-        private void OnServeClicked()
-        {
-            _cocktail?.ServeDrink();
-            _commands?.ServeDone();
-        }
+        // Scoring is not done here: leaving Serve for the conversation scores the drink
+        // (CocktailFlowBridge.OnOpenBarTransition), so every way of finishing the step commits
+        // the same result.
+        private void OnServeClicked() => _commands?.ServeDone();
 
         private void OnRemakeClicked()
         {

@@ -69,6 +69,7 @@ namespace Bar410.GameFlow
             prepareDrinks.AddIngredient.Entered += OnAddIngredientEntered;
             prepareDrinks.AddIngredient.Exited += OnAddIngredientExited;
             openBar.Serve.Exited += OnServeExited;
+            openBar.Sub.OnTransition += OnOpenBarTransition;
 
             if (_btnShaking != null) _btnShaking.onClick.AddListener(OnShakingClicked);
             if (_btnMixing != null) _btnMixing.onClick.AddListener(OnMixingClicked);
@@ -92,6 +93,7 @@ namespace Bar410.GameFlow
             prepareDrinks.AddIngredient.Entered -= OnAddIngredientEntered;
             prepareDrinks.AddIngredient.Exited -= OnAddIngredientExited;
             openBar.Serve.Exited -= OnServeExited;
+            openBar.Sub.OnTransition -= OnOpenBarTransition;
         }
 
         // ── Step 1 · Talking ───────────────────────────────
@@ -169,19 +171,20 @@ namespace Bar410.GameFlow
         private void OnServeExited()
         {
             // The served glass never carries over — the next customer always gets a fresh one
-            // from GarnishFlowBridge.ChooseGlass. Unconditional, independent of the scoring guard
-            // below, so it still runs even when scoring already happened via the legacy path.
+            // from GarnishFlowBridge.ChooseGlass. Runs on every way out of Serve, remake included.
             PlacedGlassInstance.DestroyCurrent();
+        }
 
-            // Closes the TODO in ServeState.cs and Bar410_StateMachine_Implementation.md §3.2
-            // ("scoring moved to ServeState.OnExit"). Guarded because the existing Serve
-            // button already scores through CocktailSystemManager.ServeDrink(); whichever
-            // path runs first wins and the other becomes a no-op.
-            if (_cocktail == null || _cocktail.Order.IsScored) return;
-            if (_shakerContents == null) return;
-
-            var result = _cocktail.Scoring.Score(_cocktail.Order, _shakerContents.CurrentCocktail);
-            Debug.Log($"[CocktailFlowBridge] Scored on Serve exit → {result} (payout {_cocktail.Order.Payout})");
+        /// <summary>
+        /// The one place a drink is scored. Serve → Talking is the only transition that means
+        /// "handed over": a remake leaves Serve for Prepare Drinks and must not score or write
+        /// anything to Yarn. Whoever finishes the step (the Serve button, &lt;&lt;flow_serve_done&gt;&gt;,
+        /// a debug hotkey) gets the same commit, and a second call is a no-op.
+        /// </summary>
+        private void OnOpenBarTransition(OpenSub from, OpenSub to)
+        {
+            if (from == OpenSub.Serve && to == OpenSub.TalkingWithCustomer)
+                _cocktail?.ServeDrink();
         }
 
         // ── Method panel · Shaking / Mixing / Reset ────────

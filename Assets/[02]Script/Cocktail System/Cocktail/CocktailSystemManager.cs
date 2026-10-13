@@ -91,7 +91,9 @@ public partial class CocktailSystemManager : MonoBehaviour
     }
 
     /// <summary>
-    /// Button hook. Serves the drink to the customer and updates the Yarn result variable.
+    /// Scores the drink and publishes the result to Yarn. Idempotent: an order is committed
+    /// once, so a second call (a double press, a Yarn command after the button) does nothing
+    /// instead of applying the relationship change again.
     /// </summary>
     public void ServeDrink()
     {
@@ -100,6 +102,8 @@ public partial class CocktailSystemManager : MonoBehaviour
             Debug.LogWarning("[CocktailSystemManager] ServeDrink called with no order in progress.");
             return;
         }
+
+        if (Order.IsScored) return;
 
         UpdateVariableInYarnTrigger();
     }
