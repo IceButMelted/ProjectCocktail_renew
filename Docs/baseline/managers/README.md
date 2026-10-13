@@ -15,6 +15,7 @@
 | `placement_drag.snippet.cs` / `placement_drag.txt` | จำลองการลากขวด 2 ตัวผ่าน `DragableObject` (PointerEventData) และเรียก `IngredientHoverDetector` ซึ่ง trace หลักไม่ครอบคลุม | วางเป็น body ของ `execute_code` ตอน Play mode แล้ว diff `placement_drag.txt` |
 | `serve_commit.snippet.cs` / `serve_commit.txt` | ออกจาก Serve 3 ทาง (`ServeDone()` ตรงๆ, remake, ปุ่ม Serve) แล้วบันทึกว่าเขียนอะไรลง Yarn (`$task_done`, `$satisfaction`) | วางเป็น body ของ `execute_code` ตอน Play mode ใหม่ แล้ว diff `serve_commit.txt` |
 | `lock_fingerprint.snippet.cs` / `lock_fingerprint.txt` | สถานะ lock ของ 21 object (ขวดทั้งหมด, shaker, ปุ่ม book) หลังแต่ละ writer ทำงาน 9 จุด และจำนวนขวดที่รู้จัก `ShakerContents` แล้วตั้งแต่เริ่ม | วางเป็น body ของ `execute_code` ตอน Play mode ใหม่ แล้ว diff |
+| `wiring_dump.snippet.cs` / `wiring_dump.after_stage4b.txt` | นับ scene ref ทั้งต้นไม้ (ใน child เดียวกัน/ข้าม child/UnityEvent/ออกนอก prefab) `wiring_dump.txt` คือ Stage 0, `…after_stage4b.txt` คือหลัง 4b | รันใน Edit mode ตั้ง `tag` แล้ว diff ตัวเลขหัวไฟล์ |
 | `screens_baseline/*.jpg` | ภาพอ้างอิงขนาดครึ่ง 960x540 | เทียบด้วยตา คู่กับ `screens/` ที่ driver เขียน (full-size, gitignored) |
 
 ## วิธีเช็กหลังแต่ละ stage
@@ -73,6 +74,10 @@ order ถูกสุ่มด้วย `UnityEngine.Random` ตอนเข้�
 | 2 | ข้าม | `FlowWiring` ว่างเปล่าไม่มีประโยชน์ สร้างตอน Stage 4 พร้อม wiring จริง |
 | 3 | `dbbef25` | trace เหมือนไฟล์ใน git ทุกไบต์ (รวม `target=`), drag simulation เหมือนก่อนแก้, Yarn contract exit 0, console errors 0 |
 | 4f | `b794bdf` | trace เหมือนไฟล์ใน git ทุกไบต์; serve_commit: `ServeDone()` ตรงๆ เขียน `$task_done=True` แล้ว (ก่อนแก้เป็น False), remake ไม่เขียนอะไร, ปุ่ม Serve เหมือนเดิม |
+| 4d | `f5ca4c9` | trace เหมือนไฟล์ใน git ทุกไบต์ (รวม camera `PrepareCam`, lock, method panel ตอนเต็ม และตอน Clear), Yarn contract exit 0, console errors 0 |
+| 4c-VisualizeCocktail | `91ef84e` | ลบ screen-space panel; trace เหมือนเดิมทุกบรรทัด ยกเว้นฟิลด์ `visScreen=` ที่ถูกถอดออกจาก snippet และจากไฟล์ baseline (ตัว object ไม่มีแล้ว) |
+| 4a | `c4865fe` | lock fingerprint เหมือนก่อนแก้ทั้ง 9 จุด (21 object), ขวดที่ถือ `ShakerContents` ตั้งแต่เริ่ม 3 → 19 จาก 19, trace เหมือนไฟล์ใน git ทุกไบต์, Yarn contract exit 0, console errors 0 |
+| 4b | `3fe82b2` | trace เหมือนไฟล์ใน git ทุกไบต์ (snippet หา panel ด้วย type แล้ว), ตำแหน่งปุ่มใน Canvas_Cocktail กับ Canvas เหมือนกัน (1009.34, 430.47) หลัง camera blend จบ, ปุ่ม Reset ล้าง shaker และปิด panel, ปุ่ม Stir ไป Minigame ด้วย Stiring, ภาพต่างจากก่อนแก้ไม่เกิน 0.24% ของ pixel (ขยับตามเฟรมของ animation), Yarn contract exit 0, console errors 0 |
 
 ## เมื่อโครงสร้างใน scene เปลี่ยนจากตอน audit (2026-10-05)
 
@@ -80,7 +85,3 @@ order ถูกสุ่มด้วย `UnityEngine.Random` ตอนเข้�
 - มี `[CocktailSystem]/Canvas_Cocktail` แล้ว ตอนนี้มีแค่ `Panel - OrderDirnks` (post-it) ที่เหลืออยู่ใต้ `Canvas` เดิม
 - `RecipeBook` และ `Architexturebook` ไม่อยู่แล้ว (Interactable_3DObject เหลือ 1, `DragableObject` 12, `ScaleOnHover` 17)
 - `GranishCam` อยู่ใต้ `[CocktailSystem]/Garnish_Plate`
-| 4d | `f5ca4c9` | trace เหมือนไฟล์ใน git ทุกไบต์ (รวม camera `PrepareCam`, lock, method panel ตอนเต็ม และตอน Clear), Yarn contract exit 0, console errors 0 |
-| 4c-VisualizeCocktail | `91ef84e` | ลบ screen-space panel; trace เหมือนเดิมทุกบรรทัด ยกเว้นฟิลด์ `visScreen=` ที่ถูกถอดออกจาก snippet และจากไฟล์ baseline (ตัว object ไม่มีแล้ว) |
-| 4a | `c4865fe` | lock fingerprint เหมือนก่อนแก้ทั้ง 9 จุด (21 object), ขวดที่ถือ `ShakerContents` ตั้งแต่เริ่ม 3 → 19 จาก 19, trace เหมือนไฟล์ใน git ทุกไบต์, Yarn contract exit 0, console errors 0 |
-| 4b | ดู `git log` | trace เหมือนไฟล์ใน git ทุกไบต์ (snippet หา panel ด้วย type แล้ว), ตำแหน่งปุ่มใน Canvas_Cocktail กับ Canvas เหมือนกัน (1009.34, 430.47) หลัง camera blend จบ, ปุ่ม Reset ล้าง shaker และปิด panel, ปุ่ม Stir ไป Minigame ด้วย Stiring, ภาพต่างจากก่อนแก้ไม่เกิน 0.24% ของ pixel (ขยับตามเฟรมของ animation), Yarn contract exit 0, console errors 0 |
