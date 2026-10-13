@@ -44,7 +44,7 @@ string Snap(string label) {
   var sh3 = root.transform.Find("[CocktailSystem]/CocktailShaker");
   var shaker3D = sh3 != null ? sh3.GetComponent<Interactable_3DObject>() : null;
   var postIt = root.GetComponentInChildren<Post_It_Order>(true);
-  var book = Btn("Canvas/Panel - Hub/BTN - Open_CloseBook");
+  var book = Btn("Canvas_Shell/Panel - Hub/BTN - Open_CloseBook");
   // S00 is taken before the flow touches the camera. Since Stage 7d the chapter dialogue's own camera commands run (they
   // used to fail), so how far it got before this script stopped it decides what the camera shows at S00: not part of the trace.
   var cam = label.StartsWith("S00") ? "" : (CameraManager.Current != null ? CameraManager.Current.ActiveCameraId : "noCameraManager");
@@ -65,7 +65,7 @@ string Snap(string label) {
     + " bookBtn=" + (book != null ? book.interactable.ToString() : "none")
     + " | method=" + On(methodPanel != null ? methodPanel.transform : null) + " serve=" + On(FindDeep("Panel - Serve")) + " garnish=" + On(FindDeep("Panel - Granish UI"))
     + " visWS=" + Panel("[CocktailSystem]/CocktailShaker/Canvas - World Space/PanelWS - VisurlCocktail")
-    + " book=" + Panel("Canvas/Panel - BookUI") + " postit=" + On(postIt != null ? postIt.transform : null)
+    + " book=" + Panel("Canvas_Shell/Panel - BookUI") + " postit=" + On(postIt != null ? postIt.transform : null)
     + " | dialogue=" + (runner != null && runner.IsDialogueRunning);
 }
 void Pour() {
@@ -119,6 +119,7 @@ System.Collections.IEnumerator Run() {
   cmds.RemakeDrink();
   yield return Log("S07_remakeFromGarnish", true);
 
+  yield return Until(() => minigames.ActivePhase == MinigamePhase.Idle, 25f, "outro finished");   // a cancelled run's outro can outlast the screenshots that used to give it time (HANDOFF 6.3 item 5)
   Pour();
   cmds.IngredientAdded();
   yield return Until(() => minigames.ActivePhase == MinigamePhase.Play, 8f, "minigame Play (2)");
@@ -135,6 +136,7 @@ System.Collections.IEnumerator Run() {
   BtnN("BTN_Reset (2)")?.onClick.Invoke();
   yield return Log("S10_remakeFromServe", true);
 
+  yield return Until(() => minigames.ActivePhase == MinigamePhase.Idle, 25f, "outro finished");   // a cancelled run's outro can outlast the screenshots that used to give it time (HANDOFF 6.3 item 5)
   Pour();
   cmds.IngredientAdded();
   yield return Until(() => minigames.ActivePhase == MinigamePhase.Play, 8f, "minigame Play (3)");
@@ -152,6 +154,7 @@ System.Collections.IEnumerator Run() {
 
   cmds.CloseBar();
   yield return Log("S13_closeBar", true);
+  yield return Until(() => minigames.ActivePhase == MinigamePhase.Idle, 25f, "outro finished");   // S14 reports the last run's outcome, which only exists once its outro is over
   cmds.NextDay();
   yield return Log("S14_nextDay", true);
 

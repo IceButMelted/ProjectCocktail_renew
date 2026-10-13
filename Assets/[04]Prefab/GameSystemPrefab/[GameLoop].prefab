@@ -6731,6 +6731,7 @@ GameObject:
   - component: {fileID: 2926996384368697071}
   - component: {fileID: 5364419615578008043}
   - component: {fileID: 3663661448364769662}
+  - component: {fileID: 8498624414764055906}
   m_Layer: 5
   m_Name: EndShiftButton
   m_TagString: Untagged
@@ -6852,6 +6853,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 721493dc660b67f42ac149f940ea506f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::SceneLoader
+--- !u!114 &8498624414764055906
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3957115907059525109}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c2a095fb0c70734fbbea9dbea4e3992, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LoadSceneButton
+  _loader: {fileID: 3663661448364769662}
+  _scene: MainMenu
 --- !u!1 &3963443330870393159
 GameObject:
   m_ObjectHideFlags: 0
@@ -7748,6 +7763,7 @@ MonoBehaviour:
   presenter: {fileID: 0}
   animator: {fileID: 5639186367515995513}
   autoHideDuration: 3
+  _btnToggle: {fileID: 6977248097087503802}
 --- !u!1 &4444332042972292104
 GameObject:
   m_ObjectHideFlags: 0
@@ -11262,7 +11278,7 @@ GameObject:
   - component: {fileID: 2443127666601538344}
   - component: {fileID: 4000954163714106338}
   m_Layer: 0
-  m_Name: Canvas
+  m_Name: Canvas_Shell
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -12239,6 +12255,7 @@ GameObject:
   - component: {fileID: 7555011390858454176}
   - component: {fileID: 5972356583603465791}
   - component: {fileID: 5982615620084787985}
+  - component: {fileID: 5728593882196687496}
   m_Layer: 0
   m_Name: Button
   m_TagString: Untagged
@@ -12348,6 +12365,20 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls: []
+--- !u!114 &5728593882196687496
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7129480582928665787}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2c2a095fb0c70734fbbea9dbea4e3992, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::LoadSceneButton
+  _loader: {fileID: 5281718887829214763}
+  _scene: MainMenu
 --- !u!1 &7140896777276798973
 GameObject:
   m_ObjectHideFlags: 0
@@ -12830,7 +12861,6 @@ GameObject:
   - component: {fileID: 173320216533135447}
   - component: {fileID: 1322866041113331605}
   - component: {fileID: 8071046045357891513}
-  - component: {fileID: 9217307720336397454}
   m_Layer: 0
   m_Name: '[GameLoop]'
   m_TagString: Untagged
@@ -13022,31 +13052,6 @@ MonoBehaviour:
   _garnish: {fileID: 671426686590414340}
   _cocktail: {fileID: 8872214703517392345}
   _postIt: {fileID: 2023415601741730665}
---- !u!114 &9217307720336397454
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7365518877294038948}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 8da32c756185c814c8c7e519966cc7f6, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Bar410.GameFlow.UIFlowBridge
-  _bookUI: {fileID: 7933774315266148633}
-  _btnOpenBook: {fileID: 653714614720984720}
-  _btnBookNext: {fileID: 3312169640845197079}
-  _btnBookPrevious: {fileID: 4257275729197947967}
-  _btnBookClose: {fileID: 3607295825653456021}
-  _postIt: {fileID: 2023415601741730665}
-  _btnTogglePostIt: {fileID: 6977248097087503802}
-  _btnEndShift: {fileID: 5364419615578008043}
-  _endShiftLoader: {fileID: 3663661448364769662}
-  _endShiftScene: MainMenu
-  _btnThanks: {fileID: 5982615620084787985}
-  _thanksLoader: {fileID: 5281718887829214763}
-  _thanksScene: MainMenu
 --- !u!1 &7437655887941705277
 GameObject:
   m_ObjectHideFlags: 0
@@ -18376,6 +18381,18 @@ PrefabInstance:
       propertyPath: m_Color.r
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 1367088875875336114, guid: 1e692d6819828524194b3fe14a2da1ef, type: 3}
+      propertyPath: _btnNext
+      value: 
+      objectReference: {fileID: 3312169640845197079}
+    - target: {fileID: 1367088875875336114, guid: 1e692d6819828524194b3fe14a2da1ef, type: 3}
+      propertyPath: _btnClose
+      value: 
+      objectReference: {fileID: 3607295825653456021}
+    - target: {fileID: 1367088875875336114, guid: 1e692d6819828524194b3fe14a2da1ef, type: 3}
+      propertyPath: _btnPrevious
+      value: 
+      objectReference: {fileID: 4257275729197947967}
     - target: {fileID: 1367088875875336114, guid: 1e692d6819828524194b3fe14a2da1ef, type: 3}
       propertyPath: _openBookSFX
       value: Book_Open

@@ -12,6 +12,9 @@ public class Post_It_Order : MonoBehaviour
     [SerializeField] private Animator animator;
     [SerializeField] private float autoHideDuration = 3f;
 
+    [Tooltip("The button on the post-it that opens and closes it.")]
+    [SerializeField] private UnityEngine.UI.Button _btnToggle;
+
 
     private bool _isPostItVisible = false;
     private bool _isOutScreen = true;
@@ -28,6 +31,13 @@ public class Post_It_Order : MonoBehaviour
         }
         if(presenter != null)
             presenter = FindAnyObjectByType<BubblePresenter>();
+
+        if (_btnToggle != null) _btnToggle.onClick.AddListener(TogglePostIt);
+    }
+
+    private void OnDestroy()
+    {
+        if (_btnToggle != null) _btnToggle.onClick.RemoveListener(TogglePostIt);
     }
 
     // ─── Core Visibility (Open / Close) ───────────────────────────────────────

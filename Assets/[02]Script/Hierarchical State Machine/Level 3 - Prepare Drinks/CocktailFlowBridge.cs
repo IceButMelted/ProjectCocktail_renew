@@ -80,6 +80,8 @@ namespace Bar410.GameFlow
                 _methodPanel.MixingChosen += OnMixingClicked;
                 _methodPanel.ResetChosen += OnMethodResetClicked;
             }
+
+            if (_btnBook != null) _btnBook.onClick.AddListener(OnOpenBookClicked);
         }
 
         private void OnDestroy()
@@ -97,6 +99,8 @@ namespace Bar410.GameFlow
                 _methodPanel.MixingChosen -= OnMixingClicked;
                 _methodPanel.ResetChosen -= OnMethodResetClicked;
             }
+
+            if (_btnBook != null) _btnBook.onClick.RemoveListener(OnOpenBookClicked);
 
             if (_gameLoop == null || _gameLoop.OpenBar == null) return;
 
@@ -164,6 +168,10 @@ namespace Bar410.GameFlow
         }
 
         private void OnPrepareDrinksExited() => _bookUI?.CloseBook();
+
+        // The recipe-book button lives in the Hub, outside the book panel (which is inactive while
+        // closed and so cannot listen for it), and its lock rules are in this bridge anyway.
+        private void OnOpenBookClicked() => _bookUI?.SetActive(true);
 
         // ── Step 2.1 · AddIngredient ───────────────────────
 

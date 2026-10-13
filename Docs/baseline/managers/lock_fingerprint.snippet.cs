@@ -31,7 +31,7 @@ string Sig(GameObject go) {
 var tracked = new System.Collections.Generic.List<GameObject>();
 foreach (var ui in UnityEngine.Object.FindObjectsByType<IngredientButtonUI>(FindObjectsInactive.Include, FindObjectsSortMode.None)) tracked.Add(ui.gameObject);
 tracked.Add(shaker.gameObject);
-var book = root.transform.Find("Canvas/Panel - Hub/BTN - Open_CloseBook");
+var book = root.transform.Find("Canvas_Shell/Panel - Hub/BTN - Open_CloseBook");
 if (book != null) tracked.Add(book.gameObject);
 tracked = tracked.Distinct().OrderBy(g => g.name).ToList();
 void Snap(string label) {
