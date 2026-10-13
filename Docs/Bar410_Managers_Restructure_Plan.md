@@ -198,7 +198,7 @@ baseline อยู่ที่ `Docs/baseline/managers/` (README ในโฟล
 - **ไม่ย้าย** `PendingType`/`LastOutcome` ออกจาก `MinigameState`: เป็น state ระดับ flow ที่ Yarn อ่าน (`flow_minigame_type`/`flow_minigame_result`) และ `LastOutcome` ถูกล้างทุกครั้งที่เข้า 2.2 การย้ายต้องให้ `GameFlowCommands` รู้จัก manager (flow → gameplay) ซึ่งเพิ่ม ref ข้ามชั้น
 - **เลื่อน** `_cocktailCamera`/`IMinigameContext.ResetCamera()` (null ใน scene และ prefab ทำงานเป็น no-op) ไป Stage 8 ที่ต้องตัดสินว่าจะต่อกับ Camera manager หรือลบ
 
-**Stage 6 · Garnish Manager** แยก `GarnishManager` + `Canvas_Garnish` (tabs, ice toggle เป็น component ของ panel เอง, **Serve panel ย้ายเข้า**) + `GarnishChoice`, `PlacedGlassInstance` เลิก static, grid หา manager ด้วย `GetComponentInParent`, `GlassPlacementZone` อยู่ใต้ Garnish, ตัด `ShakerPanelController._serveUI`
+**Stage 6 · Garnish Manager** ✅ ทำแล้ว 2026-10-13 (4 commit: 6a canvas+root, 6b manager, 6c serve panel, 6d glass) `GarnishManager` ถือ glass/ice/ตกแต่ง/pour + Serve panel บน `Canvas_Garnish`; `GarnishFlowBridge` 20 → 7 slot; grid หา manager ด้วย `GetComponentInParent`; `PlacedGlassInstance` ไม่มี static; ตัด `ShakerPanelController._serveUI`; ice ไปทาง event `IceToggled` → `ShakerContents.SetIce` (ไม่มี echo `IceChanged`); ไม่ทำ `GarnishChoice` (ไม่มี consumer) รายละเอียดใน HANDOFF §7
 
 **Stage 7 · TalkToCustomer Manager** instance registry แทน static dict, ชื่อ Yarn command เดิม, `Snapshot()`/`Restore()` ให้ `SaveLoadManager`, รับ `YarnVariableSync` + `DialogueRunner` + roster, `Cocktail.UsePreferences(...)` ผ่าน FlowWiring, `OrderScored` → `Customer.CommitOrderResult` ทดสอบ save → load
 

@@ -2,7 +2,7 @@
 
 เขียนเมื่อ 2026-10-13 หลังจบ Stage 4b · branch `GameFlow/Managers` (แตกจาก `GameFlow/Main` ที่ `1962402`, **ยังไม่ push**)
 
-> **อัปเดตหลังเขียน:** Stage 5 (Minigame) ทำเสร็จและตรวจแล้ว พร้อมแก้ regression ของ 4b (`4b-fix`) และลบ `BG_BTN` ทั้งหมดอยู่ใน **commit เดียว** (user สั่ง) ดูแถว "Stage 5 commit" ใน §2 รายละเอียดใน §7 และ §6.3 ข้อ 11–13
+> **อัปเดตหลังเขียน:** Stage 5 (Minigame, `e61fc99`) และ **Stage 6 (Garnish, 4 commit: `6621bd2`, `754daee`, `eb63d71`, `e5601e2`)** ทำเสร็จ ตรวจแล้ว และ commit แล้ว (ยังไม่ push) รายละเอียด Stage 6 ใน §2 §3 §7 และตัวตรวจใหม่ `garnish_ui` ใน §6.1
 
 เอกสารนี้ให้คนที่รับงานต่อ (หรือ session ใหม่) ทำงานต่อได้โดยไม่ต้องอ่าน chat เดิม อ่านตามลำดับ §1 → §2 → §6 แล้วเริ่มที่ §7
 
@@ -18,11 +18,11 @@
 | | |
 |---|---|
 | เป้าหมาย | แยก `[GameLoop]` เป็น Manager อิสระต่อกัน (Cocktail, Minigame, Garnish, TalkToCustomer, Camera, Placement) แต่ละตัวมี Canvas ของตัวเอง ข้อมูลที่ใช้ร่วมกันมีเจ้าของเดียว FSM คุมแค่ Level 2–3 |
-| ทำเสร็จ (commit แล้ว) | Stage 0, 1, 3, 4a, 4b, 4c (เฉพาะ VisualizeCocktail), 4d, 4f, **5** (Stage 5 + `4b-fix` + ลบ `BG_BTN` อยู่ใน commit เดียว) |
+| ทำเสร็จ (commit แล้ว) | Stage 0, 1, 3, 4a, 4b, 4c (เฉพาะ VisualizeCocktail), 4d, 4f, **5** (Stage 5 + `4b-fix` + ลบ `BG_BTN` ใน commit เดียว), **6** (6a–6d) |
 | ข้าม | Stage 2 (`FlowWiring` ว่างเปล่า), Stage 4c ส่วน book (เลื่อนไป Stage 8) |
-| เหลือ | Stage 6 Garnish, 7 TalkToCustomer, 8 Camera (+ presenter, book/post-it, `ResetCamera`), 9 Shell + ลบ bridge, 10 (optional) |
+| เหลือ | Stage 7 TalkToCustomer, 8 Camera (+ presenter, book/post-it, `ResetCamera`), 9 Shell + ลบ bridge, 10 (optional) |
 | working tree | สะอาด ยกเว้น `ProjectSettings/Packages/dev.yarnspinner/Assembly-CSharp-generated.ysls.json` ซึ่ง Yarn สร้างเอง **ไม่ใช่งานของเรา ไม่ต้อง stage** |
-| ตรวจล่าสุด | flow trace เหมือน baseline ทุกไบต์, lock fingerprint: 19 object ที่เหลือเหมือน baseline ทุกจุดทุกค่า (ไฟล์ regenerate), กดปุ่ม Shake/Stir และปุ่ม back ด้วย pointer click จริงผ่าน, Yarn contract exit 0, console error 0 (1 warning เดิม) |
+| ตรวจล่าสุด | flow trace, `serve_commit`, lock fingerprint (19 object) เหมือน baseline ทุกไบต์; `garnish_ui` เหมือน baseline ทุกบรรทัด (ต่างแค่ชื่อ class ใน warning); Yarn contract exit 0; console error 0 (1 warning เดิม) |
 
 ตัวเลขเทียบ (wiring dump, scene `New Drag Drop System`)
 
@@ -37,6 +37,8 @@
 | root → Canvas / `[CocktailSystem]` / `[MiniGameSystem]` / CamController | 33 / 16 / 5 / 4 | 29 / 17 / 5 / 4 |
 
 หลัง Stage 5 (`wiring_dump.after_stage5.txt`): ref ข้าม child **61** (root → `[MiniGameSystem]` 5 → 1 เพราะปุ่ม cancel ย้ายไปอยู่ใน manager เอง), ref ใน child เดียวกัน 150 เท่าเดิม, scene ref 215 → 211, comps 916 → 885 / MonoBehaviour 402 → 386 (ลบ `BG_BTN` 7 object และ `IngredientButtonUI` ซาก 2 ตัว), UnityEvent 19 เท่าเดิม (UnityEvent ที่ลบเป็นตัวว่าง)
+
+หลัง Stage 6 (`wiring_dump.after_stage6.txt`): ref ข้าม child **40** (76 → 61 → 40: root → `Canvas` 29 → 12 เพราะ Garnish/Serve UI ย้ายออกจาก `Canvas`, root → `[GarnishSystem]` 2), ref ใน child เดียวกัน 150 → 167, scene ref 211 → 207, comps 885 → 891 / MonoBehaviour 386 → 389 (`GarnishManager` + CanvasScaler/GraphicRaycaster ของ `Canvas_Garnish`), UnityEvent 19 เท่าเดิม, script บน root 8 เท่าเดิม `GarnishFlowBridge` 20 slot → 7, `ServeFlowBridge` 7 slot → 5
 
 ไฟล์เต็ม: `Docs/baseline/managers/wiring_dump.txt` (Stage 0) และ `wiring_dump.after_stage4b.txt`
 
@@ -55,8 +57,12 @@
 | `91ef84e` | 4c-Vis | **ลบ** `Canvas/Panel - VisurlCocktail` (screen-space) + `_panelVisualCocktail` (decision D10) | ไม่มีโค้ด/event ใดเปิดมัน; ผู้เล่นเห็นแต่ตัว world-space |
 | `c4865fe` | 4a | `IngredientButtonGroup` เก็บขวดจาก `IngredientButtonUI` ใต้ตัวเอง (list ใน scene 20 → 2: shaker, ปุ่ม book) + `BindShaker` จาก `CocktailSystemManager.Awake` | ขวดถือ `ShakerContents` ตั้งแต่เริ่ม 3 → 19 จาก 19 |
 | `3fe82b2` | 4b | `MethodPanel` (component ใหม่) เป็นเจ้าของปุ่ม Shake/Stir/Reset ส่ง event; bridge เหลือ 1 slot (เดิม 4); ย้าย panel ไป `[CocktailSystem]/Canvas_Cocktail`; `Canvas_Cocktail` CanvasScaler match 0 → 0.5; prefab เก่าได้ component เดียวกัน | panel ดูแลตัวเอง |
-| Stage 5 commit | 4b-fix | ลบ `IngredientButtonUI` (`action=None`, ไม่มี call) ออกจาก `BTN_Shaking`/`BTN_Mixing` ใน scene + prefab; `IngredientButtonGroup.Members` กลับเป็น `GetComponentsInChildren<IngredientButtonUI>` ล้วน (ไม่มี special-case) | 4b ย้าย panel เข้าใต้ `[CocktailSystem]` สองปุ่มนี้เลยกลายเป็นสมาชิกของกลุ่มที่ `OnFulled` lock → ผู้เล่นกด Shake/Stir ตอน drink เต็มไม่ได้ trace มองไม่เห็นเพราะเรียก `onClick.Invoke()` |
-| Stage 5 commit | 5 | `MinigameSystemManager` ถือปุ่ม back ×2 + `Resolve()` + `_defaultType` (ส่ง `BackRequested`); bridge เหลือ slot `_gameLoop`/`_commands`/`_minigames`/`_shakerContents`; ลบ `OnStartedMinigame`/`OnEndedGame`; **ลบ `BG_BTN` ทั้งกลุ่ม** (user สั่ง) จึงไม่มี give-up/cancel-direct/F6 อีก | ปุ่ม cancel อยู่ใน bridge ที่ root; ปุ่ม dev ที่ปิดไว้และตายทั้งกลุ่ม |
+| `e61fc99` | 4b-fix | ลบ `IngredientButtonUI` (`action=None`, ไม่มี call) ออกจาก `BTN_Shaking`/`BTN_Mixing` ใน scene + prefab; `IngredientButtonGroup.Members` กลับเป็น `GetComponentsInChildren<IngredientButtonUI>` ล้วน (ไม่มี special-case) | 4b ย้าย panel เข้าใต้ `[CocktailSystem]` สองปุ่มนี้เลยกลายเป็นสมาชิกของกลุ่มที่ `OnFulled` lock → ผู้เล่นกด Shake/Stir ตอน drink เต็มไม่ได้ trace มองไม่เห็นเพราะเรียก `onClick.Invoke()` |
+| `e61fc99` | 5 | `MinigameSystemManager` ถือปุ่ม back ×2 + `Resolve()` + `_defaultType` (ส่ง `BackRequested`); bridge เหลือ slot `_gameLoop`/`_commands`/`_minigames`/`_shakerContents`; ลบ `OnStartedMinigame`/`OnEndedGame`; **ลบ `BG_BTN` ทั้งกลุ่ม** (user สั่ง) จึงไม่มี give-up/cancel-direct/F6 อีก | ปุ่ม cancel อยู่ใน bridge ที่ root; ปุ่ม dev ที่ปิดไว้และตายทั้งกลุ่ม |
+| `6621bd2` | 6a | สร้าง `[GarnishSystem]/Canvas_Garnish` (scaler เท่า `Canvas_Cocktail`) ย้าย `Panel - Granish UI`, `Panel - Serve`, `Garnish_Plate` (พร้อม `GlassPlacementZone`, `GranishCam`, `Ref - Panel Serve`) เข้าไป ไม่เปลี่ยนโค้ด; ตัวตรวจใหม่ `garnish_ui`; `flow_trace`/`serve_commit` หา panel ด้วยชื่อ | D2/D9 — Garnish มี canvas และ root ของตัวเอง |
+| `754daee` | 6b | `GarnishManager` (ใหม่) ถือ glass/ice/ตกแต่ง/pour + ปุ่ม tab ของ canvas ตัวเอง ส่ง event; `GarnishFlowBridge` 20 → 7 slot; grid ×3 หา manager ด้วย `GetComponentInParent`, glass grid ฟัง `Opened`/`PourStarted` (ตัดวงกลม bridge ↔ grid); `IceToggled` → bridge → `ShakerContents.SetIce` | bridge ถือ UI + logic ทั้งหมด, 20 slot, lambda ไม่ unsubscribe |
+| `eb63d71` | 6c | Serve panel + 2 ปุ่มเป็นของ `GarnishManager` (`OpenServe`/`CloseServe`, `ServeRequested`/`RemakeRequested`); `ServeFlowBridge` เหลือฝั่ง flow; ลบ `CocktailFlowBridge._panelServe` และ `ShakerPanelController._serveUI` กับ flag serve | panel เดียวมี 3 writer |
+| `e5601e2` | 6d | glass เป็นของ `GarnishManager` (`Glass`, `ClearGlass()`); ลบ `PlacedGlassInstance.Current`/`Spawn`/`DestroyCurrent` (static); การเคลียร์ glass ย้ายจาก `CocktailFlowBridge` ไป `GarnishFlowBridge` | static ที่ใครก็เข้าถึง glass ได้ |
 
 ---
 
@@ -75,6 +81,10 @@
 | Stage 5 ย้าย `PendingType`/`LastOutcome` เข้า manager | ไม่ย้าย | เป็น state ระดับ flow ที่ Yarn อ่าน (`flow_minigame_type`/`flow_minigame_result`) และ `LastOutcome` ถูกล้างทุกครั้งที่เข้า 2.2 การย้ายต้องให้ `GameFlowCommands` ถือ ref ไป manager ซึ่งข้ามชั้น; ย้ายเฉพาะส่วนที่เป็นของ manager จริง (ปุ่ม, ลำดับเลือก, default) |
 | Stage 5 ลบ `_cocktailCamera`/`ResetCamera()` | เลื่อนไป Stage 8 | null ทั้ง scene และ prefab (no-op) แต่เป็น seam ที่ออกแบบไว้ "snap กล้องตอนเริ่มเกม" เป็นเรื่องของ Camera manager ให้ตัดสินตอนนั้นว่าต่อหรือลบ |
 | Stage 5 แก้ F6 ให้ Give-up/Cancel-direct ออกผ่าน HSM | ลบปุ่มทั้งคู่ (`BG_BTN`) | หลักฐานใน `f6_giveup.txt`: ค้างที่ 2.2 แล้ว `IngredientAdded()` ถูกปฏิเสธ ปุ่มอยู่ใน `BG_BTN` ที่ปิดไว้และไม่มีอะไรเปิด ผมแก้ให้ออกผ่าน HSM ก่อน (ผ่าน `f6_giveup.after_stage5.txt`) แล้ว user สั่งลบทั้งกลุ่ม จึงถอดโค้ด give-up ออกด้วย |
+| 6 ice: Garnish ส่ง `IceToggled` → `Cocktail.SetIce` → `IceChanged` กลับ | `IceToggled` → bridge → `ShakerContents.SetIce` ไม่มี echo | writer ของ ice มีทางเดียว (Garnish) และ icon ของ Garnish เป็นสถานะของตัวเองที่รีเซ็ตตอน `Close()` echo จะไม่ได้ทำอะไร (YAGNI) flag ยังอยู่ที่ `CurrentCocktail.AddIce` (D5) |
+| 6 `GarnishChoice` (plain C#: glass + item + rim) | ไม่ทำ | ไม่มี consumer: ไม่มีอะไรอ่านสามอย่างนี้รวมกัน (scoring ไม่ใช้) ทำตอนมีผู้ใช้จริง |
+| 6 Serve ส่ง `ServeClicked` ให้ FlowWiring | `ServeRequested` ไป `ServeFlowBridge` | FlowWiring ยังไม่มี (Stage 2 ข้าม) bridge ทำหน้าที่เดียวกัน จะรวมตอน Stage 9 |
+| 6 `Canvas_Garnish` ลำดับวาด | อยู่ก่อน `Canvas` (sortingOrder 0 เท่ากัน) เหมือน `Canvas_Cocktail` | Hub/BookUI/Transition ที่อยู่ใน `Canvas` จึงวาดทับ Garnish UI (ก่อนย้าย Garnish UI อยู่เหนือ Hub) ภาพ garnish step เทียบด้วยตาแล้วเหมือนเดิม ถ้า Hub ทับ panel ในอนาคตให้ปรับ sortingOrder |
 
 ---
 
@@ -133,6 +143,7 @@
 | F6 give-up / cancel-direct | `f6_giveup.snippet.cs` → `f6_giveup.after_stage5.txt` (`f6_giveup.txt` = ก่อนแก้) | ปุ่ม `BG_BTN/BTN_Reset`/`BTN_Next` ใน 2.2 แล้วลอง `IngredientAdded()` ต่อ | เหมือนข้างบน |
 | minigame type resolution | `resolve_priority.snippet.cs` → `resolve_priority.txt` | default / method ของ drink / เลือกเอง (trace อื่นทุกตัวเรียก `SelectShaking` ก่อนจึงไม่ครอบคลุม) | เหมือนข้างบน |
 | กดปุ่ม Method จริง | `method_buttons_click.snippet.cs` → `method_buttons_click.txt` | Shake/Stir ด้วย pointer click ผ่าน EventSystem ตอน drink เต็ม (ดู `interactable`) | เหมือนข้างบน; ต้องรันเมื่อย้าย object ใต้ `[CocktailSystem]` |
+| Garnish UI | `garnish_ui.snippet.cs` → `garnish_ui.txt` | tab, glass swap, ice round trip, slot/item/rim, finish/pour gating, remove ice/swap glass หลัง pour, Reset, default ตอนเข้าใหม่, ปุ่ม Serve และตำแหน่ง ด้วย pointer click จริง หา object ด้วยชื่อ | เหมือนข้างบน; `diff` กับ `garnish_ui.txt` ต้องเหมือนทุกไบต์ |
 
 ทุก snippet รันเป็น body ของ `mcp__unityMCP__execute_code` ใน Play mode **เริ่มจาก Play session ใหม่** (stop → play) และทุกตัวหยุด chapter dialogue ของฉากก่อน
 
@@ -185,7 +196,22 @@
 - **เศษที่ต้องตรวจก่อนลบ**: `MinigameSystemManager._cocktailCamera` เป็น null (`ResetCamera()` เป็น no-op), `OnStartedMinigame`/`OnEndedGame` ไม่มี listener ใน `New Drag Drop System` แต่**ต้องเช็ก `New Cocktail System.unity` และ `Garnish Mockup.unity`** ก่อนลบ field; `Update()` เรียก `ProcessedGame()` ทุกเฟรมแม้ Idle และเตือน "No active minigame" ถ้าไม่มี
 - ตัวตรวจ: flow trace (S03, S04, S08) + ตัวใหม่สำหรับ give-up/cancel-direct + Yarn contract
 
-### Stage 6 · Garnish Manager
+### Stage 6 · Garnish Manager (**เสร็จ**, 4 commit)
+
+ที่ทำจริง
+- **6a** `[GarnishSystem]/Canvas_Garnish` ใหม่ (อยู่ก่อน `Canvas` ใน `[GameLoop]`) รับ `Panel - Granish UI`, `Panel - Serve` และ `Garnish_Plate` (world position คงเดิม) ทั้ง scene และ prefab
+- **6b** `GarnishManager` (`Assets/[02]Script/Garnish/`, บน `[GarnishSystem]`) ถือ glass/ice/ตกแต่ง/pour และปุ่ม tab/Pour/Finish/Reset/ice ของ canvas ตัวเอง; รับ drink เป็น argument (`Pour(drink)`); events `Opened`, `PourRequested`, `PourStarted`, `IceToggled`, `FinishRequested`, `ResetRequested`; `GarnishFlowBridge` เหลือ 7 slot: เข้า step → `UpdateCocktailInShaker`, กล้อง, ล็อก ingredient, `Open()`; event ของ manager → flow/cocktail
+- **6c** Serve panel + ปุ่ม Serve/Remake เป็นของ `GarnishManager` (D2); `ServeFlowBridge` ถือฝั่ง flow (เปิด/ปิดตาม step, ซ่อน post-it, ส่ง `ServeDone()`/`RemakeDrink()`); ตัด writer อีก 2 ตัว (`CocktailFlowBridge._panelServe`, `ShakerPanelController._serveUI` + flag serve)
+- **6d** `PlacedGlassInstance` ไม่มี static; `GarnishManager.Glass`/`ClearGlass()`; `GarnishFlowBridge` เคลียร์ glass ตอน `PrepareDrinks.Entered` และ `Serve.Exited` (เดิมอยู่ `CocktailFlowBridge`)
+
+ค้าง/สังเกต
+- `CanFinish` ยังเป็น True หลัง `ClearGlass()` จนกว่า `Open()` ถัดไป (พฤติกรรมเดิม baseline ล็อกไว้ ไม่มีผลเพราะ panel ปิดอยู่) ถ้าจะแก้ให้ reset ใน `ClearGlass()` แล้ว trace จะเปลี่ยน `canFinish=` ที่ S07/S10 ต้องบันทึกในคอมมิต
+- `GlassPlacementZone` คงไว้ใต้ `[GarnishSystem]/Garnish_Plate` (D9) ไม่มีใครเรียก (`SetGlass`, static `_occupant`) ถ้าจะลบเป็นการตัดสินใจ design
+- `Bar410DialogueOrderTest` ใช้ `GarnishManager` แล้ว (ต่อ `_garnish` ใน scene แล้ว) ยังไม่ได้รันจริง (ต้องมี dialogue)
+- `IngredientButtonUI._action` ยังมีค่า `SetShaking`/`SetMixing`/`AddIce`/`ResetShaker` ที่ไม่มีใครใช้ (ปุ่ม method มี `MethodPanel` แล้ว) ถ้าจะตัดเป็นงานเล็กแยก
+- ดูข้อ "ที่วางแผนไว้เดิม" ด้านล่างเฉพาะเมื่อต้องรู้ว่าตัดสินอะไรไปจากแผน (ข้อสรุปอยู่ใน §3)
+
+ที่วางแผนไว้เดิม
 - แยก `GarnishManager` + `Canvas_Garnish` ออกจาก `GarnishFlowBridge` (330 บรรทัด, 20 slots): tabs (3 ปุ่ม + 3 panel, ควร reset ที่ `OnEnable`), ice toggle (2 ปุ่ม, `OnEnable` → สถานะ "add"), pour/finish/reset, glass choice; `GarnishChoice` = glass + garnish item + rim (**ไม่รวม ice**)
 - **Serve panel ย้ายเข้า `Canvas_Garnish`** (D2): Garnish ส่ง `ServeClicked`/`RemakeClicked`; การให้คะแนนอยู่ที่ Cocktail แล้ว (4f) ปุ่ม Serve แค่ `ServeDone()`; ตัด `ShakerPanelController._serveUI`
 - **ice (D5, 4e)**: flag อยู่ที่ `CurrentCocktail.AddIce`; Garnish ส่ง `IceToggled(bool)` → `Cocktail.SetIce` → `IceChanged(bool)` กลับ ต้องไม่ยิง `Changed` (`ShakerContents.SetIce` ตั้งใจไม่ยิง กัน UI toggle เด้ง); ตรวจก่อนว่า recipe match ขึ้นกับ `AddIce` ไหม (`UpdateCocktailInShaker` รันตอนเข้า Garnish ก่อนเลือก ice)
@@ -241,7 +267,8 @@
 |---|---|
 | `Assets/[02]Script/Hierarchical State Machine/GameFlowCommands.cs` | Yarn/UI entry; `CommandTarget()` guard |
 | `…/Level 3 - Prepare Drinks/CocktailFlowBridge.cs` | seam ที่โตที่สุด: shaker events, scoring trigger, Method panel handler, glass cleanup |
-| `…/Level 2 - Open Bar/GarnishFlowBridge.cs` | Stage 6 |
+| `Assets/[02]Script/Garnish/GarnishManager.cs` | Garnish manager: glass, ice, ตกแต่ง, pour, Serve panel (Stage 6) |
+| `…/Level 2 - Open Bar/GarnishFlowBridge.cs` | seam ของ step 3: เปิด/ปิด station, ส่ง drink, ice flag, finish/reset, เคลียร์ glass |
 | `…/Level 3 - Prepare Drinks/MinigameFlowBridge.cs` | Stage 5 |
 | `Assets/[02]Script/Cocktail System/Cocktail/CocktailSystemManager.cs` (+ `Yarn/*.cs` partial) | Cocktail manager; `ServeDrink()` idempotent; `BindShaker` |
 | `Assets/[02]Script/Cocktail System/Cocktail/Shaker/IngredientButtonGroup.cs` | auto-collect ขวด |
@@ -255,6 +282,6 @@
 
 ## 10. คำสั่งเริ่ม session ใหม่
 
-> อ่าน `Docs/Bar410_Managers_Restructure_HANDOFF.md` แล้วทำต่อที่ Stage 6 (Garnish Manager) ตาม §6 และ §7 ก่อนแก้อะไร ให้ตรวจว่าอยู่ branch `GameFlow/Managers` และ working tree สะอาด (ยกเว้น `ysls.json`) จากนั้นรัน `check_yarn_contract.py --check`, flow trace และ lock fingerprint เพื่อยืนยันว่า baseline ยังผ่าน (รอให้ Play พร้อมก่อนรัน snippet ดู §6.3 ข้อ 11)
+> อ่าน `Docs/Bar410_Managers_Restructure_HANDOFF.md` แล้วทำต่อที่ Stage 7 (TalkToCustomer Manager) ตาม §6 และ §7 ก่อนแก้อะไร ให้ตรวจว่าอยู่ branch `GameFlow/Managers` และ working tree สะอาด (ยกเว้น `ysls.json`) จากนั้นรัน `check_yarn_contract.py --check`, flow trace, `garnish_ui` และ lock fingerprint เพื่อยืนยันว่า baseline ยังผ่าน (รอให้ Play พร้อมก่อนรัน snippet ดู §6.3 ข้อ 11) Stage 7 ต้องทดสอบ save → load จริง ซึ่งยังไม่มีตัวตรวจ
 
 ผู้ใช้เป็นคนไทย ตอบไทยกระชับ ชื่อเทคนิคเป็นอังกฤษ; ตัดสินใจทุกอย่างผ่าน decision log; คุ้นกับ Unity MCP; ไม่ push/ไม่เปิด PR จนกว่าจะบอก
