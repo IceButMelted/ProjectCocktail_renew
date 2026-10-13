@@ -8,9 +8,6 @@ public class MinigameSystemManager : MonoBehaviour, IMinigameContext
 {
     // ── Inspector ──────────────────────────────────────────
 
-    [Header("Dependencies")]
-    [SerializeField] private CameraController _cocktailCamera;
-
     [Header("Selection")]
     [Tooltip("Runs when nothing was selected and the drink has no preparation method yet.")]
     [SerializeField] private Enum_MiniGameType _defaultType = Enum_MiniGameType.Shaking;
@@ -114,9 +111,6 @@ public class MinigameSystemManager : MonoBehaviour, IMinigameContext
         }
         _activeMinigame.ProcessedGame();
     }
-
-    void IMinigameContext.ResetCamera()
-        => _cocktailCamera?.ResetView();
 
     /// <summary>
     /// The single exit for the end-of-game event. BaseMiniGame calls this once,

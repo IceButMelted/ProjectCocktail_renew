@@ -85,7 +85,7 @@ public interface IMinigame
 // ── Context Abstraction (DIP) ──────────────────────────────
 
 /// <summary>
-/// Abstracts the two things BaseMiniGame needs from the outside world.
+/// Abstracts what BaseMiniGame needs from the outside world: to say that a run is over.
 /// MinigameSystemManager implements this; nothing else needs to know.
 ///
 /// This is also the seam the game-flow layer plugs into: a minigame never learns
@@ -94,9 +94,6 @@ public interface IMinigame
 /// </summary>
 public interface IMinigameContext
 {
-    /// <summary>Called at game start — e.g. snaps the camera back.</summary>
-    void ResetCamera();
-
     /// <summary>
     /// Called exactly once per run, when the outro finishes.
     /// Carries its own <paramref name="type"/> so a game that ended after the manager
