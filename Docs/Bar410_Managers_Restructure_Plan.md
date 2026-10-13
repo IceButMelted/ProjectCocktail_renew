@@ -202,7 +202,7 @@ baseline อยู่ที่ `Docs/baseline/managers/` (README ในโฟล
 
 **Stage 9 · Shell + cleanup bridge** `LoadSceneButton`, `Canvas_Shell`, ลบ bridge ที่ว่างแล้วทีละตัว (`TalkingWithCustomerBridge`, `ServeFlowBridge`, `UIFlowBridge`, `CocktailFlowBridge`, `MinigameFlowBridge`, `GarnishFlowBridge`)
 
-**Stage 10 · (optional) Level 1 เป็น enum** ลดโค้ดราว 130 บรรทัด แต่ L1 ถูก Yarn คุมอยู่แล้วโดยพฤตินัย มีค่าน้อย
+**Stage 10 · (optional) Level 1 เป็น enum** ลดโค้ดราว 130 บรรทัด มีค่าน้อย (D11: L1 ขับด้วยปุ่ม/hotkey ตามเดิม ไม่ต้องรอ Yarn)
 
 ### ตัวชี้วัดหลังจบ (ประมาณการ ต้องนับซ้ำด้วย dump เดิม)
 
@@ -216,7 +216,7 @@ baseline อยู่ที่ `Docs/baseline/managers/` (README ในโฟล
 
 | # | ตัดสินใจ | หมายเหตุ |
 |---|---|---|
-| D1 | FSM = Level 2–3, Level 1 ให้ Yarn | ยืนยันแล้ว |
+| D1 | FSM = Level 2–3, Level 1 ให้ Yarn | ยืนยันแล้ว **ส่วน Level 1 แทนที่ด้วย D11** |
 | D2 | Serve panel อยู่ `Canvas_Garnish` | ยืนยันแล้ว |
 | D3 | Camera เป็น Manager แยก (ไม่มี canvas) | ยืนยันแล้ว |
 | D4 | Yarn variable writer + `DialogueRunner` ref ย้ายไป TalkToCustomer | ยืนยันแล้ว |
@@ -224,8 +224,9 @@ baseline อยู่ที่ `Docs/baseline/managers/` (README ในโฟล
 | D6 | `CharacterData` อยู่ใน TalkToCustomer (คงไว้ ไม่ลบ) | ยืนยันแล้ว |
 | D7 | `PlacementSystem` คงไว้ แยกเป็น Manager ของตัวเอง | ยืนยันแล้ว |
 | D8 | `Canvas/Panel - VisurlCocktail` อยู่กับ Cocktail Manager (คงไว้ ไม่ลบ) | ยืนยันแล้ว **แทนที่ด้วย D10** |
-| D9 | `GlassPlacementZone` อยู่กับ Garnish (คงไว้ ไม่ลบ) | **ตีความจากบรรทัดที่ไม่มีประธาน** ต้องยืนยัน |
+| D9 | `GlassPlacementZone` อยู่กับ Garnish (คงไว้ ไม่ลบ) | ยืนยันแล้ว 2026-10-13 (เดิมตีความจากบรรทัดที่ไม่มีประธาน) |
 | D10 | ลบ `Canvas/Panel - VisurlCocktail` (screen-space) เหลือ world-space ตัวเดียว ลบ `_panelVisualCocktail` ด้วย | ยืนยันแล้ว 2026-10-13 หลังตรวจว่าไม่มีอะไรเปิดมัน |
+| D11 | **Level 1 (Open ⇄ Close) ขับด้วยปุ่ม/hotkey ตามเดิม** ไม่เพิ่ม `flow_close_bar`/`flow_next_day` ใน `.yarn` | ยืนยันแล้ว 2026-10-13 ไม่มีงานแก้ L1 ใน stage ใด; Stage 10 ยังเป็น optional (ลดโค้ด ไม่จำเป็นต่อเป้าหมาย) |
 
 ### ยังเปิดอยู่ (มีค่า default)
 

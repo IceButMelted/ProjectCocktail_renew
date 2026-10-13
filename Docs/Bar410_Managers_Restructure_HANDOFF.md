@@ -73,7 +73,7 @@
 
 | # | ตัดสินใจ | สถานะ |
 |---|---|---|
-| D1 | FSM = Level 2–3; Level 1 ให้ Yarn คุม | ยืนยัน (แต่ดู §8 ข้อ 1: ไม่มี `.yarn` เรียก `flow_close_bar`/`flow_next_day`) |
+| D1 | FSM = Level 2–3; Level 1 ให้ Yarn คุม | ยืนยัน ส่วน Level 1 **แทนที่ด้วย D11** |
 | D2 | Serve panel อยู่ `Canvas_Garnish` | ยืนยัน |
 | D3 | Camera เป็น Manager แยก (ไม่มี canvas) | ยืนยัน |
 | D4 | Yarn variable writer + `DialogueRunner` ref ไป TalkToCustomer | ยืนยัน |
@@ -81,8 +81,9 @@
 | D6 | `CharacterData` + roster อยู่ TalkToCustomer | ยืนยัน |
 | D7 | `PlacementSystem` คงไว้เป็น Manager แยก | ยืนยัน (ทำแบบ `Current`) |
 | D8 | `Canvas/Panel - VisurlCocktail` อยู่กับ Cocktail | **แทนที่ด้วย D10** |
-| D9 | `GlassPlacementZone` อยู่กับ Garnish (คงไว้ ไม่ลบ) | ตีความจากบรรทัดที่ไม่มีประธาน **ยังไม่ได้ยืนยัน** |
+| D9 | `GlassPlacementZone` อยู่กับ Garnish (คงไว้ ไม่ลบ) | ยืนยัน 2026-10-13 |
 | D10 | ลบ screen-space `VisualizeCocktail` เหลือ world-space ตัวเดียว | ยืนยัน |
+| D11 | Level 1 (Open ⇄ Close) ขับด้วยปุ่ม/hotkey ตามเดิม ไม่เพิ่ม `flow_close_bar`/`flow_next_day` ใน `.yarn` | ยืนยัน 2026-10-13 ไม่มีงานแก้ L1 |
 
 ค่า default ที่ยังไม่ยืนยัน: Shell (Hub, EndShift, Thx, Transition) เป็น `Canvas_Shell` ไม่มี manager; Placement เข้าถึงผ่าน `Current`; `RecipeBook` หายไปจาก scene แล้ว (ไม่ต้องตัดสิน)
 
@@ -191,15 +192,16 @@
 `LoadSceneButton` บน `EndShiftButton` และ `Panel_Thx` (มี Button + `SceneLoader` ใน GameObject เดียวกันแล้ว), `Canvas_Shell`, ลบ bridge ที่ว่างทีละตัว (`TalkingWithCustomerBridge`, `ServeFlowBridge`, `UIFlowBridge`, `CocktailFlowBridge`, `MinigameFlowBridge`, `GarnishFlowBridge`) รวมเป็น `FlowWiring` ไฟล์เดียวถ้ายังจำเป็น; ลบ slot `_gameLoop`/`_commands` ที่ซ้ำ (3 ตัวเป็น null อยู่แล้วและทุกอย่างยังทำงาน)
 
 ### Stage 10 (optional) · Level 1 เป็น enum
-ลดโค้ดราว 130 บรรทัด มีค่าน้อย: **ตอนนี้ไม่มี `.yarn` ไฟล์ไหนเรียก `flow_close_bar`/`flow_next_day`** (ใช้แค่ `flow_prepare_drinks` 9 ครั้ง) ดังนั้น L1 ถูกขับด้วย hotkey/โค้ดเท่านั้น ถ้าต้องการให้ Yarn คุมจริง ต้องให้ writer เพิ่ม command ใน `.yarn`
+ลดโค้ดราว 130 บรรทัด มีค่าน้อย ไม่จำเป็นต่อเป้าหมาย: ไม่มี `.yarn` ไฟล์ไหนเรียก `flow_close_bar`/`flow_next_day` (ใช้แค่ `flow_prepare_drinks` 9 ครั้ง) และ user ตัดสินแล้ว (D11) ให้ L1 ขับด้วยปุ่ม/hotkey ตามเดิม ไม่ต้องให้ writer เพิ่ม command
 
 ---
 
 ## 8. คำถามที่ยังเปิด / ต้องการคำตอบจาก user
 
-1. **Level 1 จะให้ใครขับ?** (ดู Stage 10) ถ้าตั้งใจให้ Yarn คุม ต้องมีคนเพิ่ม `<<flow_close_bar>>`/`<<flow_next_day>>` ใน `.yarn`
-2. **D9**: `GlassPlacementZone` อยู่กับ Garnish ใช่ไหม (ตีความจากบรรทัดที่ไม่มีประธาน)
-3. **`Canvas_Cocktail` match 0.5** ตั้งใจเดิมเป็น 0 หรือเปล่า (ผมเปลี่ยนใน 4b)
+~~1. Level 1 ให้ใครขับ~~ **ตอบแล้ว (D11)**: ปุ่ม/hotkey ตามเดิม
+~~2. D9 `GlassPlacementZone`~~ **ตอบแล้ว**: อยู่กับ Garnish
+
+3. **`Canvas_Cocktail` match 0.5** ตั้งใจเดิมเป็น 0 หรือเปล่า (ผมเปลี่ยนใน 4b) — ยังไม่ได้คำตอบ
 4. **Shell** เป็น `Canvas_Shell` ที่ไม่มี manager ใช่ไหม (default)
 5. **F6** — ยังไม่เคยทดสอบด้วยมือ (Give-up ค้างใน 2.2?) ถ้า user รู้อยู่แล้วบอกได้ จะข้ามขั้นจำลอง
 6. ทดสอบด้วยเมาส์จริงที่ MCP ทำไม่ได้: ลากขวดลง shaker, ลากผลไม้จาก tray, Shift+1/2 hotkey ขอให้ user ลองสั้นๆ หลัง Stage 5/6
