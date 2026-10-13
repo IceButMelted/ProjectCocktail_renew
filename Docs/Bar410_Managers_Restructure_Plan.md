@@ -202,7 +202,7 @@ baseline อยู่ที่ `Docs/baseline/managers/` (README ในโฟล
 
 **Stage 7 · TalkToCustomer Manager** ✅ ทำแล้ว 2026-10-13 (4 commit: 7a ตัวตรวจ, 7b NPC + save, 7c ตัวแปร Yarn + preferences, 7d command ไม่ผูกชื่อ object) `TalkToCustomerManager` บน `NPCs_And_Set`; `Cocktail` ไม่ถือ DialogueRunner/roster/CharacterData แล้ว (`OrderScored`/`OrderCleared`/`UsePreferences`, ต่อด้วย `TalkingWithCustomerBridge`); 7d แก้ `wait_for_task`/`Enable_InteractableObject`/`Reset_Variable`/`Can_End_Shift` ที่ล้มเพราะชื่อ `SystemGame` ไม่มีใน scene รายละเอียดใน HANDOFF §7
 
-**Stage 8 · Camera Manager** รวม ID table เดียว, Yarn camera command ผ่าน manager, `Instance` เหลือเฉพาะที่ Yarn ใช้, ส่ง `Camera` ให้ Placement
+**Stage 8 · Camera Manager** ✅ ทำแล้ว 2026-10-13 (3 commit: 8a ตัวตรวจ, 8b manager + Yarn static, 8c ลบ `ResetCamera` ที่ตาย) `CinimachineCameraSwitcher` เปลี่ยนเป็น `CameraManager` (GUID เดิม) เก็บ `CameraEntry` เอง ตั้งชื่อ shot ที่ flow ขอ (`ShowBar`/`ShowShaker`/`ShowGarnish`) และถือ `CameraController` (`SetLookFixed`/`ResetLook`); `Switch_Camera`/`Cut_Camera`/`Fix_Camera`/`Reset_Camera` เป็น static ชื่อเดิม ไม่ผูกชื่อ object `CamController`; `_cocktailCamera`/`ResetCamera()` ถูกลบ **ไม่ทำ** (D12): presenter/`FlowStep`, ส่ง `Camera` ให้ Placement รายละเอียดใน HANDOFF §7
 
 **Stage 9 · Shell + cleanup bridge** `LoadSceneButton`, `Canvas_Shell`, ลบ bridge ที่ว่างแล้วทีละตัว (`TalkingWithCustomerBridge`, `ServeFlowBridge`, `UIFlowBridge`, `CocktailFlowBridge`, `MinigameFlowBridge`, `GarnishFlowBridge`)
 
@@ -231,6 +231,7 @@ baseline อยู่ที่ `Docs/baseline/managers/` (README ในโฟล
 | D9 | `GlassPlacementZone` อยู่กับ Garnish (คงไว้ ไม่ลบ) | ยืนยันแล้ว 2026-10-13 (เดิมตีความจากบรรทัดที่ไม่มีประธาน) |
 | D10 | ลบ `Canvas/Panel - VisurlCocktail` (screen-space) เหลือ world-space ตัวเดียว ลบ `_panelVisualCocktail` ด้วย | ยืนยันแล้ว 2026-10-13 หลังตรวจว่าไม่มีอะไรเปิดมัน |
 | D11 | **Level 1 (Open ⇄ Close) ขับด้วยปุ่ม/hotkey ตามเดิม** ไม่เพิ่ม `flow_close_bar`/`flow_next_day` ใน `.yarn` | ยืนยันแล้ว 2026-10-13 ไม่มีงานแก้ L1 ใน stage ใด; Stage 10 ยังเป็น optional (ลดโค้ด ไม่จำเป็นต่อเป้าหมาย) |
+| D12 | **ไม่สร้าง presenter / flat `FlowStep` enum ใน Stage 8** กฎ step → book/post-it/ingredient (ประมาณ 15 บรรทัดใน 5 bridge) รวมที่ `FlowWiring` ตอน Stage 9 พร้อมการรวม bridge; **`N_InputManager._sceneCamera` คงเป็น ref ที่ serialize** ไม่ส่งผ่าน Camera manager | ตัดสินโดย Claude 2026-10-13 เป็นค่า default รอ user ยืนยัน: presenter จะเป็น bridge ตัวที่ 6 ที่ต้องรู้ FSM เหมือนเดิม ผลต่อผู้เล่นเป็นศูนย์ และ Stage 9 ต้องรวม bridge อยู่แล้ว; การส่ง `Camera` ต้องเพิ่ม wiring เพื่อแลกกับ ref ตัวเดียว |
 
 ### ยังเปิดอยู่ (มีค่า default)
 
