@@ -18,6 +18,9 @@ public class IngredientButtonUIEditor : Editor
     private SerializedProperty _mixer;
     private SerializedProperty _alcohol;
     private SerializedProperty _liqueur;
+    private SerializedProperty _shaker;
+    private SerializedProperty _onPoured;
+    private SerializedProperty _onRejected;
 
     // ── Label colours ─────────────────────────────────────
     private static readonly Color HeaderColour  = new Color(0.25f, 0.55f, 0.90f);
@@ -29,6 +32,9 @@ public class IngredientButtonUIEditor : Editor
         _mixer   = serializedObject.FindProperty("_mixer");
         _alcohol = serializedObject.FindProperty("_alcohol");
         _liqueur = serializedObject.FindProperty("_liqueur");
+        _shaker = serializedObject.FindProperty("_shaker");
+        _onPoured = serializedObject.FindProperty("OnPoured");
+        _onRejected = serializedObject.FindProperty("OnRejected");
     }
 
     public override void OnInspectorGUI()
@@ -38,8 +44,40 @@ public class IngredientButtonUIEditor : Editor
         base.DrawHeader();
         DrawActionField();
         DrawIngredientField();
+        DrawShakerField();
+        DrawEventFields();
 
         serializedObject.ApplyModifiedProperties();
+    }
+
+    /// <summary>Which shaker this button pours into. Empty = find the one in the scene.</summary>
+    private void DrawShakerField()
+    {
+        EditorGUILayout.Space(4);
+        EditorGUILayout.LabelField("Shaker", EditorStyles.boldLabel);
+        EditorGUILayout.PropertyField(_shaker, new GUIContent(
+            "Shaker Contents",
+            "The ShakerContents this button pours into.\nLeave empty to find the one in the scene on first use."));
+    }
+
+    /// <summary>
+    /// Designer hooks. Only shown for the pouring actions — the other actions never raise them.
+    /// </summary>
+    private void DrawEventFields()
+    {
+        var action = (IngredientButtonUI.ButtonAction)_action.enumValueIndex;
+
+        bool pours = action is IngredientButtonUI.ButtonAction.AddMixer
+                            or IngredientButtonUI.ButtonAction.AddAlcohol
+                            or IngredientButtonUI.ButtonAction.AddLiqueur;
+        if (!pours) return;
+
+        EditorGUILayout.Space(4);
+        EditorGUILayout.LabelField("Events", EditorStyles.boldLabel);
+        EditorGUILayout.PropertyField(_onPoured, new GUIContent(
+            "On Poured", "The pour landed — play the animation, sound, splash here."));
+        EditorGUILayout.PropertyField(_onRejected, new GUIContent(
+            "On Rejected", "The glass was already full (10 units) so nothing was added."));
     }
 
     private void DrawActionField()
@@ -104,13 +142,13 @@ public class IngredientButtonUIEditor : Editor
         => action switch
         {
             IngredientButtonUI.ButtonAction.None       => "No action assigned.",
-            IngredientButtonUI.ButtonAction.AddMixer    => "Fires OnAddMixer + OnAddIngredient on the shaker.",
-            IngredientButtonUI.ButtonAction.AddAlcohol  => "Fires OnAddAlcohol + OnAddIngredient on the shaker.",
-            IngredientButtonUI.ButtonAction.AddLiqueur  => "Fires OnAddLiqueur + OnAddIngredient on the shaker.",
+            IngredientButtonUI.ButtonAction.AddMixer    => "Adds 1 unit of this Mixer to ShakerContents, then raises On Poured (or On Rejected when the glass is full).",
+            IngredientButtonUI.ButtonAction.AddAlcohol  => "Adds 1 unit of this Base Spirit to ShakerContents, then raises On Poured (or On Rejected when the glass is full).",
+            IngredientButtonUI.ButtonAction.AddLiqueur  => "Adds 1 unit of this Liqueur to ShakerContents, then raises On Poured (or On Rejected when the glass is full).",
             IngredientButtonUI.ButtonAction.SetShaking  => "Sets the preparation method to Shaking. No ingredient needed.",
-            IngredientButtonUI.ButtonAction.SetMixing   => "Sets the preparation method to Mixing. No ingredient needed.",
+            IngredientButtonUI.ButtonAction.SetMixing   => "Sets the preparation method to Mixing (Method.Stirring). No ingredient needed.",
             IngredientButtonUI.ButtonAction.AddIce      => "Adds ice and disables this button (one-shot). No ingredient needed.",
-            IngredientButtonUI.ButtonAction.ResetShaker => "Fires OnResetedCocktail on the shaker. No ingredient needed.",
+            IngredientButtonUI.ButtonAction.ResetShaker => "Empties the shaker — ShakerContents.Clear(), which raises its Cleared event. No ingredient needed.",
             _                                           => string.Empty
         };
 }

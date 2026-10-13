@@ -1,22 +1,17 @@
-﻿// ============================================================
+// ============================================================
 //  SO_CocktailList.cs — ScriptableObject recipe collection.
 //
-//  SOLID — D (Dependency Inversion):
-//    Implements IDrinkRepository so CocktailSystemManager never
-//    references this concrete type directly.  Swap for any other
+//  SOLID — D: implements IDrinkRepository so CocktailSystemManager
+//    never references this concrete type directly. Swap for any other
 //    source (e.g. JSON loader, server) without touching consumers.
 //
-//  SOLID — O (Open / Closed):
-//    New filtering strategies (e.g. GetByGlass) are added as
-//    new interface methods + implementations here — existing
-//    callers are unaffected.
+//  SOLID — O: new filtering strategies (e.g. GetByGlass) are added as
+//    new interface methods + implementations here — existing callers unaffected.
 //
-//  SOLID — S (Single Responsibility):
-//    Stores and serves recipe data.  No game logic.
+//  SOLID — S: stores and serves recipe data. No game logic.
 // ============================================================
 
 using System.Collections.Generic;
-using System.Linq;
 using UnityEngine;
 using static E_Cocktail;
 
@@ -36,7 +31,7 @@ public class SO_CocktailList : ScriptableObject, IDrinkRepository
     {
         if (cocktails == null || cocktails.Count == 0)
         {
-            Debug.LogWarning("[SO_CocktailList] GetRandom called on empty list.");
+            Debug.LogWarning("[SO_CocktailList] GetRandom called on empty list.", this);
             return null;
         }
         return cocktails[Random.Range(0, cocktails.Count)];
@@ -45,16 +40,40 @@ public class SO_CocktailList : ScriptableObject, IDrinkRepository
     /// <inheritdoc/>
     public S_Drink GetRandom(TypeOfCocktail type)
     {
-        var matches = cocktails
-            .Where(d => DrinkUtility.GetTypeOfAlcohol(d) == type)
-            .ToList();
+        // No LINQ: allocates one list instead of an enumerator chain plus ToList;
+        // runs whenever a customer places an order.
+        var matches = new List<S_Drink>();
+
+        if (cocktails != null)
+        {
+            foreach (var drink in cocktails)
+                if (drink != null && AlcoholClassifier.Resolve(drink) == type) matches.Add(drink);
+        }
 
         if (matches.Count == 0)
         {
-            Debug.LogWarning($"[SO_CocktailList] No cocktails of type {type}. Falling back to random.");
+            Debug.LogWarning($"[SO_CocktailList] No cocktails of type {type}. Falling back to random.", this);
             return GetRandom();
         }
 
         return matches[Random.Range(0, matches.Count)];
+    }
+
+    /// <inheritdoc/>
+    public bool TryGetByName(string name, out S_Drink drink)
+    {
+        drink = null;
+        if (string.IsNullOrEmpty(name) || cocktails == null) return false;
+
+        foreach (var candidate in cocktails)
+        {
+            if (candidate == null) continue;
+            if (!string.Equals(candidate.Name, name, System.StringComparison.OrdinalIgnoreCase)) continue;
+
+            drink = candidate;
+            return true;
+        }
+
+        return false;
     }
 }

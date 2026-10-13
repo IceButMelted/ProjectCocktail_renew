@@ -14,7 +14,7 @@ namespace Bar410.GameFlow
     /// </summary>
     public class ClosingBarPhase : StateBase
     {
-        /// <summary>Player chose "Next Day". Parent moves to <see cref="GamePhase.Prepare"/>.</summary>
+        /// <summary>Player chose "Next Day". Parent moves to <see cref="GamePhase.Open"/>.</summary>
         public event Action OnRequestNextDay;
 
         protected override void OnEnter()

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
 using static E_Cocktail;
@@ -13,6 +14,35 @@ public class MinigameSystemManager : MonoBehaviour, IMinigameContext
     [Header("Events")]
     public UnityEvent OnStartedMinigame;
     public UnityEvent OnEndedGame;
+
+    // ── Game-flow seam (HSM) ───────────────────────────────
+    // Reserved for Bar410.GameFlow. Nothing subscribes yet — MinigameFlowBridge
+    // (see Bar410_Minigame_Integration_Plan.md §3.3) is the intended and only listener.
+    //
+    //   MinigameState.OnStartRequested(type) ──> StartMinigame(type)
+    //   MinigameFinished(type, outcome)      ──> MinigameState.ReportResult(outcome)
+    //   MinigameState.OnStopRequested        ──> CancelMinigame()
+    //
+    // Kept as a plain C# event, not a UnityEvent: the flow layer subscribes in code
+    // and must not be re-pointable from the Inspector.
+
+    /// <summary>
+    /// Raised once per run, when the outro has finished.
+    /// Carries the type of the game that actually ended — not necessarily <see cref="ActiveType"/>,
+    /// since the manager may already have switched away.
+    /// </summary>
+    public event Action<Enum_MiniGameType, MinigameOutcome> MinigameFinished;
+
+    /// <summary>Raised when a run begins, before the intro plays.</summary>
+    public event Action<Enum_MiniGameType> MinigameStarted;
+
+    /// <summary>Which game the manager is currently driving. <c>None</c> if there is none.</summary>
+    public Enum_MiniGameType ActiveType
+        => _activeMinigame != null ? _activeMinigame.GameType : Enum_MiniGameType.None;
+
+    /// <summary>The active game's phase — <c>Idle</c> when nothing is on screen.</summary>
+    public MinigamePhase ActivePhase
+        => _activeMinigame != null ? _activeMinigame.Phase : MinigamePhase.Idle;
 
     // ── Private State ──────────────────────────────────────
 
@@ -60,28 +90,30 @@ public class MinigameSystemManager : MonoBehaviour, IMinigameContext
     void IMinigameContext.ResetCamera()
         => _cocktailCamera?.ResetRotaionAndMovement();
 
-    void IMinigameContext.NotifyGameEnded()
-        => OnEndedGame?.Invoke();
-    
-    public void NextPhase()
+    /// <summary>
+    /// The single exit for the end-of-game event. BaseMiniGame calls this once,
+    /// when its outro finishes — nothing else raises OnEndedGame or MinigameFinished.
+    /// </summary>
+    void IMinigameContext.NotifyGameEnded(Enum_MiniGameType type, MinigameOutcome outcome)
     {
-        if (_activeMinigame == null)
-        {
-            Debug.LogWarning("[MinigameSystemManager] No active minigame to close.");
-            return;
-        }
-        _activeMinigame.ClosePanel();
-        OnEndedGame?.Invoke();
+        Debug.Log($"[MinigameSystemManager] {type} finished: {outcome}");
+        MinigameFinished?.Invoke(type, outcome);   // flow layer (typed)
+        OnEndedGame?.Invoke();                     // scene listeners (designer-facing)
     }
 
-    public void ClosePanelReset()
+    /// <summary>
+    /// Cancels the active minigame — UI close button, or the flow layer backing out of step 2.2.
+    /// The outro still plays; <see cref="MinigameFinished"/> then reports
+    /// <see cref="MinigameOutcome.Cancelled"/> exactly once.
+    /// </summary>
+    public void CancelMinigame()
     {
         if (_activeMinigame == null)
         {
-            Debug.LogWarning("[MinigameSystemManager] No active minigame to close.");
+            Debug.LogWarning("[MinigameSystemManager] No active minigame to cancel.");
             return;
         }
-        _activeMinigame.ClosePanel();
+        _activeMinigame.Cancel();
     }
 
 
@@ -101,7 +133,8 @@ public class MinigameSystemManager : MonoBehaviour, IMinigameContext
 
         SwitchTo(game);
         game.StartGame();
-        OnStartedMinigame?.Invoke();
+        MinigameStarted?.Invoke(type);   // flow layer (typed)
+        OnStartedMinigame?.Invoke();     // scene listeners (designer-facing)
     }
 
     /// <summary>
@@ -130,7 +163,12 @@ public class MinigameSystemManager : MonoBehaviour, IMinigameContext
 
     private void SwitchTo(BaseMiniGame next)
     {
-        _activeMinigame?.SetState(MiniGameState.Standby);
+        if (next == null || ReferenceEquals(next, _activeMinigame)) return;
+
+        // Never leave a half-played game ticking in the background.
+        if (_activeMinigame != null && _activeMinigame.Phase != MinigamePhase.Idle)
+            _activeMinigame.Cancel();
+
         _activeMinigame = next;
     }
 

@@ -81,6 +81,10 @@ public class SaveLoadManager : MonoBehaviour
     /// </summary>
     private void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
+        // Additive loads are UI pages (PauseManager), not a game scene reload — re-running
+        // InitializeReferences would stack duplicate Yarn listeners and corrupt jump/detour tracking.
+        if (mode == LoadSceneMode.Additive) return;
+
         // Skip the loading screen — its objects aren't what we care about.
         if (scene.name == "LoadingScene") return;
 
@@ -143,6 +147,7 @@ public class SaveLoadManager : MonoBehaviour
             _detourDepth = 0;
             SceneLoaderBridge.DialogueRootNode = nodeName;
             SceneLoaderBridge.SessionOptionChoices.Clear(); // choices reset per root, not per detour
+            SceneLoaderBridge.CheckpointLineId = null;      // replay starts at this root, a checkpoint from an earlier root is unreachable
             SceneLoaderBridge.IsInDetour = false;
         }
         else
@@ -185,6 +190,13 @@ public class SaveLoadManager : MonoBehaviour
 
     public void SaveToFile(int slot)
     {
+        // Mid silent-replay the scene is still fast-forwarding to the loaded line, so CurrentLineId is not the real position.
+        if (SceneLoaderBridge.IsSilentReplay)
+        {
+            Debug.LogWarning("[SaveLoadManager] Save skipped: silent replay still running.");
+            return;
+        }
+
         CollectYarnData();
         CollectNPCData();
 
@@ -194,8 +206,11 @@ public class SaveLoadManager : MonoBehaviour
         _saveData.MetaData.PlaytimeSeconds = PlaytimeTracker.TotalSeconds;
         _saveData.MetaData.PlaytimeFormatted = PlaytimeTracker.Formatted();
         _saveData.MetaData.ChapterName = SceneLoaderBridge.DialogueRootNode; // root, not CurrentNode — survives <<detour>>
+        // During a task rewind to the #save_checkpoint line. With no checkpoint, CurrentLineId is
+        // still the last line shown before <<wait_for_task>> (no line plays during a task), so it is the same rewind.
         _saveData.MetaData.LastLineId = CocktailSystemManager.IsWaitingForTask
-            ? SceneLoaderBridge.CheckpointLineId   // rewind before task on load
+                                        && !string.IsNullOrEmpty(SceneLoaderBridge.CheckpointLineId)
+            ? SceneLoaderBridge.CheckpointLineId
             : SceneLoaderBridge.CurrentLineId;
         _saveData.MetaData.ReplayOptionChoices = new List<int>(SceneLoaderBridge.SessionOptionChoices);
         _saveData.MetaData.IsEmpty = false;

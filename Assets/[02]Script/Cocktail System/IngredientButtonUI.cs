@@ -1,14 +1,13 @@
 using UnityEngine;
+using UnityEngine.Events;
 using static E_Cocktail;
 
 /// <summary>
-/// UI-friendly ingredient button for use with Unity's Button component (WorldSpace Canvas).
+/// One ingredient / method / ice button. Set <see cref="ButtonAction"/> in the Inspector,
+/// wire the click to <see cref="Invoke"/> — one connection, no manual swapping. Works from
+/// a UI Button or Interactable_2_5DObject.OnClicked.
 ///
-/// Set <see cref="Action"/> in the Inspector to choose what this button does.
-/// Wire the Button's OnClick() to <see cref="Invoke"/> — one connection, no manual swapping.
-///
-/// Unlike IngredientButton (mesh/raycast), this component owns no visual logic —
-/// the Button component handles all interaction and the Animator/Transition handles visuals.
+/// Talks to <see cref="ShakerContents"/>, the owner of the live drink.
 /// </summary>
 public class IngredientButtonUI : MonoBehaviour
 {
@@ -30,18 +29,37 @@ public class IngredientButtonUI : MonoBehaviour
     [SerializeField] private BaseSpirit _alcohol;
     [SerializeField] private Liqueur _liqueur;
 
-    // ── Private ───────────────────────────────────────────
-    private CocktailShakerData _shaker;
+    [Header("Shaker")]
+    [Tooltip("Leave empty to find the one in the scene on first use.")]
+    [SerializeField] private ShakerContents _shaker;
 
-    private void Awake()
-        => _shaker = FindFirstObjectByType<CocktailShakerData>();
+    [Header("Events")]
+    [Tooltip("Fired only when the pour actually landed — not when the glass is already full (GDD §15, 10 units).")]
+    public UnityEvent OnPoured = new UnityEvent();
 
-    // ── Single entry-point (wire this to Button.OnClick) ──
+    [Tooltip("Fired when the pour was refused because the glass has no room left.")]
+    public UnityEvent OnRejected = new UnityEvent();
 
-    /// <summary>
-    /// Dispatches to the correct action based on <see cref="Action"/>.
-    /// Wire only this method to the Button's OnClick() event.
-    /// </summary>
+    // ── Shaker resolution ─────────────────────────────────
+
+    /// <summary>Resolved on first use so Inspector-unassigned buttons still find the scene's ShakerContents.</summary>
+    private ShakerContents Shaker
+    {
+        get
+        {
+            if (_shaker != null) return _shaker;
+
+            _shaker = FindFirstObjectByType<ShakerContents>(FindObjectsInactive.Include);
+            if (_shaker == null)
+                Debug.LogWarning($"[IngredientButtonUI] No ShakerContents in the scene — '{name}' does nothing.", this);
+
+            return _shaker;
+        }
+    }
+
+    // ── Single entry-point (wire this to the click) ───────
+
+    /// <summary>Dispatches to the action picked in the Inspector.</summary>
     public void Invoke()
     {
         switch (_action)
@@ -51,19 +69,7 @@ public class IngredientButtonUI : MonoBehaviour
             case ButtonAction.AddLiqueur: AddLiqueur(); break;
             case ButtonAction.SetShaking: SetShaking(); break;
             case ButtonAction.SetMixing: SetMixing(); break;
-            case ButtonAction.AddIce: AddIce(); break;
-            case ButtonAction.ResetShaker: ResetShaker(); break;
-        }
-    }
-
-    public void ActionBehavior() {
-        switch (_action) {
-            case ButtonAction.AddMixer: AddMixer(); break;
-            case ButtonAction.AddAlcohol: AddAlcohol(); break;
-            case ButtonAction.AddLiqueur: AddLiqueur(); break;
-            case ButtonAction.SetShaking: SetShaking(); break;
-            case ButtonAction.SetMixing: SetMixing(); break;
-            case ButtonAction.AddIce: AddIce(); break;
+            case ButtonAction.AddIce: AddIce(true); break;
             case ButtonAction.ResetShaker: ResetShaker(); break;
         }
     }
@@ -71,44 +77,41 @@ public class IngredientButtonUI : MonoBehaviour
     // ── Individual methods (also available directly) ──────
 
     /// <summary>Add the assigned Mixer to the shaker.</summary>
-    public void AddMixer()
-    {
-        _shaker.OnAddMixer?.Invoke(_mixer, 1);
-    }
+    public void AddMixer() => Pour(() => Shaker.TryToAddMixer(_mixer, 1));
 
     /// <summary>Add the assigned Alcohol to the shaker.</summary>
-    public void AddAlcohol()
-    {
-        _shaker.OnAddAlcohol?.Invoke(_alcohol, 1);
-    }
+    public void AddAlcohol() => Pour(() => Shaker.TryToAddAlcohol(_alcohol, 1));
 
     /// <summary>Add the assigned Liqueur to the shaker.</summary>
-    public void AddLiqueur()
-    {
-        _shaker.OnAddLiqueur?.Invoke(_liqueur, 1);
-    }
+    public void AddLiqueur() => Pour(() => Shaker.TryToAddLiqueur(_liqueur, 1));
 
     /// <summary>Set preparation method to Shaking.</summary>
-    public void SetShaking()
-        => _shaker.SetMethod(Method.Shaking);
+    public void SetShaking() => Shaker?.SetMethod(Method.Shaking);
 
-    /// <summary>Set preparation method to Mixing.</summary>
-    public void SetMixing()
-        => _shaker.SetMethod(Method.Stirring);
+    /// <summary>Set preparation method to Mixing (Method.Stirring).</summary>
+    public void SetMixing() => Shaker?.SetMethod(Method.Stirring);
 
-    /// <summary>Add ice to the shaker.</summary>
-    public void AddIce()
+    /// <summary>Add or remove ice. The no-argument overload had an empty body and was deleted.</summary>
+    public void AddIce(bool enable) => Shaker?.ToggleIce(enable);
+
+    /// <summary>Empty the shaker. ShakerContents.Cleared carries the news to listeners.</summary>
+    public void ResetShaker() => Shaker?.Clear();
+
+    // ── Internal ──────────────────────────────────────────
+
+    /// <summary>
+    /// Runs the add and reports whether it landed. DrinkBuilder silently refuses a pour that
+    /// breaks the 10-unit ceiling, so part count is what tells the two apart.
+    /// </summary>
+    private void Pour(System.Action add)
     {
-        //_shaker.SetIceAddIce();
-        
+        var shaker = Shaker;
+        if (shaker == null) return;
+
+        int before = shaker.TotalParts;
+        add();
+
+        if (shaker.TotalParts != before) OnPoured?.Invoke();
+        else OnRejected?.Invoke();
     }
-
-    public void AddIce(bool enable) { 
-        _shaker.ToggleIce(enable);
-    }
-
-
-    /// <summary>Reset the shaker to empty state.</summary>
-    public void ResetShaker()
-        => _shaker.ResetShaker();
 }

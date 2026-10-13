@@ -1,0 +1,34 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: db22b27b503ab6f4ebfe62be17969343, type: 3}
+  m_Name: SoundSettings
+  m_EditorClassIdentifier: Assembly-CSharp::SoundSettings
+  AudioMixer: {fileID: 24100000, guid: 5e2da7c56517b6e4bbce2e849802ef5c, type: 2}
+  MasterVolume: 1
+  MasterVolumeName: MasterVolume
+  MusicVolume: 0.8
+  MusicVolumeName: MusicVolume
+  MusicGroup: Master/Music
+  AmbientVolume: 0.5
+  AmbientVolumeName: AmbientVolume
+  AmbientGroup: Master/Ambient
+  MasterSFXVolume: 1
+  MasterSFXVolumeName: MasterSFXVolume
+  SFXVolume: 1
+  SFXVolumeName: SFXVolume
+  SFXGroup: Master/SFXMaster/SFX
+  UIVolume: 1
+  UIVolumeName: UIVolume
+  UIGroup: Master/SFXMaster/Ui
+  VoiceVolume: 1
+  VoiceVolumeName: VoiceVolume
+  VoiceGroup: Master/Voice

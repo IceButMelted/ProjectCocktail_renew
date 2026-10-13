@@ -93,7 +93,7 @@ public class CameraController : MonoBehaviour
     /// </summary>
     public ViewDirection CurrentDirection => currentDirection;
 
-    private bool isFixedCamera = false;
+    private bool isFixedCamera = true;
 
     /// <summary>
     /// When set to true, immediately resets the camera to the forward view
@@ -131,7 +131,7 @@ public class CameraController : MonoBehaviour
         }
 
         if (settings == null)
-            Debug.LogWarning("CameraController: No CameraControllerSettings asset assigned — using built-in defaults.");
+            Debug.LogWarning("CameraController: No CameraControllerSettings asset assigned ï¿½ using built-in defaults.");
 
         initialPosition = transform.position;
         downPosition = initialPosition - new Vector3(0, MoveDownDistance, 0);

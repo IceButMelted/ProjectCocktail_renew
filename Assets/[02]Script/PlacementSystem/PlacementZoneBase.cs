@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 
 /// <summary>
@@ -25,6 +26,11 @@ public abstract class PlacementZoneBase : MonoBehaviour
         if (!_restrictByTag) return true;
         return item.CompareTag(_requiredTag);
     }
+
+    /// <summary>Fired by N_PlacementSystem once an item actually lands in this zone (not on every drag frame).</summary>
+    public event Action<GameObject> Placed;
+
+    public void NotifyPlaced(GameObject item) => Placed?.Invoke(item);
 
     /// <summary>
     /// Returns the clamped world-space position for the item's pivot.

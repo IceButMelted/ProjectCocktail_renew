@@ -69,12 +69,21 @@ public class BookUI_V2 : MonoBehaviour
     [SerializeField] private TMP_Text _rightPageNumberLabel;
     [SerializeField] private string _pageNumberFormat = "{0}";
 
+    [Header("Sound")]
+    [SerializeField] private string _pageFlipUISFX = "";
+    [SerializeField] private string _openBookUISFX= "";
+    [SerializeField] private string _closeBookUISFX = "";
+
     [Header("Events")]
     public UnityEvent<int> OnSpreadChanged;
     public UnityEvent OnBookOpened;
     public UnityEvent OnBookClosed;
 
+    
+
     // ── Properties ────────────────────────────────────────────────────────────
+
+    private bool _hasOpenedOnce;
 
     public int CurrentSpreadIndex { get; private set; }
     public int SpreadCount => _spreads.Count;
@@ -102,15 +111,22 @@ public class BookUI_V2 : MonoBehaviour
 
         if (open)
         {
-            GoToSpread(_startSpreadIndex);
+            // First open ever uses the authored start page; every open after that resumes
+            // wherever the book was left (CurrentSpreadIndex survives HideAllSpreads on close).
+            GoToSpread(_hasOpenedOnce ? CurrentSpreadIndex : _startSpreadIndex);
+            _hasOpenedOnce = true;
             OnBookOpened?.Invoke();
+            TryPlay(_openBookUISFX);
         }
         else
         {
             HideAllSpreads();
             OnBookClosed?.Invoke();
+            TryPlay(_closeBookUISFX);
         }
     }
+
+    public void CloseBook() => SetActive(false);
 
     public void Toggle() => SetActive(!IsOpen);
 
@@ -143,6 +159,9 @@ public class BookUI_V2 : MonoBehaviour
         ApplyPreAuthoredContent(spread.rightPage);
         ShowSpread(spread);
         UpdatePageNumberLabels();
+
+        TryPlay(_pageFlipUISFX);
+
 
         OnSpreadChanged?.Invoke(CurrentSpreadIndex);
     }
@@ -305,5 +324,11 @@ public class BookUI_V2 : MonoBehaviour
         if (index >= 0 && index < _spreads.Count) return true;
         Debug.LogWarning($"[BookUI] Spread index {index} is out of range (0 – {_spreads.Count - 1}).");
         return false;
+    }
+
+    private static void TryPlay(string id)
+    {
+        if (!string.IsNullOrEmpty(id))
+            SoundManager.Instance?.PlayUiSFX(id);
     }
 }

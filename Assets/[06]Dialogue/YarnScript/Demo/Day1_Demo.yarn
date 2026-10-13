@@ -85,9 +85,10 @@ Walter: [order] "{Order_Cocktail_ByName_OutName("Sea Breeze")}" [/order] should 
 Player: Coming right up. #line:19
 <<SetEmotion NPC_Name.Owen "neutral">>
 
+<<flow_prepare_drinks>>
 
-<<Reset_Camera CamController>>
-<<Switch_Camera CamController "MainCam">>
+//<<Reset_Camera CamController>>
+//<<Switch_Camera CamController "MainCam">>
 <<Fix_Camera CamController false>>
 <<wait_for_task SystemGame>>
 
@@ -143,8 +144,6 @@ title: D1_04_Isla_Arrive
 <<Switch_Camera CamController "MainCam">>
 
 
-<<Panel_FadeOut Panel_Transition>>
-<<Panel_FadeIn Panel_Transition>>
 <<wait 2>>
 
 
@@ -191,9 +190,7 @@ Isla: Oh by the way. my name is Isla. #line:42
 Isla: I'm a nurse at the local clinic. #line:43
 Player: I'm Bartender. Nice to meet you. #line:44
 Isla: Yeah nice to meet you too. #line:45
-Player: Would you like anything to drink? #line:46
-Isla: Um... Let me see. #line:47
-Isla: I have a morning shift tomorrow... #line:48
+Player: Would you like anything to drink? #line:461
 Isla: Do you have anything to recommend? #line:49
 <<jump D1_05_Isla_Order>>
 ===
@@ -211,16 +208,17 @@ Player: Got it. #line:4D
 
 <<SetEmotion NPC_Name.Isla "neutral">>
 
-<<Reset_Camera CamController>>
-<<Switch_Camera CamController "MainCam">>
-<<Fix_Camera CamController false>>
+<<flow_prepare_drinks>>
+
+//<<Reset_Camera CamController>>
+//<<Fix_Camera CamController false>>
 <<wait_for_task SystemGame>>
 
 //After Isla's order
-<<Enable_InteractableObject SystemGame false>>
+//<<Enable_InteractableObject SystemGame false>>
 <<Fix_Camera CamController true>>
 <<Reset_Camera CamController>>
-<<Switch_Camera CamController NearLeftCam>>
+<<Switch_Camera CamController CenterCam>>
 
 <<if $satisfaction == Satisfaction.Perfect>>
     <<SetEmotion NPC_Name.Isla "happy">>
@@ -327,6 +325,8 @@ Owen: Oh right, I should probably order before the bartender kicks me out. #line
 Owen: I'll have [order] {Order_Cocktail_ByName_OutName("Gin Fizz")}. [/order] #line:79
 Player: One moment. #line:7A
 <<SetEmotion NPC_Name.Owen "neutral">>
+
+<<flow_prepare_drinks>>
 
 <<Reset_Camera CamController>>
 <<Switch_Camera CamController "MainCam">>
@@ -495,6 +495,7 @@ Owen: Yup, see you. #line:D0
 ===
 
 title: D1_13_Owen_Talk_Outro
+position: 307,317
 ---
 //After isla leave
 <<SetEmotion NPC_Name.Owen "neutral">>
@@ -518,6 +519,7 @@ Owen: [fade]...It is.[/fade] #line:E0
 ===
 
 title: D1_14_Owen_Leave
+position: 691,633
 ---
 
 Owen: Anyway, I should head out. #line:E1

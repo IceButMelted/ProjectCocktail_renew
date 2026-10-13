@@ -9,8 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8246347767388262365}
-  - component: {fileID: 3104275474088279606}
-  - component: {fileID: 9213904461191353842}
+  - component: {fileID: 434043347250111920}
   m_Layer: 0
   m_Name: SoundSystem
   m_TagString: Untagged
@@ -33,7 +32,7 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &3104275474088279606
+--- !u!114 &434043347250111920
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -42,19 +41,17 @@ MonoBehaviour:
   m_GameObject: {fileID: 6559767331297106402}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: edb0f380c539e3845b825b0a65e829c9, type: 3}
+  m_Script: {fileID: 11500000, guid: 58f9a00a77a7ba24d87d274b8b491784, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::SoundRunner
---- !u!114 &9213904461191353842
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6559767331297106402}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 87911d35fb392d14ba9a7ceeaae4c9bb, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::RegisterSound
-  soundData: {fileID: 11400000, guid: 9e12c7a2aba2038478434e1bdc8168aa, type: 2}
+  m_EditorClassIdentifier: Assembly-CSharp::SoundManager
+  m_SoundData: {fileID: 11400000, guid: 9e12c7a2aba2038478434e1bdc8168aa, type: 2}
+  m_SoundSettings: {fileID: 11400000, guid: 99d44bdb1f5eb2445ac7a164c958dca5, type: 2}
+  m_BGMStart: 
+  m_MaxSFXCount: 5
+  m_SliderMasterVolume: {fileID: 0}
+  m_SliderMusicVolume: {fileID: 0}
+  m_SliderAmbientVolume: {fileID: 0}
+  m_SliderMasterSFXVolume: {fileID: 0}
+  m_SliderSFXVolume: {fileID: 0}
+  m_SliderUIVolume: {fileID: 0}
+  m_SliderVoiceVolume: {fileID: 0}

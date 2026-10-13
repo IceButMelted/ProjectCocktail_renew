@@ -36,7 +36,7 @@ public class LoadingManager : MonoBehaviour
             _displayProgress = Mathf.Lerp(
                 _displayProgress,
                 targetProgress,
-                Time.deltaTime * smoothSpeed
+                Time.unscaledDeltaTime * smoothSpeed    // unscaled: a leftover timeScale 0 (load from pause) must not freeze loading
             );
 
             loadingBar.value = _displayProgress;
@@ -46,7 +46,7 @@ public class LoadingManager : MonoBehaviour
 
             if (_displayProgress >= 0.99f)
             {
-                yield return new WaitForSeconds(0.3f);
+                yield return new WaitForSecondsRealtime(0.3f);
 
                 // Fire callback BEFORE activating the scene
                 onComplete?.Invoke();

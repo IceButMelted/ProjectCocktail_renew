@@ -348,6 +348,12 @@ namespace Yarn.Unity
         // ── Update polling ───────────────────────────────────────────────────
 
         private void Update()
+        {
+            if (PauseManager.IsPaused) return;  // Update keeps running at timeScale 0 — don't let Space advance the line behind the menu
+            PollInput();
+        }
+
+        private void PollInput()
 {
     switch (UsedInputMode)
     {
