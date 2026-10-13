@@ -71,7 +71,7 @@ order ถูกสุ่มด้วย `UnityEngine.Random` ตอนเข้�
 | 1 | `fe06935` | trace เหมือน baseline ทุกบรรทัด (ยกเว้น `target=` ที่ตอนนี้ถูกตรึงด้วย seed), Yarn contract exit 0, console errors 0 |
 | 2 | ข้าม | `FlowWiring` ว่างเปล่าไม่มีประโยชน์ สร้างตอน Stage 4 พร้อม wiring จริง |
 | 3 | `dbbef25` | trace เหมือนไฟล์ใน git ทุกไบต์ (รวม `target=`), drag simulation เหมือนก่อนแก้, Yarn contract exit 0, console errors 0 |
-| 4f | ดู `git log` | trace เหมือนไฟล์ใน git ทุกไบต์; serve_commit: `ServeDone()` ตรงๆ เขียน `$task_done=True` แล้ว (ก่อนแก้เป็น False), remake ไม่เขียนอะไร, ปุ่ม Serve เหมือนเดิม |
+| 4f | `b794bdf` | trace เหมือนไฟล์ใน git ทุกไบต์; serve_commit: `ServeDone()` ตรงๆ เขียน `$task_done=True` แล้ว (ก่อนแก้เป็น False), remake ไม่เขียนอะไร, ปุ่ม Serve เหมือนเดิม |
 
 ## เมื่อโครงสร้างใน scene เปลี่ยนจากตอน audit (2026-10-05)
 
@@ -79,3 +79,4 @@ order ถูกสุ่มด้วย `UnityEngine.Random` ตอนเข้�
 - มี `[CocktailSystem]/Canvas_Cocktail` แล้ว ตอนนี้มีแค่ `Panel - OrderDirnks` (post-it) ที่เหลืออยู่ใต้ `Canvas` เดิม
 - `RecipeBook` และ `Architexturebook` ไม่อยู่แล้ว (Interactable_3DObject เหลือ 1, `DragableObject` 12, `ScaleOnHover` 17)
 - `GranishCam` อยู่ใต้ `[CocktailSystem]/Garnish_Plate`
+| 4d | ดู `git log` | trace เหมือนไฟล์ใน git ทุกไบต์ (รวม camera `PrepareCam`, lock, method panel ตอนเต็ม และตอน Clear), Yarn contract exit 0, console errors 0 |

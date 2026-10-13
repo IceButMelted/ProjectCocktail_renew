@@ -13524,121 +13524,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::ShakerContents
   Changed:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 4080245900655418650}
-        m_TargetAssemblyTypeName: ShakerContents, Assembly-CSharp
-        m_MethodName: IsCocktailFull
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 974337863640375313}
-        m_TargetAssemblyTypeName: VisualizeCocktail, Assembly-CSharp
-        m_MethodName: UpdateCocktailBars
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   Cleared:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 974337863640375313}
-        m_TargetAssemblyTypeName: VisualizeCocktail, Assembly-CSharp
-        m_MethodName: ResetVisualBars
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 8588145332230479579}
-        m_TargetAssemblyTypeName: ShakerPanelController, Assembly-CSharp
-        m_MethodName: HideMethod
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 6049133883410967789}
-        m_TargetAssemblyTypeName: IngredientButtonGroup, Assembly-CSharp
-        m_MethodName: EnableInteractablePrepareDrinksPhase
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
+      m_Calls: []
   OnFulled:
     m_PersistentCalls:
-      m_Calls:
-      - m_Target: {fileID: 6049133883410967789}
-        m_TargetAssemblyTypeName: IngredientButtonGroup, Assembly-CSharp
-        m_MethodName: Disable
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 8588145332230479579}
-        m_TargetAssemblyTypeName: ShakerPanelController, Assembly-CSharp
-        m_MethodName: ShowMethod
-        m_Mode: 1
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 0
-        m_CallState: 2
-      - m_Target: {fileID: 653714615255478872}
-        m_TargetAssemblyTypeName: UnityEngine.UI.Button, UnityEngine.UI
-        m_MethodName: set_interactable
-        m_Mode: 6
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: 
-          m_BoolArgument: 1
-        m_CallState: 2
-      - m_Target: {fileID: 1321084322}
-        m_TargetAssemblyTypeName: CinimachineCameraSwitcher, Assembly-CSharp
-        m_MethodName: SwitchCamera
-        m_Mode: 5
-        m_Arguments:
-          m_ObjectArgument: {fileID: 0}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
-          m_IntArgument: 0
-          m_FloatArgument: 0
-          m_StringArgument: PrepareCam
-          m_BoolArgument: 1
-        m_CallState: 2
+      m_Calls: []
   IdentityResolved:
     m_PersistentCalls:
       m_Calls: []
@@ -21101,6 +20993,8 @@ MonoBehaviour:
   _bookUI: {fileID: 1405869133}
   _postIt: {fileID: 2023415601206712225}
   _panelServe: {fileID: 761406268844529709}
+  _fullDrinkCameraId: PrepareCam
+  _btnBook: {fileID: 653714615255478872}
   _btnShaking: {fileID: 1813103946349313516}
   _btnMixing: {fileID: 4363117676914697572}
   _btnMethodReset: {fileID: 5936304511771913311}

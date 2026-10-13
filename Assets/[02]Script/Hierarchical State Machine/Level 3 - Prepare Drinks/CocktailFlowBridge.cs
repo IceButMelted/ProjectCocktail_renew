@@ -46,6 +46,13 @@ namespace Bar410.GameFlow
         [Tooltip("Hidden defensively on AddIngredient entry — Serve is also always closed by ServeFlowBridge on its own Exit.")]
         [SerializeField] private GameObject _panelServe;
 
+        [Header("Shaker events (were Inspector UnityEvents on ShakerContents)")]
+        [Tooltip("Camera that frames the shaker once the drink is full and the method panel opens.")]
+        [SerializeField] private string _fullDrinkCameraId = "PrepareCam";
+        [Tooltip("The recipe-book button. Locking the ingredients when the drink fills also locks " +
+                 "this button (it is a member of IngredientButtonGroup), so it is switched back on.")]
+        [SerializeField] private Button _btnBook;
+
         [Header("Method Panel (2.1 — Shaking / Stirring / Reset)")]
         [SerializeField] private Button _btnShaking;
         [SerializeField] private Button _btnMixing;
@@ -71,6 +78,13 @@ namespace Bar410.GameFlow
             openBar.Serve.Exited += OnServeExited;
             openBar.Sub.OnTransition += OnOpenBarTransition;
 
+            if (_shakerContents != null)
+            {
+                _shakerContents.Changed.AddListener(OnShakerChanged);
+                _shakerContents.Cleared.AddListener(OnShakerCleared);
+                _shakerContents.OnFulled.AddListener(OnShakerFull);
+            }
+
             if (_btnShaking != null) _btnShaking.onClick.AddListener(OnShakingClicked);
             if (_btnMixing != null) _btnMixing.onClick.AddListener(OnMixingClicked);
             if (_btnMethodReset != null) _btnMethodReset.onClick.AddListener(OnMethodResetClicked);
@@ -78,6 +92,13 @@ namespace Bar410.GameFlow
 
         private void OnDestroy()
         {
+            if (_shakerContents != null)
+            {
+                _shakerContents.Changed.RemoveListener(OnShakerChanged);
+                _shakerContents.Cleared.RemoveListener(OnShakerCleared);
+                _shakerContents.OnFulled.RemoveListener(OnShakerFull);
+            }
+
             if (_btnShaking != null) _btnShaking.onClick.RemoveListener(OnShakingClicked);
             if (_btnMixing != null) _btnMixing.onClick.RemoveListener(OnMixingClicked);
             if (_btnMethodReset != null) _btnMethodReset.onClick.RemoveListener(OnMethodResetClicked);
@@ -94,6 +115,30 @@ namespace Bar410.GameFlow
             prepareDrinks.AddIngredient.Exited -= OnAddIngredientExited;
             openBar.Serve.Exited -= OnServeExited;
             openBar.Sub.OnTransition -= OnOpenBarTransition;
+        }
+
+        // ── Shaker → scene reactions ───────────────────────
+        // These were persistent UnityEvent calls on ShakerContents, authored in the Inspector and
+        // invisible to a code search. They run in the same order as the old calls.
+
+        private void OnShakerChanged()
+        {
+            _visualCocktail?.UpdateCocktailBars();
+        }
+
+        private void OnShakerCleared()
+        {
+            _visualCocktail?.ResetVisualBars();
+            _shakerPanels?.HideMethod();
+            _ingredients?.EnableInteractablePrepareDrinksPhase();
+        }
+
+        private void OnShakerFull()
+        {
+            _ingredients?.Disable();
+            _shakerPanels?.ShowMethod();
+            if (_btnBook != null) _btnBook.interactable = true;
+            _cameraSwitcher?.SwitchCamera(_fullDrinkCameraId);
         }
 
         // ── Step 1 · Talking ───────────────────────────────

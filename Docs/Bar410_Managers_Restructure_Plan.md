@@ -183,14 +183,14 @@ baseline อยู่ที่ `Docs/baseline/managers/` (README ในโฟล
 
 **Stage 3 · Placement Manager** (เสร็จ) ไม่รวม `N_PlacementSystem` กับ `N_InputManager` เป็น class เดียว เพราะอยู่ GameObject เดียวกันและ ref กันเองอยู่แล้ว การรวมแก้ข้อมูล serialized โดยไม่ลด wiring และ trace กับ drag simulation จับความต่างไม่ครบ จึงทำเท่าที่ได้ผล: `N_PlacementSystem.Current` แบบ scene-scoped (set ใน `Awake`, ล้างใน `OnDestroy`) พร้อม `.InputManager` เป็นทางเข้าเดียว แทน `public static DragableObject._placementSystem` กับ `FindFirstObjectByType` ใน `OnEnable` และ static cache ใน `IngredientHoverDetector` (ตัวเลขเดิม "ลบ Find ×14+1" ผิด static ตัวเดียวถูกเติมครั้งเดียว Find จริงเกิดแค่ครั้งแรก) ถ้าต้องการรวม class ค่อยทำทีหลังได้
 
-**Stage 4 · Cocktail Manager**
-- 4a `IngredientShelf` (writer เดียว, collect จาก container 3 อัน, ส่ง `ShakerContents` ให้ bottle เลิก `FindFirstObjectByType` ×16)
-- 4b `Canvas_Cocktail` + Method panel เป็นเจ้าของปุ่มตัวเอง
-- 4c post-it + book ย้ายเข้า, ตรวจ `VisualizeCocktail` ทั้งสองตัว
-- 4d `ShakerContents` UnityEvents 8 ตัว → subscribe ในโค้ดที่ manager
-- 4e `SetIce`/`IceChanged` เป็น API ของ Cocktail
-- 4f scoring ทางเดียว: `Cocktail.Serve()` กันเรียกซ้ำด้วย `IsScored`, เลิก fallback ใน `OnServeExited`
-- ระหว่างทาง `Cocktail.Serve()` ยังเขียน Yarn variable เองจนถึง Stage 7
+**Stage 4 · Cocktail Manager** (ทำเป็น commit ย่อย)
+- 4f (เสร็จ) scoring ทางเดียว: ให้คะแนนตอนเปลี่ยน Serve → Talking (`OpenBar.Sub.OnTransition`) ไม่ใช่ตอน Exited เพราะ Exited เกิดตอน remake ด้วย และ `ServeDrink()` กันเรียกซ้ำด้วย `IsScored` ผลคือ `ServeDone()` ตรงๆ (`<<flow_serve_done>>`, hotkey 7) เขียน `$task_done` ลง Yarn ถูกต้องแล้ว (เดิมได้แค่ `IsScored`)
+- 4d (เสร็จ) `ShakerContents` UnityEvent 9 call (Changed 2, Cleared 3, OnFulled 4) ย้ายเป็น listener ในโค้ดที่ `CocktailFlowBridge` ลำดับเดิม ส่วน `IsCocktailFull` เรียกใน `ShakerContents.RaiseChanged()` ก่อน `Changed` เสมอ ปุ่ม book ต้องมี ref ใหม่ `_btnBook` ชั่วคราวจนกว่า BookPanel จะเป็นเจ้าของปุ่ม
+- 4a `IngredientShelf` (writer เดียว, collect จาก container 3 อัน, ส่ง `ShakerContents` ให้ bottle เลิก `FindFirstObjectByType` ×16) ยังไม่ทำ
+- 4b `Canvas_Cocktail` + Method panel เป็นเจ้าของปุ่มตัวเอง ยังไม่ทำ
+- 4c book + ตรวจ `VisualizeCocktail` ทั้งสองตัว (post-it ย้ายเข้า `Canvas_Cocktail` แล้ว) ยังไม่ทำ
+- 4e `SetIce`/`IceChanged` เป็น API ของ Cocktail ย้ายไปทำพร้อม Stage 6 เพราะผู้เรียกคือ Garnish
+- `FlowWiring` ไม่จำเป็นใน stage นี้ bridge เดิมทำหน้าที่ seam ได้ จะรวมเป็นไฟล์เดียวตอนล้าง bridge (Stage 9)
 
 **Stage 5 · Minigame Manager** ย้ายการเลือก type, cancel buttons, `LastOutcome` เข้ามา แก้ F6 หลังจำลองให้เห็นก่อน
 

@@ -63,7 +63,7 @@ public class ShakerContents : MonoBehaviour, IIngredientReceiver
     public void SetMethod(Method method)
     {
         CurrentCocktail.PreparationMethod = method;
-        Changed?.Invoke();
+        RaiseChanged();
     }
 
     public void SetMethodToShake() => SetMethod(Method.Shaking);
@@ -108,7 +108,7 @@ public class ShakerContents : MonoBehaviour, IIngredientReceiver
             return;
         }
         if (!DrinkBuilder.TryAddAlcohol(CurrentCocktail, alcohol, amount)) return;
-        Changed?.Invoke();
+        RaiseChanged();
     }
 
     public void TryToAddLiqueur(Liqueur liqueur, int amount = 1)
@@ -118,7 +118,7 @@ public class ShakerContents : MonoBehaviour, IIngredientReceiver
             return; 
         }
         if (!DrinkBuilder.TryAddLiqueur(CurrentCocktail, liqueur, amount)) return;
-        Changed?.Invoke();
+        RaiseChanged();
     }
 
     public void TryToAddMixer(Mixer mixer, int amount = 1)
@@ -128,6 +128,18 @@ public class ShakerContents : MonoBehaviour, IIngredientReceiver
             return; 
         }
         if (!DrinkBuilder.TryAddMixer(CurrentCocktail, mixer, amount)) return;
+        RaiseChanged();
+    }
+
+    /// <summary>
+    /// Every "the drink changed" notification goes through here: first work out whether the
+    /// glass just filled up (raising <see cref="OnFulled"/>), then tell the <see cref="Changed"/>
+    /// listeners. This used to be an Inspector UnityEvent call on Changed; keeping it as the
+    /// first step preserves the order listeners saw before.
+    /// </summary>
+    private void RaiseChanged()
+    {
+        IsCocktailFull();
         Changed?.Invoke();
     }
 
@@ -164,7 +176,7 @@ public class ShakerContents : MonoBehaviour, IIngredientReceiver
         LastMatch = RecipeMatch.None;
 
         Cleared?.Invoke();
-        Changed?.Invoke();
+        RaiseChanged();
     }
 
     // ── Queries ────────────────────────────────────────────
