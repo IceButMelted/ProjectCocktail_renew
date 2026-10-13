@@ -47,7 +47,7 @@ string Snap(string label) {
   var book = Btn("Canvas/Panel - Hub/BTN - Open_CloseBook");
   // S00 is taken before the flow touches the camera. Since Stage 7d the chapter dialogue's own camera commands run (they
   // used to fail), so how far it got before this script stopped it decides what the camera shows at S00: not part of the trace.
-  var cam = label.StartsWith("S00") ? "" : (CinimachineCameraSwitcher.Instance != null ? CinimachineCameraSwitcher.Instance.ActiveCameraId : "noSwitcher");
+  var cam = label.StartsWith("S00") ? "" : (CameraManager.Current != null ? CameraManager.Current.ActiveCameraId : "noCameraManager");
   return label
     + " | phase=" + Bar410.GameFlow.GameFlowCommands.Yarn_CurrentPhase()
     + " step=" + Bar410.GameFlow.GameFlowCommands.Yarn_CurrentStep()

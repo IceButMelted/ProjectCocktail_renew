@@ -37,15 +37,11 @@ namespace Bar410.GameFlow
         [SerializeField] private bool _driveIngredientButtons = true;
 
         [Header("Camera / Book / Post-it")]
-        [SerializeField] private CameraController _camera;
-        [SerializeField] private CinimachineCameraSwitcher _cameraSwitcher;
-        [SerializeField] private string _prepareDrinksCameraId = "MainCam";
+        [SerializeField] private CameraManager _cameras;
         [SerializeField] private BookUI_V2 _bookUI;
         [SerializeField] private Post_It_Order _postIt;
 
         [Header("Shaker events (were Inspector UnityEvents on ShakerContents)")]
-        [Tooltip("Camera that frames the shaker once the drink is full and the method panel opens.")]
-        [SerializeField] private string _fullDrinkCameraId = "PrepareCam";
         [Tooltip("The recipe-book button. Locking the ingredients when the drink fills also locks " +
                  "this button (it is a member of IngredientButtonGroup), so it is switched back on.")]
         [SerializeField] private Button _btnBook;
@@ -136,7 +132,7 @@ namespace Bar410.GameFlow
             _ingredients?.Disable();
             _shakerPanels?.ShowMethod();
             if (_btnBook != null) _btnBook.interactable = true;
-            _cameraSwitcher?.SwitchCamera(_fullDrinkCameraId);
+            _cameras?.ShowShaker();
         }
 
         // ── Step 1 · Talking ───────────────────────────────
@@ -162,8 +158,8 @@ namespace Bar410.GameFlow
             if (_shakerPanels != null) _shakerPanels.ResetPermissions();
             if (_cocktail != null) _cocktail.Order.ClearResult();
 
-            _camera?.ResetRotaionAndMovement();
-            _cameraSwitcher?.SwitchCamera(_prepareDrinksCameraId);
+            _cameras?.ResetLook();
+            _cameras?.ShowBar();
             _postIt?.Init();
         }
 

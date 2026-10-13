@@ -6814,7 +6814,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Bar410.GameFlow.TalkingWithCustomerBridge
   _gameLoop: {fileID: 0}
   _ingredients: {fileID: 6049133883410967789}
-  _camera: {fileID: 1321084323}
+  _cameras: {fileID: 1321084322}
   _bookUI: {fileID: 1405869133}
   _cocktail: {fileID: 8872214704051886353}
   _customers: {fileID: 9194944203317526871}
@@ -7673,8 +7673,7 @@ MonoBehaviour:
   _cocktail: {fileID: 8872214704051886353}
   _shakerContents: {fileID: 4080245900655418650}
   _ingredients: {fileID: 6049133883410967789}
-  _cameraSwitcher: {fileID: 1321084322}
-  _garnishCameraId: GranishCam
+  _cameras: {fileID: 1321084322}
 --- !u!224 &1927217058093561900
 RectTransform:
   m_ObjectHideFlags: 0
@@ -10950,6 +10949,10 @@ PrefabInstance:
       propertyPath: Lens.FarClipPlane
       value: 15
       objectReference: {fileID: 0}
+    - target: {fileID: 7402073843992000668, guid: 74dc30c4f63e65b4cafd605906b67635, type: 3}
+      propertyPath: _look
+      value: 
+      objectReference: {fileID: 1321084323}
     - target: {fileID: 7402073843992000668, guid: 74dc30c4f63e65b4cafd605906b67635, type: 3}
       propertyPath: logTransitions
       value: 0
@@ -19785,12 +19788,9 @@ MonoBehaviour:
   _ingredients: {fileID: 6049133883410967789}
   _visualCocktail: {fileID: 974337863640375313}
   _driveIngredientButtons: 1
-  _camera: {fileID: 1321084323}
-  _cameraSwitcher: {fileID: 1321084322}
-  _prepareDrinksCameraId: MainCam
+  _cameras: {fileID: 1321084322}
   _bookUI: {fileID: 1405869133}
   _postIt: {fileID: 2023415601206712225}
-  _fullDrinkCameraId: PrepareCam
   _btnBook: {fileID: 653714615255478872}
   _methodPanel: {fileID: 9061270629617664791}
 --- !u!1 &7950363188708236408

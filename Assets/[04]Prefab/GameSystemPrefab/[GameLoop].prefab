@@ -12919,12 +12919,9 @@ MonoBehaviour:
   _ingredients: {fileID: 6049133883945461797}
   _visualCocktail: {fileID: 974337863101129945}
   _driveIngredientButtons: 1
-  _camera: {fileID: 8729133242691898634}
-  _cameraSwitcher: {fileID: 5386111175212639213}
-  _prepareDrinksCameraId: MainCam
+  _cameras: {fileID: 5386111175212639213}
   _bookUI: {fileID: 7933774315266148633}
   _postIt: {fileID: 2023415601741730665}
-  _fullDrinkCameraId: PrepareCam
   _btnBook: {fileID: 0}
   _methodPanel: {fileID: 6185912478383533967}
 --- !u!114 &5508285943544454353
@@ -12962,8 +12959,7 @@ MonoBehaviour:
   _cocktail: {fileID: 8872214703517392345}
   _shakerContents: {fileID: 4080245901194107346}
   _ingredients: {fileID: 6049133883945461797}
-  _cameraSwitcher: {fileID: 5386111175212639213}
-  _garnishCameraId: GranishCam
+  _cameras: {fileID: 5386111175212639213}
 --- !u!114 &173320216533135447
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -13005,8 +13001,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Bar410.GameFlow.TalkingWithCustomerBridge
   _gameLoop: {fileID: 0}
   _ingredients: {fileID: 6049133883945461797}
-  _camera: {fileID: 8729133242691898634}
+  _cameras: {fileID: 5386111175212639213}
   _bookUI: {fileID: 7933774315266148633}
+  _cocktail: {fileID: 0}
+  _customers: {fileID: 0}
 --- !u!114 &8071046045357891513
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -16391,11 +16389,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   _normalCocktailRepository: {fileID: 11400000, guid: e64c41a62842fd54491c7e08deb2cd77, type: 2}
   _specialCocktailRepository: {fileID: 0}
-  _customerRoster: {fileID: 11400000, guid: e3a3fbdd06635a7ef811260fb95a32f1, type: 2}
   _shakerContents: {fileID: 4080245901194107346}
   _ingredientButtons: {fileID: 6049133883945461797}
   _endShiftBTN: {fileID: 5364419615578008043}
-  _dialogueRunner: {fileID: 0}
   _postItOrder: {fileID: 2023415601741730665}
 --- !u!114 &6049133883945461797
 MonoBehaviour:
@@ -17372,6 +17368,10 @@ PrefabInstance:
       propertyPath: Lens.FarClipPlane
       value: 15
       objectReference: {fileID: 0}
+    - target: {fileID: 7402073843992000668, guid: 74dc30c4f63e65b4cafd605906b67635, type: 3}
+      propertyPath: _look
+      value: 
+      objectReference: {fileID: 8729133242691898634}
     - target: {fileID: 7402073843992000668, guid: 74dc30c4f63e65b4cafd605906b67635, type: 3}
       propertyPath: logTransitions
       value: 0

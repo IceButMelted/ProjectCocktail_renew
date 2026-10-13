@@ -116,7 +116,7 @@ public class MinigameSystemManager : MonoBehaviour, IMinigameContext
     }
 
     void IMinigameContext.ResetCamera()
-        => _cocktailCamera?.ResetRotaionAndMovement();
+        => _cocktailCamera?.ResetView();
 
     /// <summary>
     /// The single exit for the end-of-game event. BaseMiniGame calls this once,

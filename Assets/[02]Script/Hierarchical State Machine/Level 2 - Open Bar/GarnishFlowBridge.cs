@@ -42,8 +42,7 @@ namespace Bar410.GameFlow
         [SerializeField] private IngredientButtonGroup _ingredients;
 
         [Header("Camera")]
-        [SerializeField] private CinimachineCameraSwitcher _cameraSwitcher;
-        [SerializeField] private string _garnishCameraId = "GranishCam";
+        [SerializeField] private CameraManager _cameras;
 
         // ── Unity ──────────────────────────────────────────
 
@@ -101,7 +100,7 @@ namespace Bar410.GameFlow
             // (fully transparent) default and the poured glass looks empty even with liquid in it.
             _cocktail?.UpdateCocktailInShaker();
 
-            _cameraSwitcher?.SwitchCamera(_garnishCameraId);
+            _cameras?.ShowGarnish();
             _ingredients?.Disable();
             _garnish?.Open();
         }

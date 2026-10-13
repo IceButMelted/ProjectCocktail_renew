@@ -22,7 +22,7 @@ namespace Bar410.GameFlow
 
         [Header("Scene Objects")]
         [SerializeField] private IngredientButtonGroup _ingredients;
-        [SerializeField] private CameraController _camera;
+        [SerializeField] private CameraManager _cameras;
         [SerializeField] private BookUI_V2 _bookUI;
 
         [Header("Cocktail <-> customers")]
@@ -61,7 +61,7 @@ namespace Bar410.GameFlow
         private void OnEntered()
         {
             _ingredients?.Disable();
-            _camera?.SetFixedCamera(true);
+            _cameras?.SetLookFixed(true);
             _bookUI?.CloseBook();
         }
     }

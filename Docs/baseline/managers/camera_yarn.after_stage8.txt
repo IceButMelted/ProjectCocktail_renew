@@ -1,0 +1,49 @@
+# camera surface through the real command dispatcher and the flow
+A the commands as the .yarn files write them
+  <<Fix_Camera CamController true>> -> Succeeded | cam=CenterCam fixed=True dir=Forward
+  <<Switch_Camera CamController CenterCam>> -> Succeeded | cam=CenterCam fixed=True dir=Forward
+  <<Switch_Camera CamController "MainCam">> -> Succeeded | cam=MainCam fixed=True dir=Forward
+  <<Cut_Camera CamController SummaryCam>> -> Succeeded | cam=SummaryCam fixed=True dir=Forward
+  <<Switch_Camera CamController NearLeftCam>> -> Succeeded | cam=NearLeftCam fixed=True dir=Forward
+  <<Switch_Camera CamController "MainCam">> -> Succeeded | cam=MainCam fixed=True dir=Forward
+  <<Fix_Camera CamController false>> -> Succeeded | cam=MainCam fixed=False dir=Forward
+  <<Fix_Camera CamController true>> -> Succeeded | cam=MainCam fixed=True dir=Forward
+  (look forced to Left)
+  <<Reset_Camera CamController>> -> Succeeded | cam=MainCam fixed=True dir=Forward
+  <<Fix_Camera CamController false>> -> Succeeded | cam=MainCam fixed=False dir=Forward
+  (look forced to Right, fixed=false)
+  <<Reset_Camera CamController>> -> Succeeded | cam=MainCam fixed=False dir=Forward
+  <<Fix_Camera CamController true>> -> Succeeded | cam=MainCam fixed=True dir=Forward
+  unknown id:
+  <<Switch_Camera CamController NoSuchCam>> -> Succeeded | cam=MainCam fixed=True dir=Forward
+B the same commands with the camera object renamed
+  <<Fix_Camera CamController true>> -> Succeeded | cam=MainCam fixed=True dir=Forward
+  <<Switch_Camera CamController CenterCam>> -> Succeeded | cam=CenterCam fixed=True dir=Forward
+  <<Switch_Camera CamController "MainCam">> -> Succeeded | cam=MainCam fixed=True dir=Forward
+  <<Cut_Camera CamController SummaryCam>> -> Succeeded | cam=SummaryCam fixed=True dir=Forward
+  <<Switch_Camera CamController NearLeftCam>> -> Succeeded | cam=NearLeftCam fixed=True dir=Forward
+  <<Switch_Camera CamController "MainCam">> -> Succeeded | cam=MainCam fixed=True dir=Forward
+  <<Fix_Camera CamController false>> -> Succeeded | cam=MainCam fixed=False dir=Forward
+  <<Fix_Camera CamController true>> -> Succeeded | cam=MainCam fixed=True dir=Forward
+  (look forced to Left)
+  <<Reset_Camera CamController>> -> Succeeded | cam=MainCam fixed=True dir=Forward
+  <<Fix_Camera CamController false>> -> Succeeded | cam=MainCam fixed=False dir=Forward
+  (look forced to Right, fixed=false)
+  <<Reset_Camera CamController>> -> Succeeded | cam=MainCam fixed=False dir=Forward
+  <<Fix_Camera CamController true>> -> Succeeded | cam=MainCam fixed=True dir=Forward
+  <<Switch_Camera CamController "MainCam">> -> Succeeded | cam=MainCam fixed=True dir=Forward
+C what the flow does to the camera
+  <<Fix_Camera CamController false>> -> Succeeded | cam=MainCam fixed=False dir=Forward
+  before PrepareDrinks (fixed=false, look forced to Left) | cam=MainCam fixed=False dir=Left
+  C1 PrepareDrinks entered | cam=MainCam fixed=False dir=Forward
+  C2 drink full | cam=PrepareCam fixed=False dir=Forward
+  <<Fix_Camera CamController true>> -> Succeeded | cam=PrepareCam fixed=True dir=Forward
+  C3 garnish entered | cam=GranishCam fixed=True dir=Forward
+  C4 serve entered | cam=GranishCam fixed=True dir=Forward
+  <<Fix_Camera CamController false>> -> Succeeded | cam=GranishCam fixed=False dir=Forward
+  (fixed=false, look forced to Right)
+  C5 talking entered | cam=GranishCam fixed=True dir=Forward
+console: errors=1 warnings=1
+  error: CameraManager.SwitchCamera: No camera registered with id 'NoSuchCam'.
+  warning: [CocktailFlowBridge] Leaving the conversation with no order placed — the .yarn node should call an Order_Cocktail_* function.
+DONE
