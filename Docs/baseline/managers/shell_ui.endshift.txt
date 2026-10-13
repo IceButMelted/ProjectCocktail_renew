@@ -1,0 +1,15 @@
+# shell chrome, real pointer clicks (endshift)
+found: open=True next=True prev=True close=True postItButton=True
+U0 start | book.active=False IsOpen=False spread=0 | postIt.visible=False outScreen=True
+U0b step 2.1 | book.active=False IsOpen=False spread=0 | postIt.visible=True outScreen=False | openInteractable=True
+U1 click open     | book.active=True IsOpen=True spread=0
+U2 click next     | book.active=True IsOpen=True spread=1
+U3 click next     | book.active=True IsOpen=True spread=2
+U4 click previous | book.active=True IsOpen=True spread=1
+U5 click close    | book.active=False IsOpen=False spread=1
+U6 click open     | book.active=True IsOpen=True spread=1
+U7 click close    | book.active=False IsOpen=False spread=1
+U8 post-it toggle  | postIt.visible=True outScreen=False
+U9 post-it toggle  | postIt.visible=True outScreen=False
+U10 click endshift | TargetScene=MainMenu
+DONE
