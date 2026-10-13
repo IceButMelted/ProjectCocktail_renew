@@ -15,15 +15,14 @@ using UnityEngine;
 
 public static class IngredientHoverDetector
 {
-    private static N_InputManager _inputManager;
-
     /// <summary>The ShakerContents currently under the mouse, or null.</summary>
     public static ShakerContents ResolveHoveredShaker()
     {
-        if (_inputManager == null) _inputManager = Object.FindFirstObjectByType<N_InputManager>();
-        if (_inputManager == null) return null;
+        var placement = N_PlacementSystem.Current;
+        var inputManager = placement != null ? placement.InputManager : null;
+        if (inputManager == null) return null;
 
-        var hovered = _inputManager.GetObjectMouseHover();
+        var hovered = inputManager.GetObjectMouseHover();
         return hovered != null ? hovered.GetComponentInParent<ShakerContents>() : null;
     }
 }

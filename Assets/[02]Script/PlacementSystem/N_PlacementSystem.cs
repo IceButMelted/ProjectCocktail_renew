@@ -2,9 +2,19 @@ using UnityEngine;
 
 public class N_PlacementSystem : MonoBehaviour
 {
+    /// <summary>
+    /// The scene's placement system, set in Awake and cleared in OnDestroy. Every DragableObject
+    /// and ingredient source reaches drag control and mouse queries through this one entry point
+    /// instead of finding them itself. Scene-scoped on purpose: nothing here survives a scene load.
+    /// </summary>
+    public static N_PlacementSystem Current { get; private set; }
+
     [SerializeField] private GameObject _mouseIndicator;
     [SerializeField] private N_InputManager _inputManager;
     [SerializeField] private float _floatingDistance = 3f;
+
+    /// <summary>Mouse ray and zone queries (what is under the cursor, where a drag may land).</summary>
+    public N_InputManager InputManager => _inputManager;
 
     private DragableObject _selectedDragable;
     private GameObject _selectedObject;
@@ -15,6 +25,22 @@ public class N_PlacementSystem : MonoBehaviour
 
     private float _bottomOffset;
     private bool _isFloating;
+
+    private void Awake()
+    {
+        if (Current != null && Current != this)
+        {
+            Debug.LogWarning($"[N_PlacementSystem] A second instance on '{name}' is being ignored; drags stay bound to '{Current.name}'.", this);
+            return;
+        }
+
+        Current = this;
+    }
+
+    private void OnDestroy()
+    {
+        if (Current == this) Current = null;
+    }
 
     private void Update()
     {

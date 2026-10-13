@@ -179,9 +179,9 @@ baseline อยู่ที่ `Docs/baseline/managers/` (README ในโฟล
 
 **Stage 1 · Subtract** ย้าย dev scripts ไป `[Debug]`, แก้ hotkey ชน, `DefaultExecutionOrder` + ลบ `EnsureBuilt`, ครอบ `flow_*` ด้วย `IsSilentReplay`, ลบ slot/field ที่ null และไม่มีใครใช้ (`MinigameSystemManager._cocktailCamera`, `ShakerPanelController` serve/ice flags), แก้ comment เก่า **ไม่ลบ object ใดในรายการ object ตาย** เพราะตัดสินให้คงไว้ทั้งหมดแล้ว
 
-**Stage 2 · `FlowWiring` คู่ขนาน** สร้าง `FlowWiring` ที่ `[GameLoop]/Flow` ยังไม่ย้าย logic
+**Stage 2 · (ข้าม)** `FlowWiring` ที่ยังไม่มี wiring จริงเป็นแค่ class ว่าง ไม่มีอะไรให้เทียบ baseline จึงย้ายการสร้างไปรวมกับ Stage 4 ที่เป็น manager ตัวแรกซึ่งต้องผูก state เข้ากับ verb
 
-**Stage 3 · Placement Manager** รวม `N_PlacementSystem` + `N_InputManager` เป็น `PlacementManager`, `Current` แบบ scene-scoped, แทน `DragableObject._placementSystem` และ `IngredientHoverDetector._inputManager` (ลบ `FindFirstObjectByType` ×14+1) เล็ก ไม่ขึ้นกับ stage อื่น และลบ public static ก่อนเพิ่มของใหม่
+**Stage 3 · Placement Manager** (เสร็จ) ไม่รวม `N_PlacementSystem` กับ `N_InputManager` เป็น class เดียว เพราะอยู่ GameObject เดียวกันและ ref กันเองอยู่แล้ว การรวมแก้ข้อมูล serialized โดยไม่ลด wiring และ trace กับ drag simulation จับความต่างไม่ครบ จึงทำเท่าที่ได้ผล: `N_PlacementSystem.Current` แบบ scene-scoped (set ใน `Awake`, ล้างใน `OnDestroy`) พร้อม `.InputManager` เป็นทางเข้าเดียว แทน `public static DragableObject._placementSystem` กับ `FindFirstObjectByType` ใน `OnEnable` และ static cache ใน `IngredientHoverDetector` (ตัวเลขเดิม "ลบ Find ×14+1" ผิด static ตัวเดียวถูกเติมครั้งเดียว Find จริงเกิดแค่ครั้งแรก) ถ้าต้องการรวม class ค่อยทำทีหลังได้
 
 **Stage 4 · Cocktail Manager**
 - 4a `IngredientShelf` (writer เดียว, collect จาก container 3 อัน, ส่ง `ShakerContents` ให้ bottle เลิก `FindFirstObjectByType` ×16)

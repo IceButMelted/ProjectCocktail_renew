@@ -12,6 +12,7 @@
 | `check_yarn_contract.py` | เขียน baseline หรือเทียบกับ baseline | ไม่มี dependency นอก Python |
 | `flow_trace.snippet.cs` | driver เล่นวนครบ 1 รอบผ่าน HSM และปุ่มจริง | วางเป็น body ของ `execute_code` ตอน Play mode (เริ่มจาก Play ใหม่ทุกครั้ง) |
 | `flow_trace.txt` | ผลของ driver 15 step ทั้ง state ของ flow, order, shaker, glass, camera, lock, panel | diff กับไฟล์ที่ run ใหม่ |
+| `placement_drag.snippet.cs` / `placement_drag.txt` | จำลองการลากขวด 2 ตัวผ่าน `DragableObject` (PointerEventData) และเรียก `IngredientHoverDetector` ซึ่ง trace หลักไม่ครอบคลุม | วางเป็น body ของ `execute_code` ตอน Play mode แล้ว diff `placement_drag.txt` |
 | `screens_baseline/*.jpg` | ภาพอ้างอิงขนาดครึ่ง 960x540 | เทียบด้วยตา คู่กับ `screens/` ที่ driver เขียน (full-size, gitignored) |
 
 ## วิธีเช็กหลังแต่ละ stage
@@ -66,7 +67,9 @@ order ถูกสุ่มด้วย `UnityEngine.Random` ตอนเข้�
 | Stage | commit | ผลเทียบ baseline |
 |---|---|---|
 | 0 | `0b6b3f7` | สร้าง baseline |
-| 1 | ดู `git log` | trace เหมือน baseline ทุกบรรทัด (ยกเว้น `target=` ที่ตอนนี้ถูกตรึงด้วย seed), Yarn contract exit 0, console errors 0 |
+| 1 | `fe06935` | trace เหมือน baseline ทุกบรรทัด (ยกเว้น `target=` ที่ตอนนี้ถูกตรึงด้วย seed), Yarn contract exit 0, console errors 0 |
+| 2 | ข้าม | `FlowWiring` ว่างเปล่าไม่มีประโยชน์ สร้างตอน Stage 4 พร้อม wiring จริง |
+| 3 | ดู `git log` | trace เหมือนไฟล์ใน git ทุกไบต์ (รวม `target=`), drag simulation เหมือนก่อนแก้, Yarn contract exit 0, console errors 0 |
 
 ## เมื่อโครงสร้างใน scene เปลี่ยนจากตอน audit (2026-10-05)
 
