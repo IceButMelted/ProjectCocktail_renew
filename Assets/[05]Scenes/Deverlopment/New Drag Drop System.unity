@@ -6816,6 +6816,8 @@ MonoBehaviour:
   _ingredients: {fileID: 6049133883410967789}
   _camera: {fileID: 1321084323}
   _bookUI: {fileID: 1405869133}
+  _cocktail: {fileID: 8872214704051886353}
+  _customers: {fileID: 9194944203317526871}
 --- !u!114 &1332642415283588300
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -21315,11 +21317,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: '::'
   _normalCocktailRepository: {fileID: 11400000, guid: e64c41a62842fd54491c7e08deb2cd77, type: 2}
   _specialCocktailRepository: {fileID: 0}
-  _customerRoster: {fileID: 11400000, guid: e3a3fbdd06635a7ef811260fb95a32f1, type: 2}
   _shakerContents: {fileID: 4080245900655418650}
   _ingredientButtons: {fileID: 6049133883410967789}
   _endShiftBTN: {fileID: 5364419615039319331}
-  _dialogueRunner: {fileID: 5269035541885067561}
   _postItOrder: {fileID: 2023415601206712225}
 --- !u!224 &8892421996016302128
 RectTransform:
@@ -22486,6 +22486,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5cd685126780bea4a9296055f2a48ed9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TalkToCustomerManager
+  _dialogueRunner: {fileID: 5269035541885067561}
+  _customerRoster: {fileID: 11400000, guid: e3a3fbdd06635a7ef811260fb95a32f1, type: 2}
 --- !u!114 &9217307720875085894
 MonoBehaviour:
   m_ObjectHideFlags: 0

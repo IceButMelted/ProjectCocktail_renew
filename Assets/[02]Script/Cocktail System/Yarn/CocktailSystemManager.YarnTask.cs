@@ -28,16 +28,8 @@ public partial class CocktailSystemManager
     [Header("BTN End Shift")]
     [SerializeField] private Button _endShiftBTN;
 
-    [Header("Yarn / Task References")]
-    [SerializeField] private DialogueRunner _dialogueRunner;
-
     [Header("UI Post-It Order")]
     [SerializeField] private Post_It_Order _postItOrder;
-
-    private YarnVariableSync _yarnVariables;
-
-    /// <summary>Lazily built so it survives domain reloads and Awake ordering.</summary>
-    private YarnVariableSync Variables => _yarnVariables ??= new YarnVariableSync(_dialogueRunner);
 
     // ── Task gate ──────────────────────────────────────────
 
@@ -49,14 +41,13 @@ public partial class CocktailSystemManager
     public bool IsTaskComplete => Order.IsScored;
 
     /// <summary>
-    /// COMMAND — writes the scored order into Yarn and closes the drink-making UI.
-    /// Called once, from <see cref="UpdateVariableInYarnTrigger"/>.
+    /// COMMAND — publishes the scored order (<see cref="OrderScored"/>, which writes it into Yarn)
+    /// and closes the drink-making UI. Called once, from <see cref="UpdateVariableInYarnTrigger"/>.
     /// </summary>
     private void CommitTaskResult()
     {
         EnableButtonInYarn(false);
-        Variables.WriteResult(Order);
-        Variables.ApplyRelationshipDelta(Order.Customer, Order.RelationshipDelta);
+        OrderScored?.Invoke(Order);
 
         if (_postItOrder != null) _postItOrder.SetOutScreen(true);
     }
@@ -127,7 +118,8 @@ public partial class CocktailSystemManager
 
     /// <summary>
     /// &lt;&lt;Reset_Variable CocktailSystemManager&gt;&gt;
-    /// Resets BOTH the order context AND Yarn storage.
+    /// Resets the order context and tells whoever keeps the dialogue's variables to reset them
+    /// (<see cref="OrderCleared"/>).
     /// </summary>
     [YarnCommand("Reset_Variable")]
     public void ResetVariableInYarn()
@@ -135,7 +127,7 @@ public partial class CocktailSystemManager
         if (SceneLoaderBridge.IsSilentReplay) return; // vars already restored from save
 
         Order.Clear();
-        Variables.Reset();
+        OrderCleared?.Invoke();
 
         Debug.Log("[CocktailSystemManager] All variables reset — ready for next loop.");
     }
