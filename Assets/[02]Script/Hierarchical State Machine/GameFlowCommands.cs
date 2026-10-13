@@ -104,7 +104,7 @@ namespace Bar410.GameFlow
         public void DrinkComplete() => _gameLoop.OpenBar.PrepareDrinks.Minigame.CompleteDrink();
 
         // ── Level 3 · Which minigame step 2.2 runs ─────────
-        // Selection only — none of these transition. MinigameFlowBridge reads the choice
+        // Selection only — none of these transition. FlowWiring reads the choice
         // when 2.2 is entered, and falls back to the shaker's method if nothing was selected.
 
         /// <summary>Picks the minigame for the next entry into 2.2.</summary>

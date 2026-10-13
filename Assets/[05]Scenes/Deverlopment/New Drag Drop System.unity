@@ -7655,25 +7655,6 @@ CanvasGroup:
   m_Interactable: 0
   m_BlocksRaycasts: 1
   m_IgnoreParentGroups: 0
---- !u!114 &1918563697585345354
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7365518877833284460}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 690bde7a798d9c3498cd82d078ea36de, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Bar410.GameFlow.GarnishFlowBridge
-  _gameLoop: {fileID: 5740347442567854999}
-  _commands: {fileID: 7227755909219274211}
-  _garnish: {fileID: 536261336}
-  _cocktail: {fileID: 8872214704051886353}
-  _shakerContents: {fileID: 4080245900655418650}
-  _ingredients: {fileID: 6049133883410967789}
-  _cameras: {fileID: 1321084322}
 --- !u!224 &1927217058093561900
 RectTransform:
   m_ObjectHideFlags: 0
@@ -15305,23 +15286,6 @@ Transform:
   m_Children: []
   m_Father: {fileID: 6931643272018009541}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5508285943005239321
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7365518877833284460}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 22436daba0bcb3fcd9f2cf37d76469b0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Bar410.GameFlow.MinigameFlowBridge
-  _gameLoop: {fileID: 5740347442567854999}
-  _commands: {fileID: 7227755909219274211}
-  _minigames: {fileID: 7437440570615746227}
-  _shakerContents: {fileID: 4080245900655418650}
-  _autoAdvanceOnWin: 1
 --- !u!114 &5512316723309935226
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -18821,10 +18785,8 @@ GameObject:
   - component: {fileID: 5740347442567854999}
   - component: {fileID: 7227755909219274211}
   - component: {fileID: 7947671018981094586}
-  - component: {fileID: 5508285943005239321}
-  - component: {fileID: 1918563697585345354}
   - component: {fileID: 1322866041647825757}
-  - component: {fileID: 8071046044819168113}
+  - component: {fileID: 7947671018981094587}
   m_Layer: 0
   m_Name: '[GameLoop]'
   m_TagString: Untagged
@@ -19822,6 +19784,25 @@ MonoBehaviour:
   _postIt: {fileID: 2023415601206712225}
   _btnBook: {fileID: 653714615255478872}
   _methodPanel: {fileID: 9061270629617664791}
+--- !u!114 &7947671018981094587
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7365518877833284460}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 038d9457c9368a94a8ed0fcfbeff0bf7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Bar410.GameFlow.FlowWiring
+  _cocktail: {fileID: 8872214704051886353}
+  _minigames: {fileID: 7437440570615746227}
+  _garnish: {fileID: 536261336}
+  _cameras: {fileID: 1321084322}
+  _shakerContents: {fileID: 4080245900655418650}
+  _ingredients: {fileID: 6049133883410967789}
+  _postIt: {fileID: 2023415601206712225}
 --- !u!1 &7950363188708236408
 GameObject:
   m_ObjectHideFlags: 0
@@ -20077,23 +20058,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &8071046044819168113
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 7365518877833284460}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: dfb0a5c513ef3a048b9eed1d57cc5f5f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::Bar410.GameFlow.ServeFlowBridge
-  _gameLoop: {fileID: 0}
-  _commands: {fileID: 0}
-  _garnish: {fileID: 536261336}
-  _cocktail: {fileID: 8872214704051886353}
-  _postIt: {fileID: 2023415601206712225}
 --- !u!224 &8092587686482396379
 RectTransform:
   m_ObjectHideFlags: 0

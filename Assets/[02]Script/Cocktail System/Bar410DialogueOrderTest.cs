@@ -93,7 +93,7 @@ public class Bar410DialogueOrderTest : MonoBehaviour
         _commands.IngredientAdded();
         _commands.DrinkComplete();
 
-        yield return null; // let GarnishFlowBridge.OnGarnishEntered's UpdateCocktailInShaker run
+        yield return null; // let FlowWiring.OnGarnishEntered's UpdateCocktailInShaker run
 
         _garnish.ChooseGlass(_glassToUse);
         _garnish.Pour(_shakerContents.CurrentCocktail);

@@ -30,7 +30,7 @@ namespace Bar410.GameFlow
         // MinigameSystemManager, or the flow layer drags UnityEngine and a scene
         // object into itself and the layering in Bar410_StateMachine_Implementation.md breaks.
         //
-        // MinigameFlowBridge (a MonoBehaviour, see Bar410_Minigame_Integration_Plan.md §3.3)
+        // FlowWiring (a MonoBehaviour, see Bar410_Minigame_Integration_Plan.md §3.3)
         // is the one and only thing that subscribes here and translates in both directions:
         //
         //   OnStartRequested(type)  ──> MinigameSystemManager.StartMinigame(type)

@@ -18,7 +18,7 @@ public class MinigameSystemManager : MonoBehaviour, IMinigameContext
     [SerializeField] private Button[] _btnBack;
 
     // ── Game-flow seam (HSM) ───────────────────────────────
-    // MinigameFlowBridge (see Bar410_Minigame_Integration_Plan.md §3.3) is the only listener.
+    // FlowWiring (see Bar410_Minigame_Integration_Plan.md §3.3) is the only listener.
     //
     //   MinigameState.OnStartRequested(type) ──> StartMinigame(Resolve(type, ...))
     //   MinigameFinished(type, outcome)      ──> MinigameState.ReportResult(outcome)

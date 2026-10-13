@@ -10,7 +10,7 @@
 //  It knows nothing about the game flow, the cocktail or the camera.
 //  What it needs comes in as an argument (Pour takes the drink) and
 //  what the rest of the game has to react to goes out as an event;
-//  GarnishFlowBridge is the one place that connects the two.
+//  FlowWiring is the one place that connects the two.
 // ============================================================
 
 using System;

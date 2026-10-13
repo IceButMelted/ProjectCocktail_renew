@@ -83,7 +83,7 @@ public class ShakerContents : MonoBehaviour, IIngredientReceiver
 
     /// <summary>
     /// Which minigame the drink's method calls for (GDD §10).
-    /// MinigameFlowBridge reads this as its second-priority type source
+    /// FlowWiring reads this as its second-priority type source
     /// (Bar410_Minigame_Integration_Plan §3.1).
     /// </summary>
     public Enum_MiniGameType RequiredMinigame
