@@ -299,39 +299,20 @@ public class SaveLoadManager : MonoBehaviour
     // ──────────────────────────────────────────────────────────────────────────
     #region NPC Data
 
-    /// <summary>Snapshot all NPC_Base instances in the scene into _saveData.</summary>
+    /// <summary>Snapshot where the scene's customers stand into _saveData.</summary>
     public void CollectNPCData()
     {
-        var npcs = FindObjectsByType<NPC_Base>(FindObjectsSortMode.None);
+        var customers = TalkToCustomerManager.Current;
+        if (customers == null) return;
 
-        foreach (var npc in npcs)
-        {
-            _saveData.NPCData.npcDataDict[npc.Name] = new NPCData
-            {
-                position = npc.transform.position,
-                rotation = npc.transform.rotation,
-                CurrentWayPointIndex = npc.CurrentWaypointIndex,
-                CurrentLookDirection = npc.CurrentLookDirection
-            };
-        }
+        foreach (var pair in customers.Snapshot())
+            _saveData.NPCData.npcDataDict[pair.Key] = pair.Value;
     }
 
-    /// <summary>Apply loaded NPC data back onto scene objects.</summary>
+    /// <summary>Apply loaded NPC data back onto the scene's customers.</summary>
     public void ApplyNPCData()
     {
-        var npcs = FindObjectsByType<NPC_Base>(FindObjectsSortMode.None);
-
-        foreach (var item in _saveData.NPCData.npcDataDict)
-        {
-            var npc = npcs.FirstOrDefault(n => n.Name == item.Key);
-            if (npc == null) continue;
-
-            npc.transform.position = item.Value.position;
-            npc.transform.rotation = item.Value.rotation;
-            npc.CurrentWaypointIndex = item.Value.CurrentWayPointIndex;
-            npc.CurrentLookDirection = item.Value.CurrentLookDirection;
-            npc.TeleportToWaypoint(npc.CurrentWaypointIndex);
-        }
+        TalkToCustomerManager.Current?.Restore(_saveData.NPCData.npcDataDict);
     }
 
     #endregion

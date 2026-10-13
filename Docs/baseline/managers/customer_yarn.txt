@@ -42,9 +42,8 @@ C yarn variables written when an order is scored
    scored=True result=Acceptable relDelta=0.25 | yarn $task_done=True $satisfaction=2 $type_of_cocktail=1 $rel_Walter 0 -> 0.25
    second ServeDrink is a no-op: $rel_Walter stays 0.25
    after ResetVariableInYarn: $task_done=False $satisfaction=0 orderHas=False
-console: warnings+errors=4
+console: warnings+errors=3
   Warning: [FindNPC] Invalid NPC name: 'Nobody'
   Warning: Unknown look direction 'NPC_Name.up' for NPC_Walter
   Warning: NPC_Walter: waypoint index 9 is out of range.
-  Warning: NPC_Owen: waypoint index -1 is out of range.
 DONE

@@ -1,9 +1,14 @@
-﻿using System.Collections;
-using System.Collections.Generic;
+using System.Collections;
 using UnityEngine;
-using Yarn.Unity;
 using static E_Cocktail;
 
+/// <summary>
+/// One person at the bar: their face, their gaze and where they stand.
+///
+/// Knows nothing about dialogue. TalkToCustomerManager finds an NPC by name and owns the Yarn
+/// commands (SetEmotion, SetLookDirection, MoveIn, MoveOut) that drive the methods below, and the
+/// save system's snapshot of the position.
+/// </summary>
 public class NPC_Base : MonoBehaviour
 {
     [Header("Sprite Emotional")]
@@ -28,13 +33,8 @@ public class NPC_Base : MonoBehaviour
 
     private int _currentIndex = -1;
 
-    private static readonly Dictionary<NPC_Name, NPC_Base> _registry = new();
-
     public int CurrentWaypointIndex { get => _currentIndex; set => _currentIndex = value; }
     public Direction CurrentLookDirection { get => _currentLookDirection; set => _currentLookDirection = value; }
-
-    private void Awake() => _registry[Name] = this;
-    private void OnDestroy() => _registry.Remove(Name);
 
     private void Start()
     {
@@ -46,70 +46,20 @@ public class NPC_Base : MonoBehaviour
             _lookForwardSprite = _neutralSprite;
     }
 
-
-    // ─── Yarn Commands ───────────────────────────────────────────────────────
-
-    [YarnCommand("SetEmotion")]
-    public static void SetEmotion(string npcNameStr, string emotion) =>
-        FindNPC(npcNameStr)?.DoSetEmotion(emotion);
-
-    [YarnCommand("SetLookDirection")]
-    public static void SetLookDirection(string npcNameStr, string direction) =>
-        FindNPC(npcNameStr)?.DoLookDirection(direction);
-
-    [YarnCommand("MoveIn")]
-    public static IEnumerator MoveIn(string npcNameStr, int waypointIndex)
-    {
-        if (SceneLoaderBridge.IsSilentReplay) yield break;
-        yield return SlideMoveIn(npcNameStr, waypointIndex);
-    }
-
-    [YarnCommand("MoveOut")]
-    public static IEnumerator MoveOut(string npcNameStr)
-    {
-        if (SceneLoaderBridge.IsSilentReplay) yield break;
-        yield return SlideMoveOut(npcNameStr);
-    }
-
-
-    #region Method Helpers
-    public static IEnumerator SlideMoveIn(string npcNameStr, int waypointIndex)
-    {
-        NPC_Base npc = FindNPC(npcNameStr);
-        if (npc == null) yield break;
-        yield return npc.StartCoroutine(npc.DoMoveTo(waypointIndex));
-    }
-
-    public static IEnumerator SlideMoveOut(string npcNameStr) => SlideMoveIn(npcNameStr, 0);
-
-    private static NPC_Base FindNPC(string npcNameStr)
-    {
-        string raw = npcNameStr.Contains(".") ? npcNameStr.Split('.')[1] : npcNameStr;
-        if (!System.Enum.TryParse<NPC_Name>(raw, true, out NPC_Name target) || target == NPC_Name.None)
-        {
-            Debug.LogWarning($"[FindNPC] Invalid NPC name: '{npcNameStr}'");
-            return null;
-        }
-        if (!_registry.TryGetValue(target, out NPC_Base npc))
-        {
-            Debug.LogWarning($"[FindNPC] No NPC with NPCName.{target} found in scene.");
-            return null;
-        }
-        return npc;
-    }
-
-    private void DoSetEmotion(string emotion)
+    /// <summary>"happy", "upset" or "neutral". Anything else keeps the current face so the typo is visible in the scene.</summary>
+    public void SetEmotion(string emotion)
     {
         SpriteRenderer.sprite = emotion.ToLower() switch
         {
             "happy" => _happySprite,
             "upset" => _upsetSprite,
             "neutral" => _neutralSprite,
-            _ => SpriteRenderer.sprite  // unknown: keep current, let Yarn script catch the typo
+            _ => SpriteRenderer.sprite
         };
     }
 
-    private void DoLookDirection(string direction)
+    /// <summary>"left", "right" or "forward", optionally spelled "Direction.left".</summary>
+    public void LookDirection(string direction)
     {
         string raw = (direction.Contains(".") ? direction.Split('.')[1] : direction).ToLower();
         switch (raw)
@@ -121,7 +71,8 @@ public class NPC_Base : MonoBehaviour
         }
     }
 
-    private IEnumerator DoMoveTo(int waypointIndex)
+    /// <summary>Slides to the waypoint at <paramref name="waypointIndex"/>. Run it with StartCoroutine on this NPC.</summary>
+    public IEnumerator MoveTo(int waypointIndex)
     {
         if (!IsValidIndex(waypointIndex)) yield break;
         _currentIndex = waypointIndex;
@@ -149,5 +100,4 @@ public class NPC_Base : MonoBehaviour
         }
         return true;
     }
-    #endregion
 }
