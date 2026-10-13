@@ -32,6 +32,9 @@ namespace YarnSpinner.Custom
         // Pool of OptionItem views so we can reuse them
         readonly List<OptionItem> optionViews = new List<OptionItem>();
 
+        // Same index as optionViews: what each choice fades with.
+        readonly List<CanvasGroup> optionGroups = new List<CanvasGroup>();
+
         [Space]
         [SerializeField] bool showsLastLine;
 
@@ -70,6 +73,11 @@ namespace YarnSpinner.Custom
         [ShowIf(nameof(useFadeEffect))]
         public float fadeDownDuration = 0.1f;
 
+        [Group("Fade")]
+        [ShowIf(nameof(useFadeEffect))]
+        [Tooltip("After the container has faded up, each choice fades up one at a time, top to bottom, taking this many seconds each. 0 shows them all with the container.")]
+        public float optionFadeUpDuration = 0.3f;
+
         [Group("Timeout")]
         [Tooltip("Optional countdown bar. Timeout works without it.")]
         [SerializeField] TimeoutBar? timedBar;
@@ -82,12 +90,52 @@ namespace YarnSpinner.Custom
         private const string TimeoutMetadataTag = "timeout";
         private const string SilentTimeoutMetadataTag = "silenttimeout";
 
+        // The option container can sit outside canvasGroup (a sibling with its own background),
+        // so it is hidden, faded and unblocked alongside it rather than left always on screen.
+        CanvasGroup? ContainerGroup =>
+            optionContainer != null && optionContainer.TryGetComponent(out CanvasGroup group) && group != canvasGroup
+                ? group
+                : null;
+
+        void SetInteractable(bool value)
+        {
+            if (canvasGroup != null)
+            {
+                canvasGroup.interactable = value;
+                canvasGroup.blocksRaycasts = value;
+            }
+
+            var container = ContainerGroup;
+            if (container != null)
+            {
+                container.interactable = value;
+                container.blocksRaycasts = value;
+            }
+        }
+
+        async YarnTask FadeAsync(float from, float to, float duration, CancellationToken token)
+        {
+            var container = ContainerGroup;
+            var containerFade = container != null
+                ? Effects.FadeAlphaAsync(container, from, to, duration, token)
+                : YarnTask.CompletedTask;
+
+            if (canvasGroup != null)
+            {
+                await Effects.FadeAlphaAsync(canvasGroup, from, to, duration, token);
+            }
+
+            await containerFade;
+        }
+
         void HideCanvas()
         {
-            if (canvasGroup == null) return;
-            canvasGroup.alpha = 0;
-            canvasGroup.interactable = false;
-            canvasGroup.blocksRaycasts = false;
+            if (canvasGroup != null) canvasGroup.alpha = 0;
+
+            var container = ContainerGroup;
+            if (container != null) container.alpha = 0;
+
+            SetInteractable(false);
         }
 
         public override YarnTask OnDialogueCompleteAsync()
@@ -195,10 +243,14 @@ namespace YarnSpinner.Custom
 
             CancelSourceWhenDialogueCancelled().Forget();
 
+            bool staggerOptions = useFadeEffect && optionFadeUpDuration > 0f;
+
             for (int i = 0; i < dialogueOptions.Length; i++)
             {
                 var optionView = optionViews[i];
                 var option = dialogueOptions[i];
+
+                optionGroups[i].alpha = staggerOptions ? 0 : 1;
 
                 if (option.IsAvailable == false && showUnavailableOptions == false)
                 {
@@ -252,16 +304,19 @@ namespace YarnSpinner.Custom
                 timedBar.gameObject.SetActive(fallbackOption != null);
             }
 
-            if (useFadeEffect && canvasGroup != null)
+            await FadeAsync(0, 1, useFadeEffect ? fadeUpDuration : 0, cancellationToken.HurryUpToken);
+
+            // Pool order is sibling order, so this runs top to bottom. Hurrying up finishes them all at once.
+            if (staggerOptions)
             {
-                await Effects.FadeAlphaAsync(canvasGroup, 0, 1, fadeUpDuration, cancellationToken.HurryUpToken);
+                for (int i = 0; i < dialogueOptions.Length; i++)
+                {
+                    if (!optionViews[i].gameObject.activeSelf) continue;
+                    await Effects.FadeAlphaAsync(optionGroups[i], 0, 1, optionFadeUpDuration, cancellationToken.HurryUpToken);
+                }
             }
 
-            if (canvasGroup != null)
-            {
-                canvasGroup.interactable = true;
-                canvasGroup.blocksRaycasts = true;
-            }
+            SetInteractable(true);
 
             if (fallbackOption != null)
             {
@@ -276,16 +331,9 @@ namespace YarnSpinner.Custom
                 timedBar.gameObject.SetActive(false);
             }
 
-            if (canvasGroup != null)
-            {
-                canvasGroup.interactable = false;
-                canvasGroup.blocksRaycasts = false;
-            }
+            SetInteractable(false);
 
-            if (useFadeEffect && canvasGroup != null)
-            {
-                await Effects.FadeAlphaAsync(canvasGroup, 1, 0, fadeDownDuration, cancellationToken.HurryUpToken);
-            }
+            await FadeAsync(1, 0, useFadeEffect ? fadeDownDuration : 0, cancellationToken.HurryUpToken);
 
             foreach (var optionView in optionViews)
             {
@@ -387,6 +435,10 @@ namespace YarnSpinner.Custom
             optionView.transform.SetParent(targetTransform, false);
             optionView.transform.SetAsLastSibling();
             optionView.gameObject.SetActive(false);
+
+            optionGroups.Add(optionView.TryGetComponent(out CanvasGroup group)
+                ? group
+                : optionView.gameObject.AddComponent<CanvasGroup>());
 
             return optionView;
         }
