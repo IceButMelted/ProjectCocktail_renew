@@ -7,6 +7,7 @@
 // ============================================================
 
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PlacedGlassInstance : MonoBehaviour
@@ -29,9 +30,23 @@ public class PlacedGlassInstance : MonoBehaviour
     private GlassPlacementZone _zone;
     private bool _hasIce;
 
+    // The size each garnish renderer was authored at. Whatever sprite goes in is fitted to it.
+    private struct SlotBox
+    {
+        public Vector2 Size;          // parent-space width/height the sprite may fill
+        public Vector3 Scale;         // authored localScale
+        public BoxCollider Collider;  // click area, kept at its authored size
+        public Vector3 ColliderSize;
+    }
+
+    private readonly Dictionary<SpriteRenderer, SlotBox> _slotBoxes = new Dictionary<SpriteRenderer, SlotBox>();
+
     private void Awake()
     {
+        RememberBox(_garnishRim);
         if (_garnishSlots == null) return;
+
+        foreach (var slot in _garnishSlots) RememberBox(slot);
 
         for (int i = 0; i < _garnishSlots.Length; i++)
         {
@@ -78,14 +93,50 @@ public class PlacedGlassInstance : MonoBehaviour
             return;
         }
 
-        var slot = _garnishSlots[slotIndex];
-        if (slot != null) slot.sprite = item != null ? item.Sprite : null;
+        SetFitted(_garnishSlots[slotIndex], item != null ? item.Sprite : null);
     }
 
     /// <summary>Sets the whole-rim garnish treatment. Pass null to clear it.</summary>
     public void ApplyGarnishRim(SO_GarnishRimOption rim)
     {
-        if (_garnishRim != null) _garnishRim.sprite = rim != null ? rim.Sprite : null;
+        SetFitted(_garnishRim, rim != null ? rim.Sprite : null);
+    }
+
+    private void RememberBox(SpriteRenderer slot)
+    {
+        if (slot == null) return;
+
+        Vector3 scale = slot.transform.localScale;
+        Vector2 spriteSize = slot.sprite != null ? (Vector2)slot.sprite.bounds.size : Vector2.one;
+        var collider = slot.GetComponent<BoxCollider>();
+
+        _slotBoxes[slot] = new SlotBox
+        {
+            Size = new Vector2(spriteSize.x * scale.x, spriteSize.y * scale.y),
+            Scale = scale,
+            Collider = collider,
+            ColliderSize = collider != null ? collider.size : Vector3.zero,
+        };
+    }
+
+    // Shows the sprite as large as fits the slot's authored box, keeping its proportions, so
+    // garnish art of any pixel size lands at the same size on the glass.
+    private void SetFitted(SpriteRenderer slot, Sprite sprite)
+    {
+        if (slot == null) return;
+
+        slot.sprite = sprite;
+        if (sprite == null || !_slotBoxes.TryGetValue(slot, out SlotBox box)) return;
+
+        Vector2 size = sprite.bounds.size;
+        if (size.x <= 0f || size.y <= 0f) return;
+
+        float k = Mathf.Min(box.Size.x / size.x, box.Size.y / size.y);
+        slot.transform.localScale = new Vector3(k, k, box.Scale.z);
+
+        // The collider scales with the transform; undo that so the click area stays put.
+        if (box.Collider != null)
+            box.Collider.size = new Vector3(box.ColliderSize.x * box.Scale.x / k, box.ColliderSize.y * box.Scale.y / k, box.ColliderSize.z);
     }
 
     /// <summary>Pours <paramref name="drink"/>'s colours into this glass. Called by GarnishManager.Pour.</summary>
