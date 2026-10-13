@@ -312,6 +312,10 @@ namespace Bar410.GameFlow
             _cocktail?.ResetCocktail();
             _visualCocktail?.UpdateCocktailBars();
             _methodPanel?.Hide();
+
+            // A full shaker moved the camera onto it (OnShakerFull); the flow stays in 2.1 here,
+            // so no state entry puts it back on the bar.
+            _cameras?.ShowBar();
         }
 
         // ── 2.2 · Minigame ─────────────────────────────────
