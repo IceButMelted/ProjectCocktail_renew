@@ -45,7 +45,9 @@ string Snap(string label) {
   var shaker3D = sh3 != null ? sh3.GetComponent<Interactable_3DObject>() : null;
   var postIt = root.GetComponentInChildren<Post_It_Order>(true);
   var book = Btn("Canvas/Panel - Hub/BTN - Open_CloseBook");
-  var cam = CinimachineCameraSwitcher.Instance != null ? CinimachineCameraSwitcher.Instance.ActiveCameraId : "noSwitcher";
+  // S00 is taken before the flow touches the camera. Since Stage 7d the chapter dialogue's own camera commands run (they
+  // used to fail), so how far it got before this script stopped it decides what the camera shows at S00: not part of the trace.
+  var cam = label.StartsWith("S00") ? "" : (CinimachineCameraSwitcher.Instance != null ? CinimachineCameraSwitcher.Instance.ActiveCameraId : "noSwitcher");
   return label
     + " | phase=" + Bar410.GameFlow.GameFlowCommands.Yarn_CurrentPhase()
     + " step=" + Bar410.GameFlow.GameFlowCommands.Yarn_CurrentStep()

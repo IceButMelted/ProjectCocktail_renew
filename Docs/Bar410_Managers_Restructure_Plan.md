@@ -200,7 +200,7 @@ baseline อยู่ที่ `Docs/baseline/managers/` (README ในโฟล
 
 **Stage 6 · Garnish Manager** ✅ ทำแล้ว 2026-10-13 (4 commit: 6a canvas+root, 6b manager, 6c serve panel, 6d glass) `GarnishManager` ถือ glass/ice/ตกแต่ง/pour + Serve panel บน `Canvas_Garnish`; `GarnishFlowBridge` 20 → 7 slot; grid หา manager ด้วย `GetComponentInParent`; `PlacedGlassInstance` ไม่มี static; ตัด `ShakerPanelController._serveUI`; ice ไปทาง event `IceToggled` → `ShakerContents.SetIce` (ไม่มี echo `IceChanged`); ไม่ทำ `GarnishChoice` (ไม่มี consumer) รายละเอียดใน HANDOFF §7
 
-**Stage 7 · TalkToCustomer Manager** instance registry แทน static dict, ชื่อ Yarn command เดิม, `Snapshot()`/`Restore()` ให้ `SaveLoadManager`, รับ `YarnVariableSync` + `DialogueRunner` + roster, `Cocktail.UsePreferences(...)` ผ่าน FlowWiring, `OrderScored` → `Customer.CommitOrderResult` ทดสอบ save → load
+**Stage 7 · TalkToCustomer Manager** ✅ ทำแล้ว 2026-10-13 (4 commit: 7a ตัวตรวจ, 7b NPC + save, 7c ตัวแปร Yarn + preferences, 7d command ไม่ผูกชื่อ object) `TalkToCustomerManager` บน `NPCs_And_Set`; `Cocktail` ไม่ถือ DialogueRunner/roster/CharacterData แล้ว (`OrderScored`/`OrderCleared`/`UsePreferences`, ต่อด้วย `TalkingWithCustomerBridge`); 7d แก้ `wait_for_task`/`Enable_InteractableObject`/`Reset_Variable`/`Can_End_Shift` ที่ล้มเพราะชื่อ `SystemGame` ไม่มีใน scene รายละเอียดใน HANDOFF §7
 
 **Stage 8 · Camera Manager** รวม ID table เดียว, Yarn camera command ผ่าน manager, `Instance` เหลือเฉพาะที่ Yarn ใช้, ส่ง `Camera` ให้ Placement
 
