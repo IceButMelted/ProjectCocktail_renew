@@ -188,7 +188,7 @@ baseline อยู่ที่ `Docs/baseline/managers/` (README ในโฟล
 - 4d (เสร็จ) `ShakerContents` UnityEvent 9 call (Changed 2, Cleared 3, OnFulled 4) ย้ายเป็น listener ในโค้ดที่ `CocktailFlowBridge` ลำดับเดิม ส่วน `IsCocktailFull` เรียกใน `ShakerContents.RaiseChanged()` ก่อน `Changed` เสมอ ปุ่ม book ต้องมี ref ใหม่ `_btnBook` ชั่วคราวจนกว่า BookPanel จะเป็นเจ้าของปุ่ม
 - 4a `IngredientShelf` (writer เดียว, collect จาก container 3 อัน, ส่ง `ShakerContents` ให้ bottle เลิก `FindFirstObjectByType` ×16) ยังไม่ทำ
 - 4b `Canvas_Cocktail` + Method panel เป็นเจ้าของปุ่มตัวเอง ยังไม่ทำ
-- 4c book + ตรวจ `VisualizeCocktail` ทั้งสองตัว (post-it ย้ายเข้า `Canvas_Cocktail` แล้ว) ยังไม่ทำ
+- 4c book ยังไม่ทำ (post-it ย้ายเข้า `Canvas_Cocktail` แล้ว) ส่วนการตรวจ `VisualizeCocktail` ทั้งสองตัวทำแล้ว: `Canvas/Panel - VisurlCocktail` (screen-space) **ไม่มีโค้ดหรือ event ใดเปิดมัน** (ref เดียวคือ `CocktailFlowBridge._panelVisualCocktail` ที่ใช้แค่ปิด) ผู้เล่นเห็นแค่ตัว world-space บน shaker เมื่อบังคับเปิดตัว screen-space มันเล็กและถูกปุ่ม Shake บัง (ดู `screens_baseline/visualize_*.jpg`) จึงคงไว้ตามที่ตัดสินแล้ว ไม่ย้าย ไม่ลบ จนกว่าจะตัดสินว่าจะใช้ตัวไหนเป็นตัวจริง
 - 4e `SetIce`/`IceChanged` เป็น API ของ Cocktail ย้ายไปทำพร้อม Stage 6 เพราะผู้เรียกคือ Garnish
 - `FlowWiring` ไม่จำเป็นใน stage นี้ bridge เดิมทำหน้าที่ seam ได้ จะรวมเป็นไฟล์เดียวตอนล้าง bridge (Stage 9)
 
