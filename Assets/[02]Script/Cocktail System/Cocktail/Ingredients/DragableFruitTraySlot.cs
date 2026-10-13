@@ -21,6 +21,10 @@
 //  here shouldn't respawn after being consumed — the next one is only
 //  created by the next drag gesture, so nothing exists outside an active
 //  drag.
+//
+//  Sound: a plain click still plays this object's pointer-up sound
+//  (UIPointerSound). A hijacked drag does not — the release only makes
+//  that sound if the piece actually went into the shaker.
 // ============================================================
 
 using UnityEngine;
@@ -35,11 +39,16 @@ public class DragableFruitTraySlot : DragableObject
     private bool _hijackEnabled;
     private DragableObject _activePiece;
     private ScaleOnHover _scaleOnHover;
+    private UIPointerSound _sound;
 
     // Start, not Awake — DragableObject's own Awake is private (not virtual), so a
     // same-named Awake here would hide it from Unity's dispatch instead of running
     // alongside it, leaving PastLocation/_collider on the base class uninitialized.
-    private void Start() => _scaleOnHover = GetComponent<ScaleOnHover>();
+    private void Start()
+    {
+        _scaleOnHover = GetComponent<ScaleOnHover>();
+        _sound = GetComponent<UIPointerSound>();
+    }
 
     /// <summary>
     /// Turns drag-hijack on/off — see InteractableToggle.ApplyOnlyFruitTraySlot, applied by
@@ -74,7 +83,7 @@ public class DragableFruitTraySlot : DragableObject
         {
             _activePiece.FinishRedirectedDrag();
             _activePiece = null;
-            return; 
+            return;
         }
 
         base.OnPointerUp(eventData);
@@ -113,6 +122,17 @@ public class DragableFruitTraySlot : DragableObject
         }
 
         piece.Initialize(_fruitType, null); // null origin — no auto-respawn, see file header
+
+        // The release sound waits for the piece's verdict: muted for the length of the drag,
+        // played here only on a delivery. The piece reports in LateUpdate, after this object's
+        // own pointer-up has already been (silently) handled.
+        if (_sound != null)
+        {
+            _sound.SetCanPlayUp(false);
+            piece.OnDelivered.AddListener(() => { _sound.SetCanPlayUp(true); _sound.PlayUp(); });
+            piece.OnLost.AddListener(() => _sound.SetCanPlayUp(true));
+        }
+
         return piece.GetComponent<DragableObject>();
     }
 }

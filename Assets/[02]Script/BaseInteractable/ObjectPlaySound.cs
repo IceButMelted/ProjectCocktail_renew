@@ -37,6 +37,14 @@ public class UIPointerSound : PointerInteractableBase
     public void SetCanPlayExit(bool value) => _canPlayExit = value;
     public void SetCanPlayUp(bool value) => _canPlayUp = value;
 
+    private bool _canPlayEndDrag = true;
+
+    /// <summary>Off for an owner that decides for itself what a finished drag sounds like.</summary>
+    public void SetCanPlayEndDrag(bool value) => _canPlayEndDrag = value;
+
+    /// <summary>Plays the pointer-up sound now, for an owner that decides for itself when a release counts.</summary>
+    public void PlayUp() => TryPlay(_onUpID);
+
     private DragableObject _dragableObject;
     private float _lastDragTime = -1f;
     private bool _wasDragging;
@@ -114,7 +122,7 @@ public class UIPointerSound : PointerInteractableBase
         _canPlayEnter = true;
         _canPlayExit = true;
         _canPlayUp = true;
-        TryPlay(_onEndDragID);
+        if (_canPlayEndDrag) TryPlay(_onEndDragID);
     }
 
     private void TickDragSound()
