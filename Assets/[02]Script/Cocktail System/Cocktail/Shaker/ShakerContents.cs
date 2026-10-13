@@ -77,7 +77,7 @@ public class ShakerContents : MonoBehaviour, IIngredientReceiver
     {
         CurrentCocktail.AddIce = enable;
 
-        //prevent toggle ui in GarnishFlowBridge from being called when ice is added or removed in the shaker
+        //prevent toggle ui in GarnishManager from being called when ice is added or removed in the shaker
         //Changed?.Invoke();
     }
 

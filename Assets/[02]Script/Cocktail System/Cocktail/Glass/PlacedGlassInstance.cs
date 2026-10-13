@@ -21,7 +21,7 @@ public class PlacedGlassInstance : MonoBehaviour
     [Tooltip("Whole-rim treatment (salt/sugar/etc.) — one per glass, separate from the 2 slots above.")]
     [SerializeField] private SpriteRenderer _garnishRim;
 
-    /// <summary>Fires the clicked slot's index. GarnishFlowBridge listens to track which slot the next Garnish Item button targets.</summary>
+    /// <summary>Fires the clicked slot's index. GarnishManager listens to track which slot the next Garnish Item button targets.</summary>
     public event Action<int> GarnishSlotClicked;
 
     public SO_GlassOption Option { get; private set; }
@@ -93,7 +93,7 @@ public class PlacedGlassInstance : MonoBehaviour
     /// <summary>Called by the zone once this instance is assigned as its occupant.</summary>
     public void NotifyPlaced(GlassPlacementZone zone) => _zone = zone;
 
-    /// <summary>Pushes the served drink's colour onto this glass. Called by GarnishFlowBridge on pour.</summary>
+    /// <summary>Pushes the served drink's colour onto this glass. Called by GarnishManager on pour.</summary>
     public void ApplyDrink(S_Drink drink)
     {
         if (_waterSlosh == null || drink == null) return;
@@ -103,7 +103,7 @@ public class PlacedGlassInstance : MonoBehaviour
         _waterSlosh.UpdateColor();
     }
 
-    /// <summary>Toggles the ice visual. Called by GarnishFlowBridge.ToggleIce.</summary>
+    /// <summary>Toggles the ice visual. Called by GarnishManager.ToggleIce.</summary>
     public void ApplyIce(bool enable) => _waterSlosh?.AddIce(enable);
 
     /// <summary>
@@ -129,12 +129,12 @@ public class PlacedGlassInstance : MonoBehaviour
         if (_garnishRim != null) _garnishRim.sprite = rim != null ? rim.Sprite : null;
     }
 
-    /// <summary>Starts the water-level-rising animation. Called by GarnishFlowBridge.Pour.</summary>
+    /// <summary>Starts the water-level-rising animation. Called by GarnishManager.Pour.</summary>
     public void StartFill() => _waterSlosh?.StartFilling();
 
     /// <summary>
     /// Fires once the pour animation finishes raising the water level. Pass-through to the
-    /// sibling WaterSlosh so callers (GarnishFlowBridge) react to the fill finishing instead of
+    /// sibling WaterSlosh so callers (GarnishManager) react to the fill finishing instead of
     /// polling a boolean every frame.
     /// </summary>
     public event Action OnFillComplete

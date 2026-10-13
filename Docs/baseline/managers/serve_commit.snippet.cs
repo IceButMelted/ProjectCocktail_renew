@@ -11,7 +11,7 @@ if (cmds == null) return "no GameFlowCommands.Instance, enter Play mode first";
 var root = cmds.gameObject;
 var cocktail = UnityEngine.Object.FindFirstObjectByType<CocktailSystemManager>(FindObjectsInactive.Include);
 var shaker = UnityEngine.Object.FindFirstObjectByType<ShakerContents>(FindObjectsInactive.Include);
-var garnish = UnityEngine.Object.FindFirstObjectByType<Bar410.GameFlow.GarnishFlowBridge>();
+var garnish = UnityEngine.Object.FindFirstObjectByType<GarnishManager>();   // Stage 6: the station is GarnishManager, the bridge only connects it
 var minigames = UnityEngine.Object.FindFirstObjectByType<MinigameSystemManager>();
 var runner = UnityEngine.Object.FindFirstObjectByType<Yarn.Unity.DialogueRunner>(FindObjectsInactive.Include);
 if (runner != null && runner.IsDialogueRunning) runner.Stop();
@@ -57,9 +57,9 @@ System.Collections.IEnumerator ToServe() {
   cmds.DrinkComplete();
   yield return Until(() => Bar410.GameFlow.GameFlowCommands.Yarn_CurrentStep() == "Garnish", 5f, "Garnish");
   garnish.ChooseGlass(glass);
-  garnish.Pour();
-  yield return Until(() => garnish.CanFinishGarnish, 10f, "pour finished");
-  garnish.TryFinishGarnish();
+  garnish.Pour(shaker.CurrentCocktail);
+  yield return Until(() => garnish.CanFinish, 10f, "pour finished");
+  garnish.TryFinish();
   yield return null; yield return null;
 }
 System.Collections.IEnumerator Run() {

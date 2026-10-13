@@ -8,7 +8,7 @@ if (cmds == null) return "no GameFlowCommands.Instance, enter Play mode first";
 var root = cmds.gameObject;
 var cocktail = UnityEngine.Object.FindFirstObjectByType<CocktailSystemManager>(FindObjectsInactive.Include);
 var shaker = UnityEngine.Object.FindFirstObjectByType<ShakerContents>(FindObjectsInactive.Include);
-var garnish = UnityEngine.Object.FindFirstObjectByType<Bar410.GameFlow.GarnishFlowBridge>();
+var garnish = UnityEngine.Object.FindFirstObjectByType<GarnishManager>();   // Stage 6: the station is GarnishManager, the bridge only connects it
 var minigames = UnityEngine.Object.FindFirstObjectByType<MinigameSystemManager>();
 var runner = UnityEngine.Object.FindFirstObjectByType<Yarn.Unity.DialogueRunner>(FindObjectsInactive.Include);
 // The scene starts a chapter dialogue that auto-advances; stop it so only this script drives the flow.
@@ -54,7 +54,7 @@ string Snap(string label) {
     + " mgPhase=" + minigames.ActivePhase
     + " | order.has=" + o.HasOrder + " scored=" + o.IsScored + " result=" + o.Result + " target=" + o.TargetName
     + " | shaker.parts=" + shaker.TotalParts + " ice=" + shaker.CurrentCocktail.AddIce + " method=" + shaker.CurrentCocktail.PreparationMethod
-    + " | glass=" + (PlacedGlassInstance.Current != null) + " canFinish=" + garnish.CanFinishGarnish
+    + " | glass=" + (PlacedGlassInstance.Current != null) + " canFinish=" + garnish.CanFinish
     + " | cam=" + cam
     + " | lock: bottle=" + (flat != null ? flat.Interactable.ToString() : "none")
     + " drag=" + (drag != null ? drag.Interactable.ToString() : "none")
@@ -110,8 +110,8 @@ System.Collections.IEnumerator Run() {
   garnish.ChooseGlass(glass);
   garnish.ToggleIce(true);
   yield return Log("S05_glassChosen_iceOn", true);
-  garnish.Pour();
-  yield return Until(() => garnish.CanFinishGarnish, 10f, "pour finished");
+  garnish.Pour(shaker.CurrentCocktail);
+  yield return Until(() => garnish.CanFinish, 10f, "pour finished");
   yield return Log("S06_poured", true);
 
   cmds.RemakeDrink();
@@ -125,9 +125,9 @@ System.Collections.IEnumerator Run() {
   yield return Log("S08_drinkCompleteViaCommand_cancelPath");
 
   garnish.ChooseGlass(glass);
-  garnish.Pour();
-  yield return Until(() => garnish.CanFinishGarnish, 10f, "pour finished (2)");
-  garnish.TryFinishGarnish();
+  garnish.Pour(shaker.CurrentCocktail);
+  yield return Until(() => garnish.CanFinish, 10f, "pour finished (2)");
+  garnish.TryFinish();
   yield return Log("S09_serveStep", true);
 
   BtnN("BTN_Reset (2)")?.onClick.Invoke();
@@ -139,9 +139,9 @@ System.Collections.IEnumerator Run() {
   cmds.DrinkComplete();
   yield return Until(() => Bar410.GameFlow.GameFlowCommands.Yarn_CurrentStep() == "Garnish", 5f, "step Garnish (3)");
   garnish.ChooseGlass(glass);
-  garnish.Pour();
-  yield return Until(() => garnish.CanFinishGarnish, 10f, "pour finished (3)");
-  garnish.TryFinishGarnish();
+  garnish.Pour(shaker.CurrentCocktail);
+  yield return Until(() => garnish.CanFinish, 10f, "pour finished (3)");
+  garnish.TryFinish();
   yield return Log("S11_serveStep_again");
 
   BtnN("BTN_Serving")?.onClick.Invoke();

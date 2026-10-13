@@ -26,7 +26,7 @@ public class Bar410DialogueOrderTest : MonoBehaviour
     [SerializeField] private CocktailSystemManager _cocktail;
     [SerializeField] private ShakerContents _shakerContents;
     [SerializeField] private Bar410.GameFlow.GameFlowCommands _commands;
-    [SerializeField] private Bar410.GameFlow.GarnishFlowBridge _garnishBridge;
+    [SerializeField] private GarnishManager _garnish;
     [SerializeField] private UnityEngine.UI.Button _serveButton;
     [SerializeField] private SO_GlassOption _glassToUse;
 
@@ -95,20 +95,20 @@ public class Bar410DialogueOrderTest : MonoBehaviour
 
         yield return null; // let GarnishFlowBridge.OnGarnishEntered's UpdateCocktailInShaker run
 
-        _garnishBridge.ChooseGlass(_glassToUse);
-        _garnishBridge.Pour();
+        _garnish.ChooseGlass(_glassToUse);
+        _garnish.Pour(_shakerContents.CurrentCocktail);
 
         timeout = Time.realtimeSinceStartup + 10f;
-        yield return new WaitUntil(() => _garnishBridge.CanFinishGarnish || Time.realtimeSinceStartup > timeout);
+        yield return new WaitUntil(() => _garnish.CanFinish || Time.realtimeSinceStartup > timeout);
 
-        if (!_garnishBridge.CanFinishGarnish)
+        if (!_garnish.CanFinish)
         {
             Debug.LogError("[Bar410OrderTest] Pour never finished filling — aborting before Serve.", this);
             LastRunTimedOut = true;
             yield break;
         }
 
-        _garnishBridge.TryFinishGarnish();
+        _garnish.TryFinish();
 
         // 3. Click the real Serve button — this is what actually completes
         //    the Yarn wait_for_task AND advances the HSM back to TalkingWithCustomer.

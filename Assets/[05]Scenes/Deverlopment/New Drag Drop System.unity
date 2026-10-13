@@ -969,6 +969,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 536261335}
+  - component: {fileID: 536261336}
   m_Layer: 0
   m_Name: '[GarnishSystem]'
   m_TagString: Untagged
@@ -993,6 +994,33 @@ Transform:
   - {fileID: 1172353783410246338}
   m_Father: {fileID: 7943527777821137633}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &536261336
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 536261334}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 722f9c69cee645a41aff8384cb9c6446, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GarnishManager
+  _glassSpawnPoint: {fileID: 1172353783410246338}
+  _panel: {fileID: 3511644287516326166}
+  _panelGlassSelection: {fileID: 6719146133829475110}
+  _panelGarnishItem: {fileID: 6385686531660237892}
+  _panelGarnishRim: {fileID: 8498606657762490101}
+  _btnGlassSelection: {fileID: 2593266067498636251}
+  _btnGarnishItem: {fileID: 3275857814339920553}
+  _btnGarnishRim: {fileID: 826660858106739880}
+  _btnPour: {fileID: 3008694762120225847}
+  _btnFinish: {fileID: 8527765289998595182}
+  _btnReset: {fileID: 7096965408994840909}
+  _btnAddIce: {fileID: 6545920609835826682}
+  _btnRemoveIce: {fileID: 5089860153755036676}
+  _sfxAddIce: Add_Ice
+  _sfxRemoveIce: Remove_Ice
 --- !u!1 &538860978
 GameObject:
   m_ObjectHideFlags: 0
@@ -3716,7 +3744,7 @@ MonoBehaviour:
   _cocktail: {fileID: 0}
   _shakerContents: {fileID: 0}
   _commands: {fileID: 0}
-  _garnishBridge: {fileID: 0}
+  _garnish: {fileID: 536261336}
   _serveButton: {fileID: 0}
   _glassToUse: {fileID: 11400000, guid: d604270535b546d44b03588217e146f3, type: 2}
   _orderNode: D1_02_Walter_Order
@@ -7636,27 +7664,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Bar410.GameFlow.GarnishFlowBridge
   _gameLoop: {fileID: 5740347442567854999}
   _commands: {fileID: 7227755909219274211}
+  _garnish: {fileID: 536261336}
   _cocktail: {fileID: 8872214704051886353}
   _shakerContents: {fileID: 4080245900655418650}
-  _glassSpawnPoint: {fileID: 1172353783410246338}
   _ingredients: {fileID: 6049133883410967789}
   _cameraSwitcher: {fileID: 1321084322}
   _garnishCameraId: GranishCam
-  _panelGarnishUI: {fileID: 3511644287516326166}
-  _panelGlassSelectionUI: {fileID: 6719146133829475110}
-  _panelGarnishItemUI: {fileID: 6385686531660237892}
-  _panelGarnishRimUI: {fileID: 8498606657762490101}
-  _glassGrid: {fileID: 2707310711287267235}
-  _btnPour: {fileID: 3008694762120225847}
-  _btnFinishGarnish: {fileID: 8527765289998595182}
-  _btnResetGarnish: {fileID: 7096965408994840909}
-  _btnGarnishItem: {fileID: 3275857814339920553}
-  _btnGarnishRim: {fileID: 826660858106739880}
-  _btnGlassSelection: {fileID: 2593266067498636251}
-  _gb_btnAddIce: {fileID: 7140896776742302517}
-  _gb_btnRemoveIce: {fileID: 5690214535184830495}
-  _sfxAddIce: Add_Ice
-  _sfxRemoveIce: Remove_Ice
 --- !u!224 &1927217058093561900
 RectTransform:
   m_ObjectHideFlags: 0
@@ -9658,7 +9671,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 11055fca477c6c241aa3caf43b1c1c8a, type: 2}
   _btnPreviousPage: {fileID: 8010154545668561326}
   _btnNextPage: {fileID: 919748690467911939}
-  _garnishBridge: {fileID: 1918563697585345354}
 --- !u!222 &2720485663299901518
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -16707,7 +16719,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: c1f5f8709cff88f44a0d14fa382904c2, type: 2}
   _btnPreviousPage: {fileID: 3665445087074965276}
   _btnNextPage: {fileID: 6252767058669196301}
-  _garnishBridge: {fileID: 1918563697585345354}
 --- !u!1 &6326720929964244151
 GameObject:
   m_ObjectHideFlags: 0
@@ -20492,7 +20503,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 38cd04f497ce78449a0f783b74e4764b, type: 2}
   _btnPreviousPage: {fileID: 1304304983139756878}
   _btnNextPage: {fileID: 7103014404918678944}
-  _garnishBridge: {fileID: 1918563697585345354}
 --- !u!114 &8292760064707384551
 MonoBehaviour:
   m_ObjectHideFlags: 0

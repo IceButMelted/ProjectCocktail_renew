@@ -8519,6 +8519,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7589327764082641628}
+  - component: {fileID: 671426686590414340}
   m_Layer: 0
   m_Name: '[GarnishSystem]'
   m_TagString: Untagged
@@ -8543,6 +8544,33 @@ Transform:
   - {fileID: 1172353782875719178}
   m_Father: {fileID: 7943527777282448937}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &671426686590414340
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4997203804334677511}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 722f9c69cee645a41aff8384cb9c6446, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::GarnishManager
+  _glassSpawnPoint: {fileID: 1172353782875719178}
+  _panel: {fileID: 3511644286977637854}
+  _panelGlassSelection: {fileID: 6719146133294948334}
+  _panelGarnishItem: {fileID: 6385686532199450764}
+  _panelGarnishRim: {fileID: 8498606658297508413}
+  _btnGlassSelection: {fileID: 2593266066963617555}
+  _btnGarnishItem: {fileID: 3275857813801231969}
+  _btnGarnishRim: {fileID: 826660857568016480}
+  _btnPour: {fileID: 3008694762659471615}
+  _btnFinish: {fileID: 8527765289463574694}
+  _btnReset: {fileID: 7096965408459789701}
+  _btnAddIce: {fileID: 6545920609296611634}
+  _btnRemoveIce: {fileID: 5089860153216313548}
+  _sfxAddIce: Add_Ice
+  _sfxRemoveIce: Remove_Ice
 --- !u!1 &5143448140072700822
 GameObject:
   m_ObjectHideFlags: 0
@@ -10895,7 +10923,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: c1f5f8709cff88f44a0d14fa382904c2, type: 2}
   _btnPreviousPage: {fileID: 3665445086539912148}
   _btnNextPage: {fileID: 6252767058129948869}
-  _garnishBridge: {fileID: 1918563698124560258}
 --- !u!1 &6419249441605873994
 GameObject:
   m_ObjectHideFlags: 0
@@ -11463,7 +11490,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 11055fca477c6c241aa3caf43b1c1c8a, type: 2}
   _btnPreviousPage: {fileID: 8010154545133542758}
   _btnNextPage: {fileID: 919748691002932683}
-  _garnishBridge: {fileID: 1918563698124560258}
 --- !u!1 &6772578589426255694
 GameObject:
   m_ObjectHideFlags: 0
@@ -12932,27 +12958,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::Bar410.GameFlow.GarnishFlowBridge
   _gameLoop: {fileID: 5740347443106578271}
   _commands: {fileID: 7227755909753768235}
+  _garnish: {fileID: 671426686590414340}
   _cocktail: {fileID: 8872214703517392345}
   _shakerContents: {fileID: 4080245901194107346}
-  _glassSpawnPoint: {fileID: 1172353782875719178}
   _ingredients: {fileID: 6049133883945461797}
   _cameraSwitcher: {fileID: 5386111175212639213}
   _garnishCameraId: GranishCam
-  _panelGarnishUI: {fileID: 3511644286977637854}
-  _panelGlassSelectionUI: {fileID: 6719146133294948334}
-  _panelGarnishItemUI: {fileID: 6385686532199450764}
-  _panelGarnishRimUI: {fileID: 8498606658297508413}
-  _glassGrid: {fileID: 2707310710748576619}
-  _btnPour: {fileID: 3008694762659471615}
-  _btnFinishGarnish: {fileID: 8527765289463574694}
-  _btnResetGarnish: {fileID: 7096965408459789701}
-  _btnGarnishItem: {fileID: 3275857813801231969}
-  _btnGarnishRim: {fileID: 826660857568016480}
-  _btnGlassSelection: {fileID: 2593266066963617555}
-  _gb_btnAddIce: {fileID: 7140896777276798973}
-  _gb_btnRemoveIce: {fileID: 5690214535719326935}
-  _sfxAddIce: Add_Ice
-  _sfxRemoveIce: Remove_Ice
 --- !u!114 &173320216533135447
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -15094,7 +15105,6 @@ MonoBehaviour:
   - {fileID: 11400000, guid: 38cd04f497ce78449a0f783b74e4764b, type: 2}
   _btnPreviousPage: {fileID: 1304304982605262726}
   _btnNextPage: {fileID: 7103014405453730152}
-  _garnishBridge: {fileID: 1918563698124560258}
 --- !u!1 &8533786738022412533
 GameObject:
   m_ObjectHideFlags: 0

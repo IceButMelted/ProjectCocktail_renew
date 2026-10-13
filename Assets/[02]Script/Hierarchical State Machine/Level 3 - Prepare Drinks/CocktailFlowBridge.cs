@@ -219,7 +219,7 @@ namespace Bar410.GameFlow
         private void OnServeExited()
         {
             // The served glass never carries over — the next customer always gets a fresh one
-            // from GarnishFlowBridge.ChooseGlass. Runs on every way out of Serve, remake included.
+            // from GarnishManager.ChooseGlass. Runs on every way out of Serve, remake included.
             PlacedGlassInstance.DestroyCurrent();
         }
 
