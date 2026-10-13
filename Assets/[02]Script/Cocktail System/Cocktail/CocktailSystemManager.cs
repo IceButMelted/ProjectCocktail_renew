@@ -88,6 +88,10 @@ public partial class CocktailSystemManager : MonoBehaviour
 
         Orders = new OrderService(_lookup, _randomPool, preferences);
         Scoring = new DrinkScoringService(_lookup);
+
+        // The bottles pour into the shaker this manager owns; hand it over once here instead of
+        // letting each bottle search the scene on its first pour.
+        if (_ingredientButtons != null) _ingredientButtons.BindShaker(_shakerContents);
     }
 
     /// <summary>
