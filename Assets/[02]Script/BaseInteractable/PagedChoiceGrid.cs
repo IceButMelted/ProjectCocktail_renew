@@ -1,13 +1,13 @@
 // ============================================================
 //  PagedChoiceGrid.cs — A fixed set of visible buttons showing a
-//  longer ScriptableObject catalog one page at a time.
+//  longer ScriptableObject catalog through a sliding window.
 //
-//  Page size = number of buttons. Each button's icon and click
-//  behaviour come from whichever option sits at its position on the
-//  current page, so adding content means adding assets to the list,
-//  never adding buttons. Next/Previous page wrap circularly. On a
-//  short last page, the leftover buttons are made non-interactable
-//  and their image is hidden.
+//  Each button's icon and click behaviour come from whichever option
+//  sits under it, so adding content means adding assets to the list,
+//  never adding buttons. Next/Previous move the window by one option
+//  and wrap around the catalog, so every button stays filled. Only a
+//  catalog shorter than the button count leaves buttons empty: those
+//  are made non-interactable and their image is hidden.
 // ============================================================
 
 using System.Collections.Generic;
@@ -16,7 +16,7 @@ using UnityEngine.UI;
 
 public abstract class PagedChoiceGrid<TOption> : MonoBehaviour where TOption : ScriptableObject
 {
-    [Tooltip("The visible slots. Page size = this count.")]
+    [Tooltip("The visible slots. The window shows this many options at once.")]
     [SerializeField] private List<Button> _buttons = new List<Button>();
 
     [Tooltip("Full catalog, any length.")]
@@ -26,12 +26,11 @@ public abstract class PagedChoiceGrid<TOption> : MonoBehaviour where TOption : S
     [SerializeField] private Button _btnPreviousPage;
     [SerializeField] private Button _btnNextPage;
 
-    private int _page;
+    private int _first; // index into _options of the option under the first button
     private bool _locked;
 
-    public int PageCount => _buttons.Count == 0
-        ? 0
-        : Mathf.Max(1, Mathf.CeilToInt(_options.Count / (float)_buttons.Count));
+    // Nothing to scroll to when every option already has a button.
+    private bool CanScroll => _options.Count > _buttons.Count;
 
     protected virtual void Awake()
     {
@@ -54,17 +53,13 @@ public abstract class PagedChoiceGrid<TOption> : MonoBehaviour where TOption : S
         if (_btnNextPage != null) _btnNextPage.onClick.RemoveListener(NextPage);
     }
 
-    public void NextPage()
-    {
-        if (PageCount == 0) return;
-        _page = (_page + 1) % PageCount;
-        Refresh();
-    }
+    public void NextPage() => Scroll(1);
+    public void PreviousPage() => Scroll(-1);
 
-    public void PreviousPage()
+    private void Scroll(int step)
     {
-        if (PageCount == 0) return;
-        _page = (_page - 1 + PageCount) % PageCount;
+        if (!CanScroll) return;
+        _first = (_first + step + _options.Count) % _options.Count;
         Refresh();
     }
 
@@ -83,8 +78,8 @@ public abstract class PagedChoiceGrid<TOption> : MonoBehaviour where TOption : S
 
     private TOption OptionAt(int slot)
     {
-        int index = _page * _buttons.Count + slot;
-        return index < _options.Count ? _options[index] : null;
+        if (slot >= _options.Count) return null;
+        return _options[(_first + slot) % _options.Count];
     }
 
     private void Refresh()
@@ -109,9 +104,8 @@ public abstract class PagedChoiceGrid<TOption> : MonoBehaviour where TOption : S
             }
         }
 
-        bool multiPage = PageCount > 1;
-        if (_btnPreviousPage != null) _btnPreviousPage.interactable = multiPage;
-        if (_btnNextPage != null) _btnNextPage.interactable = multiPage;
+        if (_btnPreviousPage != null) _btnPreviousPage.interactable = CanScroll;
+        if (_btnNextPage != null) _btnNextPage.interactable = CanScroll;
     }
 
     protected abstract Sprite GetIcon(TOption option);
