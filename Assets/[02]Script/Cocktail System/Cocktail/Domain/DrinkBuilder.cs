@@ -50,14 +50,15 @@ public static class DrinkBuilder
 
     /// <summary>
     /// Writes name, price, strength, glass and colours onto <paramref name="runtime"/>
-    /// from a single <see cref="RecipeMatch"/>.
+    /// from a single <see cref="RecipeMatch"/>. <paramref name="unmatched"/> colours a drink
+    /// that matches no recipe (null = built-in fallback).
     ///
     /// Replaces five separate Update* methods that each ran their own recipe scan
     /// (plan §2.4) and depended on each other's ordering — old UpdateTypeOfAlcohol
     /// looked the drink up by the Name that UpdateName had just written. One match
     /// in, one consistent identity out.
     /// </summary>
-    public static void ApplyRecipeIdentity(S_Drink runtime, in RecipeMatch match)
+    public static void ApplyRecipeIdentity(S_Drink runtime, in RecipeMatch match, SO_UnmatchedDrinkColor unmatched = null)
     {
         if (runtime == null) return;
 
@@ -76,7 +77,7 @@ public static class DrinkBuilder
             ? AlcoholClassifier.Resolve(match.Recipe)
             : AlcoholClassifier.Compute(runtime);
 
-        DrinkColorBlender.Resolve(match, runtime, out var top, out var bottom);
+        DrinkColorBlender.Resolve(match, runtime, unmatched, out var top, out var bottom);
         runtime.waterColorTop = top;
         runtime.waterColorBottom = bottom;
     }

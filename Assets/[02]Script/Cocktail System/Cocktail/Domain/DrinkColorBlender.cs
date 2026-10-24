@@ -14,8 +14,9 @@ using UnityEngine;
 public static class DrinkColorBlender
 {
     /// <summary>
-    /// Stand-in for an unmatched drink until per-ingredient colours exist. Deliberately
-    /// not black: black reads as "rendering broke", this reads as "murky drink".
+    /// Fallback for an unmatched drink when no <see cref="SO_UnmatchedDrinkColor"/> is
+    /// assigned (and that asset's default). Deliberately not black: black reads as
+    /// "rendering broke", this reads as "murky drink".
     /// </summary>
     public static readonly Color UnmatchedTop = new Color(0.35f, 0.29f, 0.22f, 1f);
     public static readonly Color UnmatchedBottom = new Color(0.24f, 0.19f, 0.14f, 1f);
@@ -28,9 +29,10 @@ public static class DrinkColorBlender
     /// TODO(design, plan S8): Fail (b) branch can't be finished yet. S_Drink stores
     /// colours per RECIPE and no asset maps ingredient type to colour, so there's nothing
     /// to blend. Add that table (an SO keyed by BaseSpirit/Liqueur/Mixer, or a colour
-    /// field on an ingredient definition) and replace the constants below.
+    /// field on an ingredient definition) and blend it here instead of <paramref name="unmatched"/>.
     /// </summary>
-    public static void Resolve(in RecipeMatch match, S_Drink poured, out Color top, out Color bottom)
+    public static void Resolve(in RecipeMatch match, S_Drink poured, SO_UnmatchedDrinkColor unmatched,
+                               out Color top, out Color bottom)
     {
         if (match.IsRecognised)
         {
@@ -39,7 +41,7 @@ public static class DrinkColorBlender
             return;
         }
 
-        top = UnmatchedTop;
-        bottom = UnmatchedBottom;
+        top = unmatched != null ? unmatched.Top : UnmatchedTop;
+        bottom = unmatched != null ? unmatched.Bottom : UnmatchedBottom;
     }
 }

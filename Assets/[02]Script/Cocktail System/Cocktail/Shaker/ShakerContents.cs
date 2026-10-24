@@ -26,6 +26,10 @@ public class ShakerContents : MonoBehaviour, IIngredientReceiver
     /// <summary>Most recent comparison against the recipe database.</summary>
     public RecipeMatch LastMatch { get; private set; } = RecipeMatch.None;
 
+    [Header("Colour")]
+    [Tooltip("Colour of a drink that matches no recipe. Empty = built-in murky brown.")]
+    [SerializeField] private SO_UnmatchedDrinkColor _unmatchedColor;
+
     // ── Events ─────────────────────────────────────────────
     // UnityEvent, not C# event: designers bind sounds/particles/UI straight in the
     // Inspector without a programmer adding a subscriber. Code still subscribes via
@@ -161,7 +165,7 @@ public class ShakerContents : MonoBehaviour, IIngredientReceiver
     public RecipeMatch UpdateIdentity(IReadOnlyList<S_Drink> recipes)
     {
         LastMatch = DrinkDeviation.FindBestMatch(CurrentCocktail, recipes);
-        DrinkBuilder.ApplyRecipeIdentity(CurrentCocktail, LastMatch);
+        DrinkBuilder.ApplyRecipeIdentity(CurrentCocktail, LastMatch, _unmatchedColor);
 
         IdentityResolved?.Invoke(LastMatch);
         return LastMatch;
