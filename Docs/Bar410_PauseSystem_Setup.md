@@ -1,5 +1,9 @@
 # Bar410 — Pause System: ขั้นตอน Setup ใน Unity
 
+> **สถานะ ณ 2026-10-24** (ตรวจกับโค้ด/scene ปัจจุบัน) · ภาพรวมล่าสุดอยู่ที่ `Docs/Bar410_Status_Report_2026-10-24.html` และ `Docs/Bar410_Managers_Restructure_HANDOFF.md`
+>
+> - ยังค้าง: ทดสอบของจริงใน §D3 (typewriter หยุดตอน pause, กด Esc บนคีย์บอร์ดจริง, กด Esc ระหว่างลากของ)
+
 **Date:** 2026-10-06 · **Branch:** `GameFlow/Main` · **Unity:** 6000.3.19f1
 **คู่กับ:** `Bar410_PauseSystem_Plan.md` (แผนและ Decision Log P1–P13)
 **สถานะ:** Part A และ B ทำครบแล้ว (2026-10-06): โค้ดเสร็จ, `PauseScene` ต่อ component แล้วและ register ใน Build Settings แล้ว, prefab `[PauseManager]` วางใน scene เกมกับ MainMenu แล้ว ทดสอบใน Play mode จาก scene เกมแล้ว (ดู B5) เหลือ Part C (เนื้อหา layer) ชื่อ field ในเอกสารตรงกับโค้ดจริง

@@ -2,6 +2,8 @@
 
 เขียนเมื่อ 2026-10-13 หลังจบ **Stage 9** · branch `GameFlow/Managers` (แตกจาก `GameFlow/Main` ที่ `1962402`, **ยังไม่ push, ไม่มี PR**)
 
+> **อัปเดต 2026-10-24:** branch push แล้ว (ยังไม่มี PR) · user เล่น Day 1 ผ่าน → §8 ข้อ 1 และ 10 ปิด · ภาพรวมล่าสุด `Docs/Bar410_Status_Report_2026-10-24.html`
+>
 > **เรื่องที่ต้องรู้ก่อนทำอะไรต่อ (สั้นที่สุด)**
 > 1. Stage 0–9 เสร็จและ commit แล้วทั้งหมด งานที่เหลือมีแค่ Stage 10 (optional) และการตัดสินใจเรื่อง push / PR
 > 2. **Stage 7d (`e7bc9ad`) เปลี่ยนสิ่งที่ผู้เล่นเห็น**: `.yarn` เรียก `SystemGame` ซึ่งไม่มีใน scene แล้ว ทุก command ของ cocktail เคยล้ม ตอนนี้ทำงาน (dialogue รอการเสิร์ฟจริง) **user ยังไม่ได้เล่นจริง** (§8 ข้อ 1) revert ได้ด้วย commit เดียว
@@ -305,7 +307,7 @@
 
 ตัดสินแล้ว (ไม่ต้องถามอีก): L1 ขับด้วยปุ่ม/hotkey (D11), `GlassPlacementZone` อยู่ Garnish (D9), ลบ `BG_BTN`, แก้ 4b ด้วยวิธี B, commit Stage 5 เป็น commit เดียว
 
-1. **เล่น Day 1 จริงหนึ่งรอบเพื่อตรวจ 7d** dialogue ตอนนี้รอการเสิร์ฟที่ `wait_for_task` และคำสั่งบรรทัดแรก (`Enable_InteractableObject`, `Fix_Camera`, `Switch_Camera`) ทำงานจริง ถ้าไม่ตรงกับที่ writer ออกแบบให้ revert `e7bc9ad` (ต้นเหตุ: ชื่อ object ใน scene ไม่ตรงกับ `.yarn`)
+1. ✅ **ปิด 2026-10-24: user เล่น Day 1 จริงแล้ว ปกติดี** (เดิม: เล่น Day 1 จริงหนึ่งรอบเพื่อตรวจ 7d) dialogue ตอนนี้รอการเสิร์ฟที่ `wait_for_task` และคำสั่งบรรทัดแรก (`Enable_InteractableObject`, `Fix_Camera`, `Switch_Camera`) ทำงานจริง ถ้าไม่ตรงกับที่ writer ออกแบบให้ revert `e7bc9ad` (ต้นเหตุ: ชื่อ object ใน scene ไม่ตรงกับ `.yarn`)
 2. **save ควรเก็บอะไรของ NPC** ตอนนี้เก็บตำแหน่ง/waypoint แต่ไม่เก็บหน้า (emotion) และทิศมอง (`_currentLookDirection` ไม่เคยถูกเซ็ต) ต้องให้ user ตัดสิน เพราะต้องปรับ save format และ restore
 3. **save → load จริงข้าม scene + silent replay** ยังไม่เคยทดสอบ (`customer_yarn` ครอบคลุมแค่ `Collect`/`Apply` ในฉากเดียว) ถ้า Stage 9 จะแตะ `SceneLoaderBridge` ต้องมีตัวตรวจนี้ก่อน
 4. **`Canvas_Cocktail` CanvasScaler match 0.5** ผมเปลี่ยนจาก 0 ใน 4b ตั้งใจเดิมเป็น 0 หรือเปล่า (ยังไม่ได้คำตอบ)
@@ -313,8 +315,8 @@
 6. **ลำดับวาดของ `Canvas_Garnish`/`Canvas_Cocktail`** อยู่ก่อน `Canvas` จึงถูก Hub/BookUI/Transition วาดทับ ถ้าเห็นว่า Hub บัง panel ให้ปรับ `sortingOrder`
 7. **ทดสอบด้วยเมาส์จริงที่ MCP ทำไม่ได้**: ลากขวดลง shaker, ลากผลไม้จาก tray, Shift+1/2 hotkey ขอให้ user ลองสั้นๆ
 8. **`CharacterData` (legacy)** คงไว้ตาม D6 แต่ไม่ถูกใช้ (roster ต่อไว้) ถ้าจะลบให้ลบ component บน `NPCs_And_Set` + fallback ใน `TalkToCustomerManager` และ `Demo_KeysShortCut` (R → โหลด scene ใหม่) ยังอยู่
-9. **push / เปิด PR** ยังไม่ทำ ตามที่ user สั่ง (branch นำ `GameFlow/Main` อยู่ ~30 commit)
-10. **เล่นจริงดูกล้อง** chapter dialogue ใช้ `Switch_Camera`/`Fix_Camera`/`Reset_Camera` ผ่าน static command ใหม่ ผมตรวจผ่าน dispatcher แต่ยังไม่เห็นด้วยตาว่า shot/blend ตอนคุยตรงกับที่ writer ต้องการ (ถ้าไม่ตรง คือ 7d ทำให้คำสั่งทำงานจริงเป็นครั้งแรก ไม่ใช่ 8b)
+9. **เปิด PR** branch push ขึ้น origin แล้ว ยังไม่มี PR (branch นำ `GameFlow/Main` อยู่ ~30 commit)
+10. ✅ **ปิด 2026-10-24 พร้อมข้อ 1** (เดิม: เล่นจริงดูกล้อง) chapter dialogue ใช้ `Switch_Camera`/`Fix_Camera`/`Reset_Camera` ผ่าน static command ใหม่ ผมตรวจผ่าน dispatcher แต่ยังไม่เห็นด้วยตาว่า shot/blend ตอนคุยตรงกับที่ writer ต้องการ (ถ้าไม่ตรง คือ 7d ทำให้คำสั่งทำงานจริงเป็นครั้งแรก ไม่ใช่ 8b)
 11. **ยืนยัน D12**: ไม่ทำ presenter/`FlowStep` และไม่ส่ง `Camera` ให้ Placement ถ้าต้องการ enum ให้ทำที่ Stage 9
 12. **ปุ่ม toggle ของ post-it** ไม่ interactable (ดู §7 Stage 9 ค้าง/สังเกต) ตั้งใจหรือเปล่า
 13. **รวมเข้า `GameFlow/Main`**: branch นำอยู่ ~45 commit ยังไม่ push ถ้าจะเปิด PR ให้บอก (ผมจะไม่ push เอง)

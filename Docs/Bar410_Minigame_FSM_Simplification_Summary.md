@@ -1,5 +1,9 @@
 # Bar410 — Minigame FSM Simplification · สรุปสั้น
 
+> **สถานะ ณ 2026-10-24** (ตรวจกับโค้ด/scene ปัจจุบัน) · ภาพรวมล่าสุดอยู่ที่ `Docs/Bar410_Status_Report_2026-10-24.html` และ `Docs/Bar410_Managers_Restructure_HANDOFF.md`
+>
+> - "ค้างอยู่ 1 เรื่อง" ปิดแล้ว: `SystemGame.prefab` ถูกลบแล้ว
+
 **Date:** 2026-08-20 · **Branch:** `GameLoop/main`
 **Plan ต้นทาง:** [`Bar410_Minigame_FSM_Simplification_Plan.md`](Bar410_Minigame_FSM_Simplification_Plan.md)
 **รายละเอียดเต็ม:** [`Bar410_Minigame_FSM_Simplification_Report.md`](Bar410_Minigame_FSM_Simplification_Report.md)

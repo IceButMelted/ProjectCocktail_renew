@@ -1,5 +1,9 @@
 # Garnish Decoration System (3 points per glass, UI picker) — Plan for /grill-with-docs
 
+> **สถานะ ณ 2026-10-24** (ตรวจกับโค้ด/scene ปัจจุบัน) · ภาพรวมล่าสุดอยู่ที่ `Docs/Bar410_Status_Report_2026-10-24.html` และ `Docs/Bar410_Managers_Restructure_HANDOFF.md`
+>
+> - แผนนี้ถูกทำไปแล้วในรูปแบบที่ต่างจากที่เขียน: Rim garnish 1 แบบต่อแก้ว + 2 item slot (หมวด Fresh/Novelty ใช้ slot ร่วมกัน) ดู `CONTEXT.md` › Glass & Garnish และ GDD §21.0.1
+
 ## Context
 
 GDD §21 already reserves space for a glass decoration mechanic ("v1 scope: Slot-based asset
