@@ -4,6 +4,8 @@
 
 > **อัปเดต 2026-10-24:** branch push แล้ว (ยังไม่มี PR) · user เล่น Day 1 ผ่าน → §8 ข้อ 1 และ 10 ปิด · ภาพรวมล่าสุด `Docs/Bar410_Status_Report_2026-10-24.html`
 >
+> **คำตอบ user 2026-10-24 (รายงาน §6 ข้อ A):** 1) สีเครื่องดื่มที่ไม่ตรงสูตรย้ายไป `UnmatchedDrinkColor.asset` (`SO_UnmatchedDrinkColor`, `db426b8`) · 2) dialogue ที่รอเสิร์ฟจริงและกล้องตอนคุยหลัง 7d **ตรงกับที่ writer ตั้งใจ** (คง `e7bc9ad`) · 3) เปิด PR เข้า `GameFlow/Main` · 4) ไฟล์ค้างแยก commit ตามเรื่อง (ทำแล้ว)
+>
 > **เรื่องที่ต้องรู้ก่อนทำอะไรต่อ (สั้นที่สุด)**
 > 1. Stage 0–9 เสร็จและ commit แล้วทั้งหมด งานที่เหลือมีแค่ Stage 10 (optional) และการตัดสินใจเรื่อง push / PR
 > 2. **Stage 7d (`e7bc9ad`) เปลี่ยนสิ่งที่ผู้เล่นเห็น**: `.yarn` เรียก `SystemGame` ซึ่งไม่มีใน scene แล้ว ทุก command ของ cocktail เคยล้ม ตอนนี้ทำงาน (dialogue รอการเสิร์ฟจริง) **user ยังไม่ได้เล่นจริง** (§8 ข้อ 1) revert ได้ด้วย commit เดียว
@@ -319,7 +321,7 @@
 10. ✅ **ปิด 2026-10-24 พร้อมข้อ 1** (เดิม: เล่นจริงดูกล้อง) chapter dialogue ใช้ `Switch_Camera`/`Fix_Camera`/`Reset_Camera` ผ่าน static command ใหม่ ผมตรวจผ่าน dispatcher แต่ยังไม่เห็นด้วยตาว่า shot/blend ตอนคุยตรงกับที่ writer ต้องการ (ถ้าไม่ตรง คือ 7d ทำให้คำสั่งทำงานจริงเป็นครั้งแรก ไม่ใช่ 8b)
 11. **ยืนยัน D12**: ไม่ทำ presenter/`FlowStep` และไม่ส่ง `Camera` ให้ Placement ถ้าต้องการ enum ให้ทำที่ Stage 9
 12. **ปุ่ม toggle ของ post-it** ไม่ interactable (ดู §7 Stage 9 ค้าง/สังเกต) ตั้งใจหรือเปล่า
-13. **รวมเข้า `GameFlow/Main`**: branch นำอยู่ ~45 commit ยังไม่ push ถ้าจะเปิด PR ให้บอก (ผมจะไม่ push เอง)
+13. ✅ **user สั่งเปิด PR 2026-10-24** (เดิม: รวมเข้า `GameFlow/Main`): branch นำอยู่ ~45 commit ยังไม่ push ถ้าจะเปิด PR ให้บอก (ผมจะไม่ push เอง)
 
 ---
 
