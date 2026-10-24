@@ -30,16 +30,12 @@ namespace Bar410.GameFlow
         // MinigameSystemManager, or the flow layer drags UnityEngine and a scene
         // object into itself and the layering in Bar410_StateMachine_Implementation.md breaks.
         //
-        // MinigameFlowBridge (a MonoBehaviour, not written yet — see
-        // Bar410_Minigame_Integration_Plan.md §3.3) is the one and only thing that
-        // subscribes here and translates in both directions:
+        // FlowWiring (a MonoBehaviour, see Bar410_Minigame_Integration_Plan.md §3.3)
+        // is the one and only thing that subscribes here and translates in both directions:
         //
         //   OnStartRequested(type)  ──> MinigameSystemManager.StartMinigame(type)
         //   OnStopRequested         ──> MinigameSystemManager.CancelMinigame()
         //   MinigameFinished(..)    ──> ReportResult(outcome)   [inbound]
-        //
-        // Until that bridge exists these events have no subscribers, so OnEnter/OnExit
-        // are no-ops exactly as before — nothing in the current flow changes.
 
         /// <summary>Which minigame step 2.2 should run. Set by GameFlowCommands / the shaker's method.</summary>
         public Enum_MiniGameType PendingType { get; private set; } = Enum_MiniGameType.None;
@@ -70,8 +66,8 @@ namespace Bar410.GameFlow
         protected override void OnExit()
         {
             OnStopRequested?.Invoke();
-            // TODO: fold LastOutcome into DrinkOrderContext for scoring at step 5
-            //       (HSM doc §8 Q4 — LastOutcome is a placeholder for that per-ingredient list).
+            // LastOutcome is not scored: a minigame cannot be lost (GDD §10.1), so it only
+            // tells the flow (and Yarn, via flow_minigame_result) how the last run ended.
         }
 
         // ── Transitions out of 2.2 ─────────────────────────

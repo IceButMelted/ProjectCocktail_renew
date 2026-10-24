@@ -1,5 +1,10 @@
 # Bar410 — Garnish Restructure: เอกสารส่งต่องาน / HANDOFF
 
+> **สถานะ ณ 2026-10-24** (ตรวจกับโค้ด/scene ปัจจุบัน) · ภาพรวมล่าสุดอยู่ที่ `Docs/Bar410_Status_Report_2026-10-24.html` และ `Docs/Bar410_Managers_Restructure_HANDOFF.md`
+>
+> - ปิดแล้ว: §5 ทั้งสองข้อ (listener ที่ target หลุด / `CocktailGrass` หายจาก scene แล้ว; ตกแต่งแก้วทำแล้วใน `GarnishManager`)
+> - `GarnishFlowBridge`/`WaterSlosh` ไม่มีแล้ว: ถูกแทนด้วย `FlowWiring` + `GarnishManager` (Managers restructure) และ `PourVisual` (Pour V2)
+
 **Date:** 2026-09-07 · **Branch:** `GameLoop/main`
 **สถานะ:** โค้ดคอมไพล์ผ่าน ไม่มี error/warning ใหม่ · `Bar410 > Validate Cocktail Data` ผ่าน ·
 ทดสอบ end-to-end จริงใน Play mode (ไม่ใช่แค่อ่านโค้ด) ทุกจุดสำคัญ

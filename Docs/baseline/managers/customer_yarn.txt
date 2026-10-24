@@ -1,0 +1,49 @@
+# customer / yarn surface through the real command dispatcher
+A0 initial | Walter:sprite=Walter_Default pos=(2.77, 0.80, 7.66) idx=-1 | Owen:sprite=Owen_Default pos=(2.77, 0.80, 7.66) idx=-1 | Isla:sprite=Isla_Default pos=(2.77, 0.91, 7.66) idx=-1
+A1 emotion
+  <<SetEmotion Walter happy>> -> Succeeded
+   Walter:sprite=Walter_Happy pos=(2.77, 0.80, 7.66) idx=-1
+  <<SetEmotion Walter upset>> -> Succeeded
+   Walter:sprite=Walter_Upset pos=(2.77, 0.80, 7.66) idx=-1
+  <<SetEmotion Walter neutral>> -> Succeeded
+   Walter:sprite=Walter_Default pos=(2.77, 0.80, 7.66) idx=-1
+  <<SetEmotion Nobody happy>> -> Succeeded
+A2 look direction
+  <<SetLookDirection Walter left>> -> Succeeded
+   Walter:sprite=Walter_Left pos=(2.77, 0.80, 7.66) idx=-1
+  <<SetLookDirection Walter right>> -> Succeeded
+   Walter:sprite=Walter_Right pos=(2.77, 0.80, 7.66) idx=-1
+  <<SetLookDirection Walter forward>> -> Succeeded
+   Walter:sprite=Walter_Default pos=(2.77, 0.80, 7.66) idx=-1
+  <<SetLookDirection Walter NPC_Name.up>> -> Succeeded
+A3 movement
+  <<MoveIn Walter 2>> -> Succeeded
+   after MoveIn Walter 2 | Walter:sprite=Walter_Default pos=(7.03, 0.98, 5.93) idx=2
+  <<MoveIn Isla 1>> -> Succeeded
+   after MoveIn Isla 1 | Isla:sprite=Isla_Default pos=(5.87, 0.98, 5.93) idx=1
+  <<MoveIn Walter 9>> -> Succeeded
+   after MoveIn Walter 9 (out of range) | Walter:sprite=Walter_Default pos=(7.03, 0.98, 5.93) idx=2
+  <<MoveOut Walter>> -> Succeeded
+   after MoveOut Walter | Walter:sprite=Walter_Default pos=(2.97, 0.98, 8.01) idx=0
+A4 cocktail commands addressed by object name
+  <<Enable_InteractableObject SystemGame false>> -> Succeeded
+  <<Enable_InteractableObject [CocktailSystem] false>> -> Succeeded
+  <<Reset_Variable SystemGame>> -> Succeeded
+  <<wait_for_task SystemGame>> -> Succeeded
+   IsWaitingForTask after wait_for_task SystemGame = True
+B save -> load of the NPCs
+  <<MoveIn Walter 3>> -> Succeeded
+  <<SetLookDirection Walter left>> -> Succeeded
+B1 live state | Walter:sprite=Walter_Left pos=(8.09, 0.98, 5.93) idx=3 | Owen:sprite=Owen_Default pos=(2.77, 0.80, 7.66) idx=-1 | Isla:sprite=Isla_Default pos=(5.87, 0.98, 5.93) idx=1
+B2 collected: Isla:pos=(5.87, 0.98, 5.93) idx=1 look=None | Owen:pos=(2.77, 0.80, 7.66) idx=-1 look=None | Walter:pos=(8.09, 0.98, 5.93) idx=3 look=None
+B3 disturbed | Walter:sprite=Walter_Left pos=(0.00, 0.00, 0.00) idx=0 | Owen:sprite=Owen_Default pos=(2.77, 0.80, 7.66) idx=-1 | Isla:sprite=Isla_Default pos=(1.00, 1.00, 1.00) idx=1
+B4 restored | Walter:sprite=Walter_Left pos=(8.09, 0.98, 5.93) idx=3 | Owen:sprite=Owen_Default pos=(2.77, 0.80, 7.66) idx=-1 | Isla:sprite=Isla_Default pos=(5.87, 0.98, 5.93) idx=1
+C yarn variables written when an order is scored
+   scored=True result=Acceptable relDelta=0.25 | yarn $task_done=True $satisfaction=2 $type_of_cocktail=1 $rel_Walter 0 -> 0.25
+   second ServeDrink is a no-op: $rel_Walter stays 0.25
+   after ResetVariableInYarn: $task_done=False $satisfaction=0 orderHas=False
+console: warnings+errors=3
+  Warning: [FindNPC] Invalid NPC name: 'Nobody'
+  Warning: Unknown look direction 'NPC_Name.up' for NPC_Walter
+  Warning: NPC_Walter: waypoint index 9 is out of range.
+DONE

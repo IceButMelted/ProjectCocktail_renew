@@ -8,6 +8,10 @@
 //
 //  Sits alongside the bottle's existing DragableObject + IngredientButtonUI
 //  (whose Invoke() does the actual pour and fires OnPoured/OnRejected).
+//
+//  Sound: a drag that ends anywhere but in the shaker is silent. One
+//  that pours plays the bottle's pointer-up sound (UIPointerSound), the
+//  same sound a plain click-to-pour makes.
 // ============================================================
 
 using UnityEngine;
@@ -21,6 +25,8 @@ public class BottleIngredientSource : MonoBehaviour
 
     private DragableObject _dragable;
     private IngredientButtonUI _button;
+    private UIPointerSound _sound;
+    private bool _pouringFromDrag;
     private Vector3 _homePosition;
     private int _homeLayer;
     private int _ignoreRaycastLayer;
@@ -31,6 +37,8 @@ public class BottleIngredientSource : MonoBehaviour
     {
         _dragable = GetComponent<DragableObject>();
         _button = GetComponent<IngredientButtonUI>();
+        _sound = GetComponent<UIPointerSound>();
+        _button.OnPoured.AddListener(OnPoured);
         _homePosition = transform.position;
         _homeLayer = gameObject.layer;
         _ignoreRaycastLayer = LayerMask.NameToLayer("Ignore Raycast");
@@ -47,11 +55,24 @@ public class BottleIngredientSource : MonoBehaviour
     private void OnEnable()
     {
         if (_dragable != null) _dragable.IgnorePlacementZones = true;
+        if (_sound != null) _sound.SetCanPlayEndDrag(false); // this component speaks for the drag instead
     }
 
     private void OnDisable()
     {
         if (_dragable != null) _dragable.IgnorePlacementZones = false;
+        if (_sound != null) _sound.SetCanPlayEndDrag(true);
+    }
+
+    private void OnDestroy()
+    {
+        if (_button != null) _button.OnPoured.RemoveListener(OnPoured);
+    }
+
+    // OnPoured also fires for a plain click, which UIPointerSound already voices on pointer-up.
+    private void OnPoured()
+    {
+        if (_pouringFromDrag && _sound != null) _sound.PlayUp();
     }
 
     /// <summary>
@@ -99,7 +120,12 @@ public class BottleIngredientSource : MonoBehaviour
         _dragable.PastLocation = _homePosition;
         gameObject.layer = _homeLayer;
 
-        if (_isHoveringShaker) _button.Invoke();
+        if (_isHoveringShaker)
+        {
+            _pouringFromDrag = true;
+            _button.Invoke();
+            _pouringFromDrag = false;
+        }
 
         _isHoveringShaker = false;
     }

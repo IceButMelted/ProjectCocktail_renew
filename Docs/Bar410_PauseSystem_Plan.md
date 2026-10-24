@@ -13,7 +13,7 @@ Date: 2026-10-06 · Status: โค้ดระบบ pause เขียนแล
 | # | การตัดสินใจ |
 |---|---|
 | P1 | ใช้ `Time.timeScale = 0` เป็นกลไก pause ไม่ pause `DialogueRunner` หรือ Text Animator ตรง ๆ |
-| P2 | UI ฝั่งเกมเป็น **Additive Scene เดียวชื่อ `PauseScene`** มี 3 layer (PauseMenu, Settings, SaveLoad) แต่ละ layer เป็น **prefab** (เจ้าของแก้ prefab ตัวเอง scene แค่ถือ instance) ส่วน MainMenu วาง instance ของ prefab Settings/SaveLoad ตัวเดียวกันใน scene ตรง ๆ *(แก้ 2026-10-06 จากเดิมหนึ่งหน้าหนึ่ง scene)* เหตุผลที่ใช้ additive: `SoundManager` และระบบ SaveLoad เป็น Singleton แบบ `DontDestroyOnLoad` อยู่แล้ว UI scene จึงเข้าถึงผ่าน `Instance` ได้โดยไม่ต้องอ้าง Inspector ข้าม scene |
+| P2 | UI ฝั่งเกมเป็น **Additive Scene เดียวชื่อ `PauseScene`** มี 3 layer (PauseMenu, Settings, SaveLoad) ส่วน MainMenu เปิด layer Settings ตัวเดียวกันนี้ผ่าน `PauseManager.OpenPanel` โดยข้ามเมนู Pause *(แก้ 2026-10-06 จากเดิมหนึ่งหน้าหนึ่ง scene และแก้อีกรอบ 2026-10-07 จากเดิมที่ให้วาง prefab ซ้ำใน MainMenu)* เหตุผลที่ใช้ additive: `SoundManager` และระบบ SaveLoad เป็น Singleton แบบ `DontDestroyOnLoad` อยู่แล้ว UI scene จึงเข้าถึงผ่าน `Instance` ได้โดยไม่ต้องอ้าง Inspector ข้าม scene |
 | P3 | **Preload แล้วซ่อน** — โหลด scene `PauseScene` ไว้ตอน `PauseManager.Start` แล้วปิด root object เปิด/ปิดด้วย SetActive ไม่โหลด/unload ตอนใช้งาน (MainMenu ไม่มี additive จึงไม่ต้อง preload) |
 | P4 | Save เปิดได้ทุกช่วงของ HSM แต่ถ้า Save ระหว่าง Minigame / ทำเครื่องดื่ม / Garnish จะบันทึกเฉพาะ state ของ **Conversation** (ย้อนไปที่ checkpoint ก่อน task) |
 | P5 | เสียงตอน pause: **Music และ Ambient ลดเสียง**, **SFX หยุด** (UI SFX ยังเล่นเพื่อให้ปุ่มในเมนูมีเสียง) |
@@ -22,8 +22,8 @@ Date: 2026-10-06 · Status: โค้ดระบบ pause เขียนแล
 | P8 | หน้า **Settings** ยกเลิก duck ของ Music/Ambient ขณะเปิดอยู่ เพื่อให้ผู้เล่นได้ยินเสียงจริงตอนเลื่อน slider ส่วน SFX/Voice ยังหยุดอยู่ |
 | P9 | `PlaytimeTracker` **นับเวลาที่ pause** ตามเดิม ไม่แก้โค้ด |
 | P10 | **Lead** สร้าง scene `PauseScene` (เปล่า) กับ prefab เปล่าของแต่ละ layer และ register Build Settings ครั้งเดียวก่อนเริ่มงาน ทีมไม่แตะ Build Settings |
-| P11 *(default, ยังไม่ได้ยืนยัน)* | `Esc` ใน MainMenu ที่ไม่มีหน้าเปิดอยู่: ไม่ทำอะไร (ในโค้ด: ไม่มี `Pause Scene` = ไม่เปิดเองด้วย Esc) |
-| P12 *(แทนที่ด้วย P2/P3)* | Gameplay preload `PauseScene` (ค่า `Pause Scene` ใน `PauseManager`) MainMenu ไม่ preload อะไร (เว้น `Pause Scene` ว่าง) |
+| P11 | `Esc` ใน MainMenu ที่ไม่มีหน้าเปิดอยู่: ไม่ทำอะไร (ในโค้ด: ปิด **Esc Opens Pause Menu** ใน `PauseManager` ของ MainMenu) |
+| P12 | ทั้ง Gameplay และ MainMenu preload `PauseScene` ด้วย `PauseManager` (ค่า `Pause Scene`) MainMenu เปิดตรงไปที่ layer Settings ด้วย `OpenPanelButton` / `PauseManager.OpenPanel("Settings")` ไม่ผ่านเมนู Pause และไม่หยุดเวลา (Pause Time ปิด) |
 | P13 | `PausePanel` บน root ของแต่ละ layer เป็นตัวนับว่า "หน้าเปิดอยู่" `PauseManager` ไม่ต้องรู้ชื่อหน้า: Esc ปิดทีละชั้นผ่าน `PausePanel.CloseTopSub()`, flag `Release Music Duck` ใช้ยกเลิก duck (แทนรายชื่อ `duckExemptPages`), `sortingOrder` ตั้งให้อัตโนมัติ (`PauseManager` ตั้ง Canvas ของ `PauseScene` เป็น 10000, ถ้า `PausePanel` อยู่บน Canvas ของตัวเองจะตั้ง 10000 + ลำดับที่เปิด) |
 
 ---
@@ -72,13 +72,15 @@ public static void Refresh();            // PausePanel เรียกเอง�
 ฟิลด์ใน Inspector:
 
 - **Pause Time** (`m_PauseTime`, ค่าเริ่มต้น เปิด): หยุดเวลาและ pause SFX/Voice ตอนมี panel เปิด MainMenu ปิดไว้
-- **Pause Scene** (`m_PauseScene`, ค่าเริ่มต้น `PauseScene`): ชื่อ additive scene ที่ preload ว่าง = ไม่มี scene (MainMenu) และ Esc ไม่เปิด pause เอง
+- **Pause Scene** (`m_PauseScene`, ค่าเริ่มต้น `PauseScene`): ชื่อ additive scene ที่ preload (ว่าง = ไม่มี scene)
+- **Esc Opens Pause Menu** (`m_EscOpensPauseMenu`, ค่าเริ่มต้น เปิด): `Esc` เปิดเมนู Pause เมื่อไม่มีอะไรเปิดอยู่ MainMenu ปิดไว้
 
 พฤติกรรม:
 
 - **Preload ใน `Start`**: `LoadSceneAsync(Pause Scene, Additive)` (ถ้า scene โหลดอยู่แล้วก็ใช้ต่อ ถ้าไม่อยู่ใน Build Settings จะ `LogError`) แล้วจัดการ root ของ scene: root ที่มี `PausePanel` ถูกเก็บไว้เปิด/ปิด (ตั้ง Canvas ของ root เป็น `sortingOrder` 10000) ส่วน root ที่ไม่มี `PausePanel` (EventSystem หรือไฟที่ใส่ไว้ทดสอบ scene เดี่ยว ๆ) ถูกปิดถาวร layer ย่อยถูกปิดทุกครั้ง และ layer ฐานถูกเปิดทุกครั้งที่ `Open()` จึงบันทึก layer เป็น active หรือ inactive ในไฟล์ scene ก็ได้ ระหว่าง preload `PausePanel` ที่ถูก enable โดยการโหลดจะไม่ทำให้เกมหยุด (`m_Preloading`)
 - **สถานะ pause** มาจากจำนวน `PausePanel` ที่ถูกเปิดอยู่ (`Apply()`): `paused = Pause Time && มี panel เปิด` ตั้ง `Time.timeScale` ตามนั้น และเรียก `SoundManager.Instance?.SetPaused(paused, !มี panel ที่ปล่อย duck)` ทุกครั้งที่ panel เปิด/ปิด (idempotent) การนับตาม panel ทำให้ Settings เปิดซ้อนบน Pause แล้วปิด Settings เกมยังหยุดอยู่
 - **`Open()`**: เปิด root ของ scene PauseScene (layer ฐานที่เปิดไว้ในไฟล์ scene จะ `OnEnable` แล้วลงทะเบียนเอง) **`Close()`**: `PausePanel.CloseAllSub()` (layer ย่อยที่ค้างอยู่ปิดหมด รอบหน้าเริ่มที่ layer ฐาน) แล้วซ่อน root
+- **`OpenPanel(key)`** (เปิด layer เดียวตรง ๆ ข้ามเมนู Pause ใช้จาก MainMenu): เปิด root แล้วแสดงเฉพาะ `PausePanel` ที่ `Matches(key)` (Key หรือชื่อ GameObject) ส่วน layer ฐานไม่ถูกแสดง (ทุก layer เริ่มปิดตอน preload และ `Open()` เป็นฝ่ายเปิด layer ฐาน) โหมดนี้ (`m_Direct`) เมื่อ layer ที่เปิดถูกซ่อน (ปุ่ม Back หรือ `Esc`) `PauseManager` ซ่อน root ตามในเฟรมถัดไปจาก `Update`
 - **`Esc`** (`Keyboard.current.escapeKey.wasPressedThisFrame` ใน `Update` ซึ่งยังทำงานตอน `timeScale = 0`; มี fallback `Input.GetKeyDown` ถ้าปิด Input System): ปิด layer ย่อยบนสุดก่อน (`PausePanel.CloseTopSub()`) ถ้าไม่มี layer ย่อยและ Pause เปิดอยู่ให้ `Close()` ถ้า Pause ปิดอยู่และ scene preload พร้อมแล้วให้ `Open()` (P11: MainMenu ไม่มี Pause Scene จึงไม่ทำอะไร)
 - **`OnDestroy`**: ถ้าเราเป็นฝ่ายหยุดเวลา → `Time.timeScale = 1` และ `SetPaused(false)`
 
@@ -93,6 +95,8 @@ public static void Refresh();            // PausePanel เรียกเอง�
 - `Show()` / `Hide()`: ไว้ผูกกับ `Button.onClick` ใน Inspector (อ้าง object ใน scene เดียวกันได้ จึงไม่ต้องมีสคริปต์นำทาง)
 
 **`ClosePageButton`** — แปะบนปุ่ม Resume ใน scene `PauseScene` เรียก `PauseManager.Close()` (ปุ่มใน scene `PauseScene` อ้าง `PauseManager` ข้าม scene ไม่ได้) ปุ่ม Back ของ layer ย่อยไม่ต้องใช้ ให้ผูก `Button.onClick` → `PausePanel.Hide()` ของ layer นั้นตรง ๆ
+
+**`OpenPanelButton`** — แปะบนปุ่มนอก `PauseScene` (เช่น `BTN_Setting` ใน `MainMenu_V2`) ตั้ง **Key** (`Settings`) กดแล้วเรียก `PauseManager.OpenPanel(key)` ไม่ทำอะไรถ้า scene นั้นไม่มี `PauseManager` `PausePanel` มีฟิลด์ **Key** (ว่าง = ใช้ชื่อ GameObject) ตั้ง `Panel - Setting` เป็น `Settings`
 
 เปิด layer ย่อย: ผูก `Button.onClick` → `PausePanel.Show()` ของ layer ที่ต้องการ (ปุ่ม Save กับ Load แยกกันได้ โดยให้ panel SaveLoad มี method เลือกแท็บแล้วผูกเพิ่มในปุ่มเดียวกัน)
 
@@ -215,10 +219,10 @@ public static void Refresh();            // PausePanel เรียกเอง�
 | Settings กับ duck | ยกเลิก duck ของ Music/Ambient ตอน Settings เปิด | P8, §3.1, §4 |
 | `PlaytimeTracker` นับเวลา pause | นับตามเดิม ไม่แก้โค้ด | P9, §2.3 |
 | เจ้าของ Build Settings | Lead สร้าง scene เปล่าและ register ครั้งเดียว | P10, §6 ข้อ 9 |
-| `Esc` ใน MainMenu ที่ไม่มีหน้าเปิด | ไม่ทำอะไร *(default)* | P11, §3.1 |
-| scene ที่ preload | Gameplay: `PauseScene` (scene เดียว) / MainMenu: ไม่ preload (ใช้ prefab ใน scene ตรง ๆ) | P2, P3, P12 |
+| `Esc` ใน MainMenu ที่ไม่มีหน้าเปิด | ไม่ทำอะไร | P11, §3.1 |
+| scene ที่ preload | `PauseScene` (scene เดียว) ทั้ง Gameplay และ MainMenu | P2, P3, P12 |
 
-ข้อ `Esc` ใน MainMenu ยังไม่ได้ยืนยันกับเจ้าของโปรเจกต์ ใช้ค่าเริ่มต้นไปก่อน (ในโค้ดคือเว้น **Pause Scene** ว่างใน MainMenu) ส่วนรายการ scene ที่ preload ถูกแทนที่ด้วยรูปแบบ scene เดียว (P2/P3)
+ข้อ `Esc` ใน MainMenu ใช้ค่าเริ่มต้นที่เสนอไว้ (ไม่ทำอะไร) ยังไม่ได้ยืนยันโดยตรงกับเจ้าของโปรเจกต์ ส่วนรายการ scene ที่ preload ถูกแทนที่ด้วยรูปแบบ scene เดียว (P2/P3)
 
 ### ความเสี่ยงที่เคยค้าง — สถานะ (2026-10-06)
 

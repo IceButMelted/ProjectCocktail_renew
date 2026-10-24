@@ -21,11 +21,10 @@ public class SO_GlassOption : ScriptableObject
     public GlassType Shape;
 
     [Header("Visuals")]
+    [Tooltip("Icon on the glass grid. The glass on the table takes its sprites from PlacedPrefab.")]
     public Sprite GlassSprite;
-    public Sprite WaterSprite;
-    public Sprite IceSprite;
 
     [Header("Placement")]
-    [Tooltip("Instantiated on the shelf and dragged onto the table. Must carry PlacedGlassInstance + DragableObject + Collider.")]
+    [Tooltip("Spawned on the garnish plate. Must carry PlacedGlassInstance and CocktailGlass.")]
     public GameObject PlacedPrefab;
 }

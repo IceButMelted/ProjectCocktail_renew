@@ -26,6 +26,10 @@ public class ShakerContents : MonoBehaviour, IIngredientReceiver
     /// <summary>Most recent comparison against the recipe database.</summary>
     public RecipeMatch LastMatch { get; private set; } = RecipeMatch.None;
 
+    [Header("Colour")]
+    [Tooltip("Colour of a drink that matches no recipe. Empty = built-in murky brown.")]
+    [SerializeField] private SO_UnmatchedDrinkColor _unmatchedColor;
+
     // ── Events ─────────────────────────────────────────────
     // UnityEvent, not C# event: designers bind sounds/particles/UI straight in the
     // Inspector without a programmer adding a subscriber. Code still subscribes via
@@ -63,7 +67,7 @@ public class ShakerContents : MonoBehaviour, IIngredientReceiver
     public void SetMethod(Method method)
     {
         CurrentCocktail.PreparationMethod = method;
-        Changed?.Invoke();
+        RaiseChanged();
     }
 
     public void SetMethodToShake() => SetMethod(Method.Shaking);
@@ -77,13 +81,13 @@ public class ShakerContents : MonoBehaviour, IIngredientReceiver
     {
         CurrentCocktail.AddIce = enable;
 
-        //prevent toggle ui in GarnishFlowBridge from being called when ice is added or removed in the shaker
+        //prevent toggle ui in GarnishManager from being called when ice is added or removed in the shaker
         //Changed?.Invoke();
     }
 
     /// <summary>
     /// Which minigame the drink's method calls for (GDD §10).
-    /// MinigameFlowBridge reads this as its second-priority type source
+    /// FlowWiring reads this as its second-priority type source
     /// (Bar410_Minigame_Integration_Plan §3.1).
     /// </summary>
     public Enum_MiniGameType RequiredMinigame
@@ -108,7 +112,7 @@ public class ShakerContents : MonoBehaviour, IIngredientReceiver
             return;
         }
         if (!DrinkBuilder.TryAddAlcohol(CurrentCocktail, alcohol, amount)) return;
-        Changed?.Invoke();
+        RaiseChanged();
     }
 
     public void TryToAddLiqueur(Liqueur liqueur, int amount = 1)
@@ -118,7 +122,7 @@ public class ShakerContents : MonoBehaviour, IIngredientReceiver
             return; 
         }
         if (!DrinkBuilder.TryAddLiqueur(CurrentCocktail, liqueur, amount)) return;
-        Changed?.Invoke();
+        RaiseChanged();
     }
 
     public void TryToAddMixer(Mixer mixer, int amount = 1)
@@ -128,6 +132,18 @@ public class ShakerContents : MonoBehaviour, IIngredientReceiver
             return; 
         }
         if (!DrinkBuilder.TryAddMixer(CurrentCocktail, mixer, amount)) return;
+        RaiseChanged();
+    }
+
+    /// <summary>
+    /// Every "the drink changed" notification goes through here: first work out whether the
+    /// glass just filled up (raising <see cref="OnFulled"/>), then tell the <see cref="Changed"/>
+    /// listeners. This used to be an Inspector UnityEvent call on Changed; keeping it as the
+    /// first step preserves the order listeners saw before.
+    /// </summary>
+    private void RaiseChanged()
+    {
+        IsCocktailFull();
         Changed?.Invoke();
     }
 
@@ -149,7 +165,7 @@ public class ShakerContents : MonoBehaviour, IIngredientReceiver
     public RecipeMatch UpdateIdentity(IReadOnlyList<S_Drink> recipes)
     {
         LastMatch = DrinkDeviation.FindBestMatch(CurrentCocktail, recipes);
-        DrinkBuilder.ApplyRecipeIdentity(CurrentCocktail, LastMatch);
+        DrinkBuilder.ApplyRecipeIdentity(CurrentCocktail, LastMatch, _unmatchedColor);
 
         IdentityResolved?.Invoke(LastMatch);
         return LastMatch;
@@ -164,7 +180,7 @@ public class ShakerContents : MonoBehaviour, IIngredientReceiver
         LastMatch = RecipeMatch.None;
 
         Cleared?.Invoke();
-        Changed?.Invoke();
+        RaiseChanged();
     }
 
     // ── Queries ────────────────────────────────────────────

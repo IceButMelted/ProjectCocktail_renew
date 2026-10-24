@@ -1,0 +1,12 @@
+# F6 trace, scene=New Drag Drop System
+S01_prepareDrinks | phase=Open step=AddIngredient mgType=None mgResult= mgPhase=Idle | shaker.parts=0 method=None | lock: bottle=True src=True shaker3D=True | methodPanel=off
+A_in22 | phase=Open step=Minigame mgType=Shaking mgResult= mgPhase=Play | shaker.parts=10 method=Shaking | lock: bottle=False src=False shaker3D=False | methodPanel=off
+A1_giveUp_pressed | phase=Open step=Minigame mgType=Shaking mgResult= mgPhase=Outro | shaker.parts=0 method=None | lock: bottle=True src=True shaker3D=True | methodPanel=off
+A2_giveUp_outroDone | phase=Open step=Minigame mgType=Shaking mgResult=Cancelled mgPhase=Idle | shaker.parts=0 method=None | lock: bottle=True src=True shaker3D=True | methodPanel=off
+A3_pourAgain_ingredientAdded | phase=Open step=Minigame mgType=Shaking mgResult=Cancelled mgPhase=Idle | shaker.parts=10 method=None | lock: bottle=False src=False shaker3D=False | methodPanel=on
+A4_anotherIngredient_command | phase=Open step=AddIngredient mgType=Shaking mgResult=Cancelled mgPhase=Idle | shaker.parts=10 method=None | lock: bottle=True src=True shaker3D=True | methodPanel=on
+B_in22 | phase=Open step=Minigame mgType=Shaking mgResult= mgPhase=Play | shaker.parts=10 method=Shaking | lock: bottle=False src=False shaker3D=False | methodPanel=off
+B1_cancelDirect_outroDone | phase=Open step=Minigame mgType=Shaking mgResult=Cancelled mgPhase=Idle | shaker.parts=10 method=Shaking | lock: bottle=False src=False shaker3D=True | methodPanel=off
+B2_ingredientAdded | phase=Open step=Minigame mgType=Shaking mgResult=Cancelled mgPhase=Idle | shaker.parts=10 method=Shaking | lock: bottle=False src=False shaker3D=True | methodPanel=off
+console: errors=0 warnings=3
+DONE

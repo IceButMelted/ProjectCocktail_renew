@@ -74,6 +74,11 @@ public class BookUI_V2 : MonoBehaviour
     [SerializeField] private string _openBookUISFX= "";
     [SerializeField] private string _closeBookUISFX = "";
 
+    [Header("Buttons (children of this panel)")]
+    [SerializeField] private Button _btnNext;
+    [SerializeField] private Button _btnPrevious;
+    [SerializeField] private Button _btnClose;
+
     [Header("Events")]
     public UnityEvent<int> OnSpreadChanged;
     public UnityEvent OnBookOpened;
@@ -97,9 +102,20 @@ public class BookUI_V2 : MonoBehaviour
 
     private void Awake()
     {
+        if (_btnNext != null) _btnNext.onClick.AddListener(NextSpread);
+        if (_btnPrevious != null) _btnPrevious.onClick.AddListener(PreviousSpread);
+        if (_btnClose != null) _btnClose.onClick.AddListener(Toggle);
+
         HideAllSpreads();
         gameObject.SetActive(false);
         IsOpen = false;
+    }
+
+    private void OnDestroy()
+    {
+        if (_btnNext != null) _btnNext.onClick.RemoveListener(NextSpread);
+        if (_btnPrevious != null) _btnPrevious.onClick.RemoveListener(PreviousSpread);
+        if (_btnClose != null) _btnClose.onClick.RemoveListener(Toggle);
     }
 
     // ── Public API — Book control ─────────────────────────────────────────────

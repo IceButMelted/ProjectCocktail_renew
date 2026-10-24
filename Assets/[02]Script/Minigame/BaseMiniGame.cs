@@ -163,7 +163,6 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
 
         // Anything that ends the run before Complete() counts as cancelled.
         _pendingOutcome = MinigameOutcome.Cancelled;
-        _context?.ResetCamera();
         SetPhase(MinigamePhase.Intro);
     }
 

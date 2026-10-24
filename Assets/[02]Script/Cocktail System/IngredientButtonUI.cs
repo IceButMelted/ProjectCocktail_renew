@@ -30,8 +30,15 @@ public class IngredientButtonUI : MonoBehaviour
     [SerializeField] private Liqueur _liqueur;
 
     [Header("Shaker")]
-    [Tooltip("Leave empty to find the one in the scene on first use.")]
+    [Tooltip("Bottles under IngredientButtonGroup are given this by CocktailSystemManager. " +
+             "Anything else may leave it empty and will find the scene's one on first use.")]
     [SerializeField] private ShakerContents _shaker;
+
+    /// <summary>Hands the button the shaker it pours into, so it never has to search for it.</summary>
+    public void Bind(ShakerContents shaker)
+    {
+        if (shaker != null) _shaker = shaker;
+    }
 
     [Header("Events")]
     [Tooltip("Fired only when the pour actually landed — not when the glass is already full (GDD §15, 10 units).")]

@@ -1,5 +1,11 @@
 # Bar410 — Hierarchical State Machine Implementation
 
+> **สถานะ ณ 2026-10-24** (ตรวจกับโค้ด/scene ปัจจุบัน) · ภาพรวมล่าสุดอยู่ที่ `Docs/Bar410_Status_Report_2026-10-24.html` และ `Docs/Bar410_Managers_Restructure_HANDOFF.md`
+>
+> - §8 "Nothing is wired" / leaf state เป็น stub: ปิดแล้ว (`FlowWiring` ต่อทุก step; comment TODO ใน leaf state ถูกแก้แล้ว)
+> - Open question 1: ตอบแล้ว (D11 ปิดร้านด้วยปุ่ม/hotkey) · Q4 `DrinkOrderContext`: ไม่ต้องทำ (ให้คะแนนครั้งเดียวตอน Serve → Talking, minigame แพ้ไม่ได้, ตกแต่งไม่นับคะแนน)
+> - ยังค้าง: Q3 กิจกรรมตอนปิดร้าน 3 อย่าง (`ClosingBarPhase` ยังเป็น TODO)
+
 **Date:** 2026-08-20
 **Branch:** `DialogueSystem/NewSystem/DragDropPlacement`
 **Source spec:** `Bar410_StateMachine_Spec.md` (Draft v1.0)

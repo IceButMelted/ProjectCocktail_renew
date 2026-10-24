@@ -1,0 +1,9 @@
+# placement drag simulation (PointerEventData driven, no real mouse)
+[CocktailSystem]/Base Spirits/BaseSpirit - Gin | interactable=True beingDrags=False
+  afterDrag  | beingDrags=True isDragging=True anyDragging=True moved=True
+  afterUp    | beingDrags=False isDragging=False anyDragging=False backHome=True
+[CocktailSystem]/Mixer/Mixer - Soda | interactable=True beingDrags=False
+  afterDrag  | beingDrags=True isDragging=True anyDragging=True moved=True
+  afterUp    | beingDrags=False isDragging=False anyDragging=False backHome=True
+hoverDetector | resolved without error, hovered shaker=null (mouse not over shaker)
+DONE

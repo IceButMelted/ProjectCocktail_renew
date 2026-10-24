@@ -2,7 +2,6 @@ using System;
 using Unity.Cinemachine;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using Yarn.Unity;
 
 /// <summary>
 /// Mouse-driven camera controller that smoothly transitions between different view angles
@@ -107,12 +106,8 @@ public class CameraController : MonoBehaviour
             if (isFixedCamera == value) return;
             isFixedCamera = value;
             if (isFixedCamera)
-                ResetCamera();
+                ResetView();
         }
-    }
-    [YarnCommand("Fix_Camera")]
-    public void SetFixedCamera(bool value) { 
-        IsFixedCamera = value;
     }
 
     #endregion
@@ -308,11 +303,6 @@ public class CameraController : MonoBehaviour
         targetPosition = direction == ViewDirection.Down ? downPosition : initialPosition;
     }
 
-    private void ResetCamera() { 
-        currentDirection = ViewDirection.Forward;
-        StartRotation(ViewDirection.Forward);
-        StartMovement(ViewDirection.Forward);
-    }
     #endregion
 
     #region Transition Updates
@@ -351,8 +341,9 @@ public class CameraController : MonoBehaviour
         }
     }
 
-    [YarnCommand("Reset_Camera")]
-    public void ResetRotaionAndMovement() { 
+    /// <summary>Snaps the view back to forward (and back to its starting position).</summary>
+    public void ResetView()
+    {
         currentDirection = ViewDirection.Forward;
         StartRotation(ViewDirection.Forward);
         StartMovement(ViewDirection.Forward);

@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using static E_Cocktail;
@@ -18,10 +19,6 @@ public partial class CocktailSystemManager : MonoBehaviour
     [Tooltip("Optional. Story/unlock cocktails. Searchable by name, but never randomly ordered.")]
     [SerializeField] private SO_CocktailList _specialCocktailRepository;
 
-    [Header("Customer Preferences")]
-    [Tooltip("Preferred source (GDD §19.1). Falls back to the CharacterData component when empty.")]
-    [SerializeField] private SO_CustomerRoster _customerRoster;
-
     [Header("Cocktail References")]
     [Tooltip("The drink in the glass. Preferred — assign this once the scene has been migrated.")]
     [SerializeField] private ShakerContents _shakerContents;
@@ -37,10 +34,10 @@ public partial class CocktailSystemManager : MonoBehaviour
     /// <summary>Ingredient buttons.</summary>
     private IngredientButtonGroup IngredientButtons => _ingredientButtons;
 
-    // ── Character data ─────────────────────────────────────
-    // Declared here, next to the Awake() that fills it. Read from the Yarn partial, but a
-    // field written in one file and declared in another traps the next reader.
-    private CharacterData _characterData;
+    // ── Customer preferences ───────────────────────────────
+    // Who likes what belongs to the customers (TalkToCustomerManager); this manager is handed it
+    // through UsePreferences and only passes it on to the order service.
+    private ICustomerPreferences _preferences;
 
     // ── Repositories (as interfaces) ───────────────────────
 
@@ -63,12 +60,21 @@ public partial class CocktailSystemManager : MonoBehaviour
     public OrderService Orders { get; private set; }
     public DrinkScoringService Scoring { get; private set; }
 
+    /// <summary>
+    /// Raised once per order, right after it has been scored (synchronously, inside
+    /// <see cref="ServeDrink"/>). Whoever keeps the dialogue's variables writes the result there.
+    /// <c>wait_for_task</c> waits on <see cref="DrinkOrderContext.IsScored"/>, so a subscriber has
+    /// finished before the dialogue resumes.
+    /// </summary>
+    public event Action<DrinkOrderContext> OrderScored;
+
+    /// <summary>Raised when <c>Reset_Variable</c> starts a new customer loop (the order is already cleared).</summary>
+    public event Action OrderCleared;
+
     // Unity Lifecycle
 
     private void Awake()
     {
-        _characterData = GetComponent<CharacterData>();
-
         // Composite skips null sources: unassigned special list is harmless, unassigned
         // normal list reports itself instead of throwing later (bug B11).
         _lookup = new CompositeDrinkRepository(_normalCocktailRepository, _specialCocktailRepository);
@@ -78,20 +84,28 @@ public partial class CocktailSystemManager : MonoBehaviour
         if (_allDrinks == null || _allDrinks.Count == 0)
             Debug.LogError("[CocktailSystemManager] No cocktail recipes loaded — assign a Cocktail Repository.", this);
 
-        ICustomerPreferences preferences = _customerRoster != null
-            ? (ICustomerPreferences)_customerRoster
-            : _characterData;
-
-        if (preferences == null)
-            Debug.LogError("[CocktailSystemManager] No customer preferences — assign a Customer Roster " +
-                           "or add a CharacterData component.", this);
-
-        Orders = new OrderService(_lookup, _randomPool, preferences);
+        Orders = new OrderService(_lookup, _randomPool, _preferences);
         Scoring = new DrinkScoringService(_lookup);
+
+        // The bottles pour into the shaker this manager owns; hand it over once here instead of
+        // letting each bottle search the scene on its first pour.
+        if (_ingredientButtons != null) _ingredientButtons.BindShaker(_shakerContents);
     }
 
     /// <summary>
-    /// Button hook. Serves the drink to the customer and updates the Yarn result variable.
+    /// Hands over whoever knows the customers' favourite drinks. Safe to call before or after
+    /// Awake; the order service is rebuilt with it.
+    /// </summary>
+    public void UsePreferences(ICustomerPreferences preferences)
+    {
+        _preferences = preferences;
+        if (_lookup != null) Orders = new OrderService(_lookup, _randomPool, _preferences);
+    }
+
+    /// <summary>
+    /// Scores the drink and publishes the result (<see cref="OrderScored"/>). Idempotent: an order is committed
+    /// once, so a second call (a double press, a Yarn command after the button) does nothing
+    /// instead of applying the relationship change again.
     /// </summary>
     public void ServeDrink()
     {
@@ -100,6 +114,8 @@ public partial class CocktailSystemManager : MonoBehaviour
             Debug.LogWarning("[CocktailSystemManager] ServeDrink called with no order in progress.");
             return;
         }
+
+        if (Order.IsScored) return;
 
         UpdateVariableInYarnTrigger();
     }

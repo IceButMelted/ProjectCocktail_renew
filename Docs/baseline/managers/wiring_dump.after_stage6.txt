@@ -1,0 +1,877 @@
+# wiring dump of [GameLoop] in scene 'New Drag Drop System' (after_stage6)
+TOTAL comps=891 monos=389 sceneRefs=207 sameChildRefs=167 crossChildRefs=40 outsidePrefabRefs=1 eventCalls=19 missingScripts=0
+-- top-level children of [GameLoop] (name, active, monobehaviours) --
+[CocktailSystem] active=True monos=151
+[MiniGameSystem] active=True monos=49
+[PlacmentSystem] active=True monos=2
+[GarnishSystem] active=True monos=94
+Canvas active=True monos=63
+CamController active=True monos=22
+<root> monos=8
+-- cross-child refs (source -> target) --
+<root> -> [CocktailSystem] x16
+<root> -> Canvas x12
+<root> -> CamController x4
+[CocktailSystem] -> Canvas x3
+<root> -> [GarnishSystem] x2
+<root> -> [MiniGameSystem] x1
+[CocktailSystem] -> OUTSIDE x1
+[PlacmentSystem] -> CamController x1
+-- monobehaviour counts by type --
+Image x104
+Button x40
+TextMeshProUGUI x28
+ScaleOnHover x17
+Interactable_2_5DObject x17
+IngredientButtonUI x17
+UIPointerSound x17
+HoverTooltip x17
+DragableObject x12
+BottleIngredientSource x11
+CinemachineCamera x10
+CameraEntry x10
+DragableFruitTraySlot x6
+Slider x6
+CanvasScaler x5
+GraphicRaycaster x5
+ContentSizeFitter x3
+VerticalLayoutGroup x3
+UniversalAdditionalCameraData x3
+SpriteSkin x3
+HorizontalLayoutGroup x3
+UIOnPosition3D x2
+AnimationMinigameController x2
+MinigamePanelAnimator x2
+RawImage x2
+SceneLoader x2
+GameLoopFSM x1
+GameFlowCommands x1
+CocktailFlowBridge x1
+MinigameFlowBridge x1
+GarnishFlowBridge x1
+TalkingWithCustomerBridge x1
+ServeFlowBridge x1
+UIFlowBridge x1
+CocktailSystemManager x1
+IngredientButtonGroup x1
+CocktailInspectorReadout x1
+ShakerContents x1
+ShakerPanelController x1
+ShakerTooltip x1
+Interactable_3DObject x1
+VisualizeCocktail x1
+Post_It_Order x1
+ToggleActive x1
+MethodPanel x1
+MinigameSystemManager x1
+ShakingMinigame x1
+MixingMinigame x1
+IKManager2D x1
+LimbSolver2D x1
+N_InputManager x1
+N_PlacementSystem x1
+GarnishManager x1
+UIOnPosition3DMulti x1
+GlassChoiceGrid x1
+RectMask2D x1
+GarnishItemChoiceGrid x1
+GarnishRimChoiceGrid x1
+GlassPlacementZone x1
+BookUI_V2 x1
+PanelTransition x1
+AnimationEvent x1
+PH_Thx x1
+CinimachineCameraSwitcher x1
+CameraController x1
+PhysicsRaycaster x1
+CinemachineBrain x1
+DebugPhysicsRaycaster x1
+-- outside targets --
+OUTSIDE:Text Animator Dialogue System/.../Text Animator Dialogue System(DialogueRunner) x1
+
+-- per object --
+[GameLoop]  (monos=8)
+   [GameLoopFSM] refs=0
+   [GameFlowCommands] refs=1
+      _gameLoop => [GameLoop](GameLoopFSM)
+   [CocktailFlowBridge] refs=13
+      _gameLoop => [GameLoop](GameLoopFSM)
+      _commands => [GameLoop](GameFlowCommands)
+      _cocktail => [GameLoop]/[CocktailSystem](CocktailSystemManager)
+      _shakerContents => [GameLoop]/[CocktailSystem]/CocktailShaker(ShakerContents)
+      _shakerPanels => [GameLoop]/[CocktailSystem]/CocktailShaker(ShakerPanelController)
+      _ingredients => [GameLoop]/[CocktailSystem](IngredientButtonGroup)
+      _visualCocktail => [GameLoop]/[CocktailSystem]/CocktailShaker/Canvas - World Space/PanelWS - VisurlCocktail(VisualizeCocktail)
+      _camera => [GameLoop]/CamController(CameraController)
+      _cameraSwitcher => [GameLoop]/CamController(CinimachineCameraSwitcher)
+      _bookUI => [GameLoop]/Canvas/Panel - BookUI(BookUI_V2)
+      _postIt => [GameLoop]/[CocktailSystem]/Canvas_Cocktail/Panel - OrderDirnks(Post_It_Order)
+      _btnBook => [GameLoop]/Canvas/Panel - Hub/BTN - Open_CloseBook(Button)
+      _methodPanel => [GameLoop]/[CocktailSystem]/Canvas_Cocktail/Panel - Method(MethodPanel)
+   [MinigameFlowBridge] refs=4
+      _gameLoop => [GameLoop](GameLoopFSM)
+      _commands => [GameLoop](GameFlowCommands)
+      _minigames => [GameLoop]/[MiniGameSystem](MinigameSystemManager)
+      _shakerContents => [GameLoop]/[CocktailSystem]/CocktailShaker(ShakerContents)
+   [GarnishFlowBridge] refs=7
+      _gameLoop => [GameLoop](GameLoopFSM)
+      _commands => [GameLoop](GameFlowCommands)
+      _garnish => [GameLoop]/[GarnishSystem](GarnishManager)
+      _cocktail => [GameLoop]/[CocktailSystem](CocktailSystemManager)
+      _shakerContents => [GameLoop]/[CocktailSystem]/CocktailShaker(ShakerContents)
+      _ingredients => [GameLoop]/[CocktailSystem](IngredientButtonGroup)
+      _cameraSwitcher => [GameLoop]/CamController(CinimachineCameraSwitcher)
+   [TalkingWithCustomerBridge] refs=3
+      _ingredients => [GameLoop]/[CocktailSystem](IngredientButtonGroup)
+      _camera => [GameLoop]/CamController(CameraController)
+      _bookUI => [GameLoop]/Canvas/Panel - BookUI(BookUI_V2)
+   [ServeFlowBridge] refs=3
+      _garnish => [GameLoop]/[GarnishSystem](GarnishManager)
+      _cocktail => [GameLoop]/[CocktailSystem](CocktailSystemManager)
+      _postIt => [GameLoop]/[CocktailSystem]/Canvas_Cocktail/Panel - OrderDirnks(Post_It_Order)
+   [UIFlowBridge] refs=11
+      _bookUI => [GameLoop]/Canvas/Panel - BookUI(BookUI_V2)
+      _btnOpenBook => [GameLoop]/Canvas/Panel - Hub/BTN - Open_CloseBook(Button)
+      _btnBookNext => [GameLoop]/Canvas/Panel - BookUI/Book_Cover/BTN_NextPage(Button)
+      _btnBookPrevious => [GameLoop]/Canvas/Panel - BookUI/Book_Cover/BTN_PreviousPage(Button)
+      _btnBookClose => [GameLoop]/Canvas/Panel - BookUI/Book_Cover/BTN_Close(Button)
+      _postIt => [GameLoop]/[CocktailSystem]/Canvas_Cocktail/Panel - OrderDirnks(Post_It_Order)
+      _btnTogglePostIt => [GameLoop]/[CocktailSystem]/Canvas_Cocktail/Panel - OrderDirnks/Button(Button)
+      _btnEndShift => [GameLoop]/Canvas/EndShiftButton(Button)
+      _endShiftLoader => [GameLoop]/Canvas/EndShiftButton(SceneLoader)
+      _btnThanks => [GameLoop]/Canvas/Panel_Thx/Image/Button(Button)
+      _thanksLoader => [GameLoop]/Canvas/Panel_Thx(SceneLoader)
+[GameLoop]/[CocktailSystem]  (monos=3)
+   [CocktailSystemManager] refs=5
+      _shakerContents => [GameLoop]/[CocktailSystem]/CocktailShaker(ShakerContents)
+      _ingredientButtons => [GameLoop]/[CocktailSystem](IngredientButtonGroup)
+      _endShiftBTN => [GameLoop]/Canvas/EndShiftButton(Button)
+      _dialogueRunner => OUTSIDE:Text Animator Dialogue System/.../Text Animator Dialogue System(DialogueRunner)
+      _postItOrder => [GameLoop]/[CocktailSystem]/Canvas_Cocktail/Panel - OrderDirnks(Post_It_Order)
+   [IngredientButtonGroup] refs=2
+      _members.Array.data[0] => [GameLoop]/[CocktailSystem]/CocktailShaker(GameObject)
+      _members.Array.data[1] => [GameLoop]/Canvas/Panel - Hub/BTN - Open_CloseBook(GameObject)
+   [CocktailInspectorReadout] refs=2
+      _cocktail => [GameLoop]/[CocktailSystem](CocktailSystemManager)
+      _shakerContents => [GameLoop]/[CocktailSystem]/CocktailShaker(ShakerContents)
+[GameLoop]/[CocktailSystem]/CocktailShaker  (monos=5)
+   [DragableObject] refs=0
+   [ShakerContents] refs=0
+   [ShakerPanelController] refs=2
+      _methodUI => [GameLoop]/[CocktailSystem]/Canvas_Cocktail/Panel - Method(GameObject)
+      _shakerContents => [GameLoop]/[CocktailSystem]/CocktailShaker(ShakerContents)
+   [ShakerTooltip] refs=0
+   [Interactable_3DObject] refs=1
+      EVENT[OnClicked]->ToggleUI => [GameLoop]/[CocktailSystem]/CocktailShaker(ShakerPanelController)
+[GameLoop]/[CocktailSystem]/CocktailShaker/ResultCameraPoint/PrepareCam  (monos=2)
+   [CinemachineCamera] refs=1
+      Target.LookAtTarget => [GameLoop]/[CocktailSystem]/CocktailShaker/ResultCameraPoint(Transform)
+   [CameraEntry] refs=0
+[GameLoop]/[CocktailSystem]/CocktailShaker/Canvas - World Space  (monos=2)
+   [CanvasScaler] refs=0
+   [GraphicRaycaster] refs=0
+[GameLoop]/[CocktailSystem]/CocktailShaker/Canvas - World Space/PanelWS - VisurlCocktail  (monos=4)
+   [Image] refs=0
+   [ContentSizeFitter] refs=0
+   [UIOnPosition3D] refs=1
+      _target => [GameLoop]/[CocktailSystem]/CocktailShaker(Transform)
+   [VisualizeCocktail] refs=3
+      alcoholFill => [GameLoop]/[CocktailSystem]/CocktailShaker/Canvas - World Space/PanelWS - VisurlCocktail/Alchohol(Image)
+      mixerFill => [GameLoop]/[CocktailSystem]/CocktailShaker/Canvas - World Space/PanelWS - VisurlCocktail/Mixer(Image)
+      _shaker => [GameLoop]/[CocktailSystem]/CocktailShaker(ShakerContents)
+[GameLoop]/[CocktailSystem]/CocktailShaker/Canvas - World Space/PanelWS - VisurlCocktail/Mixer  (monos=1)
+   [Image] refs=0
+[GameLoop]/[CocktailSystem]/CocktailShaker/Canvas - World Space/PanelWS - VisurlCocktail/Alchohol  (monos=1)
+   [Image] refs=0
+[GameLoop]/[CocktailSystem]/CocktailShaker/Canvas - World Space/PanelWS - VisurlCocktail/Progress_Bar  (monos=1)
+   [Image] refs=0
+[GameLoop]/[CocktailSystem]/Mixer/Mixer - Soda  (monos=7)
+   [DragableObject] refs=0
+   [ScaleOnHover] refs=1
+      scaleTarget => [GameLoop]/[CocktailSystem]/Mixer/Mixer - Soda/Sprite(GameObject)
+   [Interactable_2_5DObject] refs=2
+      _spriteRenderer => [GameLoop]/[CocktailSystem]/Mixer/Mixer - Soda/Sprite(SpriteRenderer)
+      EVENT[OnClicked]->Invoke => [GameLoop]/[CocktailSystem]/Mixer/Mixer - Soda(IngredientButtonUI)
+   [IngredientButtonUI] refs=0
+   [UIPointerSound] refs=0
+   [HoverTooltip] refs=0
+   [BottleIngredientSource] refs=0
+[GameLoop]/[CocktailSystem]/Mixer/Mixer - Syrup  (monos=7)
+   [DragableObject] refs=0
+   [ScaleOnHover] refs=1
+      scaleTarget => [GameLoop]/[CocktailSystem]/Mixer/Mixer - Syrup/Sprite(GameObject)
+   [Interactable_2_5DObject] refs=2
+      _spriteRenderer => [GameLoop]/[CocktailSystem]/Mixer/Mixer - Syrup/Sprite(SpriteRenderer)
+      EVENT[OnClicked]->Invoke => [GameLoop]/[CocktailSystem]/Mixer/Mixer - Syrup(IngredientButtonUI)
+   [IngredientButtonUI] refs=0
+   [UIPointerSound] refs=0
+   [HoverTooltip] refs=0
+   [BottleIngredientSource] refs=0
+[GameLoop]/[CocktailSystem]/Mixer/Mixer - Lemon  (monos=6)
+   [ScaleOnHover] refs=1
+      scaleTarget => [GameLoop]/[CocktailSystem]/Mixer/Mixer - Lemon/Sprite(GameObject)
+   [Interactable_2_5DObject] refs=2
+      _spriteRenderer => [GameLoop]/[CocktailSystem]/Mixer/Mixer - Lemon/Sprite(SpriteRenderer)
+      EVENT[OnClicked]->Invoke => [GameLoop]/[CocktailSystem]/Mixer/Mixer - Lemon(IngredientButtonUI)
+   [IngredientButtonUI] refs=0
+   [UIPointerSound] refs=0
+   [HoverTooltip] refs=0
+   [DragableFruitTraySlot] refs=0
+[GameLoop]/[CocktailSystem]/Mixer/Mixer - Cranberry  (monos=6)
+   [ScaleOnHover] refs=1
+      scaleTarget => [GameLoop]/[CocktailSystem]/Mixer/Mixer - Cranberry/Sprite(GameObject)
+   [Interactable_2_5DObject] refs=2
+      _spriteRenderer => [GameLoop]/[CocktailSystem]/Mixer/Mixer - Cranberry/Sprite(SpriteRenderer)
+      EVENT[OnClicked]->Invoke => [GameLoop]/[CocktailSystem]/Mixer/Mixer - Cranberry(IngredientButtonUI)
+   [IngredientButtonUI] refs=0
+   [UIPointerSound] refs=0
+   [HoverTooltip] refs=0
+   [DragableFruitTraySlot] refs=0
+[GameLoop]/[CocktailSystem]/Mixer/Mixer - Grapfruit  (monos=6)
+   [ScaleOnHover] refs=1
+      scaleTarget => [GameLoop]/[CocktailSystem]/Mixer/Mixer - Grapfruit/Sprite(GameObject)
+   [Interactable_2_5DObject] refs=2
+      _spriteRenderer => [GameLoop]/[CocktailSystem]/Mixer/Mixer - Grapfruit/Sprite(SpriteRenderer)
+      EVENT[OnClicked]->Invoke => [GameLoop]/[CocktailSystem]/Mixer/Mixer - Grapfruit(IngredientButtonUI)
+   [IngredientButtonUI] refs=0
+   [UIPointerSound] refs=0
+   [HoverTooltip] refs=0
+   [DragableFruitTraySlot] refs=0
+[GameLoop]/[CocktailSystem]/Mixer/Mixer - Lime  (monos=6)
+   [ScaleOnHover] refs=1
+      scaleTarget => [GameLoop]/[CocktailSystem]/Mixer/Mixer - Lime/Sprite(GameObject)
+   [Interactable_2_5DObject] refs=2
+      _spriteRenderer => [GameLoop]/[CocktailSystem]/Mixer/Mixer - Lime/Sprite(SpriteRenderer)
+      EVENT[OnClicked]->Invoke => [GameLoop]/[CocktailSystem]/Mixer/Mixer - Lime(IngredientButtonUI)
+   [IngredientButtonUI] refs=0
+   [UIPointerSound] refs=0
+   [HoverTooltip] refs=0
+   [DragableFruitTraySlot] refs=0
+[GameLoop]/[CocktailSystem]/Mixer/Mixer - Orange  (monos=6)
+   [ScaleOnHover] refs=1
+      scaleTarget => [GameLoop]/[CocktailSystem]/Mixer/Mixer - Orange/Sprite(GameObject)
+   [Interactable_2_5DObject] refs=2
+      _spriteRenderer => [GameLoop]/[CocktailSystem]/Mixer/Mixer - Orange/Sprite(SpriteRenderer)
+      EVENT[OnClicked]->Invoke => [GameLoop]/[CocktailSystem]/Mixer/Mixer - Orange(IngredientButtonUI)
+   [IngredientButtonUI] refs=0
+   [UIPointerSound] refs=0
+   [HoverTooltip] refs=0
+   [DragableFruitTraySlot] refs=0
+[GameLoop]/[CocktailSystem]/Mixer/Mixer - Pappermint  (monos=6)
+   [ScaleOnHover] refs=1
+      scaleTarget => [GameLoop]/[CocktailSystem]/Mixer/Mixer - Pappermint/Sprite(GameObject)
+   [Interactable_2_5DObject] refs=2
+      _spriteRenderer => [GameLoop]/[CocktailSystem]/Mixer/Mixer - Pappermint/Sprite(SpriteRenderer)
+      EVENT[OnClicked]->Invoke => [GameLoop]/[CocktailSystem]/Mixer/Mixer - Pappermint(IngredientButtonUI)
+   [IngredientButtonUI] refs=0
+   [UIPointerSound] refs=0
+   [HoverTooltip] refs=0
+   [DragableFruitTraySlot] refs=0
+[GameLoop]/[CocktailSystem]/Liqueurs/Liqueurs - Dry Vermouth  (monos=7)
+   [DragableObject] refs=0
+   [ScaleOnHover] refs=1
+      scaleTarget => [GameLoop]/[CocktailSystem]/Liqueurs/Liqueurs - Dry Vermouth/Sprite(GameObject)
+   [Interactable_2_5DObject] refs=2
+      _spriteRenderer => [GameLoop]/[CocktailSystem]/Liqueurs/Liqueurs - Dry Vermouth/Sprite(SpriteRenderer)
+      EVENT[OnClicked]->Invoke => [GameLoop]/[CocktailSystem]/Liqueurs/Liqueurs - Dry Vermouth(IngredientButtonUI)
+   [IngredientButtonUI] refs=0
+   [UIPointerSound] refs=0
+   [HoverTooltip] refs=0
+   [BottleIngredientSource] refs=0
+[GameLoop]/[CocktailSystem]/Liqueurs/Liqueurs - Triplesec  (monos=7)
+   [DragableObject] refs=0
+   [ScaleOnHover] refs=1
+      scaleTarget => [GameLoop]/[CocktailSystem]/Liqueurs/Liqueurs - Triplesec/Sprite(GameObject)
+   [Interactable_2_5DObject] refs=2
+      _spriteRenderer => [GameLoop]/[CocktailSystem]/Liqueurs/Liqueurs - Triplesec/Sprite(SpriteRenderer)
+      EVENT[OnClicked]->Invoke => [GameLoop]/[CocktailSystem]/Liqueurs/Liqueurs - Triplesec(IngredientButtonUI)
+   [IngredientButtonUI] refs=0
+   [UIPointerSound] refs=0
+   [HoverTooltip] refs=0
+   [BottleIngredientSource] refs=0
+[GameLoop]/[CocktailSystem]/Liqueurs/Liqueurs - Sweet Vermouth  (monos=7)
+   [DragableObject] refs=0
+   [ScaleOnHover] refs=1
+      scaleTarget => [GameLoop]/[CocktailSystem]/Liqueurs/Liqueurs - Sweet Vermouth/Sprite(GameObject)
+   [Interactable_2_5DObject] refs=2
+      _spriteRenderer => [GameLoop]/[CocktailSystem]/Liqueurs/Liqueurs - Sweet Vermouth/Sprite(SpriteRenderer)
+      EVENT[OnClicked]->Invoke => [GameLoop]/[CocktailSystem]/Liqueurs/Liqueurs - Sweet Vermouth(IngredientButtonUI)
+   [IngredientButtonUI] refs=0
+   [UIPointerSound] refs=0
+   [HoverTooltip] refs=0
+   [BottleIngredientSource] refs=0
+[GameLoop]/[CocktailSystem]/Liqueurs/Liqueurs - Campari  (monos=7)
+   [DragableObject] refs=0
+   [ScaleOnHover] refs=1
+      scaleTarget => [GameLoop]/[CocktailSystem]/Liqueurs/Liqueurs - Campari/Sprite(GameObject)
+   [Interactable_2_5DObject] refs=2
+      _spriteRenderer => [GameLoop]/[CocktailSystem]/Liqueurs/Liqueurs - Campari/Sprite(SpriteRenderer)
+      EVENT[OnClicked]->Invoke => [GameLoop]/[CocktailSystem]/Liqueurs/Liqueurs - Campari(IngredientButtonUI)
+   [IngredientButtonUI] refs=0
+   [UIPointerSound] refs=0
+   [HoverTooltip] refs=0
+   [BottleIngredientSource] refs=0
+[GameLoop]/[CocktailSystem]/Base Spirits/BaseSpirit - Wishkey  (monos=7)
+   [DragableObject] refs=0
+   [ScaleOnHover] refs=1
+      scaleTarget => [GameLoop]/[CocktailSystem]/Base Spirits/BaseSpirit - Wishkey/Sprite(GameObject)
+   [Interactable_2_5DObject] refs=2
+      _spriteRenderer => [GameLoop]/[CocktailSystem]/Base Spirits/BaseSpirit - Wishkey/Sprite(SpriteRenderer)
+      EVENT[OnClicked]->Invoke => [GameLoop]/[CocktailSystem]/Base Spirits/BaseSpirit - Wishkey(IngredientButtonUI)
+   [IngredientButtonUI] refs=0
+   [UIPointerSound] refs=0
+   [HoverTooltip] refs=0
+   [BottleIngredientSource] refs=0
+[GameLoop]/[CocktailSystem]/Base Spirits/BaseSpirit - Rum  (monos=7)
+   [DragableObject] refs=0
+   [ScaleOnHover] refs=1
+      scaleTarget => [GameLoop]/[CocktailSystem]/Base Spirits/BaseSpirit - Rum/Sprite(GameObject)
+   [Interactable_2_5DObject] refs=2
+      _spriteRenderer => [GameLoop]/[CocktailSystem]/Base Spirits/BaseSpirit - Rum/Sprite(SpriteRenderer)
+      EVENT[OnClicked]->Invoke => [GameLoop]/[CocktailSystem]/Base Spirits/BaseSpirit - Rum(IngredientButtonUI)
+   [IngredientButtonUI] refs=0
+   [UIPointerSound] refs=0
+   [HoverTooltip] refs=0
+   [BottleIngredientSource] refs=0
+[GameLoop]/[CocktailSystem]/Base Spirits/BaseSpirit - Vodka  (monos=7)
+   [DragableObject] refs=0
+   [ScaleOnHover] refs=1
+      scaleTarget => [GameLoop]/[CocktailSystem]/Base Spirits/BaseSpirit - Vodka/Sprite(GameObject)
+   [Interactable_2_5DObject] refs=2
+      _spriteRenderer => [GameLoop]/[CocktailSystem]/Base Spirits/BaseSpirit - Vodka/Sprite(SpriteRenderer)
+      EVENT[OnClicked]->Invoke => [GameLoop]/[CocktailSystem]/Base Spirits/BaseSpirit - Vodka(IngredientButtonUI)
+   [IngredientButtonUI] refs=1
+      _shaker => [GameLoop]/[CocktailSystem]/CocktailShaker(ShakerContents)
+   [UIPointerSound] refs=0
+   [HoverTooltip] refs=1
+      _sharedCanvas => [GameLoop]/Canvas(Canvas)
+   [BottleIngredientSource] refs=0
+[GameLoop]/[CocktailSystem]/Base Spirits/BaseSpirit - Tequila  (monos=7)
+   [DragableObject] refs=0
+   [ScaleOnHover] refs=1
+      scaleTarget => [GameLoop]/[CocktailSystem]/Base Spirits/BaseSpirit - Tequila/Sprite(GameObject)
+   [Interactable_2_5DObject] refs=2
+      _spriteRenderer => [GameLoop]/[CocktailSystem]/Base Spirits/BaseSpirit - Tequila/Sprite(SpriteRenderer)
+      EVENT[OnClicked]->Invoke => [GameLoop]/[CocktailSystem]/Base Spirits/BaseSpirit - Tequila(IngredientButtonUI)
+   [IngredientButtonUI] refs=0
+   [UIPointerSound] refs=0
+   [HoverTooltip] refs=0
+   [BottleIngredientSource] refs=0
+[GameLoop]/[CocktailSystem]/Base Spirits/BaseSpirit - Gin  (monos=7)
+   [DragableObject] refs=0
+   [ScaleOnHover] refs=1
+      scaleTarget => [GameLoop]/[CocktailSystem]/Base Spirits/BaseSpirit - Gin/Sprite(GameObject)
+   [Interactable_2_5DObject] refs=2
+      _spriteRenderer => [GameLoop]/[CocktailSystem]/Base Spirits/BaseSpirit - Gin/Sprite(SpriteRenderer)
+      EVENT[OnClicked]->Invoke => [GameLoop]/[CocktailSystem]/Base Spirits/BaseSpirit - Gin(IngredientButtonUI)
+   [IngredientButtonUI] refs=0
+   [UIPointerSound] refs=0
+   [HoverTooltip] refs=0
+   [BottleIngredientSource] refs=0
+[GameLoop]/[CocktailSystem]/Canvas_Cocktail  (monos=2)
+   [CanvasScaler] refs=0
+   [GraphicRaycaster] refs=0
+[GameLoop]/[CocktailSystem]/Canvas_Cocktail/Panel - OrderDirnks  (monos=2)
+   [Image] refs=0
+   [Post_It_Order] refs=2
+      OrderText => [GameLoop]/[CocktailSystem]/Canvas_Cocktail/Panel - OrderDirnks/Button/Postit-Text (TMP)(TextMeshProUGUI)
+      animator => [GameLoop]/[CocktailSystem]/Canvas_Cocktail/Panel - OrderDirnks(Animator)
+[GameLoop]/[CocktailSystem]/Canvas_Cocktail/Panel - OrderDirnks/Button  (monos=2)
+   [Image] refs=0
+   [Button] refs=0
+[GameLoop]/[CocktailSystem]/Canvas_Cocktail/Panel - OrderDirnks/Button/Postit-Text (TMP)  (monos=1)
+   [TextMeshProUGUI] refs=0
+[GameLoop]/[CocktailSystem]/Canvas_Cocktail/Panel - Method  (monos=6)
+   [Image] refs=0
+   [UIOnPosition3D] refs=1
+      _target => [GameLoop]/[CocktailSystem]/CocktailShaker(Transform)
+   [VerticalLayoutGroup] refs=0
+   [ContentSizeFitter] refs=0
+   [ToggleActive] refs=0
+   [MethodPanel] refs=3
+      _btnShaking => [GameLoop]/[CocktailSystem]/Canvas_Cocktail/Panel - Method/BTN_Shaking(Button)
+      _btnMixing => [GameLoop]/[CocktailSystem]/Canvas_Cocktail/Panel - Method/BTN_Mixing(Button)
+      _btnReset => [GameLoop]/[CocktailSystem]/Canvas_Cocktail/Panel - Method/BTN_Reset(Button)
+[GameLoop]/[CocktailSystem]/Canvas_Cocktail/Panel - Method/BTN_Shaking  (monos=2)
+   [Image] refs=0
+   [Button] refs=0
+[GameLoop]/[CocktailSystem]/Canvas_Cocktail/Panel - Method/BTN_Mixing  (monos=2)
+   [Image] refs=0
+   [Button] refs=0
+[GameLoop]/[CocktailSystem]/Canvas_Cocktail/Panel - Method/BTN_Reset  (monos=2)
+   [Image] refs=0
+   [Button] refs=0
+[GameLoop]/[MiniGameSystem]  (monos=3)
+   [MinigameSystemManager] refs=2
+      _btnBack.Array.data[0] => [GameLoop]/[MiniGameSystem]/Canvas_MiniGame/Canvas_ShakingMinigame/BTN - Cancel Minigame(Button)
+      _btnBack.Array.data[1] => [GameLoop]/[MiniGameSystem]/Canvas_MiniGame/Canvas_MixingMinigame/BTN - Cancel Minigame(Button)
+   [ShakingMinigame] refs=5
+      _panels => [GameLoop]/[MiniGameSystem]/Canvas_MiniGame/Canvas_ShakingMinigame(MinigamePanelAnimator)
+      amc => [GameLoop]/[MiniGameSystem]/ShakingAnimationRenderer/Minigame_Shake_Rigging(AnimationMinigameController)
+      _gaugeSlider => [GameLoop]/[MiniGameSystem]/Canvas_MiniGame/Canvas_ShakingMinigame/Bar/GuageSlider(Slider)
+      _progressSlider => [GameLoop]/[MiniGameSystem]/Canvas_MiniGame/Canvas_ShakingMinigame/Bar/ProgressBar(Slider)
+      _targetZoneSlider => [GameLoop]/[MiniGameSystem]/Canvas_MiniGame/Canvas_ShakingMinigame/Bar/Target(Slider)
+   [MixingMinigame] refs=5
+      _panels => [GameLoop]/[MiniGameSystem]/Canvas_MiniGame/Canvas_MixingMinigame(MinigamePanelAnimator)
+      amc => [GameLoop]/[MiniGameSystem]/StirringRenderTexture/Minigame_Stirring(AnimationMinigameController)
+      _needleSlider => [GameLoop]/[MiniGameSystem]/Canvas_MiniGame/Canvas_MixingMinigame/Bar/GuageSlider(Slider)
+      _hitsProgressSlider => [GameLoop]/[MiniGameSystem]/Canvas_MiniGame/Canvas_MixingMinigame/Bar/ProgressBar(Slider)
+      _targetZoneSlider => [GameLoop]/[MiniGameSystem]/Canvas_MiniGame/Canvas_MixingMinigame/Bar/Target(Slider)
+[GameLoop]/[MiniGameSystem]/StirringRenderTexture/Minigame_Stirring_Cam  (monos=1)
+   [UniversalAdditionalCameraData] refs=0
+[GameLoop]/[MiniGameSystem]/StirringRenderTexture/Minigame_Stirring  (monos=1)
+   [AnimationMinigameController] refs=0
+[GameLoop]/[MiniGameSystem]/ShakingAnimationRenderer/Minigame_Shake_Rigging  (monos=2)
+   [IKManager2D] refs=1
+      m_Solvers.Array.data[0] => [GameLoop]/[MiniGameSystem]/ShakingAnimationRenderer/Minigame_Shake_Rigging/Arm_Resolver(LimbSolver2D)
+   [AnimationMinigameController] refs=0
+[GameLoop]/[MiniGameSystem]/ShakingAnimationRenderer/Minigame_Shake_Rigging/Minigame_Shake_Hand_1.png  (monos=1)
+   [SpriteSkin] refs=2
+      m_RootBone => [GameLoop]/[MiniGameSystem]/ShakingAnimationRenderer/Minigame_Shake_Rigging(Transform)
+      m_BoneTransforms.Array.data[0] => [GameLoop]/[MiniGameSystem]/ShakingAnimationRenderer/Minigame_Shake_Rigging/UpperArm/LowerArm/LeftHand_N_Shaker(Transform)
+[GameLoop]/[MiniGameSystem]/ShakingAnimationRenderer/Minigame_Shake_Rigging/Minigame_Shake_Hand_2.png  (monos=1)
+   [SpriteSkin] refs=4
+      m_RootBone => [GameLoop]/[MiniGameSystem]/ShakingAnimationRenderer/Minigame_Shake_Rigging(Transform)
+      m_BoneTransforms.Array.data[0] => [GameLoop]/[MiniGameSystem]/ShakingAnimationRenderer/Minigame_Shake_Rigging/UpperArm/LowerArm/LeftHand_N_Shaker(Transform)
+      m_BoneTransforms.Array.data[1] => [GameLoop]/[MiniGameSystem]/ShakingAnimationRenderer/Minigame_Shake_Rigging/UpperArm/LowerArm(Transform)
+      m_BoneTransforms.Array.data[2] => [GameLoop]/[MiniGameSystem]/ShakingAnimationRenderer/Minigame_Shake_Rigging/UpperArm(Transform)
+[GameLoop]/[MiniGameSystem]/ShakingAnimationRenderer/Minigame_Shake_Rigging/Minigame_Shake_Hand_3.png  (monos=1)
+   [SpriteSkin] refs=2
+      m_RootBone => [GameLoop]/[MiniGameSystem]/ShakingAnimationRenderer/Minigame_Shake_Rigging(Transform)
+      m_BoneTransforms.Array.data[0] => [GameLoop]/[MiniGameSystem]/ShakingAnimationRenderer/Minigame_Shake_Rigging/UpperArm/LowerArm/RightHand(Transform)
+[GameLoop]/[MiniGameSystem]/ShakingAnimationRenderer/Minigame_Shake_Rigging/Arm_Resolver  (monos=1)
+   [LimbSolver2D] refs=5
+      m_Chain.m_EffectorTransform => [GameLoop]/[MiniGameSystem]/ShakingAnimationRenderer/Minigame_Shake_Rigging/UpperArm/LowerArm/Effector(Transform)
+      m_Chain.m_TargetTransform => [GameLoop]/[MiniGameSystem]/ShakingAnimationRenderer/Minigame_Shake_Rigging/Arm_Resolver/Arm_Resolver_Target(Transform)
+      m_Chain.m_Transforms.Array.data[0] => [GameLoop]/[MiniGameSystem]/ShakingAnimationRenderer/Minigame_Shake_Rigging/UpperArm(Transform)
+      m_Chain.m_Transforms.Array.data[1] => [GameLoop]/[MiniGameSystem]/ShakingAnimationRenderer/Minigame_Shake_Rigging/UpperArm/LowerArm(Transform)
+      m_Chain.m_Transforms.Array.data[2] => [GameLoop]/[MiniGameSystem]/ShakingAnimationRenderer/Minigame_Shake_Rigging/UpperArm/LowerArm/Effector(Transform)
+[GameLoop]/[MiniGameSystem]/ShakingAnimationRenderer/ShakingAnimationCam  (monos=1)
+   [UniversalAdditionalCameraData] refs=0
+[GameLoop]/[MiniGameSystem]/Canvas_MiniGame  (monos=2)
+   [CanvasScaler] refs=0
+   [GraphicRaycaster] refs=0
+[GameLoop]/[MiniGameSystem]/Canvas_MiniGame/BG  (monos=1)
+   [Image] refs=0
+[GameLoop]/[MiniGameSystem]/Canvas_MiniGame/Art001  (monos=1)
+   [Image] refs=0
+[GameLoop]/[MiniGameSystem]/Canvas_MiniGame/Art002  (monos=1)
+   [Image] refs=0
+[GameLoop]/[MiniGameSystem]/Canvas_MiniGame/Canvas_ShakingMinigame  (monos=2)
+   [Image] refs=0
+   [MinigamePanelAnimator] refs=2
+      _animators.Array.data[0] => [GameLoop]/[MiniGameSystem]/Canvas_MiniGame(Animator)
+      _animators.Array.data[1] => [GameLoop]/[MiniGameSystem]/Canvas_MiniGame/Canvas_ShakingMinigame(Animator)
+[GameLoop]/[MiniGameSystem]/Canvas_MiniGame/Canvas_ShakingMinigame/BG_Animation  (monos=1)
+   [Image] refs=0
+[GameLoop]/[MiniGameSystem]/Canvas_MiniGame/Canvas_ShakingMinigame/BG_Animation/ShakingAnimation_RT  (monos=1)
+   [RawImage] refs=0
+[GameLoop]/[MiniGameSystem]/Canvas_MiniGame/Canvas_ShakingMinigame/Bar/ProgressBar  (monos=1)
+   [Slider] refs=0
+[GameLoop]/[MiniGameSystem]/Canvas_MiniGame/Canvas_ShakingMinigame/Bar/ProgressBar/Background  (monos=1)
+   [Image] refs=0
+[GameLoop]/[MiniGameSystem]/Canvas_MiniGame/Canvas_ShakingMinigame/Bar/ProgressBar/Fill Area/Fill  (monos=1)
+   [Image] refs=0
+[GameLoop]/[MiniGameSystem]/Canvas_MiniGame/Canvas_ShakingMinigame/Bar/ProgressBar/Handle Slide Area/Handle  (monos=1)
+   [Image] refs=0
+[GameLoop]/[MiniGameSystem]/Canvas_MiniGame/Canvas_ShakingMinigame/Bar/Target  (monos=1)
+   [Slider] refs=0
+[GameLoop]/[MiniGameSystem]/Canvas_MiniGame/Canvas_ShakingMinigame/Bar/Target/Background  (monos=1)
+   [Image] refs=0
+[GameLoop]/[MiniGameSystem]/Canvas_MiniGame/Canvas_ShakingMinigame/Bar/Target/Handle Slide Area/Handle  (monos=1)
+   [Image] refs=0
+[GameLoop]/[MiniGameSystem]/Canvas_MiniGame/Canvas_ShakingMinigame/Bar/GuageSlider  (monos=1)
+   [Slider] refs=0
+[GameLoop]/[MiniGameSystem]/Canvas_MiniGame/Canvas_ShakingMinigame/Bar/GuageSlider/Handle Slide Area/Handle  (monos=1)
+   [Image] refs=0
+[GameLoop]/[MiniGameSystem]/Canvas_MiniGame/Canvas_ShakingMinigame/BTN - Cancel Minigame  (monos=2)
+   [Image] refs=0
+   [Button] refs=0
+[GameLoop]/[MiniGameSystem]/Canvas_MiniGame/Canvas_ShakingMinigame/BTN - Cancel Minigame/Text (TMP)  (monos=1)
+   [TextMeshProUGUI] refs=0
+[GameLoop]/[MiniGameSystem]/Canvas_MiniGame/Canvas_MixingMinigame  (monos=2)
+   [Image] refs=0
+   [MinigamePanelAnimator] refs=2
+      _animators.Array.data[0] => [GameLoop]/[MiniGameSystem]/Canvas_MiniGame(Animator)
+      _animators.Array.data[1] => [GameLoop]/[MiniGameSystem]/Canvas_MiniGame/Canvas_MixingMinigame(Animator)
+[GameLoop]/[MiniGameSystem]/Canvas_MiniGame/Canvas_MixingMinigame/BG_Animation  (monos=1)
+   [Image] refs=0
+[GameLoop]/[MiniGameSystem]/Canvas_MiniGame/Canvas_MixingMinigame/BG_Animation/RawImage  (monos=1)
+   [RawImage] refs=0
+[GameLoop]/[MiniGameSystem]/Canvas_MiniGame/Canvas_MixingMinigame/Bar/ProgressBar  (monos=1)
+   [Slider] refs=0
+[GameLoop]/[MiniGameSystem]/Canvas_MiniGame/Canvas_MixingMinigame/Bar/ProgressBar/Background  (monos=1)
+   [Image] refs=0
+[GameLoop]/[MiniGameSystem]/Canvas_MiniGame/Canvas_MixingMinigame/Bar/ProgressBar/Fill Area/Fill  (monos=1)
+   [Image] refs=0
+[GameLoop]/[MiniGameSystem]/Canvas_MiniGame/Canvas_MixingMinigame/Bar/Target  (monos=1)
+   [Slider] refs=0
+[GameLoop]/[MiniGameSystem]/Canvas_MiniGame/Canvas_MixingMinigame/Bar/Target/Background  (monos=1)
+   [Image] refs=0
+[GameLoop]/[MiniGameSystem]/Canvas_MiniGame/Canvas_MixingMinigame/Bar/Target/Handle Slide Area/Handle  (monos=1)
+   [Image] refs=0
+[GameLoop]/[MiniGameSystem]/Canvas_MiniGame/Canvas_MixingMinigame/Bar/GuageSlider  (monos=1)
+   [Slider] refs=0
+[GameLoop]/[MiniGameSystem]/Canvas_MiniGame/Canvas_MixingMinigame/Bar/GuageSlider/Handle Slide Area/Handle  (monos=1)
+   [Image] refs=0
+[GameLoop]/[MiniGameSystem]/Canvas_MiniGame/Canvas_MixingMinigame/BTN - Cancel Minigame  (monos=2)
+   [Image] refs=0
+   [Button] refs=0
+[GameLoop]/[MiniGameSystem]/Canvas_MiniGame/Canvas_MixingMinigame/BTN - Cancel Minigame/Text (TMP)  (monos=1)
+   [TextMeshProUGUI] refs=0
+[GameLoop]/[MiniGameSystem]/Canvas_MiniGame/InitPanel/InitPanel_004  (monos=1)
+   [Image] refs=0
+[GameLoop]/[PlacmentSystem]  (monos=2)
+   [N_InputManager] refs=1
+      _sceneCamera => [GameLoop]/CamController/Main Camera(Camera)
+   [N_PlacementSystem] refs=2
+      _mouseIndicator => [GameLoop]/[PlacmentSystem]/MouseIndicator(GameObject)
+      _inputManager => [GameLoop]/[PlacmentSystem](N_InputManager)
+[GameLoop]/[GarnishSystem]  (monos=1)
+   [GarnishManager] refs=16
+      _glassSpawnPoint => [GameLoop]/[GarnishSystem]/Garnish_Plate(Transform)
+      _panel => [GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI(GameObject)
+      _panelGlassSelection => [GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - Glass Selection(GameObject)
+      _panelGarnishItem => [GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - Garnish Item(GameObject)
+      _panelGarnishRim => [GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - Garnish Rim(GameObject)
+      _btnGlassSelection => [GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - ChangeGarnishType/BTN - GlassSelection(Button)
+      _btnGarnishItem => [GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - ChangeGarnishType/BTN - GarnishItem(Button)
+      _btnGarnishRim => [GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - ChangeGarnishType/BTN - GarnishRim(Button)
+      _btnPour => [GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - BTN/BTN - Pour(Button)
+      _btnFinish => [GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - BTN/BTN - FinishGranish(Button)
+      _btnReset => [GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - BTN/BTN -  Reset (Button)
+      _btnAddIce => [GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - BTN/BTN - AdddIce(Button)
+      _btnRemoveIce => [GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - BTN/BTN - RemoveIce(Button)
+      _panelServe => [GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Serve(GameObject)
+      _btnServe => [GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Serve/BTN_Serving(Button)
+      _btnRemake => [GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Serve/BTN_Reset (2)(Button)
+[GameLoop]/[GarnishSystem]/Canvas_Garnish  (monos=2)
+   [CanvasScaler] refs=0
+   [GraphicRaycaster] refs=0
+[GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Serve  (monos=4)
+   [Image] refs=0
+   [UIOnPosition3DMulti] refs=1
+      _target => [GameLoop]/[GarnishSystem]/Garnish_Plate/Ref - Panel Serve(Transform)
+   [VerticalLayoutGroup] refs=0
+   [ContentSizeFitter] refs=0
+[GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Serve/BTN_Serving  (monos=2)
+   [Image] refs=0
+   [Button] refs=0
+[GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Serve/BTN_Reset (2)  (monos=2)
+   [Image] refs=0
+   [Button] refs=0
+[GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI  (monos=1)
+   [Image] refs=0
+[GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - Glass Selection  (monos=3)
+   [Image] refs=0
+   [HorizontalLayoutGroup] refs=0
+   [GlassChoiceGrid] refs=6
+      _buttons.Array.data[0] => [GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - Glass Selection/BTN - ChooseHiBall(Button)
+      _buttons.Array.data[1] => [GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - Glass Selection/BTN - ChooseRock(Button)
+      _buttons.Array.data[2] => [GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - Glass Selection/BTN - ChooseMartini(Button)
+      _buttons.Array.data[3] => [GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - Glass Selection/BTN - ChooseMagrita(Button)
+      _btnPreviousPage => [GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - Glass Selection/Button (1)(Button)
+      _btnNextPage => [GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - Glass Selection/Button(Button)
+[GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - Glass Selection/Button (1)  (monos=2)
+   [Image] refs=0
+   [Button] refs=0
+[GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - Glass Selection/Button (1)/Text (TMP)  (monos=1)
+   [TextMeshProUGUI] refs=0
+[GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - Glass Selection/BTN - ChooseHiBall  (monos=2)
+   [Image] refs=0
+   [Button] refs=0
+[GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - Glass Selection/BTN - ChooseRock  (monos=2)
+   [Image] refs=0
+   [Button] refs=0
+[GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - Glass Selection/BTN - ChooseMartini  (monos=2)
+   [Image] refs=0
+   [Button] refs=0
+[GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - Glass Selection/BTN - ChooseMagrita  (monos=2)
+   [Image] refs=0
+   [Button] refs=0
+[GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - Glass Selection/Button  (monos=2)
+   [Image] refs=0
+   [Button] refs=0
+[GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - Glass Selection/Button/Text (TMP)  (monos=1)
+   [TextMeshProUGUI] refs=0
+[GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - Garnish Item  (monos=4)
+   [Image] refs=0
+   [HorizontalLayoutGroup] refs=0
+   [RectMask2D] refs=0
+   [GarnishItemChoiceGrid] refs=6
+      _buttons.Array.data[0] => [GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - Garnish Item/BTN - Garnish Item(Button)
+      _buttons.Array.data[1] => [GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - Garnish Item/BTN - Garnish Item (1)(Button)
+      _buttons.Array.data[2] => [GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - Garnish Item/BTN - Garnish Item (2)(Button)
+      _buttons.Array.data[3] => [GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - Garnish Item/BTN - Garnish Item (3)(Button)
+      _btnPreviousPage => [GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - Garnish Item/Button (1)(Button)
+      _btnNextPage => [GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - Garnish Item/Button (2)(Button)
+[GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - Garnish Item/Button (1)  (monos=2)
+   [Image] refs=0
+   [Button] refs=0
+[GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - Garnish Item/Button (1)/Text (TMP)  (monos=1)
+   [TextMeshProUGUI] refs=0
+[GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - Garnish Item/BTN - Garnish Item  (monos=2)
+   [Image] refs=0
+   [Button] refs=0
+[GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - Garnish Item/BTN - Garnish Item (1)  (monos=2)
+   [Image] refs=0
+   [Button] refs=0
+[GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - Garnish Item/BTN - Garnish Item (2)  (monos=2)
+   [Image] refs=0
+   [Button] refs=0
+[GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - Garnish Item/BTN - Garnish Item (3)  (monos=2)
+   [Image] refs=0
+   [Button] refs=0
+[GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - Garnish Item/Button (2)  (monos=2)
+   [Image] refs=0
+   [Button] refs=0
+[GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - Garnish Item/Button (2)/Text (TMP)  (monos=1)
+   [TextMeshProUGUI] refs=0
+[GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - Garnish Rim  (monos=3)
+   [Image] refs=0
+   [HorizontalLayoutGroup] refs=0
+   [GarnishRimChoiceGrid] refs=6
+      _buttons.Array.data[0] => [GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - Garnish Rim/BTN - Rim(Button)
+      _buttons.Array.data[1] => [GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - Garnish Rim/BTN - Rim (1)(Button)
+      _buttons.Array.data[2] => [GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - Garnish Rim/BTN - Rim (2)(Button)
+      _buttons.Array.data[3] => [GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - Garnish Rim/BTN - Rim (3)(Button)
+      _btnPreviousPage => [GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - Garnish Rim/Button (1)(Button)
+      _btnNextPage => [GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - Garnish Rim/Button (2)(Button)
+[GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - Garnish Rim/Button (1)  (monos=2)
+   [Image] refs=0
+   [Button] refs=0
+[GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - Garnish Rim/Button (1)/Text (TMP)  (monos=1)
+   [TextMeshProUGUI] refs=0
+[GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - Garnish Rim/BTN - Rim  (monos=2)
+   [Image] refs=0
+   [Button] refs=0
+[GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - Garnish Rim/BTN - Rim (1)  (monos=2)
+   [Image] refs=0
+   [Button] refs=0
+[GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - Garnish Rim/BTN - Rim (2)  (monos=2)
+   [Image] refs=0
+   [Button] refs=0
+[GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - Garnish Rim/BTN - Rim (3)  (monos=2)
+   [Image] refs=0
+   [Button] refs=0
+[GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - Garnish Rim/Button (2)  (monos=2)
+   [Image] refs=0
+   [Button] refs=0
+[GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - Garnish Rim/Button (2)/Text (TMP)  (monos=1)
+   [TextMeshProUGUI] refs=0
+[GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - BTN  (monos=2)
+   [Image] refs=0
+   [VerticalLayoutGroup] refs=0
+[GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - BTN/BTN - Pour  (monos=2)
+   [Image] refs=0
+   [Button] refs=0
+[GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - BTN/BTN - Pour/Text (TMP)  (monos=1)
+   [TextMeshProUGUI] refs=0
+[GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - BTN/BTN - AdddIce  (monos=2)
+   [Image] refs=0
+   [Button] refs=0
+[GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - BTN/BTN - AdddIce/Text (TMP)  (monos=1)
+   [TextMeshProUGUI] refs=0
+[GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - BTN/BTN - RemoveIce  (monos=2)
+   [Image] refs=0
+   [Button] refs=0
+[GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - BTN/BTN - RemoveIce/Text (TMP)  (monos=1)
+   [TextMeshProUGUI] refs=0
+[GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - BTN/BTN - FinishGranish  (monos=2)
+   [Image] refs=0
+   [Button] refs=0
+[GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - BTN/BTN - FinishGranish/Text (TMP)  (monos=1)
+   [TextMeshProUGUI] refs=0
+[GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - BTN/BTN -  Reset   (monos=2)
+   [Image] refs=0
+   [Button] refs=0
+[GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - BTN/BTN -  Reset /Text (TMP)  (monos=1)
+   [TextMeshProUGUI] refs=0
+[GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - ChangeGarnishType  (monos=1)
+   [Image] refs=0
+[GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - ChangeGarnishType/BTN - GlassSelection  (monos=2)
+   [Image] refs=0
+   [Button] refs=0
+[GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - ChangeGarnishType/BTN - GlassSelection/Text (TMP)  (monos=1)
+   [TextMeshProUGUI] refs=0
+[GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - ChangeGarnishType/BTN - GarnishRim  (monos=2)
+   [Image] refs=0
+   [Button] refs=0
+[GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - ChangeGarnishType/BTN - GarnishRim/Text (TMP)  (monos=1)
+   [TextMeshProUGUI] refs=0
+[GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - ChangeGarnishType/BTN - GarnishItem  (monos=2)
+   [Image] refs=0
+   [Button] refs=0
+[GameLoop]/[GarnishSystem]/Canvas_Garnish/Panel - Granish UI/Panel - ChangeGarnishType/BTN - GarnishItem/Text (TMP)  (monos=1)
+   [TextMeshProUGUI] refs=0
+[GameLoop]/[GarnishSystem]/Garnish_Plate  (monos=1)
+   [GlassPlacementZone] refs=0
+[GameLoop]/[GarnishSystem]/Garnish_Plate/GranishCam  (monos=2)
+   [CinemachineCamera] refs=0
+   [CameraEntry] refs=0
+[GameLoop]/Canvas  (monos=2)
+   [CanvasScaler] refs=0
+   [GraphicRaycaster] refs=0
+[GameLoop]/Canvas/Panel - Hub  (monos=1)
+   [Image] refs=0
+[GameLoop]/Canvas/Panel - Hub/BTN - Open_CloseBook  (monos=2)
+   [Image] refs=0
+   [Button] refs=1
+      EVENT[m_OnClick]->Toggle => [GameLoop]/Canvas/Panel - BookUI(BookUI_V2)
+[GameLoop]/Canvas/EndShiftButton  (monos=3)
+   [Image] refs=0
+   [Button] refs=0
+   [SceneLoader] refs=0
+[GameLoop]/Canvas/EndShiftButton/Text (TMP)  (monos=1)
+   [TextMeshProUGUI] refs=0
+[GameLoop]/Canvas/Panel - BookUI  (monos=2)
+   [Image] refs=0
+   [BookUI_V2] refs=15
+      _spreads.Array.data[0].spreadRoot => [GameLoop]/Canvas/Panel - BookUI/Book_Cover/TMP_Spread_01(GameObject)
+      _spreads.Array.data[0].leftPage.pageRoot => [GameLoop]/Canvas/Panel - BookUI/Book_Cover/TMP_Spread_01/1Left Page(GameObject)
+      _spreads.Array.data[0].leftPage.singleImage => [GameLoop]/Canvas/Panel - BookUI/Book_Cover/TMP_Spread_01/1Left Page/Page_1_L(Image)
+      _spreads.Array.data[0].rightPage.pageRoot => [GameLoop]/Canvas/Panel - BookUI/Book_Cover/TMP_Spread_01/1Right Page(GameObject)
+      _spreads.Array.data[0].rightPage.singleImage => [GameLoop]/Canvas/Panel - BookUI/Book_Cover/TMP_Spread_01/1Right Page/Page_1_R(Image)
+      _spreads.Array.data[1].spreadRoot => [GameLoop]/Canvas/Panel - BookUI/Book_Cover/TMP_Spread_02(GameObject)
+      _spreads.Array.data[1].leftPage.pageRoot => [GameLoop]/Canvas/Panel - BookUI/Book_Cover/TMP_Spread_02/2Left Page(GameObject)
+      _spreads.Array.data[1].leftPage.singleImage => [GameLoop]/Canvas/Panel - BookUI/Book_Cover/TMP_Spread_02/2Left Page/Page_2_L(Image)
+      _spreads.Array.data[1].rightPage.pageRoot => [GameLoop]/Canvas/Panel - BookUI/Book_Cover/TMP_Spread_02/2Right Page(GameObject)
+      _spreads.Array.data[1].rightPage.singleImage => [GameLoop]/Canvas/Panel - BookUI/Book_Cover/TMP_Spread_02/2Right Page/Page_2_R(Image)
+      _spreads.Array.data[2].spreadRoot => [GameLoop]/Canvas/Panel - BookUI/Book_Cover/TMP_Spread_03(GameObject)
+      _spreads.Array.data[2].leftPage.pageRoot => [GameLoop]/Canvas/Panel - BookUI/Book_Cover/TMP_Spread_03/3Left Page(GameObject)
+      _spreads.Array.data[2].leftPage.singleImage => [GameLoop]/Canvas/Panel - BookUI/Book_Cover/TMP_Spread_03/3Left Page/Page_3_L(Image)
+      _spreads.Array.data[2].rightPage.pageRoot => [GameLoop]/Canvas/Panel - BookUI/Book_Cover/TMP_Spread_03/3Right Page(GameObject)
+      _spreads.Array.data[2].rightPage.singleImage => [GameLoop]/Canvas/Panel - BookUI/Book_Cover/TMP_Spread_03/3Right Page/Page_3_R(Image)
+[GameLoop]/Canvas/Panel - BookUI/Book_Cover  (monos=1)
+   [Image] refs=0
+[GameLoop]/Canvas/Panel - BookUI/Book_Cover/Image  (monos=1)
+   [Image] refs=0
+[GameLoop]/Canvas/Panel - BookUI/Book_Cover/Image (1)  (monos=1)
+   [Image] refs=0
+[GameLoop]/Canvas/Panel - BookUI/Book_Cover/Spread_01 /Left Page  (monos=1)
+   [Image] refs=0
+[GameLoop]/Canvas/Panel - BookUI/Book_Cover/Spread_01 /Left Page/Left Image A  (monos=1)
+   [Image] refs=0
+[GameLoop]/Canvas/Panel - BookUI/Book_Cover/Spread_01 /Left Page/Left TextA  (monos=1)
+   [TextMeshProUGUI] refs=0
+[GameLoop]/Canvas/Panel - BookUI/Book_Cover/Spread_01 /Left Page/Left Image B  (monos=1)
+   [Image] refs=0
+[GameLoop]/Canvas/Panel - BookUI/Book_Cover/Spread_01 /Left Page/Left TextB  (monos=1)
+   [TextMeshProUGUI] refs=0
+[GameLoop]/Canvas/Panel - BookUI/Book_Cover/Spread_01 /Right Page  (monos=1)
+   [Image] refs=0
+[GameLoop]/Canvas/Panel - BookUI/Book_Cover/Spread_01 /Right Page/Right Image A  (monos=1)
+   [Image] refs=0
+[GameLoop]/Canvas/Panel - BookUI/Book_Cover/Spread_01 /Right Page/Right TextA  (monos=1)
+   [TextMeshProUGUI] refs=0
+[GameLoop]/Canvas/Panel - BookUI/Book_Cover/Spread_01 /Right Page/Right Image B  (monos=1)
+   [Image] refs=0
+[GameLoop]/Canvas/Panel - BookUI/Book_Cover/Spread_01 /Right Page/Right TextB  (monos=1)
+   [TextMeshProUGUI] refs=0
+[GameLoop]/Canvas/Panel - BookUI/Book_Cover/TMP_Spread_01/1Left Page  (monos=1)
+   [Image] refs=0
+[GameLoop]/Canvas/Panel - BookUI/Book_Cover/TMP_Spread_01/1Left Page/Page_1_L  (monos=1)
+   [Image] refs=0
+[GameLoop]/Canvas/Panel - BookUI/Book_Cover/TMP_Spread_01/1Right Page  (monos=1)
+   [Image] refs=0
+[GameLoop]/Canvas/Panel - BookUI/Book_Cover/TMP_Spread_01/1Right Page/Page_1_R  (monos=1)
+   [Image] refs=0
+[GameLoop]/Canvas/Panel - BookUI/Book_Cover/TMP_Spread_02/2Left Page  (monos=1)
+   [Image] refs=0
+[GameLoop]/Canvas/Panel - BookUI/Book_Cover/TMP_Spread_02/2Left Page/Page_2_L  (monos=1)
+   [Image] refs=0
+[GameLoop]/Canvas/Panel - BookUI/Book_Cover/TMP_Spread_02/2Right Page  (monos=1)
+   [Image] refs=0
+[GameLoop]/Canvas/Panel - BookUI/Book_Cover/TMP_Spread_02/2Right Page/Page_2_R  (monos=1)
+   [Image] refs=0
+[GameLoop]/Canvas/Panel - BookUI/Book_Cover/TMP_Spread_03/3Left Page  (monos=1)
+   [Image] refs=0
+[GameLoop]/Canvas/Panel - BookUI/Book_Cover/TMP_Spread_03/3Left Page/Page_3_L  (monos=1)
+   [Image] refs=0
+[GameLoop]/Canvas/Panel - BookUI/Book_Cover/TMP_Spread_03/3Right Page  (monos=1)
+   [Image] refs=0
+[GameLoop]/Canvas/Panel - BookUI/Book_Cover/TMP_Spread_03/3Right Page/Page_3_R  (monos=1)
+   [Image] refs=0
+[GameLoop]/Canvas/Panel - BookUI/Book_Cover/Spread_02/Left 02 Page  (monos=1)
+   [Image] refs=0
+[GameLoop]/Canvas/Panel - BookUI/Book_Cover/Spread_02/Left 02 Page/Left 02 Image A  (monos=1)
+   [Image] refs=0
+[GameLoop]/Canvas/Panel - BookUI/Book_Cover/Spread_02/Left 02 Page/Left 02 TextA  (monos=1)
+   [TextMeshProUGUI] refs=0
+[GameLoop]/Canvas/Panel - BookUI/Book_Cover/Spread_02/Left 02 Page/Left 02 Image B  (monos=1)
+   [Image] refs=0
+[GameLoop]/Canvas/Panel - BookUI/Book_Cover/Spread_02/Left 02 Page/Left 02 TextB  (monos=1)
+   [TextMeshProUGUI] refs=0
+[GameLoop]/Canvas/Panel - BookUI/Book_Cover/Spread_02/Right 02 Page  (monos=1)
+   [Image] refs=0
+[GameLoop]/Canvas/Panel - BookUI/Book_Cover/Spread_02/Right 02 Page/Right 02 Image A  (monos=1)
+   [Image] refs=0
+[GameLoop]/Canvas/Panel - BookUI/Book_Cover/Spread_02/Right 02 Page/Right 02 TextA  (monos=1)
+   [TextMeshProUGUI] refs=0
+[GameLoop]/Canvas/Panel - BookUI/Book_Cover/Spread_02/Right 02 Page/Right 02 Image B  (monos=1)
+   [Image] refs=0
+[GameLoop]/Canvas/Panel - BookUI/Book_Cover/Spread_02/Right 02 Page/Right 02 TextB  (monos=1)
+   [TextMeshProUGUI] refs=0
+[GameLoop]/Canvas/Panel - BookUI/Book_Cover/BTN_NextPage  (monos=2)
+   [Image] refs=0
+   [Button] refs=0
+[GameLoop]/Canvas/Panel - BookUI/Book_Cover/BTN_Close  (monos=2)
+   [Image] refs=0
+   [Button] refs=0
+[GameLoop]/Canvas/Panel - BookUI/Book_Cover/BTN_PreviousPage  (monos=2)
+   [Image] refs=0
+   [Button] refs=0
+[GameLoop]/Canvas/Panel_Transition  (monos=3)
+   [Image] refs=0
+   [PanelTransition] refs=1
+      animator => [GameLoop]/Canvas/Panel_Transition(Animator)
+   [AnimationEvent] refs=0
+[GameLoop]/Canvas/Panel_Thx  (monos=3)
+   [Image] refs=0
+   [SceneLoader] refs=0
+   [PH_Thx] refs=0
+[GameLoop]/Canvas/Panel_Thx/Image  (monos=1)
+   [Image] refs=0
+[GameLoop]/Canvas/Panel_Thx/Image/Button  (monos=2)
+   [Image] refs=0
+   [Button] refs=0
+[GameLoop]/Canvas/Panel_Thx/Image/Button/Text (TMP)  (monos=1)
+   [TextMeshProUGUI] refs=0
+[GameLoop]/Canvas/Panel_Thx/Text (TMP)  (monos=1)
+   [TextMeshProUGUI] refs=0
+[GameLoop]/CamController  (monos=2)
+   [CinimachineCameraSwitcher] refs=1
+      brain => [GameLoop]/CamController/Main Camera(CinemachineBrain)
+   [CameraController] refs=1
+      virtualCamera => [GameLoop]/CamController/DefultCamera(CinemachineCamera)
+[GameLoop]/CamController/Main Camera  (monos=4)
+   [UniversalAdditionalCameraData] refs=0
+   [PhysicsRaycaster] refs=0
+   [CinemachineBrain] refs=0
+   [DebugPhysicsRaycaster] refs=2
+      _camera => [GameLoop]/CamController/Main Camera(Camera)
+      _physicsRaycaster => [GameLoop]/CamController/Main Camera(PhysicsRaycaster)
+[GameLoop]/CamController/DefultCamera  (monos=2)
+   [CinemachineCamera] refs=0
+   [CameraEntry] refs=0
+[GameLoop]/CamController/MakingCam/MakingCenterCam  (monos=2)
+   [CinemachineCamera] refs=0
+   [CameraEntry] refs=0
+[GameLoop]/CamController/CamScene/FarRightCam  (monos=2)
+   [CinemachineCamera] refs=0
+   [CameraEntry] refs=0
+[GameLoop]/CamController/CamScene/SummaryCam  (monos=2)
+   [CinemachineCamera] refs=0
+   [CameraEntry] refs=0
+[GameLoop]/CamController/CamScene/FarLeftCam  (monos=2)
+   [CinemachineCamera] refs=0
+   [CameraEntry] refs=0
+[GameLoop]/CamController/CamScene/CenterCam  (monos=2)
+   [CinemachineCamera] refs=0
+   [CameraEntry] refs=0
+[GameLoop]/CamController/CamScene/NearLeftCam  (monos=2)
+   [CinemachineCamera] refs=0
+   [CameraEntry] refs=0
+[GameLoop]/CamController/CamScene/NearRighCam  (monos=2)
+   [CinemachineCamera] refs=0
+   [CameraEntry] refs=0

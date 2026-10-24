@@ -431,36 +431,53 @@ Implemented as Cinemachine virtual camera swaps driven by this FSM (state → ac
 
 ### 21.0 ผู้เล่นเลือกแก้วเสิร์ฟเอง 100% / The player picks the serving glass entirely
 
-ถอดกติกา `NotFix` แบบเดิมออกทั้งหมด — ทุกสูตรตอนนี้เหมือนกับที่เคยเป็น `NotFix`: ไม่มีสูตรไหน
-"ปักหมุด" แก้วได้อีก ผู้เล่นลากแก้ว (จากชั้นวาง) มาวางบนโต๊ะเป็นขั้นตอนแยกจากการชง — ทำก่อนหรือ
-หลังใส่วัตถุดิบก็ได้ (ระหว่าง Add Ingredient หรือ Garnish) จำกัด 1 ใบต่อโต๊ะ 1 ครั้ง เลือกแก้วหนึ่งใบ
-= ได้ทั้ง sprite ของแก้วและลาย/สไตล์การตกแต่งไปพร้อมกัน (ไม่มีขั้นเลือกแยกอีกต่อไป)
+> อัปเดต 2026-10-24 ให้ตรงกับเกมปัจจุบัน (ADR 0001, 0002, Garnish Restructure, Pour V2, `CONTEXT.md` › Glass & Garnish)
+> Updated 2026-10-24 to match the current game.
 
-The old `NotFix` escape hatch is gone entirely — every recipe now behaves the way `NotFix`
-used to: no recipe can "pin" a glass anymore. The player drags a glass (from a shelf) onto the
-table as a step separate from mixing — doable before or after adding ingredients (during Add
-Ingredient or Garnish). Limited to 1 glass placed at a time. Picking one glass option sets both
-its sprite and its garnish look/style together (no separate garnish-style pick).
+ไม่มีสูตรไหน "ปักหมุด" แก้ว (กติกา `NotFix` เดิมถูกถอดออก) การเลือกแก้ว ใส่น้ำแข็ง และตกแต่ง
+ทำใน**ขั้น Garnish เท่านั้น** ไม่ทำตอน Prepare Drinks กล้อง แก้ว และภาชนะชงอยู่กับที่ ไม่มีการลาก
+No recipe can pin a glass. Glass choice, Ice and decoration all happen **only in the Garnish step**,
+never during Prepare Drinks. Camera, glass and mixing vessel are fixed in place; nothing is dragged.
 
-หลังชงเสร็จ (ผ่าน Minigame แล้ว) ผู้เล่นต้องลากภาชนะที่ใช้ชง (มีวัตถุดิบ+Method ครบ) ไปเทลงแก้ว
-ที่วางไว้ — ตอนนี้เองที่ตัวตนของเครื่องดื่ม (สี ฯลฯ) ถูกล็อกและย้ายไปแสดงที่แก้วเสิร์ฟแทนภาชนะชง
-After mixing finishes (post-minigame), the player must drag the mixing vessel (now holding
-ingredients + Method) onto the placed glass to pour — this is the moment the drink's identity
-(colour, etc.) locks in and its visuals move from the mixing vessel to the serving glass.
+1. **เลือกแก้ว** ด้วยปุ่มใน panel Garnish แก้วปรากฏที่ตำแหน่งตายตัวทันที (แสดงเป็น UI) มีแก้วได้ทีละ 1 ใบ
+   กดเลือกแก้วอื่นก่อนเทได้ (แทนใบเดิม) แต่**หลังเทแล้วเปลี่ยนแก้วไม่ได้**
+   **Pick a glass** with a button; it appears at a fixed spot (shown as UI). One glass at a time;
+   it can be swapped before the pour, **not after**.
+2. **เท (Pour)** ด้วยปุ่ม เทได้ครั้งเดียวต่อแก้ว ตอนนี้เองที่ตัวตนของเครื่องดื่ม (สี ฯลฯ) ถูกล็อกและแสดงในแก้ว
+   **Pour** with a button, once per glass — this is when the drink's identity (colour, etc.) locks in
+   and shows in the glass.
+3. **น้ำแข็ง (Ice)** ใส่/เอาออกได้อิสระก่อนเท หลังเท**ใส่เพิ่มได้แต่เอาออกไม่ได้** น้ำแข็งเป็นเงื่อนไขของสูตร
+   (`IceMatch`) จึง**มีผลต่อคะแนน** ต่างจากแก้วและการตกแต่ง
+   **Ice** can be added/removed freely before the pour; after it, it can be added but not removed.
+   Ice is a recipe attribute (`IceMatch`) and **does affect scoring**, unlike glass and decoration.
+4. **ตกแต่ง** ดู §21.0.1 · **Decorate**, see §21.0.1.
+5. กด Finish ไป Serve ได้เมื่อเทแล้ว ไม่บังคับให้ตกแต่ง · Finish (to Serve) needs only the pour.
 
-แก้วที่วางไว้จะหายไปหลังเสิร์ฟลูกค้าเสร็จทุกครั้ง — ลูกค้าคนถัดไปต้องลากแก้วใหม่จากชั้นวางเสมอ
-ไม่มีการรีเซ็ตแก้วใบเดิมไว้ใช้ซ้ำ
-The placed glass is destroyed after each serve — the next customer always requires a fresh
-glass dragged from the shelf; the same instance is never reset and reused.
+แก้วถูกเคลียร์ทุกครั้งที่เข้า Prepare Drinks (รวม remake) และหลังเสิร์ฟ ลูกค้าคนถัดไปเริ่มจากโต๊ะว่างเสมอ
+The glass is cleared on every entry into Prepare Drinks (remake included) and after each serve;
+the next customer always starts with an empty table.
 
-ทุกกรณียังเป็น cosmetic ล้วน ไม่มีผลต่อคะแนนตาม §17-18
-All of this remains purely cosmetic and does not affect §17-18 scoring.
+แก้วไม่มีผลต่อการตกแต่ง: แก้วทุกใบเริ่มจากไม่มีการตกแต่งเลย
+Glass choice carries no garnish involvement: every glass starts undecorated.
 
-- การตกแต่งไม่ส่งผลต่อรสชาติ/ส่วนผสม/คะแนน (ตาม GDD)
-  Decoration does not affect taste/ingredients/scoring.
-- **ขอบเขต v1: Slot-based asset swap เท่านั้น** — แต่ละจุดตกแต่งเป็น slot ตายตัว คลิกแล้วสลับ asset ที่กำหนดไว้ล่วงหน้า
-  **v1 scope: slot-based asset swap only** — each decoration point is a fixed slot; clicking cycles a predefined asset.
-  🔖 **เฟสต่อไป / Future phase:** ระบบตกแต่งแบบ free-placement (สไตล์ Puni the Florist ลาก-วางอิสระ) — ยังไม่ทำใน v1
+### 21.0.1 การตกแต่ง / Decoration
+
+แก้วหนึ่งใบตกแต่งได้ 2 แบบ (ตำแหน่งต่างกันตามทรงแก้ว)
+A glass takes two kinds of decoration (positions are per glass shape):
+
+- **Rim garnish** (`SO_GarnishRimOption`) — ทาขอบทั้งแก้ว เช่น เกลือ/น้ำตาล มีได้ 1 แบบต่อแก้ว
+  A whole-rim treatment (e.g. salt or sugar), at most one per glass.
+- **Garnish item** (`SO_GarnishItemOption`) — มี **2 slot** บนแก้ว คลิก slot บนแก้วเพื่อเลือกว่าจะใส่ช่องไหน
+  แล้วเลือกของจาก grid ของหมวด **Fresh** (ผลไม้/สมุนไพร) หรือ **Novelty** (ร่ม เชอร์รี่ ฯลฯ)
+  ทั้งสองหมวดใช้ 2 slot ร่วมกัน หมวดใช้แค่กรองใน UI ไม่จำกัดว่าอยู่ช่องไหน ใส่ของซ้ำกันได้
+  **2 item slots** on the glass: click a slot to make it active, then pick from the **Fresh** or
+  **Novelty** grid. Both categories share both slots (the category only filters the UI).
+
+กติกา / Rules
+- เปลี่ยนหรือเอาออกได้ตลอด (เลือก "ไม่มี" = เคลียร์) · Any choice can be changed or cleared at any time.
+- การตกแต่งเป็น cosmetic ล้วน ไม่มีผลต่อรสชาติ/ส่วนผสม/คะแนน และไม่บังคับ (ไม่ตกแต่งเลยก็เสิร์ฟได้)
+  Decoration is purely cosmetic and never required.
+- 🔖 **เฟสต่อไป / Future phase:** ตกแต่งแบบวางอิสระ (free-placement) — ยังไม่ทำ
 
 ### 21.1 การกำหนดสี / Color Resolution
 

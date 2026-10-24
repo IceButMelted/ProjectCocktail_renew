@@ -1,5 +1,11 @@
 # Bar410 — Cocktail System: เอกสารส่งต่องาน / HANDOFF
 
+> **สถานะ ณ 2026-10-24** (ตรวจกับโค้ด/scene ปัจจุบัน) · ภาพรวมล่าสุดอยู่ที่ `Docs/Bar410_Status_Report_2026-10-24.html` และ `Docs/Bar410_Managers_Restructure_HANDOFF.md`
+>
+> - ปิดแล้ว: §8.1, §8.2 (decoration ทำแล้วเป็น Rim + 2 item slot, `E_GarnishLook` ถูกแทนด้วย `SO_GarnishRimOption`/`SO_GarnishItemOption`; `BaseFruitPieceInstance` หายแล้ว), §8.3 binding target หลุดบน `BTN_Serving`, §8.5 (scene/prefab legacy และ shim `CocktailShakerData` ถูกลบหมด), §8.6 (`.yarn` เรียก `flow_prepare_drinks` แล้ว), คำถาม decoration ใน §9
+> - ยังค้าง: roster ขาด `Cole`/`Freya` (§8.3), S6/S8/S14/S15 (§8.4), คำถาม §18 deviation เทียบสูตรไหน (§9), `Cube` (ตอนนี้มี `SurfacePlacementZone`) ยังอยู่ใน scene
+> - ชื่อ class หลายตัวในเอกสารนี้ไม่มีแล้ว (`GarnishFlowBridge`, `CocktailFlowBridge`, `WaterSlosh`): ดู `FlowWiring.cs`, `GarnishManager.cs`, `PourVisual.cs`
+
 **Date เริ่มต้น:** 2026-08-21 · **อัปเดตล่าสุด:** 2026-09-01 · **Branch:** `GameLoop/main` · **HEAD:** `c4390ac` (push แล้วหรือยังไม่แน่ใจ เช็ค `git status` ก่อน)
 **สถานะ:** โค้ดคอมไพล์ผ่านไม่มี error · **working tree มีของค้างไม่ได้ commit** (ดู §0)
 

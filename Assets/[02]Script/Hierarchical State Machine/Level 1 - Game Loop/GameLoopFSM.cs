@@ -19,7 +19,12 @@ namespace Bar410.GameFlow
     ///
     /// Drop this on a single scene object (or a bootstrap prefab) and let gameplay code
     /// talk to the phase objects it exposes rather than poking the machine directly.
+    ///
+    /// The phases are built in Awake. The negative execution order puts that Awake ahead of
+    /// every bridge and GameFlowCommands, so they can subscribe to <see cref="OpenBar"/> in
+    /// their own Awake without a lazy-build call.
     /// </summary>
+    [DefaultExecutionOrder(-100)]
     public class GameLoopFSM : MonoBehaviour
     {
         // ── Inspector ──────────────────────────────────────
@@ -37,13 +42,11 @@ namespace Bar410.GameFlow
         public OpenBarPhase OpenBar { get; private set; }
         public ClosingBarPhase ClosingBar { get; private set; }
 
-        private bool _built;
-
         // ── Unity ──────────────────────────────────────────
 
         private void Awake()
         {
-            EnsureBuilt();
+            Build();
         }
 
         private void Start()
@@ -57,18 +60,6 @@ namespace Bar410.GameFlow
         }
 
         // ── Setup ──────────────────────────────────────────
-
-        /// <summary>
-        /// Builds the phase hierarchy if it does not exist yet. Idempotent, and safe to call
-        /// from another component's Awake — component Awake order on one GameObject is not
-        /// guaranteed, so anything needing the phases should call this first.
-        /// </summary>
-        public void EnsureBuilt()
-        {
-            if (_built) return;
-            _built = true;
-            Build();
-        }
 
         private void Build()
         {

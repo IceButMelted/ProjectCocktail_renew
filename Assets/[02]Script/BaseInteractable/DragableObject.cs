@@ -22,9 +22,6 @@ public class DragableObject : PointerInteractableBase
     [Tooltip("Layers to check for overlapping objects.")]
     public LayerMask detectLayerMask;
 
-    [Header("References")]
-    public static N_PlacementSystem _placementSystem;
-
     [Header("Debug")]
     public bool DebugDraw = false;
 
@@ -57,11 +54,6 @@ public class DragableObject : PointerInteractableBase
     private bool _dragStarted;
 
     // ── Unity Lifecycle ───────────────────────────────────────────────────────
-    private void OnEnable()
-    {
-        if (_placementSystem == null)
-            _placementSystem = FindFirstObjectByType<N_PlacementSystem>();
-    }
 
     private void Awake()
     {
@@ -107,7 +99,7 @@ public class DragableObject : PointerInteractableBase
 
             _dragStarted = true;
             IsAnyDragging = true;
-            _placementSystem.StartDrag(this);
+            N_PlacementSystem.Current.StartDrag(this);
         }
     }
 
@@ -131,7 +123,7 @@ public class DragableObject : PointerInteractableBase
         _pointerDownScreenPos = eventData.position;
         _dragStarted = true;
         IsAnyDragging = true;
-        _placementSystem.StartDrag(this);
+        N_PlacementSystem.Current.StartDrag(this);
     }
 
     /// <summary>
@@ -143,7 +135,7 @@ public class DragableObject : PointerInteractableBase
     {
         if (!_dragStarted) return;
 
-        _placementSystem.ReleaseObject();
+        N_PlacementSystem.Current.ReleaseObject();
         BeingDrags = false;
         IsAnyDragging = false;
         _dragStarted = false;
@@ -156,7 +148,7 @@ public class DragableObject : PointerInteractableBase
 
         if (_dragStarted)
         {
-            _placementSystem.ReleaseObject();
+            N_PlacementSystem.Current.ReleaseObject();
             BeingDrags = false;
             IsAnyDragging = false;
         }
@@ -172,7 +164,7 @@ public class DragableObject : PointerInteractableBase
 
     private void CancelDrag()
     {
-        _placementSystem?.ReleaseObject();
+        N_PlacementSystem.Current?.ReleaseObject();
         BeingDrags = false;
         _dragStarted = false;
         IsAnyDragging = false;

@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8">
+<title>Bar410 Status Report</title>
+<style>
+  @page { size: A4; margin: 14mm 13mm; }
+  :root { --ink:#1d2330; --mute:#5b6577; --line:#d8dde6; --acc:#2f6fdf; --warn:#c46a10; --ok:#2e8b57; --bg:#ffffff; --soft:#f4f6fa; }
+  body { font-family: "Leelawadee UI","Tahoma","Segoe UI",sans-serif; color:var(--ink); background:var(--bg); font-size:10.5pt; line-height:1.5; margin:0; }
+  h1 { font-size:20pt; margin:0 0 2px; }
+  h2 { font-size:14pt; margin:22px 0 8px; padding-bottom:4px; border-bottom:2px solid var(--acc); break-after:avoid; }
+  h3 { font-size:11.5pt; margin:14px 0 6px; break-after:avoid; }
+  .sub { color:var(--mute); margin-bottom:12px; }
+  code { font-family:Consolas,monospace; font-size:9pt; background:var(--soft); padding:0 3px; border-radius:3px; }
+  table { width:100%; border-collapse:collapse; margin:6px 0 10px; font-size:9.5pt; break-inside:auto; }
+  th, td { border:1px solid var(--line); padding:4px 6px; text-align:left; vertical-align:top; }
+  th { background:var(--soft); }
+  tr { break-inside:avoid; }
+  .kpi { display:flex; gap:8px; margin:8px 0 12px; }
+  .kpi div { flex:1; border:1px solid var(--line); border-radius:6px; padding:6px 8px; }
+  .kpi b { display:block; font-size:15pt; }
+  .kpi span { color:var(--mute); font-size:9pt; }
+  .tag { display:inline-block; font-size:8.5pt; padding:0 6px; border-radius:8px; color:#fff; white-space:nowrap; }
+  .hi { background:#c0392b; } .md { background:var(--warn); } .lo { background:#7a8597; } .done { background:var(--ok); }
+  .diagram { border:1px solid var(--line); border-radius:6px; padding:8px; margin:6px 0 4px; break-inside:avoid; text-align:center; }
+  .cap { color:var(--mute); font-size:9pt; margin:0 0 10px; }
+  .note { background:#fff7e8; border-left:3px solid var(--warn); padding:6px 10px; margin:8px 0; font-size:9.5pt; }
+  .page { break-before:page; }
+  ol, ul { margin:4px 0 8px; padding-left:20px; }
+  li { margin:2px 0; }
+</style>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+</head>
+<body>
+
+<h1>Bar410 · สรุปสถานะ โครงสร้าง และ Flow ข้อมูล</h1>
+<div class="sub">ณ วันที่ 24 ต.ค. 2026 · branch <code>GameFlow/Managers</code> · อ้างอิง <code>Docs/Bar410_Managers_Restructure_HANDOFF.md</code>, <code>FlowWiring.cs</code>, memory ของโปรเจกต์ และ <code>git status</code> ปัจจุบัน</div>
+
+<div class="kpi">
+  <div><b>Stage 0–9</b><span>Managers restructure เสร็จ commit ครบ</span></div>
+  <div><b>45 commit</b><span>นำหน้า <code>GameFlow/Main</code> · push ขึ้น origin แล้ว · ยังไม่มี PR</span></div>
+  <div><b>76 → 17</b><span>ref ข้าม child ใต้ <code>[GameLoop]</code> (−78%)</span></div>
+  <div><b>ยังไม่ commit</b><span>งานใน working tree + การอัปเดตเอกสาร/comment รอบนี้</span></div>
+</div>
+
+<h2>1. สรุปสิ่งที่ทำไปแล้ว</h2>
+<table>
+<tr><th style="width:22%">งาน</th><th>สถานะ</th></tr>
+<tr><td>Managers restructure (Stage 0–9)</td><td><span class="tag done">เสร็จ</span> แยก <code>[GameLoop]</code> เป็น Manager 6 ตัว · bridge 6 ตัวรวมเป็น <code>FlowWiring</code> ตัวเดียว · root เหลือ 3 script (<code>GameLoopFSM</code>, <code>GameFlowCommands</code>, <code>FlowWiring</code>) · Stage 2 ข้าม · Stage 10 optional</td></tr>
+<tr><td>Pour V2 (CocktailCrafter_V2)</td><td><span class="tag done">เสร็จฝั่งแก้ว</span> <code>WaterSlosh</code> ถูกลบ · <code>PourVisual</code> เป็นประตูเดียวเข้า V2 · แก้วแสดงเป็น UI ผ่าน <code>GarnishStage_RT</code> · <b>ฝั่ง shaker / ingredient ยังไม่ทำ</b></td></tr>
+<tr><td>Sound / AudioMixer</td><td><span class="tag done">เสร็จ</span> <code>SoundManager</code> singleton + <code>MainMixer</code> · ระบบ pause มี sound settings แล้ว (<code>de03d97</code>)</td></tr>
+<tr><td>งาน Art ที่ merge เข้ามา (14 ต.ค.)</td><td>VFX/Mixers, particle ผลไม้, Order note pop-up, PagedChoiceGrid, Options fade-in, dialogue line box ไม่บังคลิก</td></tr>
+<tr><td>Legacy shim <code>CocktailShakerData</code></td><td><span class="tag done">หายไปแล้ว</span> เหลือแค่ชื่อใน comment ของ <code>DrinkBuilder.cs</code></td></tr>
+</table>
+
+<h2>2. โครงสร้างระบบ (Architecture)</h2>
+<p>กฎหลัก: Manager ไม่รู้จัก FSM และไม่รู้จักกันเอง (รับ verb เข้า ส่ง event ออก) · <code>FlowWiring</code> เป็นที่เดียวที่ flow กับ manager เจอกัน · ข้อมูลร่วมมีเจ้าของเดียว · ชื่อ <code>[YarnCommand]</code>/<code>[YarnFunction]</code> ห้ามเปลี่ยน (ตรวจด้วย <code>check_yarn_contract.py --check</code>)</p>
+<div class="diagram"><pre class="mermaid">
+flowchart TB
+  Yarn["<b>Yarn dialogue (.yarn)</b><br/>flow_prepare_drinks · Order_Cocktail_* · wait_for_task<br/>MoveIn · SetEmotion · Switch_Camera (static commands)"]
+  subgraph Root["[GameLoop] root"]
+    direction LR
+    CMD["GameFlowCommands<br/>Yarn / UI / hotkey entry"] --> FSM["GameLoopFSM<br/>L1 Open/Close · L2 · L3"]
+    FSM -- "Entered / Exited / OnTransition" --> FW["<b>FlowWiring</b><br/>step → verb · event → command"]
+  end
+  CK["Cocktail<br/>CocktailSystemManager<br/>ShakerContents"]
+  MG["Minigame<br/>MinigameSystemManager"]
+  GN["Garnish<br/>GarnishManager<br/>glass · pour · Serve"]
+  TC["TalkToCustomer<br/>DialogueRunner · roster<br/>YarnVariableSync"]
+  CA["Camera<br/>CameraManager"]
+  SH["Canvas_Shell<br/>Hub · Book · EndShift"]
+  PL["Placement<br/>N_PlacementSystem.Current"]
+  Yarn -- "flow_* commands" --> CMD
+  FW <--> CK & MG & GN & TC & CA & SH
+  PL -. "drag ขวด/ผลไม้" .-> CK
+</pre></div>
+<p class="cap">รูป 1 · ลูกศรสองทาง = FlowWiring เรียก verb ของ manager และฟัง event กลับ · Yarn เรียก manager ตรงได้เฉพาะ static command ที่ไม่ผูกชื่อ object (แก้ใน 7d/8b) · TalkToCustomer เขียน <code>$task_done/$satisfaction/$rel_*</code> กลับเข้า Yarn · service ข้าม scene (SoundManager, SaveLoadManager, SceneLoader) อยู่นอกภาพ</p>
+
+<h3>เจ้าของข้อมูล (Single source of truth)</h3>
+<table>
+<tr><th>ข้อมูล</th><th>เจ้าของ</th><th>คนอื่นเข้าถึงอย่างไร</th></tr>
+<tr><td>Order ของลูกค้า (target, result, <code>IsScored</code>)</td><td>CocktailSystemManager.<code>Order</code></td><td>Yarn วาง order ผ่าน <code>Order_Cocktail_*</code> · ให้คะแนนครั้งเดียวใน <code>ServeDrink()</code> (idempotent)</td></tr>
+<tr><td>เครื่องดื่มที่กำลังทำ (ส่วนผสม, method, ice)</td><td><code>ShakerContents.CurrentCocktail</code></td><td>Garnish รับเป็น argument ตอน <code>Pour(drink)</code> · ice เขียนผ่าน <code>IceToggled → SetIce</code> ทางเดียว (D5)</td></tr>
+<tr><td>แก้วเสิร์ฟ</td><td><code>GarnishManager.Glass</code></td><td>ล้างด้วย <code>ClearGlass()</code> ตอนเข้า Prepare และตอนออก Serve (ไม่มี static แล้ว)</td></tr>
+<tr><td>ตัวแปร Yarn <code>$task_done/$satisfaction/$type_of_cocktail/$rel_*</code></td><td>TalkToCustomerManager (ผู้เขียนคนเดียว)</td><td>รับจาก <code>OrderScored</code> / <code>OrderCleared</code> · relationship อยู่ใน Yarn เท่านั้น (D8 เดิม)</td></tr>
+<tr><td>step ปัจจุบันของเกม</td><td>GameLoopFSM</td><td>เปลี่ยนได้ทาง <code>GameFlowCommands</code> เท่านั้น</td></tr>
+<tr><td>กล้อง / มุมมอง</td><td>CameraManager</td><td><code>ShowBar/ShowShaker/ShowGarnish</code>, <code>SetLookFixed</code>, Yarn <code>Switch_Camera</code></td></tr>
+</table>
+
+<h2>3. ลำดับขั้นของเกม (HSM)</h2>
+<div class="diagram"><pre class="mermaid">
+stateDiagram-v2
+  direction TB
+  [*] --> Open
+  state Open {
+    direction LR
+    Talking: 1 Talking<br/>(TalkToCustomer)
+    state Prepare {
+      direction LR
+      AddIngredient: 2.1 AddIngredient<br/>(Cocktail)
+      Minigame: 2.2 Minigame<br/>(Minigame)
+      AddIngredient --> Minigame: Shake/Stir (IngredientAdded)
+      Minigame --> AddIngredient: Back (AnotherIngredient)
+    }
+    Garnish: 3 Garnish<br/>(Garnish)
+    Serve: 4 Serve<br/>(Garnish · Serve panel)
+    Talking --> Prepare: flow_prepare_drinks (Yarn)
+    Prepare --> Garnish: ชนะ minigame (DrinkComplete)
+    Garnish --> Serve: Finish (GarnishDone)
+    Serve --> Talking: Serve (ServeDone) ⇒ ให้คะแนน
+    Garnish --> Prepare: Reset (RemakeDrink)
+    Serve --> Prepare: Remake (RemakeDrink)
+  }
+  Open --> Close: ปุ่ม / hotkey (D11)
+  Close --> Open: Next day
+</pre></div>
+<p class="cap">รูป 2 · เข้า Prepare ทุกครั้ง (รวม remake) = เริ่มเครื่องดื่มใหม่และล้างแก้ว · ให้คะแนนเฉพาะ transition Serve → Talking · minigame แพ้ไม่ได้ (Completed / Cancelled)</p>
+
+<h2>4. Flow การเดินทางของข้อมูล — ลูกค้าหนึ่งคน</h2>
+<div class="diagram"><pre class="mermaid">
+sequenceDiagram
+  autonumber
+  participant Y as Yarn dialogue
+  participant TC as TalkToCustomer
+  participant C as Cocktail (Order + ShakerContents)
+  participant F as FlowWiring
+  participant S as GameLoopFSM
+  participant M as Minigame
+  participant G as Garnish
+  Y->>C: Order_Cocktail_* (วาง order)
+  Y->>S: flow_prepare_drinks
+  Y-->>Y: wait_for_task (จอดรอ)
+  S->>F: Prepare.Entered
+  F->>C: Clear() · Order.ClearResult()
+  F->>G: ClearGlass()
+  Note over C: ผู้เล่นลากขวด / ผลไม้ (Placement) → ShakerContents.Changed / OnFulled
+  C->>F: OnFulled
+  F->>F: ล็อกขวด · ShowShaker · แสดง Method panel
+  F->>S: Shake/Stir → IngredientAdded
+  S->>F: Minigame.OnStartRequested
+  F->>M: StartMinigame(Resolve(selected, RequiredMinigame))
+  M->>F: MinigameFinished(Completed)
+  F->>S: DrinkComplete
+  S->>F: Garnish.Entered
+  F->>C: UpdateCocktailInShaker() (หา recipe → สี/ชื่อ)
+  F->>G: Open()
+  G->>F: PourRequested
+  F->>G: Pour(ShakerContents.CurrentCocktail) → PourVisual
+  G->>F: IceToggled(bool) → ShakerContents.SetIce
+  G->>F: FinishRequested → GarnishDone
+  S->>F: Serve.Entered → OpenServe()
+  G->>F: ServeRequested → ServeDone
+  S->>F: OnTransition(Serve → Talking)
+  F->>C: ServeDrink() (ให้คะแนนครั้งเดียว)
+  C->>TC: OrderScored
+  TC->>Y: $task_done · $satisfaction · $rel_*
+  Y-->>Y: wait_for_task ปลด → branch ตามความพอใจ
+</pre></div>
+<p class="cap">รูป 3 · ข้อมูลเครื่องดื่มไหล ShakerContents → (Garnish รับเป็น argument) → แก้ว · ผลคะแนนไหล Order → OrderScored → ตัวแปร Yarn</p>
+
+<h2>5. งานที่เหลือ</h2>
+<table>
+<tr><th style="width:8%">ระดับ</th><th style="width:30%">งาน</th><th>รายละเอียด</th></tr>
+<tr><td><span class="tag hi">สูง</span></td><td>เล่น Day 1 จริงหนึ่งรอบ</td><td>ตรวจ 7d (<code>e7bc9ad</code>): dialogue ตอนนี้รอเสิร์ฟจริงที่ <code>wait_for_task</code> และคำสั่งกล้องบรรทัดแรกทำงานจริงเป็นครั้งแรก · ยังไม่มีใครเห็นด้วยตา · ถ้าไม่ตรงที่ writer ตั้งใจ revert ได้ commit เดียว</td></tr>
+<tr><td><span class="tag hi">สูง</span></td><td>จัดการไฟล์ค้างใน working tree</td><td><code>GarnishManager</code> (เพิ่ม <code>_background</code> backdrop), scene <code>New Drag Drop System</code>, <code>BaseGlass.prefab</code>, <code>MainMenu_V2</code> + <code>MainMenu_V2_Profiles/</code>, <code>Day1_Demo_EventNabLab.yarn</code> (บท Walter/Isla ใหม่), <code>CocktailDemoProfile</code>, <code>.gitignore</code>, <code>ViewCapture.cs</code> (ใหม่), <code>Bar410_PM_Presentation_Script.md</code> · ต้องกรอง noise Cinemachine ก่อน commit scene (HANDOFF §6.3 ข้อ 2)</td></tr>
+<tr><td><span class="tag hi">สูง</span></td><td>เปิด PR <code>GameFlow/Managers</code> → <code>GameFlow/Main</code></td><td>push แล้ว, ยังไม่มี PR · รอ user สั่ง (ควรหลังเล่นทดสอบ Day 1)</td></tr>
+<tr><td><span class="tag md">กลาง</span></td><td>Pour V2 ฝั่ง shaker / ingredient</td><td>ขวด/ผลไม้เทลง shaker ด้วย visual เดียวกัน (sprite ต่อ source) · ต้องเพิ่ม target-level ใน <code>PourController</code> (hardcode <code>1f</code> สามจุด), <code>glass.SetMenu(blend)</code> หลัง <code>Pour()</code>, เลือก queue หรือ lock เมื่อคลิกรัว, ยืนยันว่า shaker เป็น world object (V2 รันใน Canvas ไม่ได้)</td></tr>
+<tr><td><span class="tag md">กลาง</span></td><td>ช่วงปิดร้าน (ClosingBarPhase)</td><td>TODO ในโค้ด: UI ปิดร้าน, สรุปเงิน/เติมของ/เซฟ · ตัวคุมลำดับยังไม่รู้ว่าวันจบ (วันจบด้วยบทสนทนาอย่างเดียว) · รอคำตอบ design</td></tr>
+<tr><td><span class="tag md">กลาง</span></td><td>สีหน้าตัวละคร (Art)</td><td><code>SetEmotion</code> มีช่องรอแล้ว รอ asset และคิวงาน</td></tr>
+<tr><td><span class="tag md">กลาง</span></td><td>Save → Load ข้าม scene + silent replay</td><td>ยังไม่เคยทดสอบจริง · NPC save ไม่เก็บ emotion และทิศมอง (<code>_currentLookDirection</code> ไม่เคยถูกเซ็ต)</td></tr>
+<tr><td><span class="tag md">กลาง</span></td><td>ทดสอบด้วยเมาส์จริง</td><td>ลากขวดลง shaker, ลากผลไม้จาก tray, Shift+1/2 · MCP ทำแทนไม่ได้</td></tr>
+<tr><td><span class="tag lo">ต่ำ</span></td><td>Stage 10 (optional)</td><td>Level 1 เป็น enum ลดโค้ด ~130 บรรทัด ไม่จำเป็นต่อเป้าหมาย (D11)</td></tr>
+<tr><td><span class="tag md">กลาง</span></td><td>Pause: ทดสอบของจริงที่ค้าง</td><td>Typewriter ของ Text Animator หยุดตอน pause หรือไม่ (ดูจาก DLL ไม่ได้) · กด <code>Esc</code> บนคีย์บอร์ดจริง · กด <code>Esc</code> ระหว่างลากของ (<code>Bar410_PauseSystem_Setup.md</code> D3)</td></tr>
+<tr><td><span class="tag lo">ต่ำ</span></td><td>GDD gap S6 / S8 / S14 / S15</td><td>S6 ไม่มีชื่อสุ่มสำหรับ Fail-b (ใช้ <code>"???"</code>) · S8 ไม่มีสีต่อ ingredient (ใช้สี placeholder) · S14 <code>MixMethod.Build</code> และ S15 <code>unlockedByDefault</code> เลื่อนตาม D4/D1</td></tr>
+<tr><td><span class="tag lo">ต่ำ</span></td><td>เก็บกวาดของตาย</td><td><code>IngredientButtonUI._action</code> ค่า <code>SetShaking/SetMixing/AddIce/ResetShaker</code> ไม่มีใครใช้ · <code>GlassPlacementZone</code> ไม่มีใครเรียก (D9 คงไว้) · <code>CharacterData</code> legacy · <code>Demo_KeysShortCut</code> (R) · <code>CanFinish</code> ไม่ reset ใน <code>ClearGlass()</code> · <code>Bar410DialogueOrderTest</code> ยังไม่ได้รัน</td></tr>
+<tr><td><span class="tag lo">ต่ำ</span></td><td>Roster ขาด Cole / Freya</td><td><code>NPC_Name</code> มี 5 คน แต่ <code>Demo_CustomerRoster</code> มี 3 · ค่าความชอบเป็นข้อมูล design ห้ามเดา</td></tr>
+<tr><td><span class="tag lo">ต่ำ</span></td><td>ของในฉากที่รอตัดสิน</td><td><code>Cube</code> (มี <code>SurfacePlacementZone</code>) ยังอยู่ใน <code>New Drag Drop System</code> ตามที่เคยสั่งให้เก็บไว้ · hover rotation ของ <code>CameraController</code> ไม่ถูกใช้ (ADR 0002 ให้เก็บไว้)</td></tr>
+<tr><td><span class="tag lo">ต่ำ</span></td><td>ต้องเปิด Unity ดู</td><td>sprite ชิ้นผลไม้ 6 ชนิดเป็น art จริงแล้วหรือยังยืมรูปขวด · component ที่ติดมาจากการ copy บน fruit tray มะนาว · warning missing script 2 ตัวตอนโหลด scene</td></tr>
+</table>
+
+<h2>6. คำถามที่ต้องการคำตอบ</h2>
+<h3>A. ต้องตัดสินก่อนรวมงาน</h3>
+<ol>
+  <li><b>สีของเครื่องดื่มที่ไม่ตรงสูตร</b> — ใน working tree <code>DrinkColorBlender.UnmatchedTop/Bottom</code> ถูกเปลี่ยนจากสีน้ำตาล "murky" เป็น <code>Color.red</code>/<code>Color.orange</code> ตั้งใจใช้จริง หรือเป็นสี debug ที่ไม่ควร commit?</li>
+  <li><b>ผล Day 1 หลัง 7d</b> — dialogue ที่รอเสิร์ฟจริง และกล้องตอนคุย ตรงกับที่ writer ตั้งใจไหม? (ถ้าไม่ revert <code>e7bc9ad</code>)</li>
+  <li><b>เปิด PR เข้า <code>GameFlow/Main</code></b> ได้เลยหรือรอเล่นทดสอบก่อน?</li>
+  <li><b>ไฟล์ค้าง</b> — <code>MainMenu_V2_Profiles/</code>, <code>ViewCapture.cs</code>, ฉาก yarn ใหม่ของ Walter/Isla, <code>CocktailDemoProfile</code>: รวมใน commit เดียวกัน หรือแยก commit ตามเรื่อง?</li>
+</ol>
+<h3>B. Design</h3>
+<ol start="5">
+  <li><b>ปิดร้านแล้วผู้เล่นเห็นอะไร</b> (สรุปเงิน / เติมของ / เซฟ) และใครเป็นคนปิดร้าน — บทสนทนาหรือปุ่ม?</li>
+  <li><b>ปุ่ม toggle ของ post-it</b> ไม่ interactable ใน scene — ตั้งใจให้ flow เปิดปิดเอง (ลบปุ่ม) หรือให้ผู้เล่นกดได้?</li>
+  <li><b>Save ของ NPC</b> ควรเก็บ emotion และทิศมองด้วยไหม? (ต้องเปลี่ยน save format)</li>
+  <li><b>Pour ฝั่ง shaker</b>: คลิกรัวให้ queue หรือ lock จนเทเสร็จ?</li>
+  <li><b>สีหน้าตัวละคร</b> ควรเข้าคิวเมื่อไหร่?</li>
+  <li><b>GDD §18 วัด deviation เทียบกับสูตรไหน</b> — โค้ดวัดกับสูตรที่ลูกค้าสั่ง (<code>NOTE(design)</code> ที่ <code>DrinkDeviation.cs:51</code>) ถูกต้องไหม?</li>
+  <li><b>ปิดร้านมี 3 action</b> — ต้องทำตามลำดับ, เลือกทำ, หรือต้องทำครบก่อน Next Day?</li>
+</ol>
+<h3>C. ค่า default ที่ Claude ตั้งไว้ รอยืนยัน</h3>
+<ol start="12">
+  <li><code>Canvas_Cocktail</code> CanvasScaler match <b>0.5</b> (เดิม 0) ถูกต้องไหม?</li>
+  <li>Shell เป็น <code>Canvas_Shell</code> ไม่มี manager (D13) โอเคไหม?</li>
+  <li>D12: ไม่ทำ presenter / <code>FlowStep</code> enum และ Placement เก็บ ref กล้องเอง ยืนยันไหม?</li>
+  <li>ลำดับวาด <code>Canvas_Garnish</code>/<code>Canvas_Cocktail</code> อยู่ใต้ Hub — เห็น Hub บัง panel ไหม? (ถ้าใช่ ปรับ <code>sortingOrder</code>)</li>
+  <li>ลบ <code>CharacterData</code> legacy และ <code>Demo_KeysShortCut</code> ได้ไหม?</li>
+</ol>
+
+<h2>7. งานเก่าที่ปิดไปแล้ว (อัปเดตเอกสารรอบนี้)</h2>
+<p>ไล่จาก handoff เก่า 8 ฉบับเทียบกับโค้ด/scene ปัจจุบัน แต่ละฉบับมีกล่อง "สถานะ ณ 2026-10-24" ไว้บนสุดแล้ว</p>
+<table>
+<tr><th style="width:38%">เรื่องที่เอกสารเก่าบอกว่าค้าง</th><th>สถานะตอนนี้</th></tr>
+<tr><td>ไม่มีใครเรียก <code>flow_prepare_drinks</code></td><td><span class="tag done">ปิด</span> <code>.yarn</code> เรียกแล้ว 9 ครั้ง</td></tr>
+<tr><td>shim <code>CocktailShakerData</code> + <code>GamePlayScene</code>, <code>GamePlayScene 1</code>, <code>SystemGame.prefab</code>, <code>CocktailSystem.prefab</code></td><td><span class="tag done">ปิด</span> ถูกลบหมด</td></tr>
+<tr><td>ระบบตกแต่งแก้ว / <code>E_GarnishLook</code> placeholder / คำถาม 7 ข้อของ Decoration Plan</td><td><span class="tag done">ปิด</span> ทำแล้วเป็น Rim garnish 1 แบบ + 2 item slot (Fresh/Novelty) · GDD §21 และ <code>CONTEXT.md</code> อัปเดตให้ตรงแล้ว</td></tr>
+<tr><td>leaf state ของ HSM เป็น stub / TODO "DrinkOrderContext"</td><td><span class="tag done">ปิด</span> comment ถูกแก้ให้ชี้ไป <code>FlowWiring</code> · ให้คะแนนครั้งเดียวตอน Serve → Talking จึงไม่ต้องมี DrinkOrderContext</td></tr>
+<tr><td>ปุ่ม Finish Garnish / Book ไม่ปิดตอนออก Garnish</td><td><span class="tag done">ปิด</span> มีปุ่มแล้ว · <code>FlowWiring</code> ปิด book ตอนออก Prepare</td></tr>
+<tr><td><code>BTN_Serving</code> listener target หลุด, <code>CocktailGrass</code>, <code>BaseFruitPieceInstance</code>, <code>Panel - AddIce</code>, <code>Plane</code> เก่า</td><td><span class="tag done">ปิด</span> หายจาก scene แล้วทั้งหมด</td></tr>
+<tr><td>UI slider ปรับเสียง</td><td><span class="tag done">ปิด</span> มี <code>VolumeSlider.cs</code></td></tr>
+<tr><td><code>IngredientButtonGroup.SetRoster/Add/Remove</code> ค้าง</td><td><span class="tag done">ปิด</span> ถูกลบแล้ว</td></tr>
+</table>
+
+<div class="note">วิธีตรวจหลังแก้ทุกครั้ง: <code>check_yarn_contract.py --check</code> ต้อง exit 0 · flow trace / serve_commit / lock_fingerprint / garnish_ui ใน <code>Docs/baseline/managers/</code> ต้องเหมือน baseline ทุกไบต์ · รอ <code>GameFlowCommands.Instance != null</code> ก่อนรัน snippet · <code>git add</code> ระบุ path เท่านั้น</div>
+
+<script>
+  mermaid.initialize({ startOnLoad:false, theme:'neutral', fontFamily:'Leelawadee UI, Tahoma, sans-serif', flowchart:{ htmlLabels:true, useMaxWidth:true }, sequence:{ useMaxWidth:true, wrap:true }, securityLevel:'loose' });
+  mermaid.run().then(() => { document.body.setAttribute('data-ready','1'); });
+</script>
+</body>
+</html>

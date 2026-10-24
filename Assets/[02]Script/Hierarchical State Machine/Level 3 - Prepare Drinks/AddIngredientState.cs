@@ -12,15 +12,11 @@ namespace Bar410.GameFlow
         /// <summary>An ingredient was chosen. Parent moves to the minigame for it.</summary>
         public event Action OnFinished;
 
-        protected override void OnEnter()
-        {
-            // TODO: enable ingredient selection (bottle pick-up / shelf UI).
-        }
+        // Ingredients are recorded in ShakerContents as they land, not here. What the scene
+        // does on entry/exit lives in FlowWiring (§2.1 AddIngredient).
+        protected override void OnEnter() { }
 
-        protected override void OnExit()
-        {
-            // TODO: record the chosen ingredient for scoring at step 5.
-        }
+        protected override void OnExit() { }
 
         /// <summary>Call when the player commits to an ingredient.</summary>
         public void Finish() => OnFinished?.Invoke();

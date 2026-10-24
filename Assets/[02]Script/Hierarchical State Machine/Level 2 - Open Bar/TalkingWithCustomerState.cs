@@ -24,15 +24,11 @@ namespace Bar410.GameFlow
         /// <summary>Done serving for the day. Parent raises OnRequestExitToClose.</summary>
         public event Action OnRequestCloseBar;
 
-        protected override void OnEnter()
-        {
-            // TODO: start the conversation node for the current customer.
-        }
+        // The conversation itself is run by Yarn, which also places the order
+        // (Order_Cocktail_*). What the scene does on entry/exit lives in FlowWiring (§1 Talking).
+        protected override void OnEnter() { }
 
-        protected override void OnExit()
-        {
-            // TODO: stash the resulting order (see open question #4 — DrinkOrderContext).
-        }
+        protected override void OnExit() { }
 
         public void RequestPrepareDrinks() => OnRequestPrepareDrinks?.Invoke();
 

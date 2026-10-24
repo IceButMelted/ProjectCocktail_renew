@@ -23,6 +23,9 @@ public class FruitPieceInstance : MonoBehaviour
     [Tooltip("Local-space offset from the shaker's transform to snap to while hovering it during a drag.")]
     [SerializeField] private Vector3 _hoverOffset = new Vector3(0f, 0.3f, -0.2f);
 
+    [Tooltip("Burst played at the tray when the piece is pulled out. Detached first so it stays there and outlives this piece — its Stop Action must be Destroy.")]
+    [SerializeField] private ParticleSystem _pullOutVfx;
+
     [Tooltip("Fired when this piece landed on the shaker and was added.")]
     public UnityEvent OnDelivered = new UnityEvent();
 
@@ -44,6 +47,20 @@ public class FruitPieceInstance : MonoBehaviour
     {
         _fruitType = fruitType;
         _origin = origin;
+    }
+
+    /// <summary>
+    /// Plays the pull-out burst at <paramref name="at"/> without a piece ever being dragged —
+    /// call on the prefab, for a plain click on the tray. A real drag plays its own instead
+    /// (see OnDragStarted), so a gesture never gets both.
+    /// </summary>
+    public void PlayPullOutVfxAt(Transform at)
+    {
+        if (_pullOutVfx == null) return;
+
+        var vfx = Instantiate(_pullOutVfx, at.position, at.rotation);
+        vfx.transform.localScale = _pullOutVfx.transform.lossyScale;
+        vfx.Play();
     }
 
     private void Awake()
@@ -86,6 +103,12 @@ public class FruitPieceInstance : MonoBehaviour
     private void OnDragStarted()
     {
         SetVisible(true);
+
+        if (_pullOutVfx != null)
+        {
+            _pullOutVfx.transform.SetParent(null, true);
+            _pullOutVfx.Play();
+        }
 
         // Same self-occlusion fix as BottleIngredientSource: excluded from its own hover
         // raycast during the drag, otherwise snapping in front of the shaker puts this

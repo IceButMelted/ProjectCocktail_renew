@@ -1,0 +1,6 @@
+# minigame type resolution
+R0 pure | None,None=Shaking None,Stiring=Stiring Shaking,Stiring=Shaking Stiring,None=Stiring
+R1 default | ran=Shaking mgType=None method=None
+R2 fromDrink | ran=Stiring mgType=None method=Stirring
+R3 explicit | ran=Shaking mgType=Shaking method=Stirring
+DONE

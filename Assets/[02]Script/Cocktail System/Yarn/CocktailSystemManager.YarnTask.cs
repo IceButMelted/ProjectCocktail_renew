@@ -2,10 +2,17 @@
 //  CocktailSystemManager.YarnTask.cs
 //
 //  Yarn COMMANDS driving the game. Command names are a public contract —
-//  Day1_Demo.yarn calls <<wait_for_task SystemGame>> and
-//  <<Enable_InteractableObject SystemGame false>> 7x, and instance commands
-//  resolve by GameObject name, so this partial must stay on "SystemGame".
-//  Do not rename commands.
+//  Day1_Demo.yarn calls <<wait_for_task SystemGame>>,
+//  <<Enable_InteractableObject SystemGame false>>, <<Reset_Variable SystemGame>>
+//  and <<Can_End_Shift SystemGame>>. Do not rename commands.
+//
+//  They are static and ignore the object name the .yarn passes: Yarn finds an
+//  instance command's target with GameObject.Find, and once the object was
+//  renamed ("SystemGame" -> "[CocktailSystem]") every one of those calls failed
+//  with "doesn't have the correct component" and wait_for_task never waited.
+//  A static command reaches the manager through Resolve() (the same cached
+//  lookup the order functions use), so the name in the .yarn file, old or
+//  new, no longer matters.
 // ============================================================
 
 using System.Collections;
@@ -28,16 +35,8 @@ public partial class CocktailSystemManager
     [Header("BTN End Shift")]
     [SerializeField] private Button _endShiftBTN;
 
-    [Header("Yarn / Task References")]
-    [SerializeField] private DialogueRunner _dialogueRunner;
-
     [Header("UI Post-It Order")]
     [SerializeField] private Post_It_Order _postItOrder;
-
-    private YarnVariableSync _yarnVariables;
-
-    /// <summary>Lazily built so it survives domain reloads and Awake ordering.</summary>
-    private YarnVariableSync Variables => _yarnVariables ??= new YarnVariableSync(_dialogueRunner);
 
     // ── Task gate ──────────────────────────────────────────
 
@@ -49,16 +48,15 @@ public partial class CocktailSystemManager
     public bool IsTaskComplete => Order.IsScored;
 
     /// <summary>
-    /// COMMAND — writes the scored order into Yarn and closes the drink-making UI.
-    /// Called once, from <see cref="UpdateVariableInYarnTrigger"/>.
+    /// COMMAND — publishes the scored order (<see cref="OrderScored"/>, which writes it into Yarn)
+    /// and closes the drink-making UI. Called once, from <see cref="UpdateVariableInYarnTrigger"/>.
     /// </summary>
     private void CommitTaskResult()
     {
         EnableButtonInYarn(false);
-        Variables.WriteResult(Order);
-        Variables.ApplyRelationshipDelta(Order.Customer, Order.RelationshipDelta);
+        OrderScored?.Invoke(Order);
 
-        if (_postItOrder != null) _postItOrder.SetOutScreen(true);
+        if (_postItOrder != null) _postItOrder.ClearOrder();
     }
 
     /// <summary>Scores what is in the shaker, then publishes the result. Entry point from ServeDrink().</summary>
@@ -73,15 +71,24 @@ public partial class CocktailSystemManager
     // Yarn Commands
 
     /// <summary>
-    /// &lt;&lt;wait_for_task CocktailSystemManager&gt;&gt;
+    /// &lt;&lt;wait_for_task SystemGame&gt;&gt; (the name is ignored; none is needed).
     /// Suspends Yarn until the drink has been served and scored.
-    /// Does NOT freeze Unity — the game keeps running normally.
     /// </summary>
     [YarnCommand("wait_for_task")]
+    public static IEnumerator Yarn_WaitForTask(string target = "")
+    {
+        var manager = Resolve();
+        if (manager == null) yield break;
+
+        yield return manager.WaitForTask();
+    }
+
+    /// <summary>
+    /// Suspends until the drink has been served and scored.
+    /// Does NOT freeze Unity — the game keeps running normally.
+    /// </summary>
     public IEnumerator WaitForTask()
     {
-        //if (_postItOrder != null) _postItOrder.ShowPostItForDefaultDuration();
-        //if (_postItOrder != null) _postItOrder.ShowPostIt(); //in Gameloop Wire
         if (SceneLoaderBridge.IsSilentReplay) yield break;
 
         IsWaitingForTask = true;
@@ -100,6 +107,8 @@ public partial class CocktailSystemManager
     }
 
     [YarnCommand("Can_End_Shift")]
+    public static void Yarn_CanEndShift(string target = "") => Resolve()?.CanEndShift();
+
     public void CanEndShift()
     {
         if (SceneLoaderBridge.IsSilentReplay) return; // skip — UI side effect
@@ -110,12 +119,28 @@ public partial class CocktailSystemManager
     }
 
     /// <summary>
+    /// &lt;&lt;Enable_InteractableObject SystemGame false&gt;&gt; or &lt;&lt;Enable_InteractableObject false&gt;&gt;.
+    /// The object name, when present, is ignored.
+    /// </summary>
+    [YarnCommand("Enable_InteractableObject")]
+    public static void Yarn_EnableInteractable(string first, string second = "")
+    {
+        string flag = string.IsNullOrEmpty(second) ? first : second;
+        if (!bool.TryParse(flag, out bool enable))
+        {
+            Debug.LogWarning($"[CocktailSystemManager] Enable_InteractableObject: '{flag}' is not true or false.");
+            return;
+        }
+
+        Resolve()?.EnableButtonInYarn(enable);
+    }
+
+    /// <summary>
     /// Enables/disables everything the player uses to build a drink.
     /// Bug B4: used to call SetIngredientActive then re-walk the button list with a
     /// narrower component set, setting each object twice under two definitions of
     /// "interactable". Now one call, one definition (InteractableToggle).
     /// </summary>
-    [YarnCommand("Enable_InteractableObject")]
     public void EnableButtonInYarn(bool enable)
     {
         if (SceneLoaderBridge.IsSilentReplay) return; // skip — UI side effect
@@ -125,17 +150,20 @@ public partial class CocktailSystemManager
                               "Enable_InteractableObject cannot lock the ingredient buttons.", this);
     }
 
-    /// <summary>
-    /// &lt;&lt;Reset_Variable CocktailSystemManager&gt;&gt;
-    /// Resets BOTH the order context AND Yarn storage.
-    /// </summary>
     [YarnCommand("Reset_Variable")]
+    public static void Yarn_ResetVariable(string target = "") => Resolve()?.ResetVariableInYarn();
+
+    /// <summary>
+    /// &lt;&lt;Reset_Variable SystemGame&gt;&gt;
+    /// Resets the order context and tells whoever keeps the dialogue's variables to reset them
+    /// (<see cref="OrderCleared"/>).
+    /// </summary>
     public void ResetVariableInYarn()
     {
         if (SceneLoaderBridge.IsSilentReplay) return; // vars already restored from save
 
         Order.Clear();
-        Variables.Reset();
+        OrderCleared?.Invoke();
 
         Debug.Log("[CocktailSystemManager] All variables reset — ready for next loop.");
     }
