@@ -34,6 +34,8 @@ public class GarnishManager : MonoBehaviour
     [Header("Panels")]
     [Tooltip("The whole garnish panel. Opened by Open(), closed by Close().")]
     [SerializeField] private GameObject _panel;
+    [Tooltip("Backdrop behind the garnish and serve steps. Shown from Open until the serve step ends (or a remake), and never a raycast target.")]
+    [SerializeField] private Image _background;
 
     [Header("Buttons")]
     [SerializeField] private Button _btnPour;
@@ -132,6 +134,13 @@ public class GarnishManager : MonoBehaviour
             _glassViewRect = (RectTransform)_glassView.transform;
             _glassViewHome = _glassViewRect.anchoredPosition;
         }
+
+        // It covers the whole screen, so it must not sit between the pointer and the bar.
+        if (_background != null)
+        {
+            _background.raycastTarget = false;
+            _background.gameObject.SetActive(false);
+        }
     }
 
     // The buttons belong to this manager's canvas, so it wires them itself. The panel starts
@@ -186,6 +195,7 @@ public class GarnishManager : MonoBehaviour
         StopSlide(ref _panelSlide);
         if (_panelRect != null) _panelRect.anchoredPosition = _panelHome;
         if (_panel != null) _panel.SetActive(true);
+        if (_background != null) _background.gameObject.SetActive(true);
         RefreshButtons();
 
         Opened?.Invoke();
@@ -200,6 +210,8 @@ public class GarnishManager : MonoBehaviour
             _panelSlide = StartCoroutine(SlidePanelOut());
         else if (_panel != null)
             _panel.SetActive(false);
+
+        if (_background != null) _background.gameObject.SetActive(false);
 
         if (_btnAddIce != null) _btnAddIce.gameObject.SetActive(true);
         if (_btnRemoveIce != null) _btnRemoveIce.gameObject.SetActive(false);
@@ -399,6 +411,10 @@ public class GarnishManager : MonoBehaviour
     public void OpenServe()
     {
         StopSlide(ref _serveReveal);
+
+        // Close() just hid it on the way out of Garnish; in the same frame, so it never blinks.
+        if (_background != null) _background.gameObject.SetActive(true);
+
         if (isActiveAndEnabled) _serveReveal = StartCoroutine(RevealServe());
         else if (_panelServe != null) _panelServe.SetActive(true);
     }
@@ -407,6 +423,7 @@ public class GarnishManager : MonoBehaviour
     {
         StopSlide(ref _serveReveal);
         if (_panelServe != null) _panelServe.SetActive(false);
+        if (_background != null) _background.gameObject.SetActive(false);
         if (_glassViewRect != null) _glassViewRect.anchoredPosition = _glassViewHome;
     }
 
