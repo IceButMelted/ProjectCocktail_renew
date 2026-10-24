@@ -66,8 +66,8 @@ namespace Bar410.GameFlow
         protected override void OnExit()
         {
             OnStopRequested?.Invoke();
-            // TODO: fold LastOutcome into DrinkOrderContext for scoring at step 5
-            //       (HSM doc §8 Q4 — LastOutcome is a placeholder for that per-ingredient list).
+            // LastOutcome is not scored: a minigame cannot be lost (GDD §10.1), so it only
+            // tells the flow (and Yarn, via flow_minigame_result) how the last run ended.
         }
 
         // ── Transitions out of 2.2 ─────────────────────────

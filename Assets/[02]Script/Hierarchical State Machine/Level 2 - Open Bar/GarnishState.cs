@@ -16,15 +16,11 @@ namespace Bar410.GameFlow
         /// <summary>Player wants to go back and rework the drink. Parent returns to Prepare Drinks.</summary>
         public event Action OnRequestRemake;
 
-        protected override void OnEnter()
-        {
-            // TODO: enable garnish selection/placement UI.
-        }
+        // What the scene does on entry/exit lives in FlowWiring (§3 Garnish). Garnish
+        // decoration is cosmetic and is not scored (CONTEXT.md, Glass & Garnish).
+        protected override void OnEnter() { }
 
-        protected override void OnExit()
-        {
-            // TODO: record the garnish choice for scoring at step 5.
-        }
+        protected override void OnExit() { }
 
         public void Finish() => OnFinished?.Invoke();
 

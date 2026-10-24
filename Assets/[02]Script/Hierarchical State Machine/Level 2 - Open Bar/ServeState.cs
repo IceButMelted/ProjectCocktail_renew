@@ -8,9 +8,8 @@ namespace Bar410.GameFlow
     /// Step 4 — serve the drink to the customer. Two legal exits: back to the conversation
     /// (1), where the customer's reaction plays out, or backtrack to Prepare Drinks (2).
     ///
-    /// TODO(design, open question #4): the drink is scored here, off data produced in steps
-    /// 1–3 (ingredients from 2.1, minigame result from 2.2, garnish from 3). That
-    /// data-passing contract needs its own spec — see the DrinkOrderContext note in §8.
+    /// Scoring is not done here: FlowWiring scores once on the Serve → Talking transition, so
+    /// a remake (Serve → Prepare Drinks) never scores or writes to Yarn.
     /// </summary>
     public class ServeState : StateBase
     {
@@ -20,15 +19,10 @@ namespace Bar410.GameFlow
         /// <summary>Player pulled the drink back to rework it. Parent returns to Prepare Drinks.</summary>
         public event Action OnRequestRemake;
 
-        protected override void OnEnter()
-        {
-            // TODO: enable the serve interaction (drag glass to the customer, pour animation).
-        }
+        // What the scene does on entry/exit lives in FlowWiring (§4 Serve).
+        protected override void OnEnter() { }
 
-        protected override void OnExit()
-        {
-            // TODO: score the drink and hand the result to the conversation.
-        }
+        protected override void OnExit() { }
 
         public void Finish() => OnFinished?.Invoke();
 

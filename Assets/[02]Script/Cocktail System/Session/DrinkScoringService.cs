@@ -3,9 +3,8 @@
 //  writes the whole outcome into the order context.
 //
 //  Sits between the pure Domain rules and the flow layer (which owns
-//  when scoring happens). FlowWiring calls this from
-//  ServeState.Exited — the TODO in ServeState.cs:29 and
-//  Bar410_StateMachine_Implementation.md §3.2.
+//  when scoring happens). CocktailSystemManager.ServeDrink() calls
+//  this once, when FlowWiring sees the Serve -> Talking transition.
 // ============================================================
 
 using System.Collections.Generic;
