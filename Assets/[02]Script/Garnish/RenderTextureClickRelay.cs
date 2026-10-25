@@ -22,7 +22,11 @@ public class RenderTextureClickRelay : MonoBehaviour, IPointerClickHandler
         if (!RectTransformUtility.ScreenPointToLocalPointInRectangle(rect, eventData.position, eventData.pressEventCamera, out Vector2 local))
             return;
 
-        Ray ray = _camera.ViewportPointToRay(Rect.PointToNormalized(rect.rect, local));
+        Vector2 n = Rect.PointToNormalized(rect.rect, local);
+        if (TryGetComponent(out UnityEngine.UI.RawImage image)) // the image may show only part of the texture
+            n = new Vector2(image.uvRect.x + n.x * image.uvRect.width, image.uvRect.y + n.y * image.uvRect.height);
+
+        Ray ray = _camera.ViewportPointToRay(n);
         if (Physics.Raycast(ray, out RaycastHit hit, _camera.farClipPlane))
             ExecuteEvents.ExecuteHierarchy(hit.collider.gameObject, eventData, ExecuteEvents.pointerClickHandler);
     }

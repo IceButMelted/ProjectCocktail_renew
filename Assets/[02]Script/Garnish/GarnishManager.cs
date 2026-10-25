@@ -107,7 +107,11 @@ public class GarnishManager : MonoBehaviour
     private RectTransform _glassViewRect;
     private Vector2 _panelHome;
     private Vector2 _glassViewHome;
+    private Vector2 _glassViewHomeSize;
+    private Rect _glassViewHomeUv;
+    private RawImage _glassViewImage;
     private Coroutine _panelSlide;
+    private Coroutine _glassSlide;
     private Coroutine _serveReveal;
 
     /// <summary>True once a pour has fully finished filling — <see cref="TryFinish"/> only succeeds then.</summary>
@@ -133,6 +137,9 @@ public class GarnishManager : MonoBehaviour
         {
             _glassViewRect = (RectTransform)_glassView.transform;
             _glassViewHome = _glassViewRect.anchoredPosition;
+            _glassViewHomeSize = _glassViewRect.sizeDelta;
+            _glassViewImage = _glassView.GetComponent<RawImage>();
+            if (_glassViewImage != null) _glassViewHomeUv = _glassViewImage.uvRect;
         }
 
         // It covers the whole screen, so it must not sit between the pointer and the bar.
@@ -193,10 +200,32 @@ public class GarnishManager : MonoBehaviour
         _activeGarnishSlot = 0;
 
         StopSlide(ref _panelSlide);
-        if (_panelRect != null) _panelRect.anchoredPosition = _panelHome;
+        StopSlide(ref _glassSlide);
+        ResetGlassView();
         if (_panel != null) _panel.SetActive(true);
         if (_background != null) _background.gameObject.SetActive(true);
         RefreshButtons();
+
+        // Panel comes in from the right edge, the glass picture from the left, together.
+        if (isActiveAndEnabled)
+        {
+            if (_panelRect != null)
+            {
+                _panelRect.anchoredPosition = _panelHome + new Vector2(_panelRect.rect.width, 0f);
+                _panelSlide = StartCoroutine(SlideIn(_panelRect, _panelHome, () => _panelSlide = null));
+            }
+            if (_glassViewRect != null)
+            {
+                _glassView.SetActive(true);
+                _glassViewRect.anchoredPosition = _glassViewHome - new Vector2(_glassViewRect.rect.width, 0f);
+                _glassSlide = StartCoroutine(SlideIn(_glassViewRect, _glassViewHome, () => _glassSlide = null));
+            }
+        }
+        else
+        {
+            if (_panelRect != null) _panelRect.anchoredPosition = _panelHome;
+            if (_glassView != null) _glassView.SetActive(true);
+        }
 
         Opened?.Invoke();
         GlassChanged?.Invoke(Glass != null);
@@ -206,10 +235,19 @@ public class GarnishManager : MonoBehaviour
     public void Close()
     {
         StopSlide(ref _panelSlide);
+        StopSlide(ref _glassSlide);
         if (_panel != null && _panel.activeInHierarchy && isActiveAndEnabled)
+        {
             _panelSlide = StartCoroutine(SlidePanelOut());
-        else if (_panel != null)
-            _panel.SetActive(false);
+            // Off the left edge, then hidden; OpenServe in the same frame stops this and keeps it.
+            if (_glassViewRect != null && _glassView.activeSelf)
+                _glassSlide = StartCoroutine(SlideGlassOut());
+        }
+        else
+        {
+            if (_panel != null) _panel.SetActive(false);
+            if (_glassView != null) _glassView.SetActive(false);
+        }
 
         if (_background != null) _background.gameObject.SetActive(false);
 
@@ -255,7 +293,6 @@ public class GarnishManager : MonoBehaviour
 
         glass.Initialize(option);
         Glass = glass;
-        if (_glassView != null) _glassView.SetActive(true);
         _pourComplete = false; // a freshly-placed glass has nothing poured into it yet
         _hasPoured = false;
         _activeGarnishSlot = 0;
@@ -278,7 +315,6 @@ public class GarnishManager : MonoBehaviour
 
         if (Glass != null) Destroy(Glass.gameObject);
         Glass = null;
-        if (_glassView != null) _glassView.SetActive(false);
         RefreshButtons();
         GlassChanged?.Invoke(false);
     }
@@ -411,6 +447,8 @@ public class GarnishManager : MonoBehaviour
     public void OpenServe()
     {
         StopSlide(ref _serveReveal);
+        StopSlide(ref _glassSlide);
+        if (_glassView != null) _glassView.SetActive(true);
 
         // Close() just hid it on the way out of Garnish; in the same frame, so it never blinks.
         if (_background != null) _background.gameObject.SetActive(true);
@@ -424,7 +462,30 @@ public class GarnishManager : MonoBehaviour
         StopSlide(ref _serveReveal);
         if (_panelServe != null) _panelServe.SetActive(false);
         if (_background != null) _background.gameObject.SetActive(false);
-        if (_glassViewRect != null) _glassViewRect.anchoredPosition = _glassViewHome;
+        StopSlide(ref _glassSlide);
+        ResetGlassView();
+        if (_glassView != null) _glassView.SetActive(false);
+    }
+
+    private void ResetGlassView()
+    {
+        if (_glassViewRect == null) return;
+        _glassViewRect.anchoredPosition = _glassViewHome;
+        _glassViewRect.sizeDelta = _glassViewHomeSize;
+        if (_glassViewImage != null) _glassViewImage.uvRect = _glassViewHomeUv;
+    }
+
+    private IEnumerator SlideIn(RectTransform rect, Vector2 to, System.Action done)
+    {
+        yield return Slide(rect, to);
+        done();
+    }
+
+    private IEnumerator SlideGlassOut()
+    {
+        yield return Slide(_glassViewRect, _glassViewHome - new Vector2(_glassViewRect.rect.width, 0f));
+        _glassView.SetActive(false);
+        _glassSlide = null;
     }
 
     private IEnumerator SlidePanelOut()
@@ -439,9 +500,27 @@ public class GarnishManager : MonoBehaviour
     {
         if (_glassViewRect != null)
         {
-            // GlassView is anchored to the left edge: centre it in its parent.
-            float centred = (((RectTransform)_glassViewRect.parent).rect.width - _glassViewRect.rect.width) * 0.5f;
-            yield return Slide(_glassViewRect, new Vector2(centred, _glassViewHome.y));
+            // GlassView is anchored to the left edge: grow it to the parent's full width and show the
+            // whole render texture, so the glass keeps its size and the picture is not stretched.
+            Vector2 fromPos = _glassViewRect.anchoredPosition;
+            Vector2 fromSize = _glassViewRect.sizeDelta;
+            Rect fromUv = _glassViewImage != null ? _glassViewImage.uvRect : default;
+            Vector2 toSize = new Vector2(((RectTransform)_glassViewRect.parent).rect.width, fromSize.y);
+            Vector2 toPos = new Vector2(0f, fromPos.y);
+            Rect toUv = new Rect(0f, 0f, 1f, 1f);
+
+            for (float e = 0f; e < _slideDuration; e += Time.deltaTime)
+            {
+                float k = Mathf.SmoothStep(0f, 1f, e / _slideDuration);
+                _glassViewRect.anchoredPosition = Vector2.Lerp(fromPos, toPos, k);
+                _glassViewRect.sizeDelta = Vector2.Lerp(fromSize, toSize, k);
+                if (_glassViewImage != null)
+                    _glassViewImage.uvRect = new Rect(Vector2.Lerp(fromUv.position, toUv.position, k), Vector2.Lerp(fromUv.size, toUv.size, k));
+                yield return null;
+            }
+            _glassViewRect.anchoredPosition = toPos;
+            _glassViewRect.sizeDelta = toSize;
+            if (_glassViewImage != null) _glassViewImage.uvRect = toUv;
         }
 
         yield return new WaitForSeconds(_serveButtonsDelay);
