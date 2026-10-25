@@ -10,8 +10,7 @@
 //  (SetAvailable, driven by FlowWiring). The pop-up at order time
 //  shows regardless, since the order is placed during the talk.
 //
-//  It sits in the top-right corner, and moves to the top-left for
-//  the steps whose own UI fills the right of the screen (SetSide).
+//  It always sits in the top-left corner.
 // ============================================================
 
 using System.Collections;
@@ -45,9 +44,6 @@ public class Post_It_Order : MonoBehaviour
     private bool _available;
     private bool _open;
     private bool _dirty;
-    private bool _left;      // the corner the note is in now
-    private bool _wantLeft;  // the corner it should be in
-    private Vector2 _margin; // gap to the screen corner, taken from the authored position
     private Shape _shown = Shape.Hidden;
     private Coroutine _morph;
     private Coroutine _autoFold;
@@ -61,9 +57,7 @@ public class Post_It_Order : MonoBehaviour
         if (_btnOpen != null) SetScale(_btnOpen.transform, 0f);
         if (OrderText != null) OrderText.alpha = 0f;
 
-        Vector2 authored = ((RectTransform)transform).anchoredPosition;
-        _margin = new Vector2(Mathf.Abs(authored.x), Mathf.Abs(authored.y));
-        ApplySide(false);
+        PinTopLeft();
     }
 
     private void OnDestroy()
@@ -107,13 +101,6 @@ public class Post_It_Order : MonoBehaviour
         _dirty = true;
     }
 
-    /// <summary>Top-left (true) or top-right (false). A note on screen folds away, moves and comes back.</summary>
-    public void SetSide(bool left)
-    {
-        _wantLeft = left;
-        _dirty = true;
-    }
-
     private void Unfold()
     {
         CancelAutoFold(); // opened by hand: it stays until folded by hand
@@ -142,29 +129,25 @@ public class Post_It_Order : MonoBehaviour
             : _available ? Shape.Button
             : Shape.Hidden;
 
-        bool moving = _wantLeft != _left;
-        if (wanted == _shown && !moving) return;
+        if (wanted == _shown) return;
         _shown = wanted;
 
         if (_morph != null) StopCoroutine(_morph);
-        _morph = StartCoroutine(Morph(wanted, moving));
+        _morph = StartCoroutine(Morph(wanted));
     }
 
     // Always from wherever the parts are now, so an interrupted change carries on smoothly.
-    private IEnumerator Morph(Shape to, bool moving)
+    private IEnumerator Morph(Shape to)
     {
         Transform button = _btnOpen != null ? _btnOpen.transform : null;
 
-        if (to != Shape.Panel || moving)
+        if (to != Shape.Panel)
         {
             yield return FadeText(0f);
             yield return ScaleTo(_panel, 0f);
         }
 
-        if (to != Shape.Button || moving) yield return ScaleTo(button, 0f);
-
-        // Everything is folded to nothing here, so the jump to the other corner is never seen.
-        if (moving) ApplySide(_wantLeft);
+        if (to != Shape.Button) yield return ScaleTo(button, 0f);
 
         if (to == Shape.Panel)
         {
@@ -219,13 +202,14 @@ public class Post_It_Order : MonoBehaviour
         target.gameObject.SetActive(scale > 0f);
     }
 
-    // The root and both parts are pinned to the same top corner, so they grow out of it.
-    private void ApplySide(bool left)
+    // The root and both parts are pinned to the top-left corner, so they grow out of it.
+    // The gap to the corner is taken from the authored position.
+    private void PinTopLeft()
     {
-        _left = left;
-        var corner = new Vector2(left ? 0f : 1f, 1f);
+        var corner = new Vector2(0f, 1f);
+        Vector2 authored = ((RectTransform)transform).anchoredPosition;
 
-        Pin((RectTransform)transform, corner, new Vector2(left ? _margin.x : -_margin.x, -_margin.y));
+        Pin((RectTransform)transform, corner, new Vector2(Mathf.Abs(authored.x), -Mathf.Abs(authored.y)));
         Pin(_panel, corner, Vector2.zero);
         if (_btnOpen != null) Pin((RectTransform)_btnOpen.transform, corner, Vector2.zero);
     }

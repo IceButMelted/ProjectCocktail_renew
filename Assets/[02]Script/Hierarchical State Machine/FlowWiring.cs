@@ -245,7 +245,6 @@ namespace Bar410.GameFlow
         private void OnAddIngredientEntered()
         {
             _ingredients?.SetInteractable(true);
-            _postIt?.SetSide(left: false);
 
             // Phase-specific interactable policy (bottle drag + click).
             _ingredients?.EnableInteractablePrepareDrinksPhase();
@@ -328,8 +327,6 @@ namespace Bar410.GameFlow
 
         private void OnMinigameStartRequested(Enum_MiniGameType selected)
         {
-            _postIt?.SetSide(left: true);
-
             if (_minigames == null) return;
 
             var fromDrink = _shakerContents != null
@@ -392,7 +389,6 @@ namespace Bar410.GameFlow
             _ingredients?.Disable();
             _garnish?.Open();
             _postIt?.SetAvailable(true);
-            _postIt?.SetSide(left: true); // the garnish panel fills the right of the screen
         }
 
         private void OnGarnishExited()
