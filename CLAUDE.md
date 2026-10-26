@@ -63,7 +63,20 @@ Loop ของหนึ่งวัน: คุยกับลูกค้า →
 - ทดสอบใน Play mode ผ่าน Unity MCP เมื่อทำได้ และบอกตรงๆ ว่าอะไรยังไม่ได้ทดสอบ
 - commit / push / PR เฉพาะเมื่อสั่ง แยก commit ตามเรื่อง
 - งานใหญ่ให้เขียน HANDOFF / decision log ไว้ใน `Docs/`
+- **ทุกครั้งที่แก้หรือสร้างไฟล์ ให้บอกผมในข้อความตอนจบ:** path ของไฟล์, ไฟล์นั้นทำอะไร และถ้าอยู่ใน Scene/Prefab ให้บอกว่าอยู่ที่ GameObject ไหน
+- **ถ้าเป็น Component (MonoBehaviour) ใหม่:** เพิ่มลงหัวข้อ "Component ที่เพิ่มเข้ามา" ด้านล่างด้วย และอัปเดตเมื่อย้ายหรือลบ
 - TODO(เจ้าของ): กติกาเพิ่มเติม (เช่น ชื่อ branch, รูปแบบ commit, สิ่งที่ห้ามแตะ)
+
+## Component ที่เพิ่มเข้ามา
+| Component | ไฟล์ | อยู่ที่ (Scene › GameObject) | ทำอะไร |
+|---|---|---|---|
+| `EventLogPresenter` | `Assets/[06]Dialogue/EventLog/EventLogPresenter.cs` | `New Drag Drop System` › `[EventLogSystem]` | เก็บบทพูดและคำตอบลง Event Log, บันทึกลง save, ล้างด้วย `<<eventlog_clear>>` |
+| `PauseAwareKeyCodes` | `Assets/[06]Dialogue/PauseAwareKeyCodes.cs` | prefab `Assets/[06]Dialogue/Text Animator Dialogue System.prefab` › `Line Advancer` | ปุ่มเร่ง/ไปบทถัดไป (ลิสต์ปุ่ม + cooldown) ไม่รับตอน Pause |
+| `DialogueControls` | `Assets/[06]Dialogue/DialogueControls.cs` | `New Drag Drop System` › `Canvas_HUD` | ปุ่ม AutoPlay, Skip และ `Panel_SkipWarning` |
+| `DialogueSettingStepper` | `Assets/[06]Dialogue/Settings/DialogueSettingStepper.cs` | `PauseScene` › `Panel - Setting` › `Panel_DialougeSetting` › `Setting TypeWriteSpeed` (Text Speed) และ `Setting TypeWriterStyle` (Display Type) | แถว `◀ ค่า ▶` เลือก Text Speed (Slow/Normal/Fast) / Display Type (Character/Word/Instant) เก็บใน PlayerPrefs `dlg.speed` / `dlg.display` |
+| `SettingWindowTabs` | `Assets/[02]Script/Pause/SettingWindowTabs.cs` | `PauseScene` › `Panel - Setting` › `Panel_BTN_ChangeSettingWindow` | แท็บของหน้า Settings: กดปุ่มแล้วเปิด panel ของปุ่มนั้น ปิดตัวอื่น (Sound / Dialogue / Language) เปิด Settings ใหม่จะกลับไปแท็บแรก |
+
+ไฟล์ที่ไม่ใช่ Component แต่เกี่ยวข้อง: `SO_DialogueSettings` + `DialogueSettings` (`Assets/[06]Dialogue/Settings/SO_DialogueSettings.cs`, asset `DialogueSettings.asset`) คือค่าตั้งต้นของบทพูด และ `SkipScan` (`Assets/[06]Dialogue/SkipScan.cs`) ใช้ดูบทล่วงหน้าตอน Skip
 
 ## เอกสารที่ควรอ่านก่อนเริ่มงานแต่ละระบบ
 - Flow / manager: `Docs/Bar410_Managers_Restructure_HANDOFF.md`, `Docs/Bar410_StateMachine_Implementation.md`
