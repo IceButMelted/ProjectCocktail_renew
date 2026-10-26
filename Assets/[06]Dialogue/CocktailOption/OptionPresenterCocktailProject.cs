@@ -86,6 +86,10 @@ namespace YarnSpinner.Custom
         [Tooltip("Seconds before the option tagged #timeout (visible) or #SilentTimeout (hidden) is chosen automatically. 0 or less disables timeout.")]
         public float autoSelectDuration = 10f;
 
+        // Cocktail Project: raised once per option set with the picked option and whether the timer picked it.
+        public event System.Action<DialogueOption, bool>? OptionChosen;
+        bool _timedOut;
+
         private const string TruncateLastLineMarkupName = "lastline";
         private const string TimeoutMetadataTag = "timeout";
         private const string SilentTimeoutMetadataTag = "silenttimeout";
@@ -179,6 +183,8 @@ namespace YarnSpinner.Custom
 
         public override async YarnTask<DialogueOption?> RunOptionsAsync(DialogueOption[] dialogueOptions, LineCancellationToken cancellationToken)
         {
+            _timedOut = false;
+
             // All unavailable: return null, the DialogueRunner handles it.
             bool anyAvailable = false;
             foreach (var option in dialogueOptions)
@@ -347,6 +353,7 @@ namespace YarnSpinner.Custom
                 return await DialogueRunner.NoOptionSelected;
             }
 
+            if (completedTask != null) OptionChosen?.Invoke(completedTask, _timedOut);
             return completedTask;
         }
 
@@ -367,6 +374,7 @@ namespace YarnSpinner.Custom
 
             if (!token.IsCancellationRequested)
             {
+                _timedOut = true;
                 source.TrySetResult(fallback);
             }
         }

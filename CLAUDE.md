@@ -71,4 +71,5 @@ Loop ของหนึ่งวัน: คุยกับลูกค้า →
 - Cocktail: `Docs/Bar410_CocktailSystem_Architecture.md`
 - Garnish: `Docs/Bar410_GarnishRestructure_HANDOFF.md`
 - Minigame: `Docs/Bar410_Minigame_Integration_Report.md`
+- Event Log (ประวัติบทสนทนา): `Docs/Bar410_EventLog_Plan.md`
 - ภาพรวมล่าสุด: `Docs/Bar410_Status_Report_2026-10-24.html`

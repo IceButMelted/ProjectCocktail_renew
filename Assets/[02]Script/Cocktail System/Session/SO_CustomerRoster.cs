@@ -24,4 +24,20 @@ public class SO_CustomerRoster : ScriptableObject, ICustomerPreferences
 
         return false;
     }
+
+    public bool TryGetNameColor(string customerName, out Color color)
+    {
+        color = default;
+        if (Customers == null) return false;
+
+        foreach (var entry in Customers)
+        {
+            if (entry == null || entry.CustomerName != customerName) continue;
+
+            color = entry.NameColor;
+            return true;
+        }
+
+        return false;
+    }
 }
