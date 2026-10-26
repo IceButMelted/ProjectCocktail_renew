@@ -218,6 +218,16 @@ namespace YarnSpinner.Custom
                 return;
             }
 
+            DialogueControls.OnLineStarted(line.TextID);
+
+            // Skip-to-order: lines fly past unshown (the Event Log is its own presenter and still gets them),
+            // until the line carrying the [order] markup, which plays normally.
+            if (DialogueControls.IsSkipping)
+            {
+                if (line.Text.TryGetAttributeWithName("order", out _)) DialogueControls.StopSkip();
+                else return;
+            }
+
             // Same character as the previous line and the UI hasn't fully faded: keep it on screen.
             bool sameCharacter = skipFadeForSameCharacter
                 && !string.IsNullOrWhiteSpace(line.CharacterName)
@@ -302,7 +312,23 @@ namespace YarnSpinner.Custom
             }
             else
             {
-                await YarnTask.WaitUntilCanceled(token.NextContentToken).SuppressCancellationThrow();
+                // Wait for input. AutoPlay advances after the settings delay; the timer runs on
+                // Time.deltaTime, so it freezes while the game is paused.
+                float waited = 0f;
+                while (!token.IsNextContentRequested)
+                {
+                    if (DialogueControls.AutoPlay)
+                    {
+                        waited += Time.deltaTime;
+                        if (waited >= DialogueSettings.AutoPlayDelay(text.Text.Length))
+                        {
+                            DialogueControls.RequestNextLine();
+                            break;
+                        }
+                    }
+                    else waited = 0f;
+                    await YarnTask.Yield();
+                }
             }
 
             Typewriter.ContentWillDismiss();

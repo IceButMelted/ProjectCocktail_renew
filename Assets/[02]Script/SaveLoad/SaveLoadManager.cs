@@ -191,6 +191,12 @@ public class SaveLoadManager : MonoBehaviour
 
     public void SaveToFile(int slot)
     {
+        if (DialogueControls.IsSkipping)
+        {
+            Debug.LogWarning("[SaveLoadManager] Save skipped: dialogue skip still running.");
+            return;
+        }
+
         // Mid silent-replay the scene is still fast-forwarding to the loaded line, so CurrentLineId is not the real position.
         if (SceneLoaderBridge.IsSilentReplay)
         {

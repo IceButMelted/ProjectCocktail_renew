@@ -200,6 +200,17 @@ namespace YarnSpinner.Custom
                 return null;
             }
 
+            // Skip-to-order: pick the first available option, show nothing.
+            if (DialogueControls.IsSkipping)
+            {
+                foreach (var option in dialogueOptions)
+                {
+                    if (!option.IsAvailable) continue;
+                    OptionChosen?.Invoke(option, false);
+                    return option;
+                }
+            }
+
             // Timeout: an available option tagged #timeout is hidden and auto-chosen when time runs out.
             DialogueOption? fallbackOption = null;
             bool fallbackHidden = false;
@@ -232,6 +243,8 @@ namespace YarnSpinner.Custom
             }
 
             var selectedOptionCompletionSource = new YarnTaskCompletionSource<DialogueOption?>();
+            _openOptions = dialogueOptions;
+            _openSelection = selectedOptionCompletionSource;
 
             // Cancelled when any item is selected, or when the whole view is cancelled.
             var completionCancellationSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken.NextContentToken);
@@ -330,6 +343,8 @@ namespace YarnSpinner.Custom
             }
 
             var completedTask = await selectedOptionCompletionSource.Task;
+            _openOptions = null;
+            _openSelection = null;
             completionCancellationSource.Cancel();
 
             if (timedBar != null)
@@ -355,6 +370,21 @@ namespace YarnSpinner.Custom
 
             if (completedTask != null) OptionChosen?.Invoke(completedTask, _timedOut);
             return completedTask;
+        }
+
+        DialogueOption[]? _openOptions;
+        YarnTaskCompletionSource<DialogueOption?>? _openSelection;
+
+        /// <summary>Skip-to-order: resolves options already on screen with the first available one.</summary>
+        public void ChooseFirstAvailable()
+        {
+            if (_openOptions == null || _openSelection == null) return;
+            foreach (var option in _openOptions)
+            {
+                if (!option.IsAvailable) continue;
+                _openSelection.TrySetResult(option);
+                return;
+            }
         }
 
         async YarnTask RunTimeout(YarnTaskCompletionSource<DialogueOption?> source, DialogueOption fallback, CancellationToken token)
