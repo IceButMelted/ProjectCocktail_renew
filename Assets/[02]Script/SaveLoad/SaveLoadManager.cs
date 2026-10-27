@@ -102,6 +102,7 @@ public class SaveLoadManager : MonoBehaviour
             _pendingLoad = false;
             ApplyYarnData();
             ApplyNPCData();
+            FindFirstObjectByType<EventLogPresenter>()?.Restore(_saveData.EventLogData?.Entries ?? new List<EventLogEntry>());
             Debug.Log("[SaveLoadManager] Pending load applied after scene ready.");
         }
     }
@@ -190,6 +191,12 @@ public class SaveLoadManager : MonoBehaviour
 
     public void SaveToFile(int slot)
     {
+        if (DialogueControls.IsSkipping)
+        {
+            Debug.LogWarning("[SaveLoadManager] Save skipped: dialogue skip still running.");
+            return;
+        }
+
         // Mid silent-replay the scene is still fast-forwarding to the loaded line, so CurrentLineId is not the real position.
         if (SceneLoaderBridge.IsSilentReplay)
         {
@@ -199,6 +206,7 @@ public class SaveLoadManager : MonoBehaviour
 
         CollectYarnData();
         CollectNPCData();
+        _saveData.EventLogData.Entries = FindFirstObjectByType<EventLogPresenter>()?.Snapshot() ?? new List<EventLogEntry>();
 
         _saveData.MetaData.Slot = slot;
         _saveData.MetaData.SaveName = $"Save {slot + 1}";
@@ -460,6 +468,7 @@ public class SaveData
     public SaveYarnData YarnData = new SaveYarnData();
     public SaveSettingData SettingData = new SaveSettingData();
     public SaveNPCData NPCData = new SaveNPCData();
+    public SaveEventLogData EventLogData = new SaveEventLogData();
 }
 
 // ─── Unity type JSON converters ───────────────────────────────────────────────

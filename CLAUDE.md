@@ -39,18 +39,23 @@ Loop ของหนึ่งวัน: คุยกับลูกค้า →
 - **ให้คะแนนที่เดียว:** ตอน Serve → Talking (`ServeDrink()` เป็น idempotent) ส่วน remake ไม่ให้คะแนน
 - **มินิเกมแพ้ไม่ได้:** จบได้แค่ `Completed` หรือ `Cancelled`
 - **ความสัมพันธ์อยู่ในตัวแปร Yarn `$rel_<id>` ที่เดียว** ห้าม mirror ลง ScriptableObject
+- **Hub UI (เปิด/ปิดตาม Phase อย่างเดียว) ผ่าน `HubManager` บน `Canvas_HUD`** โดย `FlowWiring` เป็นคนส่ง Phase ให้ ส่วน System UI (Garnish, Minigame, Post-it ฯลฯ) ยังคุมโดย Manager ของมันเอง
 - **Singleton เป็นแบบ scene-scoped** (เช่น `PauseManager`, `SoundManager`): ซ้ำแล้วทำลายตัวเอง และไม่ใช้ DontDestroyOnLoad
 - **สูตรเครื่องดื่ม:** วัตถุดิบรวม = 10 หน่วยเสมอ ไม่มีสูตรที่ส่วนผสมซ้ำกันเป๊ะ ตรวจด้วย `Bar410 > Validate Cocktail Data`
 
 ## งานที่กำลังทำ
 ตรงนี้ให้ Update ตัวเองในการทำทุกครั้งว่ากำลังทำอะไร
-- branch `UiManager`: วางโครงสร้าง UiManager
-- แผนผัง UI ปัจจุบันอยู่ที่ FigJam board "Project Cocktails" › section "Ui Manager"
+- branch `UiManager`: วางโครงสร้าง UI (merge เข้า `main` แล้ว 2026-10-28)
+- แผนผัง UI ปัจจุบันอยู่ที่ FigJam board "Project Cocktails" › section "UI List" › "Table C" (อัปเดต 2026-10-28)
+- เสร็จแล้วในรอบนี้: Event Log, AutoPlay + Skip-to-order, ความเร็ว/แบบการแสดงตัวอักษรใน Pause › Setting, แท็บหน้า Setting, `HubManager`
+- ยังไม่ได้ทดสอบด้วยการเล่นจริง: คลิกเมาส์/controller, save/load, `*Silent*` (ยังไม่มี yarn ไหนใส่ `#timeout`), Phase Close (ยังไม่มีทางเข้า)
 - TODO(เจ้าของ): ในตอนนี้จะให้วางแผนการจัดการงาน Structure Ui เพื่อให้ง่ายต่อการใช้งานและโครงสร้างที่ชัดเจน
 
 ## สิ่งที่ต้องแก้
-- Input ซ้ำกัน: กด Pause แล้ว Yarn Spinner เลื่อนบทพูดไปพร้อมกัน
+- Input ซ้ำกัน: กด Pause แล้ว Yarn Spinner เลื่อนบทพูดไปพร้อมกัน (น่าจะแก้แล้ว: เอา Esc ออกจาก Next line ใน `PauseAwareKeyCodes` รอทดสอบด้วยการกดจริง)
 - มี EventSystem 2 ตัวในฉาก
+- Save/Load ในฉากหลักไม่กลับมาที่บรรทัดเดิม: `LinePresenterCocktailProject` ไม่ตั้ง `SceneLoaderBridge.CurrentLineId` / ไม่อ่าน `#save_checkpoint` / ไม่ทำ silent replay และ `OptionPresenterCocktailProject` ไม่เก็บคำตอบลง `SessionOptionChoices` (logic เดิมอยู่ใน `BubblePresenter` / `OptionPresenterType2` ที่ไม่ได้อยู่ในฉากแล้ว)
+- `MainMenu_V2.unity` มี component Volume บน Global Volume ถูกลบค้างอยู่ (ยังไม่ commit รอเจ้าของยืนยัน)
 
 ## Request พิเศษจาก Designer
 - รองรับการเล่นด้วย controller (ใช้ตอนออกงาน event ต่างๆ)
@@ -63,7 +68,21 @@ Loop ของหนึ่งวัน: คุยกับลูกค้า →
 - ทดสอบใน Play mode ผ่าน Unity MCP เมื่อทำได้ และบอกตรงๆ ว่าอะไรยังไม่ได้ทดสอบ
 - commit / push / PR เฉพาะเมื่อสั่ง แยก commit ตามเรื่อง
 - งานใหญ่ให้เขียน HANDOFF / decision log ไว้ใน `Docs/`
+- **ทุกครั้งที่แก้หรือสร้างไฟล์ ให้บอกผมในข้อความตอนจบ:** path ของไฟล์, ไฟล์นั้นทำอะไร และถ้าอยู่ใน Scene/Prefab ให้บอกว่าอยู่ที่ GameObject ไหน
+- **ถ้าเป็น Component (MonoBehaviour) ใหม่:** เพิ่มลงหัวข้อ "Component ที่เพิ่มเข้ามา" ด้านล่างด้วย และอัปเดตเมื่อย้ายหรือลบ
 - TODO(เจ้าของ): กติกาเพิ่มเติม (เช่น ชื่อ branch, รูปแบบ commit, สิ่งที่ห้ามแตะ)
+
+## Component ที่เพิ่มเข้ามา
+| Component | ไฟล์ | อยู่ที่ (Scene › GameObject) | ทำอะไร |
+|---|---|---|---|
+| `EventLogPresenter` | `Assets/[06]Dialogue/EventLog/EventLogPresenter.cs` | `New Drag Drop System` › `[EventLogSystem]` | เก็บบทพูดและคำตอบลง Event Log, บันทึกลง save, ล้างด้วย `<<eventlog_clear>>` |
+| `PauseAwareKeyCodes` | `Assets/[06]Dialogue/PauseAwareKeyCodes.cs` | prefab `Assets/[06]Dialogue/Text Animator Dialogue System.prefab` › `Line Advancer` | ปุ่มเร่ง/ไปบทถัดไป (ลิสต์ปุ่ม + cooldown) ไม่รับตอน Pause |
+| `DialogueControls` | `Assets/[06]Dialogue/DialogueControls.cs` | `New Drag Drop System` › `Canvas_HUD` | ปุ่ม AutoPlay, Skip และ `Panel_SkipWarning` การแสดง/ซ่อนปุ่มตาม Phase ไม่อยู่ที่นี่แล้ว ย้ายไป `HubManager` |
+| `HubManager` | `Assets/[02]Script/UI Script/HubManager.cs` | `New Drag Drop System` › `[GameLoop]` › `Canvas_HUD` | ตาราง Odin ใน Inspector: แต่ละแถวคือ Hub UI หนึ่งตัว พร้อมปุ่มเลือก Phase ที่แสดง (Talking / AddIngredient / Minigame / Garnish / Serve / Close) นอก Phase จะ fade หายและกดไม่ได้ (CanvasGroup ไม่เรียก `SetActive`) UI ที่ไม่อยู่ในตารางแสดงตลอด `FlowWiring` เรียก `SetPhase` ทุก Phase มีปุ่ม Preview ตอน edit mode (Undo ได้) |
+| `DialogueSettingStepper` | `Assets/[06]Dialogue/Settings/DialogueSettingStepper.cs` | `PauseScene` › `Panel - Setting` › `Panel_DialougeSetting` › `Setting TypeWriteSpeed` (Text Speed) และ `Setting TypeWriterStyle` (Display Type) | แถว `◀ ค่า ▶` เลือก Text Speed (Slow/Normal/Fast) / Display Type (Character/Word/Instant) เก็บใน PlayerPrefs `dlg.speed` / `dlg.display` |
+| `SettingWindowTabs` | `Assets/[02]Script/Pause/SettingWindowTabs.cs` | `PauseScene` › `Panel - Setting` › `Panel_BTN_ChangeSettingWindow` | แท็บของหน้า Settings: กดปุ่มแล้วเปิด panel ของปุ่มนั้น ปิดตัวอื่น (Sound / Dialogue / Language) เปิด Settings ใหม่จะกลับไปแท็บแรก |
+
+ไฟล์ที่ไม่ใช่ Component แต่เกี่ยวข้อง: `SO_DialogueSettings` + `DialogueSettings` (`Assets/[06]Dialogue/Settings/SO_DialogueSettings.cs`, asset `DialogueSettings.asset`) คือค่าตั้งต้นของบทพูด และ `SkipScan` (`Assets/[06]Dialogue/SkipScan.cs`) ใช้ดูบทล่วงหน้าตอน Skip
 
 ## เอกสารที่ควรอ่านก่อนเริ่มงานแต่ละระบบ
 - Flow / manager: `Docs/Bar410_Managers_Restructure_HANDOFF.md`, `Docs/Bar410_StateMachine_Implementation.md`
@@ -71,4 +90,8 @@ Loop ของหนึ่งวัน: คุยกับลูกค้า →
 - Cocktail: `Docs/Bar410_CocktailSystem_Architecture.md`
 - Garnish: `Docs/Bar410_GarnishRestructure_HANDOFF.md`
 - Minigame: `Docs/Bar410_Minigame_Integration_Report.md`
+- Event Log (ประวัติบทสนทนา): `Docs/Bar410_EventLog_Plan.md`
+- AutoPlay / Skip: `Docs/Bar410_DialogueSkipAutoPlay_Plan.md`
+- ความเร็ว / แบบการแสดงตัวอักษร: `Docs/Bar410_DialogueTextSettings_Plan.md`
+- Hub UI ตาม Phase: `Docs/Bar410_HubManager_Plan.md`
 - ภาพรวมล่าสุด: `Docs/Bar410_Status_Report_2026-10-24.html`

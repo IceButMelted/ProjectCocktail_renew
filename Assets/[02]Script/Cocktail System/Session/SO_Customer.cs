@@ -24,6 +24,9 @@ public class SO_Customer : ScriptableObject
 
     public string CustomerName;
 
+    [Tooltip("Colour of this character's name in the Event Log and name boxes.")]
+    public Color NameColor = Color.white;
+
     [Tooltip("Drink TYPES this customer likes, not specific recipes (GDD §7).")]
     public List<TypeOfCocktail> PreferredDrinkTypes = new List<TypeOfCocktail>();
 }

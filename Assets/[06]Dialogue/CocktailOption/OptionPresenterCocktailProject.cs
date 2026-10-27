@@ -86,6 +86,10 @@ namespace YarnSpinner.Custom
         [Tooltip("Seconds before the option tagged #timeout (visible) or #SilentTimeout (hidden) is chosen automatically. 0 or less disables timeout.")]
         public float autoSelectDuration = 10f;
 
+        // Cocktail Project: raised once per option set with the picked option and whether the timer picked it.
+        public event System.Action<DialogueOption, bool>? OptionChosen;
+        bool _timedOut;
+
         private const string TruncateLastLineMarkupName = "lastline";
         private const string TimeoutMetadataTag = "timeout";
         private const string SilentTimeoutMetadataTag = "silenttimeout";
@@ -179,6 +183,8 @@ namespace YarnSpinner.Custom
 
         public override async YarnTask<DialogueOption?> RunOptionsAsync(DialogueOption[] dialogueOptions, LineCancellationToken cancellationToken)
         {
+            _timedOut = false;
+
             // All unavailable: return null, the DialogueRunner handles it.
             bool anyAvailable = false;
             foreach (var option in dialogueOptions)
@@ -192,6 +198,17 @@ namespace YarnSpinner.Custom
             if (!anyAvailable)
             {
                 return null;
+            }
+
+            // Skip-to-order: pick the first available option, show nothing.
+            if (DialogueControls.IsSkipping)
+            {
+                foreach (var option in dialogueOptions)
+                {
+                    if (!option.IsAvailable) continue;
+                    OptionChosen?.Invoke(option, false);
+                    return option;
+                }
             }
 
             // Timeout: an available option tagged #timeout is hidden and auto-chosen when time runs out.
@@ -226,6 +243,8 @@ namespace YarnSpinner.Custom
             }
 
             var selectedOptionCompletionSource = new YarnTaskCompletionSource<DialogueOption?>();
+            _openOptions = dialogueOptions;
+            _openSelection = selectedOptionCompletionSource;
 
             // Cancelled when any item is selected, or when the whole view is cancelled.
             var completionCancellationSource = CancellationTokenSource.CreateLinkedTokenSource(cancellationToken.NextContentToken);
@@ -324,6 +343,8 @@ namespace YarnSpinner.Custom
             }
 
             var completedTask = await selectedOptionCompletionSource.Task;
+            _openOptions = null;
+            _openSelection = null;
             completionCancellationSource.Cancel();
 
             if (timedBar != null)
@@ -347,7 +368,23 @@ namespace YarnSpinner.Custom
                 return await DialogueRunner.NoOptionSelected;
             }
 
+            if (completedTask != null) OptionChosen?.Invoke(completedTask, _timedOut);
             return completedTask;
+        }
+
+        DialogueOption[]? _openOptions;
+        YarnTaskCompletionSource<DialogueOption?>? _openSelection;
+
+        /// <summary>Skip-to-order: resolves options already on screen with the first available one.</summary>
+        public void ChooseFirstAvailable()
+        {
+            if (_openOptions == null || _openSelection == null) return;
+            foreach (var option in _openOptions)
+            {
+                if (!option.IsAvailable) continue;
+                _openSelection.TrySetResult(option);
+                return;
+            }
         }
 
         async YarnTask RunTimeout(YarnTaskCompletionSource<DialogueOption?> source, DialogueOption fallback, CancellationToken token)
@@ -367,6 +404,7 @@ namespace YarnSpinner.Custom
 
             if (!token.IsCancellationRequested)
             {
+                _timedOut = true;
                 source.TrySetResult(fallback);
             }
         }

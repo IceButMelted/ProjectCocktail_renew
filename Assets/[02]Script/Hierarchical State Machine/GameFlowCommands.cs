@@ -57,7 +57,11 @@ namespace Bar410.GameFlow
         // ── Level 2 · Step 1 · Talking ─────────────────────
 
         /// <summary>The customer ordered something. Step 1 → 2.</summary>
-        public void PrepareDrinks() => _gameLoop.OpenBar.TalkingWithCustomer.RequestPrepareDrinks();
+        public void PrepareDrinks()
+        {
+            DialogueControls.StopSkip(); // safety: an order line without [order] markup
+            _gameLoop.OpenBar.TalkingWithCustomer.RequestPrepareDrinks();
+        }
 
         /// <summary>Done serving for the day. Step 1 → exit Open Bar → Close.</summary>
         public void CloseBar() => _gameLoop.OpenBar.TalkingWithCustomer.RequestCloseBar();

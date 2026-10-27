@@ -115,6 +115,16 @@ namespace YarnSpinner.Custom
         [ShowIf(nameof(typewriterStyle), TypewriterType.Custom)]
         public InterfaceContainer<IAsyncTypewriter>? customTypewriter;
 
+        // Player Settings (Display Type / Text Speed) are applied to the Text Animator typewriter
+        // at the start of every line. They only take effect when the typewriter above is a TextAnimatorYarnTypewriter.
+        [Group("Typewriter")]
+        [Tooltip("Text Animator timings used for Display Type = Character.")]
+        [SerializeField] Febucci.TextAnimatorForUnity.TypingsTimingsScriptableBase? characterTimings;
+
+        [Group("Typewriter")]
+        [Tooltip("Text Animator timings used for Display Type = Word.")]
+        [SerializeField] Febucci.TextAnimatorForUnity.TypingsTimingsScriptableBase? wordTimings;
+
         /// <summary>Handlers for markers in the line (the pause handler is always added).</summary>
         [Group("Typewriter")]
         [Label("Event Handlers")]
@@ -218,6 +228,16 @@ namespace YarnSpinner.Custom
                 return;
             }
 
+            DialogueControls.OnLineStarted(line.TextID);
+
+            // Skip-to-order: lines fly past unshown (the Event Log is its own presenter and still gets them),
+            // until the line carrying the [order] markup, which plays normally.
+            if (DialogueControls.IsSkipping)
+            {
+                if (line.Text.TryGetAttributeWithName("order", out _)) DialogueControls.StopSkip();
+                else return;
+            }
+
             // Same character as the previous line and the UI hasn't fully faded: keep it on screen.
             bool sameCharacter = skipFadeForSameCharacter
                 && !string.IsNullOrWhiteSpace(line.CharacterName)
@@ -276,6 +296,7 @@ namespace YarnSpinner.Custom
                 TextElement = this.lineText,
             };
 
+            ApplyTextSettings();
             Typewriter.PrepareForContent(text);
 
             if (canvasGroup != null)
@@ -294,7 +315,7 @@ namespace YarnSpinner.Custom
                 }
             }
 
-            await Typewriter.RunTypewriter(text, token.HurryUpToken).SuppressCancellationThrow();
+            await RunTypewriterAsync(text, token.HurryUpToken);
 
             if (autoAdvance)
             {
@@ -302,7 +323,23 @@ namespace YarnSpinner.Custom
             }
             else
             {
-                await YarnTask.WaitUntilCanceled(token.NextContentToken).SuppressCancellationThrow();
+                // Wait for input. AutoPlay advances after the settings delay; the timer runs on
+                // Time.deltaTime, so it freezes while the game is paused.
+                float waited = 0f;
+                while (!token.IsNextContentRequested)
+                {
+                    if (DialogueControls.AutoPlay)
+                    {
+                        waited += Time.deltaTime;
+                        if (waited >= DialogueSettings.AutoPlayDelay(text.Text.Length))
+                        {
+                            DialogueControls.RequestNextLine();
+                            break;
+                        }
+                    }
+                    else waited = 0f;
+                    await YarnTask.Yield();
+                }
             }
 
             Typewriter.ContentWillDismiss();
@@ -328,6 +365,63 @@ namespace YarnSpinner.Custom
             }
 
             Typewriter.ContentDidDismiss();
+        }
+
+        Yarn.Unity.Addons.TextAnimatorIntegration.TextAnimatorYarnTypewriter? textAnimatorTypewriter;
+
+        // Re-applied every line: it is cheap, and it keeps a line that is typing from being changed mid-way.
+        void ApplyTextSettings()
+        {
+            if (Typewriter is not Yarn.Unity.Addons.TextAnimatorIntegration.TextAnimatorYarnTypewriter ta) return;
+
+            if (textAnimatorTypewriter != ta)
+            {
+                textAnimatorTypewriter = ta;
+                // Text Animator resets its speed to 1x when typing starts, so the speed is set from this event.
+                ta.onTypewriterStart.AddListener(ApplyTypewriterSpeed);
+            }
+
+            var timings = DialogueSettings.Display == TextDisplay.Word ? wordTimings : characterTimings;
+            if (timings != null) ta.TimingSettings = timings;
+        }
+
+        void ApplyTypewriterSpeed()
+        {
+            if (textAnimatorTypewriter == null) return;
+            textAnimatorTypewriter.SetTypewriterSpeed(DialogueSettings.SpeedMultiplier);
+        }
+
+        void OnDestroy()
+        {
+            if (textAnimatorTypewriter != null) textAnimatorTypewriter.onTypewriterStart.RemoveListener(ApplyTypewriterSpeed);
+        }
+
+        async YarnTask RunTypewriterAsync(MarkupParseResult text, CancellationToken hurryUp)
+        {
+            // Package bug: TextAnimatorYarnTypewriter only finishes a line from OnAfterWaitingCharacter of the
+            // last character, which never fires with "Delays By Word". So in Word mode we also end the line
+            // when Text Animator reports the text as shown (cancelling takes the normal hurry-up finish path).
+            var display = DialogueSettings.Display;
+            if (textAnimatorTypewriter == null || display == TextDisplay.Character)
+            {
+                await Typewriter!.RunTypewriter(text, hurryUp).SuppressCancellationThrow();
+                return;
+            }
+
+            var ta = textAnimatorTypewriter;
+            using var linked = CancellationTokenSource.CreateLinkedTokenSource(hurryUp);
+            // Instant = hurry-up from the first frame: the typewriter's own skip path shows the whole line at once.
+            if (display == TextDisplay.Instant) linked.Cancel();
+            UnityEngine.Events.UnityAction onShown = linked.Cancel;
+            ta.onTextShowed.AddListener(onShown);
+            try
+            {
+                await Typewriter!.RunTypewriter(text, linked.Token).SuppressCancellationThrow();
+            }
+            finally
+            {
+                ta.onTextShowed.RemoveListener(onShown);
+            }
         }
 
         async YarnTask FadeOutInBackground(CancellationTokenSource source)

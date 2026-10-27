@@ -102,7 +102,7 @@ public partial class CocktailSystemManager
     [YarnCommand("wait_scene")]         // use <<wait_scene 1>> in .yarn instead of <<wait 1>>
     public static IEnumerator WaitScene(float seconds)
     {
-        if (SceneLoaderBridge.IsSilentReplay) yield break;
+        if (SceneLoaderBridge.IsSilentReplay || DialogueControls.IsSkipping) yield break;
         yield return new WaitForSeconds(seconds);
     }
 
