@@ -18,6 +18,10 @@ namespace Bar410.GameFlow
     ///   2.2 Minigame      start/stop the minigame; a win finishes the drink; back leaves for 2.1
     ///   3   Garnish       frame the plate, lock the ingredients, open the station; pour, ice, finish, remake
     ///   4   Serve         open/close the serve panel, take the post-it away; serve or remake
+    ///   Close             nothing but the Hub UI yet
+    ///
+    /// Every step's Entered also tells <see cref="HubManager"/> the new Phase, which shows and hides the
+    /// Hub UI (the buttons on Canvas_HUD) from its Inspector table.
     ///
     /// Lives on the same GameObject as <see cref="GameLoopFSM"/> (`[GameLoop]`).
     /// </summary>
@@ -45,6 +49,8 @@ namespace Bar410.GameFlow
                  "ingredients locks it too; it is switched back on when the drink fills.")]
         [SerializeField] private Button _btnBook;
         [SerializeField] private Post_It_Order _postIt;
+        [Tooltip("Shows and hides the Hub UI per Phase (table in its Inspector).")]
+        [SerializeField] private HubManager _hub;
 
         private GameLoopFSM _gameLoop;
         private GameFlowCommands _commands;
@@ -98,6 +104,7 @@ namespace Bar410.GameFlow
             // 2.2 Minigame
             prepareDrinks.Minigame.OnStartRequested += OnMinigameStartRequested;
             prepareDrinks.Minigame.OnStopRequested += OnMinigameStopRequested;
+            prepareDrinks.Minigame.Entered += OnMinigameEntered;
 
             if (_minigames != null)
             {
@@ -120,6 +127,9 @@ namespace Bar410.GameFlow
             openBar.Serve.Entered += OnServeEntered;
             openBar.Serve.Exited += OnServeExited;
 
+            // Close
+            _gameLoop.ClosingBar.Entered += OnClosingEntered;
+
             if (_garnish != null)
             {
                 _garnish.PourRequested += OnPourRequested;
@@ -134,6 +144,8 @@ namespace Bar410.GameFlow
 
         private void OnDestroy()
         {
+            if (_gameLoop != null && _gameLoop.ClosingBar != null) _gameLoop.ClosingBar.Entered -= OnClosingEntered;
+
             if (_cocktail != null && _customers != null)
             {
                 _cocktail.OrderScored -= _customers.CommitOrderResult;
@@ -186,6 +198,7 @@ namespace Bar410.GameFlow
             openBar.Sub.OnTransition -= OnOpenBarTransition;
             prepareDrinks.Minigame.OnStartRequested -= OnMinigameStartRequested;
             prepareDrinks.Minigame.OnStopRequested -= OnMinigameStopRequested;
+            prepareDrinks.Minigame.Entered -= OnMinigameEntered;
             openBar.Garnish.Entered -= OnGarnishEntered;
             openBar.Garnish.Exited -= OnGarnishExited;
             prepareDrinks.Entered -= OnTableReset;
@@ -202,6 +215,7 @@ namespace Bar410.GameFlow
             _ingredients?.Disable();
             _cameras?.SetLookFixed(true);
             _bookUI?.CloseBook();
+            _hub?.SetPhase(HubPhase.Talking);
         }
 
         private void OnConversationExited()
@@ -244,6 +258,7 @@ namespace Bar410.GameFlow
 
         private void OnAddIngredientEntered()
         {
+            _hub?.SetPhase(HubPhase.AddIngredient);
             _ingredients?.SetInteractable(true);
 
             // Phase-specific interactable policy (bottle drag + click).
@@ -323,6 +338,8 @@ namespace Bar410.GameFlow
         // "the player left". Every way out of the minigame goes through the HSM: cancelling the run
         // directly once left the flow in 2.2 with nothing running.
 
+        private void OnMinigameEntered() => _hub?.SetPhase(HubPhase.Minigame);
+
         private void OnMinigameBackRequested() => _commands?.AnotherIngredient();
 
         private void OnMinigameStartRequested(Enum_MiniGameType selected)
@@ -379,6 +396,8 @@ namespace Bar410.GameFlow
 
         private void OnGarnishEntered()
         {
+            _hub?.SetPhase(HubPhase.Garnish);
+
             // The drink's identity (name/colour/etc.) is resolved against the recipe database
             // once mixing is done, not on every ingredient add — Garnish entry is that "done
             // mixing" moment. Without this, S_Drink.waterColorTop/Bottom stay at their unset
@@ -428,7 +447,15 @@ namespace Bar410.GameFlow
                 _cocktail?.ServeDrink();
         }
 
-        private void OnServeEntered() => _garnish?.OpenServe();
+        private void OnServeEntered()
+        {
+            _hub?.SetPhase(HubPhase.Serve);
+            _garnish?.OpenServe();
+        }
+
+        // ── Close ──────────────────────────────────────────
+
+        private void OnClosingEntered() => _hub?.SetPhase(HubPhase.Close);
 
         private void OnServeExited() => _garnish?.CloseServe();
 
