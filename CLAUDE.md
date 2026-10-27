@@ -45,13 +45,17 @@ Loop ของหนึ่งวัน: คุยกับลูกค้า →
 
 ## งานที่กำลังทำ
 ตรงนี้ให้ Update ตัวเองในการทำทุกครั้งว่ากำลังทำอะไร
-- branch `UiManager`: วางโครงสร้าง UiManager
-- แผนผัง UI ปัจจุบันอยู่ที่ FigJam board "Project Cocktails" › section "Ui Manager"
+- branch `UiManager`: วางโครงสร้าง UI (merge เข้า `main` แล้ว 2026-10-28)
+- แผนผัง UI ปัจจุบันอยู่ที่ FigJam board "Project Cocktails" › section "UI List" › "Table C" (อัปเดต 2026-10-28)
+- เสร็จแล้วในรอบนี้: Event Log, AutoPlay + Skip-to-order, ความเร็ว/แบบการแสดงตัวอักษรใน Pause › Setting, แท็บหน้า Setting, `HubManager`
+- ยังไม่ได้ทดสอบด้วยการเล่นจริง: คลิกเมาส์/controller, save/load, `*Silent*` (ยังไม่มี yarn ไหนใส่ `#timeout`), Phase Close (ยังไม่มีทางเข้า)
 - TODO(เจ้าของ): ในตอนนี้จะให้วางแผนการจัดการงาน Structure Ui เพื่อให้ง่ายต่อการใช้งานและโครงสร้างที่ชัดเจน
 
 ## สิ่งที่ต้องแก้
-- Input ซ้ำกัน: กด Pause แล้ว Yarn Spinner เลื่อนบทพูดไปพร้อมกัน
+- Input ซ้ำกัน: กด Pause แล้ว Yarn Spinner เลื่อนบทพูดไปพร้อมกัน (น่าจะแก้แล้ว: เอา Esc ออกจาก Next line ใน `PauseAwareKeyCodes` รอทดสอบด้วยการกดจริง)
 - มี EventSystem 2 ตัวในฉาก
+- Save/Load ในฉากหลักไม่กลับมาที่บรรทัดเดิม: `LinePresenterCocktailProject` ไม่ตั้ง `SceneLoaderBridge.CurrentLineId` / ไม่อ่าน `#save_checkpoint` / ไม่ทำ silent replay และ `OptionPresenterCocktailProject` ไม่เก็บคำตอบลง `SessionOptionChoices` (logic เดิมอยู่ใน `BubblePresenter` / `OptionPresenterType2` ที่ไม่ได้อยู่ในฉากแล้ว)
+- `MainMenu_V2.unity` มี component Volume บน Global Volume ถูกลบค้างอยู่ (ยังไม่ commit รอเจ้าของยืนยัน)
 
 ## Request พิเศษจาก Designer
 - รองรับการเล่นด้วย controller (ใช้ตอนออกงาน event ต่างๆ)
@@ -87,4 +91,7 @@ Loop ของหนึ่งวัน: คุยกับลูกค้า →
 - Garnish: `Docs/Bar410_GarnishRestructure_HANDOFF.md`
 - Minigame: `Docs/Bar410_Minigame_Integration_Report.md`
 - Event Log (ประวัติบทสนทนา): `Docs/Bar410_EventLog_Plan.md`
+- AutoPlay / Skip: `Docs/Bar410_DialogueSkipAutoPlay_Plan.md`
+- ความเร็ว / แบบการแสดงตัวอักษร: `Docs/Bar410_DialogueTextSettings_Plan.md`
+- Hub UI ตาม Phase: `Docs/Bar410_HubManager_Plan.md`
 - ภาพรวมล่าสุด: `Docs/Bar410_Status_Report_2026-10-24.html`
