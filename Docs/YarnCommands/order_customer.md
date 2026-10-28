@@ -8,7 +8,7 @@
 ```
 
 ## Argument
-target: `[CocktailSystem]` · `npc`: ชื่อ `NPC_Name` (Cole / Owen / Walter / Freya / Isla)
+target: `[CocktailSystem]` · `npc`: ชื่อ `CharacterName` (Cole / Owen / Walter / Faye / Isla)
 
 ## ทำอะไร
 บอกว่าออเดอร์ถัดไปเป็นของใคร (ไม่ใส่ก็ได้)

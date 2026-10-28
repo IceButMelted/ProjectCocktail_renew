@@ -8,7 +8,7 @@
 ```
 
 ## Argument
-`npc`: `NPC_Name` เป็นตัวเลข (None 0, Cole 1, Owen 2, Walter 3, Freya 4, Isla 5)
+`npc`: `CharacterName` เป็นตัวเลข (None 0, Cole 1, Owen 2, Walter 3, Faye 4, Isla 5)
 
 ## ทำอะไร
 สุ่ม cocktail ตามความชอบของลูกค้า (mode 3) คืนชื่อ

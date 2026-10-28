@@ -76,10 +76,11 @@
 
 | ชื่อ | ประเภท | วิธีเขียน |
 |---|---|---|
-| [`MoveIn`](MoveIn.md) | Command (รอ) | `<<MoveIn NPC_Name.Isla 2>>` |
-| [`MoveOut`](MoveOut.md) | Command (รอ) | `<<MoveOut NPC_Name.Isla>>` |
-| [`SetEmotion`](SetEmotion.md) | Command | `<<SetEmotion NPC_Name.Isla "happy">>` |
-| [`SetLookDirection`](SetLookDirection.md) | Command | `<<SetLookDirection NPC_Name.Isla LookDirection.Left>>` |
+| [`CharacterExpression`](CharacterExpression.md) | Command | `<<CharacterExpression CharacterName.Isla Sad>>` |
+| [`CharacterLook`](CharacterLook.md) | Command | `<<CharacterLook CharacterName.Isla L>>` |
+| [`CharacterEnter`](CharacterEnter.md) | Command (รอ) | `<<CharacterEnter CharacterName.Isla 2>>` |
+| [`CharacterExit`](CharacterExit.md) | Command (รอ) | `<<CharacterExit CharacterName.Isla>>` |
+| [`<<Isla ...>>` แบบสั้น](CharacterShortForm.md) | Command (`Enter` / `Exit` รอ) | `<<Isla Sad>>` `<<Isla 1>>` `<<Isla Look L>>` `<<Isla Enter 2>>` `<<Isla Exit>>` |
 
 ## UI / transition / ระบบอื่น
 
