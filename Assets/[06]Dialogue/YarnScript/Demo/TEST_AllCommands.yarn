@@ -63,11 +63,6 @@ title: TEST_Camera
 Player: (TEST) Switch_Camera CenterCam (blend).
 <<Cut_Camera CamController MainCam>>
 Player: (TEST) Cut_Camera MainCam (no blend).
-<<Fix_Camera CamController false>>
-Player: (TEST) Fix_Camera false: the camera may follow the mouse now.
-<<Fix_Camera CamController true>>
-<<Reset_Camera CamController>>
-Player: (TEST) Fix_Camera true + Reset_Camera: look locked and centred.
 <<jump TEST_Hub>>
 ===
 
@@ -159,11 +154,6 @@ title: TEST_Misc
 ---
 <<wait_scene 1>>
 Player: (TEST) wait_scene 1 waited one second (skipped while Skip runs).
-<<Enable_InteractableObject SystemGame false>>
-Player: (TEST) Enable_InteractableObject false: bottles locked.
-<<Enable_InteractableObject true>>
-Player: (TEST) Enable_InteractableObject true (one-argument form): bottles usable.
-<<Enable_InteractableObject SystemGame false>>
 <<eventlog_clear>>
 Player: (TEST) eventlog_clear: the Event Log should now start from this line.
 // save_chapter_node is not tested here: [SaveLoadSystem] is inactive in the main scene, and an

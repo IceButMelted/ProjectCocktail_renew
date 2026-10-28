@@ -11,17 +11,19 @@ namespace Bar410.GameFlow
     /// manager events back into flow commands. It decides nothing else.
     ///
     /// What the flow does to the rest of the game, by step:
-    ///   BeforeOpen    waits for Panel_Transition first; Event locks the bar and shows the queued
+    ///   BeforeOpen    cuts to the bar shot, look fixed; waits for Panel_Transition first; Event locks the bar and shows the queued
     ///                 popups (EventPopupQueue), finishing when the last is closed;
     ///                 StoryBeforeOpen starts the day's node (SO_DaySchedule by $day) on its first entry
     ///   Open          shows the day's chapter title (ChapterTitleUI)
     ///   1   Talking      lock the ingredients, fix the camera look, close the book;
     ///                     carry a scored order into the dialogue's variables
     ///   2   Prepare       fresh drink, bar camera, post-it in; leaving closes the book
-    ///   2.1 AddIngredient bottles and shaker usable; the method panel follows the shaker's contents
-    ///   2.2 Minigame      start/stop the minigame; a win finishes the drink; back leaves for 2.1
+    ///   2.1 AddIngredient bottles and shaker usable; the method panel follows the shaker's contents;
+    ///                     mouse look only here, while the shaker has room
+    ///   2.2 Minigame      start/stop the minigame; look fixed; a win finishes the drink; back leaves for 2.1
     ///   3   Garnish       frame the plate, lock the ingredients, open the station; pour, ice, finish, remake
-    ///   4   Serve         open/close the serve panel, take the post-it away; serve or remake
+    ///   4   Serve         open/close the serve panel, take the post-it away; serve or remake;
+    ///                     leaving it returns to the bar shot
     ///   Close             nothing but the Hub UI yet; leaving it (next day) adds 1 to $day
     ///
     /// Every step's Entered also tells <see cref="HubManager"/> the new Phase, which shows and hides the
@@ -141,6 +143,7 @@ namespace Bar410.GameFlow
             openBar.Serve.Exited += OnServeExited;
 
             // Before Open / Close
+            _gameLoop.BeforeOpen.Entered += OnBeforeOpenEntered;
             _gameLoop.BeforeOpen.Event.Entered += OnEventEntered;
             _gameLoop.BeforeOpen.Story.Entered += OnStoryEntered;
             _gameLoop.ClosingBar.Entered += OnClosingEntered;
@@ -182,6 +185,7 @@ namespace Bar410.GameFlow
             if (_eventPopups != null) _eventPopups.AllClosed -= OnEventPopupsClosed;
             if (_gameLoop != null && _gameLoop.BeforeOpen != null)
             {
+                _gameLoop.BeforeOpen.Entered -= OnBeforeOpenEntered;
                 _gameLoop.BeforeOpen.Event.Entered -= OnEventEntered;
                 _gameLoop.BeforeOpen.Story.Entered -= OnStoryEntered;
             }
@@ -257,6 +261,7 @@ namespace Bar410.GameFlow
             _cameras?.SetLookFixed(true);
             _bookUI?.CloseBook();
             _hub?.SetPhase(HubPhase.Talking);
+            _ingredients?.Disable();
         }
 
         private void OnConversationExited()
@@ -283,12 +288,14 @@ namespace Bar410.GameFlow
             _cameras?.ResetLook();
             _cameras?.ShowBar();
             _postIt?.SetAvailable(true);
+            //_ingredients?.EnableInteractablePrepareDrinksPhase();
         }
 
         private void OnPrepareDrinksExited()
         {
             _bookUI?.CloseBook();
             _postIt?.SetAvailable(false);
+            _cameras?.SetLookFixed(true);
         }
 
         // The recipe-book button lives in the Hub, outside the book panel (which is inactive while
@@ -314,6 +321,8 @@ namespace Bar410.GameFlow
             // (a fresh PrepareDrinks entry already cleared it).
             if (_shakerPanels != null) _shakerPanels.ShowMethod();
             if (_visualCocktail != null) _visualCocktail.UpdateCocktailBars();
+
+            RefreshLook();
         }
 
         private void OnAddIngredientExited()
@@ -336,11 +345,14 @@ namespace Bar410.GameFlow
             _visualCocktail?.ResetVisualBars();
             _shakerPanels?.HideMethod();
             _ingredients?.EnableInteractablePrepareDrinksPhase();
+            _cameras?.ShowBar();
+            RefreshLook();
         }
 
         private void OnShakerFull()
         {
             _ingredients?.Disable();
+            _cameras?.SetLookFixed(true);
             _shakerPanels?.ShowMethod();
             if (_btnBook != null) _btnBook.interactable = true;
             _cameras?.ShowShaker();
@@ -371,6 +383,7 @@ namespace Bar410.GameFlow
             // A full shaker moved the camera onto it (OnShakerFull); the flow stays in 2.1 here,
             // so no state entry puts it back on the bar.
             _cameras?.ShowBar();
+            RefreshLook();
         }
 
         // ── 2.2 · Minigame ─────────────────────────────────
@@ -379,7 +392,11 @@ namespace Bar410.GameFlow
         // "the player left". Every way out of the minigame goes through the HSM: cancelling the run
         // directly once left the flow in 2.2 with nothing running.
 
-        private void OnMinigameEntered() => _hub?.SetPhase(HubPhase.Minigame);
+        private void OnMinigameEntered()
+        {
+            _hub?.SetPhase(HubPhase.Minigame);
+            RefreshLook();
+        }
 
         private void OnMinigameBackRequested() => _commands?.AnotherIngredient();
 
@@ -431,6 +448,23 @@ namespace Bar410.GameFlow
             if (_gameLoop.OpenBar.Sub.Current != OpenSub.PrepareDrinks) return false;
 
             return _gameLoop.OpenBar.PrepareDrinks.Sub.Current == PrepSub.Minigame;
+        }
+
+        /// <summary>True only while the flow is actually sitting in step 2.1.</summary>
+        private bool InAddIngredientStep()
+        {
+            if (!_gameLoop.Machine.IsRunning || _gameLoop.Machine.Current != GamePhase.Open) return false;
+            if (_gameLoop.OpenBar.Sub.Current != OpenSub.PrepareDrinks) return false;
+
+            return _gameLoop.OpenBar.PrepareDrinks.Sub.Current == PrepSub.AddIngredient;
+        }
+
+        // Mouse look only while picking ingredients on the bar shot. Fixed on the shaker shot
+        // (shaker full), in the minigame and everywhere else; fixing also snaps the view forward.
+        private void RefreshLook()
+        {
+            bool free = InAddIngredientStep() && _shakerContents != null && _shakerContents.HasRoom;
+            _cameras?.SetLookFixed(!free);
         }
 
         // ── 3 · Garnish ────────────────────────────────────
@@ -496,6 +530,15 @@ namespace Bar410.GameFlow
 
         // ── Before Open / Close ────────────────────────────
 
+        // A new day always opens on the bar, look fixed and forward. Not on Event: flow_check_events
+        // re-enters Event mid-story and must not move the writer's shot.
+        private void OnBeforeOpenEntered()
+        {
+            _cameras?.SetLookFixed(true);
+            _cameras?.ResetLook();
+            _cameras?.CutToBar();
+        }
+
         private void OnEventEntered()
         {
             // Event is always BeforeOpen's first step, so the bar is locked here: same as Talking,
@@ -552,7 +595,10 @@ namespace Bar410.GameFlow
         // and never passes here, so day 1 stays day 1.
         private void OnClosingExited() => _customers?.AdvanceDay();
 
-        private void OnServeExited() => _garnish?.CloseServe();
+        private void OnServeExited() {
+            _garnish?.CloseServe();
+            _cameras?.ShowBar();
+        }
 
         private void OnServeRequested() => _commands?.ServeDone();
 

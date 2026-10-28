@@ -11,8 +11,9 @@ using Yarn.Unity;
 /// <see cref="ShowShaker"/>, <see cref="ShowGarnish"/>) and never spells a camera id, so the id table
 /// lives here and nowhere else.
 ///
-/// The .yarn files talk to the camera with <c>Switch_Camera</c>, <c>Cut_Camera</c>, <c>Fix_Camera</c> and
-/// <c>Reset_Camera</c>. Those are static commands: an instance command is found by the NAME of the object
+/// The .yarn files talk to the camera with <c>Switch_Camera</c> and <c>Cut_Camera</c> only, to direct a shot.
+/// Whether the mouse may move the view is the game flow's call (FlowWiring), never Yarn's.
+/// Those are static commands: an instance command is found by the NAME of the object
 /// it sits on (<c>GameObject.Find</c>), which breaks the moment the object is renamed. The first argument
 /// the scripts still write (<c>CamController</c>) is accepted and ignored.
 /// </summary>
@@ -101,6 +102,9 @@ public class CameraManager : MonoBehaviour
 
     /// <summary>The bar, over the shelves: the view while ingredients are picked.</summary>
     public void ShowBar() => SwitchCamera(_barShot);
+
+    /// <summary>The bar shot with no blend: the start of a day.</summary>
+    public void CutToBar() => CutToCamera(_barShot);
 
     /// <summary>Close on the shaker: the view once the drink is full.</summary>
     public void ShowShaker() => SwitchCamera(_shakerShot);
@@ -205,12 +209,6 @@ public class CameraManager : MonoBehaviour
 
     [YarnCommand("Cut_Camera")]
     public static void Yarn_CutCamera(string target, string id) => Resolve("Cut_Camera")?.CutToCamera(id);
-
-    [YarnCommand("Fix_Camera")]
-    public static void Yarn_FixCamera(string target, bool value) => Resolve("Fix_Camera")?.SetLookFixed(value);
-
-    [YarnCommand("Reset_Camera")]
-    public static void Yarn_ResetCamera(string target = "") => Resolve("Reset_Camera")?.ResetLook();
 
     private static CameraManager Resolve(string command)
     {

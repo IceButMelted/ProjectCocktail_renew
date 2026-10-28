@@ -1,10 +1,5 @@
 title: D1_NL_00_Start
 ---
-// Set cam
-<<Enable_InteractableObject SystemGame false>>
-<<Fix_Camera CamController true>>
-<<Reset_Camera CamController>>
-<<Switch_Camera CamController "MainCam">>
 
 
 
@@ -76,13 +71,9 @@ Player: Got it.
 
 <<flow_prepare_drinks>>
 
-<<Fix_Camera CamController false>>
 <<wait_for_task SystemGame>>
 
 //After Isla's order
-<<Enable_InteractableObject SystemGame false>>
-<<Fix_Camera CamController true>>
-<<Reset_Camera CamController>>
 <<Switch_Camera CamController CenterCam>>
 
 <<if $satisfaction == Satisfaction.Perfect>>
@@ -127,8 +118,6 @@ Isla: [wave]Maybe it does.[/wave]
 title: D1_NL_04_Owen_Arrive
 ---
 //Owen come in
-<<Enable_InteractableObject SystemGame false>>
-<<Fix_Camera CamController true>>
 <<Switch_Camera CamController "MainCam">>
 
 <<MoveIn NPC_Name.Owen 3>>
@@ -190,15 +179,9 @@ Player: One moment.
 
 <<flow_prepare_drinks>>
 
-<<Reset_Camera CamController>>
-<<Switch_Camera CamController "MainCam">>
-<<Fix_Camera CamController false>>
 <<wait_for_task SystemGame>>
 
 //After Owen's order
-<<Enable_InteractableObject SystemGame false>>
-<<Fix_Camera CamController true>>
-<<Reset_Camera CamController>>
 <<Switch_Camera CamController FarRightCam>>
 
 <<if $satisfaction == Satisfaction.Perfect>>
@@ -318,15 +301,9 @@ Player: Coming right up.
 
 <<flow_prepare_drinks>>
 
-<<Reset_Camera CamController>>
-<<Switch_Camera CamController "MainCam">>
-<<Fix_Camera CamController false>>
 <<wait_for_task SystemGame>>
 
 //After Owen's second order
-<<Enable_InteractableObject SystemGame false>>
-<<Fix_Camera CamController true>>
-<<Reset_Camera CamController>>
 <<Switch_Camera CamController FarRightCam>>
 
 <<if $satisfaction == Satisfaction.Perfect>>
@@ -369,9 +346,7 @@ Player: Guess it's about time to close up.
 // Behind the fade: the loop restarts with Walter walking in again
 <<MoveOut NPC_Name.Walter>>
 
-<<Reset_Camera CamController>>
 <<Switch_Camera CamController "MainCam">>
-<<Fix_Camera CamController true>>
 
 <<Panel_FadeIn Panel_Transition>>
 

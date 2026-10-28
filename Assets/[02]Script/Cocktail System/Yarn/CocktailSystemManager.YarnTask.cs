@@ -2,8 +2,7 @@
 //  CocktailSystemManager.YarnTask.cs
 //
 //  Yarn COMMANDS driving the game. Command names are a public contract —
-//  Day1_Demo.yarn calls <<wait_for_task SystemGame>>,
-//  <<Enable_InteractableObject SystemGame false>>, <<Reset_Variable SystemGame>>
+//  Day1_Demo.yarn calls <<wait_for_task SystemGame>>, <<Reset_Variable SystemGame>>
 //  and <<Can_End_Shift SystemGame>>. Do not rename commands.
 //
 //  They are static and ignore the object name the .yarn passes: Yarn finds an
@@ -92,7 +91,7 @@ public partial class CocktailSystemManager
         if (SceneLoaderBridge.IsSilentReplay) yield break;
 
         IsWaitingForTask = true;
-        EnableButtonInYarn(true);
+        // The flow opens the bottles in step 2.1; waiting must not unlock the bar from Talking.
 
         yield return new WaitUntil(() => IsTaskComplete);
 
@@ -119,23 +118,6 @@ public partial class CocktailSystemManager
     }
 
     /// <summary>
-    /// &lt;&lt;Enable_InteractableObject SystemGame false&gt;&gt; or &lt;&lt;Enable_InteractableObject false&gt;&gt;.
-    /// The object name, when present, is ignored.
-    /// </summary>
-    [YarnCommand("Enable_InteractableObject")]
-    public static void Yarn_EnableInteractable(string first, string second = "")
-    {
-        string flag = string.IsNullOrEmpty(second) ? first : second;
-        if (!bool.TryParse(flag, out bool enable))
-        {
-            Debug.LogWarning($"[CocktailSystemManager] Enable_InteractableObject: '{flag}' is not true or false.");
-            return;
-        }
-
-        Resolve()?.EnableButtonInYarn(enable);
-    }
-
-    /// <summary>
     /// Enables/disables everything the player uses to build a drink.
     /// Bug B4: used to call SetIngredientActive then re-walk the button list with a
     /// narrower component set, setting each object twice under two definitions of
@@ -147,7 +129,7 @@ public partial class CocktailSystemManager
 
         if (IngredientButtons != null) IngredientButtons.SetInteractable(enable);
         else Debug.LogWarning("[CocktailSystemManager] No IngredientButtonGroup assigned — " +
-                              "Enable_InteractableObject cannot lock the ingredient buttons.", this);
+                              "the ingredient buttons cannot be locked.", this);
     }
 
     [YarnCommand("Reset_Variable")]

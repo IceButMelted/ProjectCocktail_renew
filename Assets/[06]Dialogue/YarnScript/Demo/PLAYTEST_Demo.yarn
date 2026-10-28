@@ -25,16 +25,14 @@ title: PT_D1_Start
 //   next day             : <<flow_next_day>> from Close adds 1 to $day. The next
 //                          day's start node begins when THIS dialogue ends, so
 //                          make flow_next_day the last thing in the day.
+//
+// Camera and bar lock are the flow's job (the day opens on MainCam, mouse look only
+// while picking ingredients, back to MainCam after serving). Writers only use
+// Switch_Camera / Cut_Camera to direct a shot.
 // ================================================================
 
 // A new day starts with a clean Event Log.
 <<eventlog_clear>>
-
-// The bar is locked and the camera fixed until the customer orders.
-<<Enable_InteractableObject SystemGame false>>
-<<Fix_Camera CamController true>>
-<<Reset_Camera CamController>>
-<<Cut_Camera CamController MainCam>>
 
 Player: (PT) Day {$day}. flow_phase = {flow_phase()}, flow_step = {flow_step()} (expect 1 / BeforeOpen / StoryBeforeOpen)
 Player: First night of the play test.
@@ -50,6 +48,7 @@ Player: Nothing new. Time to open.
 
 // Leaves BeforeOpen for Open › Talking. The Chapter Name of today's row fades in.
 <<flow_open_bar>>
+<<wait_scene 1>>
 Player: (PT) flow_phase = {flow_phase()}, flow_step = {flow_step()} (expect Open / TalkingWithCustomer)
 <<jump PT_D1_Isla>>
 ===
@@ -88,7 +87,6 @@ Player: (PT) flow_minigame_type = {flow_minigame_type()} (expect Shaking)
 
 -> Make the drink
     <<flow_prepare_drinks>>
-    <<Fix_Camera CamController false>>
 -> (Test) Let Yarn walk the steps
     <<flow_prepare_drinks>>
     Player: (PT) step = {flow_step()} (expect AddIngredient)
@@ -112,9 +110,6 @@ Player: (PT) flow_minigame_type = {flow_minigame_type()} (expect Shaking)
 // $type_of_cocktail. After the test option it returns at once.
 <<wait_for_task SystemGame>>
 
-<<Enable_InteractableObject SystemGame false>>
-<<Fix_Camera CamController true>>
-<<Reset_Camera CamController>>
 Player: (PT) order_satisfaction = {order_satisfaction()}, served type = {$type_of_cocktail}, minigame result = "{flow_minigame_result()}"
 
 <<if $day == 1>>
@@ -162,10 +157,6 @@ Player: (PT) flow_phase = {flow_phase()} (expect Close)
 title: PT_D2_Start
 ---
 <<eventlog_clear>>
-<<Enable_InteractableObject SystemGame false>>
-<<Fix_Camera CamController true>>
-<<Reset_Camera CamController>>
-<<Switch_Camera CamController MainCam>>
 
 Player: (PT) Day {$day}. flow_phase = {flow_phase()}, flow_step = {flow_step()} (expect 2 / BeforeOpen / StoryBeforeOpen)
 Player: Second night. Word must be getting around.
@@ -219,11 +210,7 @@ Player: (PT) order_type = {order_type()} (expect HighAlcohol), order_name = "{or
 Player: One strong drink coming up.
 
 <<flow_prepare_drinks>>
-<<Fix_Camera CamController false>>
 <<wait_for_task SystemGame>>
-<<Enable_InteractableObject SystemGame false>>
-<<Fix_Camera CamController true>>
-<<Reset_Camera CamController>>
 
 <<if $type_of_cocktail == TypeOfCocktail.HighAlcohol>>
     Owen: [bounce]Now THAT's strong![/bounce]

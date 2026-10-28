@@ -1,10 +1,5 @@
 title: D1_00_Start
 ---
-// Set cam
-<<Enable_InteractableObject SystemGame false>>
-<<Fix_Camera CamController true>>
-<<Reset_Camera CamController>>
-<<Switch_Camera CamController "MainCam">>
 
 <<enum TypeOfCocktail>>
     <<case None>>
@@ -90,15 +85,9 @@ Player: Coming right up. #line:19
 
 <<flow_prepare_drinks>>
 
-//<<Reset_Camera CamController>>
-//<<Switch_Camera CamController "MainCam">>
-<<Fix_Camera CamController false>>
 <<wait_for_task SystemGame>>
 
 //After Walter's order
-<<Enable_InteractableObject SystemGame false>>
-<<Fix_Camera CamController true>>
-<<Reset_Camera CamController>>
 <<Switch_Camera CamController NearLeftCam>>
 
 <<if $satisfaction == Satisfaction.Perfect>>
@@ -142,8 +131,6 @@ Walter: But don't worry, people will start trickling in once word gets out. #lin
 title: D1_04_Isla_Arrive
 ---
 //Isla come in 
-<<Enable_InteractableObject SystemGame false>>
-<<Fix_Camera CamController true>>
 <<Switch_Camera CamController "MainCam">>
 
 
@@ -213,14 +200,9 @@ Player: Got it. #line:4D
 
 <<flow_prepare_drinks>>
 
-//<<Reset_Camera CamController>>
-//<<Fix_Camera CamController false>>
 <<wait_for_task SystemGame>>
 
 //After Isla's order
-//<<Enable_InteractableObject SystemGame false>>
-<<Fix_Camera CamController true>>
-<<Reset_Camera CamController>>
 <<Switch_Camera CamController CenterCam>>
 
 <<if $satisfaction == Satisfaction.Perfect>>
@@ -265,8 +247,6 @@ Isla: I just... ended up staying longer than I planned. #line:5C
 title: D1_07_Owen_Arrive
 ---
 //Owen come in 
-<<Enable_InteractableObject SystemGame false>>
-<<Fix_Camera CamController true>>
 <<Switch_Camera CamController "MainCam">>
 <<Panel_FadeOut Panel_Transition>>
 <<Panel_FadeIn Panel_Transition>>
@@ -331,15 +311,9 @@ Player: One moment. #line:7A
 
 <<flow_prepare_drinks>>
 
-<<Reset_Camera CamController>>
-<<Switch_Camera CamController "MainCam">>
-<<Fix_Camera CamController false>>
 <<wait_for_task SystemGame>>
 
 //After Owen's order
-<<Enable_InteractableObject SystemGame false>>
-<<Fix_Camera CamController true>>
-<<Reset_Camera CamController>>
 <<Switch_Camera CamController CenterCam>>
 
 <<if $satisfaction == Satisfaction.Perfect>>
@@ -534,7 +508,6 @@ Owen: [bounce]Owen, signing out.[/bounce] #line:E6
 <<SetLookDirection NPC_Name.Owen LookDirection.Left>>
 <<MoveOut NPC_Name.Owen>>
 
-<<Fix_Camera CamController true>>
 
 <<Fade_To_Summmary Panel_Transition>>
 <<Switch_Camera CamController SummaryCam>>
