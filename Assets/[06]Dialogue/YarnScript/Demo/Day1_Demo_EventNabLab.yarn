@@ -14,28 +14,28 @@ Player : I looking forawrd to see who will come first.
 title: D1_NL_01_Isla_Arrive
 ---
 // Walter is already seated and waiting when Isla walks in
-<<MoveIn NPC_Name.Walter 1>>
-<<SetEmotion NPC_Name.Walter "neutral">>
+<<Walter Enter 1>>
+<<Walter Neutral>>
 <<wait 2>>
 
-<<MoveIn NPC_Name.Isla 2>>
+<<Isla Enter 2>>
 <<Switch_Camera CamController CenterCam>>
-<<SetEmotion NPC_Name.Isla "happy">>
+<<Isla Happy>>
 
 Isla: [wave]Good evening.[/wave]
-<<SetLookDirection NPC_Name.Walter LookDirection.Right>>
-<<SetEmotion NPC_Name.Walter "happy">>
+<<Walter Look R>>
+<<Walter Happy>>
 Walter: Good evening, Isla. Didn't expect to see you out this late.
-<<SetLookDirection NPC_Name.Isla LookDirection.Left>>
+<<Isla Look L>>
 Isla: I could say the same to you, Mr. Walter.
 Walter: [wiggle]The TV can wait one night.[/wiggle]
-<<SetLookDirection NPC_Name.Walter LookDirection.Forward>>
-<<SetLookDirection NPC_Name.Isla LookDirection.Forward>>
-<<SetEmotion NPC_Name.Walter "neutral">>
+<<Walter Look F>>
+<<Isla Look F>>
+<<Walter Neutral>>
 
 Isla: Oh, this place is new, isn't it? I don't think I've walked by here before.
 Player: Good evening. Yeah, I just opened up a few days ago.
-<<SetEmotion NPC_Name.Isla "neutral">>
+<<Isla Neutral>>
 Isla: Well, it looks lovely. Mind if I take a seat?
 Player: Of course, make yourself comfortable.
 -> Rough day?
@@ -67,7 +67,7 @@ Isla: Umm...
 Isla: Okay, I'll have [order] {Order_Cocktail_ByName_OutName("Cranberry Fizz")} [/order].
 Player: Got it.
 
-<<SetEmotion NPC_Name.Isla "neutral">>
+<<Isla Neutral>>
 
 <<flow_prepare_drinks>>
 
@@ -77,7 +77,7 @@ Player: Got it.
 <<Switch_Camera CamController CenterCam>>
 
 <<if $satisfaction == Satisfaction.Perfect>>
-    <<SetEmotion NPC_Name.Isla "happy">>
+    <<Isla Happy>>
     Isla: [bounce]Oh, wow... this is incredible.[/bounce]
     Isla: [rainb]Seriously, you have magic hands.[/rainb]
 
@@ -86,7 +86,7 @@ Player: Got it.
     Isla: But it's fine.
 
 <<elseif $satisfaction == Satisfaction.Fail>>
-    <<SetEmotion NPC_Name.Isla "upset">>
+    <<Isla Sad>>
     Isla: [shake]Uh... Bartender?[/shake]
     Isla: I think you might have grabbed the wrong bottle.
     Isla: It's definitely not what I asked for.
@@ -95,7 +95,7 @@ Player: Got it.
 
 <<Reset_Variable SystemGame>>
 
-<<SetEmotion NPC_Name.Isla "neutral">>
+<<Isla Neutral>>
 <<jump D1_NL_03_Isla_Talk>>
 ===
 
@@ -107,7 +107,7 @@ Isla: It's a nice little town, once you get used to the quiet.
 Isla: Actually, I'm not from around here either.
 Isla: I was transferred here for work.
 Player: How long have you been here?
-<<SetEmotion NPC_Name.Isla "happy">>
+<<Isla Happy>>
 Isla: [wiggle]Long enough to stop counting.[/wiggle]
 Isla: I just... ended up staying longer than I planned.
 Player: Sounds like this town has a way of doing that.
@@ -120,28 +120,28 @@ title: D1_NL_04_Owen_Arrive
 //Owen come in
 <<Switch_Camera CamController "MainCam">>
 
-<<MoveIn NPC_Name.Owen 3>>
+<<Owen Enter 3>>
 <<Switch_Camera CamController NearRightCam>>
-<<SetEmotion NPC_Name.Owen "happy">>
+<<Owen Happy>>
 
 Owen: [bounce a=3]Hey! hey!! Owen here![/bounce]
-<<SetLookDirection NPC_Name.Isla LookDirection.Right>>
+<<Isla Look R>>
 Isla: [wiggle]Ugh keep your voice down Owen.[/wiggle]
-<<SetLookDirection NPC_Name.Owen LookDirection.Left>>
+<<Owen Look L>>
 Owen: My bad, Isla. Nice to see you.
-<<SetLookDirection NPC_Name.Walter LookDirection.Right>>
-<<SetEmotion NPC_Name.Walter "happy">>
+<<Walter Look R>>
+<<Walter Happy>>
 Walter: [wiggle]Some things never change, Owen.[/wiggle]
 Owen: [bounce]Mr. Walter! Didn't see you there.[/bounce]
 Walter: Hard to miss you, son.
-<<SetEmotion NPC_Name.Walter "neutral">>
+<<Walter Neutral>>
 Owen: [shake]Wait, wait, wait[/shake] — new face behind the bar?
 Owen: I thought I knew everyone in town.
 Owen: Since when did this place have a bartender?
 -> Hello!
     Player: Hello. I'm a Bartender.
     Player: I just opened a few days ago.
-    <<SetEmotion NPC_Name.Isla "happy">>
+    <<Isla Happy>>
     Owen: Newcomer? Glad to see you.
 -> Just the bartender.
     Player: Just the bartender.
@@ -149,33 +149,33 @@ Owen: Since when did this place have a bartender?
     Owen: Mysterious. I like it.
 -> Hey! Hey!!
     Player: hey! Hey!! Bartender here!
-    <<SetEmotion NPC_Name.Isla "happy">>
+    <<Isla Happy>>
     Owen: [bounce]Now that's the spirit![/bounce]
 -> Good evening.
     Player: Good evening. I'm Bartender, nice to meet you.
-    <<SetEmotion NPC_Name.Isla "neutral">>
+    <<Isla Neutral>>
     Owen: [wiggle]Whoa, so formal. I'm speechless.[/wiggle]
     Owen: Nice to meet you.
 
 Owen: Well, you picked the right town to open a bar.
 Owen: Looks like I've finally got a regular spot.
-<<SetLookDirection NPC_Name.Isla LookDirection.Right>>
+<<Isla Look R>>
 Isla: [wiggle]You show up everywhere, Owen.[/wiggle]
-<<SetLookDirection NPC_Name.Owen LookDirection.Left>>
+<<Owen Look L>>
 Owen: I'm easy-going. I'm fine with anywhere.
 <<jump D1_NL_05_Owen_Order>>
 ===
 
 title: D1_NL_05_Owen_Order
 ---
-<<SetLookDirection NPC_Name.Owen LookDirection.Forward>>
-<<SetLookDirection NPC_Name.Isla LookDirection.Forward>>
-<<SetLookDirection NPC_Name.Walter LookDirection.Forward>>
+<<Owen Look F>>
+<<Isla Look F>>
+<<Walter Look F>>
 
 Owen: Oh right, I should probably order before the bartender kicks me out.
 Owen: I'll have [order] {Order_Cocktail_ByName_OutName("Gin Fizz")}. [/order]
 Player: One moment.
-<<SetEmotion NPC_Name.Owen "neutral">>
+<<Owen Neutral>>
 
 <<flow_prepare_drinks>>
 
@@ -185,7 +185,7 @@ Player: One moment.
 <<Switch_Camera CamController FarRightCam>>
 
 <<if $satisfaction == Satisfaction.Perfect>>
-    <<SetEmotion NPC_Name.Owen "happy">>
+    <<Owen Happy>>
     Owen: [shake][rainb]Unbelievable![/rainb][/shake] This is amazing.
     Owen: [bounce]I should have gone to bartender school instead.[/bounce]
 
@@ -194,13 +194,13 @@ Player: One moment.
     Owen: [wiggle]But it's better than not being able to drink.[/wiggle]
 
 <<elseif $satisfaction == Satisfaction.Fail>>
-    <<SetEmotion NPC_Name.Owen "upset">>
+    <<Owen Sad>>
     Owen: Hmm...[waitfor=0.2/] I hate to say it, but I think something went sideways here.
 <<endif>>
 
 <<Reset_Variable SystemGame>>
 
-<<SetEmotion NPC_Name.Owen "neutral">>
+<<Owen Neutral>>
 <<jump D1_NL_06_Owen_Talk>>
 ===
 
@@ -221,10 +221,10 @@ Owen: The hint is nature.
 
 Owen: I'm a forest ranger.
 Owen: I take care of the forests and the wildlife.
-<<SetLookDirection NPC_Name.Owen LookDirection.Left>>
+<<Owen Look L>>
 Owen: You got closer than Isla ever did.
 Owen: First time we met, she thought I was homeless.
-<<SetLookDirection NPC_Name.Isla LookDirection.Right>>
+<<Isla Look R>>
 
 <<Switch_Camera CamController NearRightCam>>
 
@@ -233,18 +233,18 @@ Isla: And you looked all scruffy.
 Owen: Because I climbed up to catch the raccoon.
 Isla: [shake]Then you fell off the tree. I was shocked.[/shake]
 Owen: Luckily, it wasn't anything serious.
-<<SetEmotion NPC_Name.Owen "happy">>
+<<Owen Happy>>
 Isla: Your ankle sprained.
 Owen: At least it's not broken.
 Player: And what about the raccoon?
-<<SetEmotion NPC_Name.Owen "neutral">>
+<<Owen Neutral>>
 Owen: It ran away before we could catch it.
 Owen: It was rummaging through the trash at Cole's house.
-<<SetEmotion NPC_Name.Isla "neutral">>
+<<Isla Neutral>>
 Isla: [wiggle]That poor raccoon probably didn't know what hit him.[/wiggle]
 Owen: [wiggle]Hey, I was very gentle.[/wiggle]
-<<SetLookDirection NPC_Name.Owen LookDirection.Forward>>
-<<SetLookDirection NPC_Name.Isla LookDirection.Forward>>
+<<Owen Look F>>
+<<Isla Look F>>
 <<jump D1_NL_07_Isla_Leave>>
 ===
 
@@ -252,26 +252,26 @@ title: D1_NL_07_Isla_Leave
 ---
 Isla: I think it's already getting late.
 Isla: I should probably head home.
-<<SetLookDirection NPC_Name.Owen LookDirection.Right>>
+<<Owen Look R>>
 Owen: [wiggle]Come on, I was enjoying the conversation.[/wiggle]
-<<SetLookDirection NPC_Name.Isla LookDirection.Left>>
+<<Isla Look L>>
 Isla: I have an early shift tomorrow.
 Owen: [dangle]Fine...[/dangle]
 Player: Get home safe!
-<<SetEmotion NPC_Name.Isla "happy">>
+<<Isla Happy>>
 Isla: [bounce]Thanks! See you guys.[/bounce]
-<<SetEmotion NPC_Name.Owen "happy">>
+<<Owen Happy>>
 Owen: Yup, see you.
 <<Switch_Camera CamController "MainCam">>
-<<SetLookDirection NPC_Name.Owen LookDirection.Forward>>
-<<MoveOut NPC_Name.Isla>>
+<<Owen Look F>>
+<<Isla Exit>>
 <<jump D1_NL_08_Owen_Outro>>
 ===
 
 title: D1_NL_08_Owen_Outro
 ---
 //After Isla leaves
-<<SetEmotion NPC_Name.Owen "neutral">>
+<<Owen Neutral>>
 Owen: [fade]...[/fade]
 Owen: It's become a lot quieter.
 Player: At least you still have me.
@@ -297,7 +297,7 @@ Owen: Actually, hold on before I head out.
 Owen: One more for the road, if that's alright.
 Owen: I'll have [order] {Order_Cocktail_ByName_OutName("Greyhound")}. [/order]
 Player: Coming right up.
-<<SetEmotion NPC_Name.Owen "neutral">>
+<<Owen Neutral>>
 
 <<flow_prepare_drinks>>
 
@@ -307,7 +307,7 @@ Player: Coming right up.
 <<Switch_Camera CamController FarRightCam>>
 
 <<if $satisfaction == Satisfaction.Perfect>>
-    <<SetEmotion NPC_Name.Owen "happy">>
+    <<Owen Happy>>
     Owen: [bounce]Now THIS is how you send a guy off right.[/bounce]
     Owen: I'll definitely be back for more.
 
@@ -316,13 +316,13 @@ Player: Coming right up.
     Owen: [wiggle]Good enough to send me home happy.[/wiggle]
 
 <<elseif $satisfaction == Satisfaction.Fail>>
-    <<SetEmotion NPC_Name.Owen "upset">>
+    <<Owen Sad>>
     Owen: [shake]Hmm... maybe I should've quit while I was ahead.[/shake]
 <<endif>>
 
 <<Reset_Variable SystemGame>>
 
-<<SetEmotion NPC_Name.Owen "neutral">>
+<<Owen Neutral>>
 <<jump D1_NL_10_Owen_Leave>>
 ===
 
@@ -334,8 +334,8 @@ Owen: The work never has a day off.
 Player: Good luck, see you again.
 Owen: Thanks, see you later.
 Owen: [bounce]Owen, signing out.[/bounce]
-<<SetLookDirection NPC_Name.Owen LookDirection.Left>>
-<<MoveOut NPC_Name.Owen>>
+<<Owen Look L>>
+<<Owen Exit>>
 
 Player: [fade]...Another quiet night.[/fade]
 Player: Guess it's about time to close up.
@@ -344,7 +344,7 @@ Player: Guess it's about time to close up.
 <<wait 1.5>>
 
 // Behind the fade: the loop restarts with Walter walking in again
-<<MoveOut NPC_Name.Walter>>
+<<Walter Exit>>
 
 <<Switch_Camera CamController "MainCam">>
 

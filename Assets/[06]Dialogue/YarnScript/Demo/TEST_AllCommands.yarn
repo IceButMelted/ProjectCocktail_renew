@@ -68,16 +68,40 @@ Player: (TEST) Cut_Camera MainCam (no blend).
 
 title: TEST_NPC
 ---
-<<MoveIn NPC_Name.Isla 2>>
-Player: (TEST) MoveIn Isla 2 finished (dialogue waited for the walk).
-<<SetEmotion NPC_Name.Isla "happy">>
-Player: (TEST) SetEmotion happy.
-<<SetLookDirection NPC_Name.Isla LookDirection.Left>>
-Player: (TEST) SetLookDirection Left.
-<<SetLookDirection NPC_Name.Isla LookDirection.Forward>>
-<<SetEmotion NPC_Name.Isla "neutral">>
-<<MoveOut NPC_Name.Isla>>
-Player: (TEST) MoveOut Isla finished.
+// Characters: long form, short form, expression by name and by number, look L/F/R, spots.
+// Isla's placeholder data: 0 Neutral (own L/R faces), 1 Happy (only Right: Left is Right flipped), 2 Sad (Forward only: L/R warn).
+// Enter and Exit hold the dialogue until the fade is over.
+<<Isla Look L>>
+<<Isla Sad>>
+Player: (TEST) Set while Isla is outside: Look L + Sad remembered, nothing on screen yet.
+<<CharacterEnter CharacterName.Isla 2>>
+Player: (TEST) CharacterEnter Isla 2 (long form) finished: she is on spot 2 looking Left with the Sad face (Forward face + a warning, Sad has no side face).
+<<CharacterExpression CharacterName.Isla Happy>>
+Player: (TEST) CharacterExpression Happy by name (long form). Looking Left: the Right face flipped.
+<<Isla 0>>
+Player: (TEST) Short form by number: "Isla 0" = Neutral (its own Left face).
+<<Isla Sad>>
+<<CharacterExpression CharacterName.Isla 1>>
+Player: (TEST) CharacterExpression 1 by number = Happy.
+<<CharacterLook CharacterName.Isla R>>
+Player: (TEST) CharacterLook R (long form): body and face turn to the Right.
+<<Isla Look F>>
+Player: (TEST) Short form "Isla Look F": Forward.
+<<Isla Nonsense>>
+Player: (TEST) Unknown expression "Isla Nonsense" must only warn and keep the face.
+<<Isla Enter 2>>
+Player: (TEST) Enter the same spot again: nothing happens.
+<<Isla Enter 3>>
+Player: (TEST) Enter a different spot (3): faded out, moved, faded in. Dialogue waited for all of it.
+<<Isla Enter>>
+Player: (TEST) Enter with no number goes to spot 0.
+<<Isla Exit>>
+Player: (TEST) Exit (short form) finished: Isla faded out.
+<<Isla Exit>>
+<<CharacterExit CharacterName.Isla>>
+Player: (TEST) Exit while outside (both forms): nothing happens.
+<<Isla Neutral>>
+<<Isla Look F>>
 <<jump TEST_Hub>>
 ===
 
@@ -90,7 +114,7 @@ Player: (TEST) Same order described: {Order_Cocktail_ByName_OutDescription("Gin 
 Player: (TEST) order_name = {order_name()}, order_type = {order_type()}
 Player: (TEST) order_flavor = {order_flavor()}
 
-// Random from the customer's preferences. Argument is NPC_Name as a number (Isla = 5).
+// Random from the customer's preferences. Argument is CharacterName as a number (Isla = 5).
 Player: (TEST) Random for Isla: {Order_Cocktail_OutName(5)}
 Player: (TEST) Its description: {Order_Cocktail_OutDescription(5)} (must be the SAME drink)
 

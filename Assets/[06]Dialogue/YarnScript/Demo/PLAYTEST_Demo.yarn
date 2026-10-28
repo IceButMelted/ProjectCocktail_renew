@@ -56,14 +56,14 @@ Player: (PT) flow_phase = {flow_phase()}, flow_step = {flow_step()} (expect Open
 title: PT_D1_Isla
 ---
 // ── A customer walks in ─────────────────────────────
-<<MoveIn NPC_Name.Isla 2>>
+<<Isla Enter 2>>
 <<Switch_Camera CamController CenterCam>>
-<<SetEmotion NPC_Name.Isla "happy">>
+<<Isla Happy>>
 Isla: [wave]Evening! Is this place open yet?[/wave]
 Player: Just opened. Take a seat.
-<<SetLookDirection NPC_Name.Isla LookDirection.Left>>
+<<Isla Look L>>
 Isla: Cosy. I like it.
-<<SetLookDirection NPC_Name.Isla LookDirection.Forward>>
+<<Isla Look F>>
 
 // ── The order: a drink by name ──────────────────────
 // order_customer names who the next order is for (it scores their preferences).
@@ -123,20 +123,20 @@ title: PT_D1_Reaction
 ---
 // ── React to the drink ($satisfaction is set by wait_for_task) ──
 <<if $satisfaction == Satisfaction.Perfect>>
-    <<SetEmotion NPC_Name.Isla "happy">>
+    <<Isla Happy>>
     Isla: [bounce]Perfect. Just how I like it.[/bounce]
 <<elseif $satisfaction == Satisfaction.Acceptable>>
     Isla: Not bad. A little different, but fine.
 <<else>>
-    <<SetEmotion NPC_Name.Isla "upset">>
+    <<Isla Sad>>
     Isla: [shake]Hmm... that's not what I asked for.[/shake]
 <<endif>>
 
 // Clears the order and the three result variables for the next customer.
 <<Reset_Variable SystemGame>>
-<<SetEmotion NPC_Name.Isla "neutral">>
+<<Isla Neutral>>
 Isla: See you tomorrow.
-<<MoveOut NPC_Name.Isla>>
+<<Isla Exit>>
 <<jump PT_D1_Close>>
 ===
 
@@ -166,12 +166,12 @@ Player: Second night. Word must be getting around.
 
 title: PT_D2_Walter
 ---
-<<MoveIn NPC_Name.Walter 1>>
-<<SetEmotion NPC_Name.Walter "neutral">>
+<<Walter Enter 1>>
+<<Walter Neutral>>
 Walter: Evening, son. Surprise me. Something I'd like.
 
 // ── The order: random from the customer's preferences ─
-// The argument is NPC_Name as a number: Cole 1, Owen 2, Walter 3, Freya 4, Isla 5.
+// The argument is CharacterName as a number: Cole 1, Owen 2, Walter 3, Faye 4, Isla 5.
 // OutName and OutDescription of the same call return the same drink.
 <<order_customer "[CocktailSystem]" Walter>>
 Player: How about a [order]{Order_Cocktail_OutName(3)}[/order]?
@@ -183,22 +183,22 @@ Walter: Go on then.
 title: PT_D2_Reaction
 ---
 <<if $satisfaction == Satisfaction.Fail>>
-    <<SetEmotion NPC_Name.Walter "upset">>
+    <<Walter Sad>>
     Walter: [shake]Not my sort of thing.[/shake]
 <<else>>
-    <<SetEmotion NPC_Name.Walter "happy">>
+    <<Walter Happy>>
     Walter: [wiggle]You've got a knack for this.[/wiggle]
 <<endif>>
 <<Reset_Variable SystemGame>>
-<<SetEmotion NPC_Name.Walter "neutral">>
+<<Walter Neutral>>
 <<jump PT_D2_Owen>>
 ===
 
 title: PT_D2_Owen
 ---
-<<MoveIn NPC_Name.Owen 3>>
+<<Owen Enter 3>>
 <<Switch_Camera CamController NearRightCam>>
-<<SetEmotion NPC_Name.Owen "happy">>
+<<Owen Happy>>
 Owen: [bounce]Hey hey! Something strong, I don't care what.[/bounce]
 
 // ── The order: a type only ───────────────────────────
@@ -215,13 +215,13 @@ Player: One strong drink coming up.
 <<if $type_of_cocktail == TypeOfCocktail.HighAlcohol>>
     Owen: [bounce]Now THAT's strong![/bounce]
 <<else>>
-    <<SetEmotion NPC_Name.Owen "upset">>
+    <<Owen Sad>>
     Owen: That's... juice, buddy.
 <<endif>>
 <<Reset_Variable SystemGame>>
-<<SetEmotion NPC_Name.Owen "neutral">>
-<<MoveOut NPC_Name.Owen>>
-<<MoveOut NPC_Name.Walter>>
+<<Owen Neutral>>
+<<Owen Exit>>
+<<Walter Exit>>
 <<jump PT_D2_Close>>
 ===
 
