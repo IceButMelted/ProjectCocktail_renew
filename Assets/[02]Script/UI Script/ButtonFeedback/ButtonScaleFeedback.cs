@@ -28,6 +28,10 @@ public class ButtonScaleFeedback : MonoBehaviour,
     Vector3 baseScale;
     bool hovered, selected, wasInteractable;
 
+    // Graphics under the button and their authored alpha, dimmed while not interactable.
+    Graphic[] graphics;
+    float[] baseAlphas;
+
     // Resting size: hover size while the pointer is on the button or it is selected, otherwise 1.
     float RestScale => (hovered || selected) ? preset.hover.scale : 1f;
 
@@ -36,6 +40,8 @@ public class ButtonScaleFeedback : MonoBehaviour,
         button = GetComponent<Button>();
         if (target == null) target = transform;
         baseScale = target.localScale;
+        graphics = GetComponentsInChildren<Graphic>(true);
+        baseAlphas = Array.ConvertAll(graphics, g => g.color.a);
         if (preset == null) Debug.LogWarning($"{name}: ButtonScaleFeedback has no preset.", this);
     }
 
@@ -43,6 +49,7 @@ public class ButtonScaleFeedback : MonoBehaviour,
     {
         button.onClick.AddListener(OnClick);
         wasInteractable = button.IsInteractable();
+        if (preset != null) Dim(!wasInteractable, 0f);
     }
 
     void OnDisable()
@@ -61,7 +68,23 @@ public class ButtonScaleFeedback : MonoBehaviour,
             hovered = selected = false;
             To(1f, preset.release);
         }
+        if (wasInteractable != now) Dim(!now, preset.disabledFadeDuration);
         wasInteractable = now;
+    }
+
+    // Fades every graphic to disabledAlpha of its own alpha (or back). Only alpha is tweened,
+    // so colour set by other scripts (e.g. the AutoPlay on/off tint) is kept.
+    void Dim(bool dim, float duration)
+    {
+        for (int i = 0; i < graphics.Length; i++)
+        {
+            var g = graphics[i];
+            if (g == null) continue;
+            g.DOKill();
+            float a = baseAlphas[i] * (dim ? preset.disabledAlpha : 1f);
+            if (duration <= 0f) { var c = g.color; c.a = a; g.color = c; }
+            else g.DOFade(a, duration).SetUpdate(preset.useUnscaledTime);
+        }
     }
 
     public void OnPointerEnter(PointerEventData e) { hovered = true; if (Active) { To(preset.hover.scale, preset.hover); Fire(ButtonFeedbackStep.Hover); } }

@@ -30,6 +30,11 @@ public class SO_ButtonFeedback : ScriptableObject
     [Tooltip("Punch on click, then release back to the resting size.")]
     public ScaleStep click = new ScaleStep { scale = 1.12f, duration = 0.08f, ease = Ease.OutQuad };
 
+    [Header("Not interactable")]
+    [Tooltip("Alpha multiplier for the button and its children while it can't be pressed.")]
+    [Range(0f, 1f)] public float disabledAlpha = 2f / 3f;
+    [Min(0f)] public float disabledFadeDuration = 0.15f;
+
     [Tooltip("Keep animating while Time.timeScale is 0 (Pause).")]
     public bool useUnscaledTime = true;
 

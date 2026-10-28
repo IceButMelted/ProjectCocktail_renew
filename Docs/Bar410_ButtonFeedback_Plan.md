@@ -115,3 +115,12 @@
   - `BTN - OpenOrder` และ `Panel - Note`: `Post_It_Order` scale สองตัวนี้ตอนเปิด/ปิดอยู่แล้ว
   - `Continue Button`: ปุ่มเลื่อนบทพูด
   - ปุ่ม Save/Load และ `Panel_EventLog/Blocker`
+
+## ส่วนเพิ่ม: ปุ่มที่กดไม่ได้จางลง (2026-10-28 ทำแล้ว)
+- `SO_ButtonFeedback.disabledAlpha` (ค่าเริ่ม 2/3) และ `disabledFadeDuration` (0.15s)
+- ทุกครั้งที่ `Button.IsInteractable()` เปลี่ยน (รวม CanvasGroup ของ `HubManager`) `ButtonScaleFeedback` จะ `DOFade` ทุก `Graphic` ใต้ปุ่ม (Image, text) ไปที่ alpha เดิม × `disabledAlpha` หรือกลับเป็น alpha เดิม ตอน `OnEnable` ตั้งค่าทันทีไม่ fade
+- tween แค่ alpha สีที่สคริปต์อื่นตั้งไว้จึงยังอยู่ (เช่นสี on/off ของ AutoPlay)
+- คูณกับ alpha ของ CanvasGroup: ปุ่ม Hub ที่ `HubManager` ซ่อนอยู่ยังมองไม่เห็นเหมือนเดิม
+- `disabledColor` ของ Button ใน `PF_Button_Hub` และ `BTN_CloseEventLog` เปลี่ยนเป็นสีขาว alpha 1 ปุ่ม ColorTint จึงไม่จางซ้อนสองชั้น
+- `Canvas_ShakingMinigame` › `BTN - Cancel Minigame` เคย override `disabledColor` เป็นสีแดง ตอนนี้ revert กลับไปใช้สีขาวของ prefab แล้ว
+- ข้อจำกัด: ถ้า `DialogueControls` ตั้งสีปุ่ม AutoPlay ใหม่ระหว่างที่ปุ่มกดไม่ได้ alpha ของปุ่มจะกลับเป็นตามสีที่ตั้งจนกว่าสถานะ interactable จะเปลี่ยนอีกครั้ง
