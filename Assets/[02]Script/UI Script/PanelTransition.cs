@@ -32,6 +32,32 @@ public class PanelTransition : MonoBehaviour
         yield return WaitForAnimation("Transition_ToSummary");
     }
 
+    /// <summary>
+    /// Waits until whatever the panel is playing now (the scene-open fade on load) is done.
+    /// This is the contract the game flow relies on: BeforeOpen starts only after it returns.
+    /// A new transition look must keep it, whatever it plays. Never hangs: a missing or
+    /// inactive animator returns at once, and <paramref name="maxSeconds"/> caps the wait.
+    /// </summary>
+    public IEnumerator WaitUntilFinished(float maxSeconds = 5f)
+    {
+        if (animator == null || !animator.isActiveAndEnabled || animator.runtimeAnimatorController == null)
+            yield break;
+
+        yield return null; // let the Animator enter its default state
+
+        float end = Time.unscaledTime + maxSeconds;
+        while (animator.isActiveAndEnabled
+               && (animator.IsInTransition(0) || animator.GetCurrentAnimatorStateInfo(0).normalizedTime < 1f))
+        {
+            if (Time.unscaledTime > end)
+            {
+                Debug.LogWarning($"[PanelTransition] Still playing after {maxSeconds}s, not waiting any longer.", this);
+                yield break;
+            }
+            yield return null;
+        }
+    }
+
     // Waits one frame for the transition to start, then waits until the
     // named state finishes playing on layer 0.
     private IEnumerator WaitForAnimation(string stateName)

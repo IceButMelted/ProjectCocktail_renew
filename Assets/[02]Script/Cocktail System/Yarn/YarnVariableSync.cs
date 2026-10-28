@@ -15,6 +15,7 @@ public class YarnVariableSync
     public const string TaskDoneVariableName = "$task_done";
     public const string TypeOfCocktailVariableName = "$type_of_cocktail";
     public const string SatisfactionVariableName = "$satisfaction";
+    public const string DayVariableName = "$day";
 
     private readonly DialogueRunner _runner;
 
@@ -50,6 +51,12 @@ public class YarnVariableSync
         _runner.VariableStorage.SetValue(TaskDoneVariableName, done);
     }
 
+    public void WriteDay(int day)
+    {
+        if (!Guard()) return;
+        _runner.VariableStorage.SetValue(DayVariableName, day);
+    }
+
     /// <summary>Back to the start of a customer loop.</summary>
     public void Reset()
     {
@@ -68,6 +75,9 @@ public class YarnVariableSync
         _runner.VariableStorage.TryGetValue(TaskDoneVariableName, out bool value);
         return value;
     }
+
+    /// <summary>The current day number (<c>$day</c>, declared 1 in Yarn).</summary>
+    public int ReadDay() => Mathf.RoundToInt(ReadRaw(DayVariableName));
 
     public float ReadRaw(string variableName)
     {

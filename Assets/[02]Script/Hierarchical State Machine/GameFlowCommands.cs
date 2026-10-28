@@ -51,8 +51,23 @@ namespace Bar410.GameFlow
 
         // ── Level 1 · Before Open ──────────────────────────
 
-        /// <summary>Day events done — open the bar. BeforeOpen → Open. Bind to a Button's OnClick.</summary>
-        public void OpenBar() => _gameLoop.BeforeOpen.RequestOpen();
+        /// <summary>Story before opening done — open the bar. StoryBeforeOpen → Open. Bind to a Button's OnClick.</summary>
+        public void OpenBar() => _gameLoop.BeforeOpen.Story.RequestOpen();
+
+        /// <summary>Check day events mid-story. StoryBeforeOpen → Event → back to the story.</summary>
+        public void CheckEvents()
+        {
+            if (!IsInStoryBeforeOpen)
+            {
+                Debug.LogWarning("[GameFlowCommands] CheckEvents is only valid in StoryBeforeOpen.", this);
+                return;
+            }
+            _gameLoop.BeforeOpen.Story.RequestEvents();
+        }
+
+        private bool IsInStoryBeforeOpen =>
+            _gameLoop.Machine.IsRunning && _gameLoop.Machine.Current == GamePhase.BeforeOpen
+            && _gameLoop.BeforeOpen.Sub.Current == BeforeOpenSub.StoryBeforeOpen;
 
         // ── Level 1 · Close ─────────────────────────────────
 
@@ -149,6 +164,22 @@ namespace Bar410.GameFlow
         [YarnCommand("flow_open_bar")]
         public static void Yarn_OpenBar() => CommandTarget()?.OpenBar();
 
+        /// <summary>
+        /// <c>&lt;&lt;flow_check_events&gt;&gt;</c> — shows any new day events and waits until they are
+        /// all closed, then the dialogue carries on from the next line.
+        /// </summary>
+        [YarnCommand("flow_check_events")]
+        public static System.Collections.IEnumerator Yarn_CheckEvents()
+        {
+            var flow = CommandTarget();
+            if (flow == null) yield break;
+
+            flow.CheckEvents();
+            var beforeOpen = flow._gameLoop.BeforeOpen;
+            while (beforeOpen.Sub.IsRunning && beforeOpen.Sub.Current == BeforeOpenSub.Event)
+                yield return null;
+        }
+
         [YarnCommand("flow_next_day")]
         public static void Yarn_NextDay() => CommandTarget()?.NextDay();
 
@@ -198,7 +229,10 @@ namespace Bar410.GameFlow
         public static string Yarn_CurrentPhase()
         {
             var flow = Resolve();
-            return flow == null ? string.Empty : flow._gameLoop.Machine.Current.ToString();
+            // Before the day starts Current is still default(GamePhase) == Open, so check IsRunning.
+            return flow == null || !flow._gameLoop.Machine.IsRunning
+                ? string.Empty
+                : flow._gameLoop.Machine.Current.ToString();
         }
 
         [YarnFunction("flow_step")]
@@ -208,6 +242,8 @@ namespace Bar410.GameFlow
             if (flow == null) return string.Empty;
 
             var loop = flow._gameLoop;
+            if (!loop.Machine.IsRunning) return string.Empty;
+            if (loop.Machine.Current == GamePhase.BeforeOpen) return loop.BeforeOpen.Sub.Current.ToString();
             if (loop.Machine.Current != GamePhase.Open) return string.Empty;
 
             return loop.OpenBar.Sub.Current == OpenSub.PrepareDrinks

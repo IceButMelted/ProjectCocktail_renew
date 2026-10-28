@@ -87,6 +87,40 @@ public class TalkToCustomerManager : MonoBehaviour
         if (Current == this) Current = null;
     }
 
+    // ── Story ──────────────────────────────────────────────
+
+    /// <summary>The current day (Yarn <c>$day</c>).</summary>
+    public int CurrentDay => Variables.ReadDay();
+
+    /// <summary>Moves <c>$day</c> on by one. Called when the bar closes into the next BeforeOpen.</summary>
+    public void AdvanceDay() => Variables.WriteDay(CurrentDay + 1);
+
+    /// <summary>
+    /// Starts <paramref name="node"/> (the runner's start node when empty). Used instead of the
+    /// runner's own auto start so the story waits for the game flow (BeforeOpen). When dialogue is
+    /// still running (the old day called &lt;&lt;flow_next_day&gt;&gt;), the node starts once it ends.
+    /// </summary>
+    public void StartStory(string node = null)
+    {
+        if (_dialogueRunner == null) return;
+
+        if (string.IsNullOrEmpty(node)) node = _dialogueRunner.startNode;
+        if (!_dialogueRunner.Dialogue.NodeExists(node))
+        {
+            Debug.LogError($"[TalkToCustomerManager] Yarn node '{node}' does not exist — story not started.", this);
+            return;
+        }
+
+        if (_dialogueRunner.IsDialogueRunning) StartCoroutine(StartWhenIdle(node));
+        else _dialogueRunner.StartDialogue(node);
+    }
+
+    private IEnumerator StartWhenIdle(string node)
+    {
+        yield return new WaitWhile(() => _dialogueRunner.IsDialogueRunning);
+        _dialogueRunner.StartDialogue(node);
+    }
+
     // ── Dialogue variables ─────────────────────────────────
 
     /// <summary>

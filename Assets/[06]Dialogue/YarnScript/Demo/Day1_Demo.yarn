@@ -36,6 +36,8 @@ title: D1_00_Start
 // Declare the variable (set false by default)
 <<declare $type_of_cocktail = TypeOfCocktail.None>>
 <<declare $satisfaction = Satisfaction.None>>
+// Day number. C# (FlowWiring) picks each day's start node from SO_DaySchedule by this.
+<<declare $day = 1>>
 
 
 <<flow_open_bar>>

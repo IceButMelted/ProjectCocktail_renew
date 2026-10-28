@@ -11,14 +11,18 @@ namespace Bar410.GameFlow
     /// manager events back into flow commands. It decides nothing else.
     ///
     /// What the flow does to the rest of the game, by step:
-    ///   1   Talking       lock the ingredients, fix the camera look, close the book;
+    ///   BeforeOpen    waits for Panel_Transition first; Event locks the bar and shows the queued
+    ///                 popups (EventPopupQueue), finishing when the last is closed;
+    ///                 StoryBeforeOpen starts the day's node (SO_DaySchedule by $day) on its first entry
+    ///   Open          shows the day's chapter title (ChapterTitleUI)
+    ///   1   Talking      lock the ingredients, fix the camera look, close the book;
     ///                     carry a scored order into the dialogue's variables
     ///   2   Prepare       fresh drink, bar camera, post-it in; leaving closes the book
     ///   2.1 AddIngredient bottles and shaker usable; the method panel follows the shaker's contents
     ///   2.2 Minigame      start/stop the minigame; a win finishes the drink; back leaves for 2.1
     ///   3   Garnish       frame the plate, lock the ingredients, open the station; pour, ice, finish, remake
     ///   4   Serve         open/close the serve panel, take the post-it away; serve or remake
-    ///   Close             nothing but the Hub UI yet
+    ///   Close             nothing but the Hub UI yet; leaving it (next day) adds 1 to $day
     ///
     /// Every step's Entered also tells <see cref="HubManager"/> the new Phase, which shows and hides the
     /// Hub UI (the buttons on Canvas_HUD) from its Inspector table.
@@ -51,6 +55,15 @@ namespace Bar410.GameFlow
         [SerializeField] private Post_It_Order _postIt;
         [Tooltip("Shows and hides the Hub UI per Phase (table in its Inspector).")]
         [SerializeField] private HubManager _hub;
+        [Tooltip("The day starts (BeforeOpen) only after this finishes playing. Empty = start at once. " +
+                 "Turn off GameLoopFSM's Auto Start and the DialogueRunner's auto start when this is set.")]
+        [SerializeField] private PanelTransition _transition;
+        [Tooltip("Which Yarn node each day's story starts at ($day). Empty = the DialogueRunner's Start Node.")]
+        [SerializeField] private SO_DaySchedule _daySchedule;
+        [Tooltip("Shows the day's Chapter Name (from the day schedule) when the bar opens. Empty = none.")]
+        [SerializeField] private ChapterTitleUI _chapterTitle;
+        [Tooltip("The day's event popups. BeforeOpen › Event waits until the player has closed them all. Empty = Event passes at once.")]
+        [SerializeField] private EventPopupQueue _eventPopups;
 
         private GameLoopFSM _gameLoop;
         private GameFlowCommands _commands;
@@ -128,8 +141,12 @@ namespace Bar410.GameFlow
             openBar.Serve.Exited += OnServeExited;
 
             // Before Open / Close
-            _gameLoop.BeforeOpen.Entered += OnBeforeOpenEntered;
+            _gameLoop.BeforeOpen.Event.Entered += OnEventEntered;
+            _gameLoop.BeforeOpen.Story.Entered += OnStoryEntered;
             _gameLoop.ClosingBar.Entered += OnClosingEntered;
+            _gameLoop.ClosingBar.Exited += OnClosingExited;
+            openBar.Entered += OnOpenEntered;
+            if (_eventPopups != null) _eventPopups.AllClosed += OnEventPopupsClosed;
 
             if (_garnish != null)
             {
@@ -143,10 +160,31 @@ namespace Bar410.GameFlow
             else Debug.LogWarning("[FlowWiring] No GarnishManager assigned — steps 3 and 4 will show nothing.", this);
         }
 
+        private System.Collections.IEnumerator Start()
+        {
+            if (_transition == null) yield break;
+
+            // Nothing is entered yet, so lock the bar and hide the Hub UI while the panel plays.
+            LockBar();
+            _hub?.SetPhase(HubPhase.None);
+
+            yield return _transition.WaitUntilFinished();
+            _gameLoop.StartDay();
+        }
+
         private void OnDestroy()
         {
-            if (_gameLoop != null && _gameLoop.ClosingBar != null) _gameLoop.ClosingBar.Entered -= OnClosingEntered;
-            if (_gameLoop != null && _gameLoop.BeforeOpen != null) _gameLoop.BeforeOpen.Entered -= OnBeforeOpenEntered;
+            if (_gameLoop != null && _gameLoop.ClosingBar != null)
+            {
+                _gameLoop.ClosingBar.Entered -= OnClosingEntered;
+                _gameLoop.ClosingBar.Exited -= OnClosingExited;
+            }
+            if (_eventPopups != null) _eventPopups.AllClosed -= OnEventPopupsClosed;
+            if (_gameLoop != null && _gameLoop.BeforeOpen != null)
+            {
+                _gameLoop.BeforeOpen.Event.Entered -= OnEventEntered;
+                _gameLoop.BeforeOpen.Story.Entered -= OnStoryEntered;
+            }
 
             if (_cocktail != null && _customers != null)
             {
@@ -191,6 +229,7 @@ namespace Bar410.GameFlow
             var openBar = _gameLoop.OpenBar;
             var prepareDrinks = openBar.PrepareDrinks;
 
+            openBar.Entered -= OnOpenEntered;
             openBar.TalkingWithCustomer.Entered -= OnTalkingEntered;
             openBar.TalkingWithCustomer.Exited -= OnConversationExited;
             prepareDrinks.Entered -= OnPrepareDrinksEntered;
@@ -388,7 +427,7 @@ namespace Bar410.GameFlow
         /// <summary>True only while the flow is actually sitting in step 2.2.</summary>
         private bool InMinigameStep()
         {
-            if (_gameLoop.Machine.Current != GamePhase.Open) return false;
+            if (!_gameLoop.Machine.IsRunning || _gameLoop.Machine.Current != GamePhase.Open) return false;
             if (_gameLoop.OpenBar.Sub.Current != OpenSub.PrepareDrinks) return false;
 
             return _gameLoop.OpenBar.PrepareDrinks.Sub.Current == PrepSub.Minigame;
@@ -457,16 +496,61 @@ namespace Bar410.GameFlow
 
         // ── Before Open / Close ────────────────────────────
 
-        private void OnBeforeOpenEntered()
+        private void OnEventEntered()
         {
-            // Same locked bar as Talking: day events play out before anything can be poured.
+            // Event is always BeforeOpen's first step, so the bar is locked here: same as Talking,
+            // day events play out before anything can be poured. Harmless again on Story → Event.
+            LockBar();
+            _hub?.SetPhase(HubPhase.BeforeOpen);
+
+            // Nothing queued (or no popup UI) passes straight on; ShowAll raises AllClosed at once then.
+            if (_eventPopups != null) _eventPopups.ShowAll();
+            else _gameLoop.BeforeOpen.Event.Finish();
+        }
+
+        private void OnEventPopupsClosed()
+        {
+            if (_gameLoop.Machine.IsRunning && _gameLoop.Machine.Current == GamePhase.BeforeOpen
+                && _gameLoop.BeforeOpen.Sub.Current == BeforeOpenSub.Event)
+                _gameLoop.BeforeOpen.Event.Finish();
+        }
+
+        private void OnStoryEntered()
+        {
+            // Back from a mid-story Event the dialogue is still running; only the day's first entry starts it.
+            if (!_gameLoop.BeforeOpen.Story.IsFirstEntry || _customers == null) return;
+
+            if (_daySchedule == null) { _customers.StartStory(); return; }
+
+            if (TryGetToday(out var row)) _customers.StartStory(row.startNode);
+            else Debug.LogError($"[FlowWiring] {_daySchedule.name} has no row for day {_customers.CurrentDay} — story not started.", this);
+        }
+
+        private void OnOpenEntered()
+        {
+            if (_chapterTitle != null && TryGetToday(out var row)) _chapterTitle.Show(row.chapterName);
+        }
+
+        /// <summary>Today's row of the day schedule ($day), or false when there is no schedule or row.</summary>
+        private bool TryGetToday(out SO_DaySchedule.Day row)
+        {
+            row = null;
+            return _daySchedule != null && _customers != null && _daySchedule.TryGet(_customers.CurrentDay, out row);
+        }
+
+        private void LockBar()
+        {
             _ingredients?.Disable();
             _cameras?.SetLookFixed(true);
             _bookUI?.CloseBook();
-            _hub?.SetPhase(HubPhase.BeforeOpen);
         }
 
         private void OnClosingEntered() => _hub?.SetPhase(HubPhase.Close);
+
+        // Close only ever leaves for BeforeOpen, and Exit runs before the next Enter, so the new
+        // day's Story already reads the new $day. The game's first BeforeOpen comes from StartDay
+        // and never passes here, so day 1 stays day 1.
+        private void OnClosingExited() => _customers?.AdvanceDay();
 
         private void OnServeExited() => _garnish?.CloseServe();
 
