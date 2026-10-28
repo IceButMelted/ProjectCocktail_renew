@@ -18,6 +18,7 @@
 
 ## หมายเหตุ
 id ที่ไม่มีจะขึ้น error ใน Console
+เริ่มวันและหลังเสิร์ฟกล้องกลับ MainCam เอง (หลังบ้านทำ) ไม่ต้องสั่ง
 
 ## โค้ด
 `Assets/[02]Script/CameraControl/CameraManager.cs`

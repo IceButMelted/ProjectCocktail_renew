@@ -50,7 +50,6 @@
 | [`wait_for_task`](wait_for_task.md) | Command (รอ) | `<<wait_for_task SystemGame>>` |
 | [`Reset_Variable`](Reset_Variable.md) | Command | `<<Reset_Variable SystemGame>>` |
 | [`Can_End_Shift`](Can_End_Shift.md) | Command | `<<Can_End_Shift SystemGame>>` |
-| [`Enable_InteractableObject`](Enable_InteractableObject.md) | Command | `<<Enable_InteractableObject SystemGame false>>` |
 | [`wait_scene`](wait_scene.md) | Command (รอ) | `<<wait_scene 1>>` |
 
 ## กล้อง (`CameraManager`)
@@ -59,8 +58,19 @@
 |---|---|---|
 | [`Switch_Camera`](Switch_Camera.md) | Command | `<<Switch_Camera CamController CenterCam>>` |
 | [`Cut_Camera`](Cut_Camera.md) | Command | `<<Cut_Camera CamController MainCam>>` |
-| [`Fix_Camera`](Fix_Camera.md) | Command | `<<Fix_Camera CamController true>>` |
-| [`Reset_Camera`](Reset_Camera.md) | Command | `<<Reset_Camera CamController>>` |
+
+## หลังบ้านทำให้เอง (ไม่ต้องเขียน)
+
+กล้องเริ่มต้นและการล็อคบาร์เป็นงานของ `FlowWiring` ตาม Phase writer ใช้แค่ `Switch_Camera` / `Cut_Camera` กำกับภาพ
+
+| ช่วง | หลังบ้านทำ |
+|---|---|
+| เริ่มวัน (BeforeOpen) | ตัดไป MainCam + fix กล้อง + ล็อคบาร์ |
+| 1 Talking | fix กล้อง + ล็อควัตถุดิบ (ช็อตที่ writer ตั้งไว้ไม่ถูกแตะ) |
+| 2.1 เลือกวัตถุดิบ | MainCam + หมุนกล้องด้วยเมาส์ได้ + ปลดล็อควัตถุดิบ (เฉพาะขณะ shaker ยังไม่เต็ม) |
+| shaker เต็ม / มินิเกม 2.2 | PrepareCam + fix |
+| 3 Garnish | GranishCam + fix + ล็อควัตถุดิบ |
+| เสิร์ฟเสร็จ | กลับ MainCam + ล็อควัตถุดิบ |
 
 ## ลูกค้า (`TalkToCustomerManager`)
 

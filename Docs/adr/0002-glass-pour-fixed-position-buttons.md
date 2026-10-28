@@ -18,3 +18,6 @@ spatial dragging at all, consistent with removing bar-layout dragging entirely (
 [0001](./0001-remove-prepare-phase-fixed-roster.md)). `GlassShelfSlot`, the drag-handling half of
 `GlassPlacementZone`, and `PlacedGlassInstance`'s `DragableObject` requirement become obsolete and
 should be replaced with a direct "instantiate at a fixed transform" + button-driven flow.
+
+## Amendment (2026-10-28)
+กล้องหมุนด้วยเมาส์ได้เฉพาะตอนเลือกวัตถุดิบ (2.1 AddIngredient บนช็อตบาร์ ขณะ shaker ยังไม่เต็ม) ช็อต shaker และมินิเกม 2.2 ยัง fix และ game flow (`FlowWiring`) เป็นคนเปิด/ปิดเอง Yarn สั่งไม่ได้แล้ว (ลบ `Fix_Camera` / `Reset_Camera` / `Enable_InteractableObject`) รายละเอียด: `Docs/Bar410_WriterCommands_Plan.md`
