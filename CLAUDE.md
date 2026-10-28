@@ -11,7 +11,7 @@ Loop ของหนึ่งวัน: คุยกับลูกค้า →
 - **ศัพท์ในโปรเจค:** `CONTEXT.md` ใช้คำตามไฟล์นี้ และเลี่ยงคำที่ไฟล์ระบุว่า _Avoid_
 - **การตัดสินใจที่ทับ GDD:** `Docs/adr/`
   - **0001:** ไม่มี Phase เตรียมร้าน (Prepare) แล้ว วัตถุดิบมีครบทุกวัน GDD §6 Phase 1 และ §23 `phase1Layout` จึงล้าสมัย
-  - **0002:** แก้วและการเทไม่ใช้การลากแล้ว แก้วอยู่ตำแหน่งตายตัว เลือกด้วยปุ่ม และกล้อง fix มุมเดียว GDD §11 (ลากไปเสิร์ฟ) และ §13/§20 (กล้องหันตามเมาส์) จึงล้าสมัย
+  - **0002:** แก้วและการเทไม่ใช้การลากแล้ว แก้วอยู่ตำแหน่งตายตัว เลือกด้วยปุ่ม และกล้อง fix มุมเดียว GDD §11 (ลากไปเสิร์ฟ) และ §13/§20 (กล้องหันตามเมาส์) จึงล้าสมัย **มี Amendment (2026-10-28):** หมุนกล้องด้วยเมาส์ได้เฉพาะตอนเลือกวัตถุดิบ (2.1) ขณะ shaker ยังไม่เต็ม ที่เหลือ fix และ `FlowWiring` เป็นคนเปิด/ปิด
 
 ## Tech
 - Unity 6, URP, Yarn Spinner Plus, Text Animator (Febucci), Cinemachine, Input System, Yarn Spinner, Text Animator for Yarn Spinner, Text Animator Extras for Yarn Spinner, DOTween (Demigiant), Odin Inspector (Sirenix), Oklab.cs, Plugins/Febucci, TableForge
@@ -39,6 +39,7 @@ Loop ของหนึ่งวัน: คุยกับลูกค้า →
   - แปลง event ของ manager กลับเป็นคำสั่ง flow
   - manager ไม่รู้จัก flow และไม่รู้จักกันเอง
 - **Manager แยกตามระบบ ต่างคนต่างมี Canvas ของตัวเอง:** Cocktail, Minigame, Garnish, TalkToCustomer, Camera, Placement (อยู่ใต้ `[GameLoop].prefab`)
+- **Writer เขียนแค่คำสั่ง flow** กล้องเริ่มต้นและการล็อคบาร์เป็นงานของ `FlowWiring` ตาม Phase yarn ใช้ `Switch_Camera` / `Cut_Camera` กำกับภาพเท่านั้น (คำสั่ง `Enable_InteractableObject` / `Fix_Camera` / `Reset_Camera` ลบทิ้งแล้ว)
 - **Yarn สั่ง flow ผ่าน `GameFlowCommands`** (`<<flow_*>>`) ส่วนออเดอร์สั่งผ่าน `CocktailSystemManager` (`Order_Cocktail_*`, `order_by_type`)
 - **ให้คะแนนที่เดียว:** ตอน Serve → Talking (`ServeDrink()` เป็น idempotent) ส่วน remake ไม่ให้คะแนน
 - **มินิเกมแพ้ไม่ได้:** จบได้แค่ `Completed` หรือ `Cancelled`
@@ -54,8 +55,9 @@ Loop ของหนึ่งวัน: คุยกับลูกค้า →
 - เสร็จแล้วในรอบนี้: Event Log, AutoPlay + Skip-to-order, ความเร็ว/แบบการแสดงตัวอักษรใน Pause › Setting, แท็บหน้า Setting, `HubManager`
 - ยังไม่ได้ทดสอบด้วยการเล่นจริง: คลิกเมาส์/controller, save/load, `*Silent*` (ยังไม่มี yarn ไหนใส่ `#timeout`), Phase Close (ยังไม่มีทางเข้า)
 - เพิ่ม Phase BeforeOpen ใน Level 1 แล้ว (2026-10-28) commit `da93422`
-- BeforeOpen รอ `Panel_Transition` เล่นจบก่อนเริ่ม (2026-10-28 ยังไม่ commit) แผน `Docs/Bar410_BeforeOpen_Plan.md`: Stage 1 (Level 2 Event / StoryBeforeOpen) , Stage 2 (ตารางวัน `SO_DaySchedule` เลือก node ตาม `$day`) , Stage 3 (Close → BeforeOpen บวก `$day`) , Stage 4 (ชื่อ Chapter ขึ้นตอนเข้า Open ด้วย `ChapterTitleUI`) , Stage 5 (popup ของ Event ด้วย `EventPopupQueue` ยังไม่ต่อระบบปลดล็อค) และ Stage 6 (Play test 2 วันด้วย `PLAYTEST_Demo.yarn` + `DaySchedule_PlayTest.asset`) เสร็จ compile + Play test ผ่านแล้ว ยังไม่ commit
-- ไฟล์ test คำสั่ง Yarn ทั้งหมด `TEST_AllCommands.yarn` + `Docs/YarnCommands/` (2026-10-28) รันใน Play ผ่านแล้ว ยกเว้น `TEST_RealOrder` (ต้องชงจริง) ยังไม่ commit
+- BeforeOpen รอ `Panel_Transition` เล่นจบก่อนเริ่ม (2026-10-28 commit `72d607a`) แผน `Docs/Bar410_BeforeOpen_Plan.md`: Stage 1 (Level 2 Event / StoryBeforeOpen) , Stage 2 (ตารางวัน `SO_DaySchedule` เลือก node ตาม `$day`) , Stage 3 (Close → BeforeOpen บวก `$day`) , Stage 4 (ชื่อ Chapter ขึ้นตอนเข้า Open ด้วย `ChapterTitleUI`) , Stage 5 (popup ของ Event ด้วย `EventPopupQueue` ยังไม่ต่อระบบปลดล็อค) และ Stage 6 (Play test 2 วันด้วย `PLAYTEST_Demo.yarn` + `DaySchedule_PlayTest.asset`) เสร็จ compile + Play test ผ่านแล้ว (commit `72d607a`)
+- ไฟล์ test คำสั่ง Yarn ทั้งหมด `TEST_AllCommands.yarn` + `Docs/YarnCommands/` (2026-10-28) รันใน Play ผ่านแล้ว ยกเว้น `TEST_RealOrder` (ต้องชงจริง) commit `3b2f37f`
+- Writer Commands (2026-10-28): ย้ายกล้อง/ล็อคบาร์ไปไว้ใน `FlowWiring` ตาม Phase และลบคำสั่ง Yarn `Enable_InteractableObject` / `Fix_Camera` / `Reset_Camera` ทิ้ง (yarn ใน `Demo/` ทุกไฟล์) แผน + ผลทดสอบ: `Docs/Bar410_WriterCommands_Plan.md` เสร็จ compile + Play test (code-driven) ผ่านแล้ว ยังไม่ commit ยังไม่ได้ทดสอบ: ภาพจริง, เมาส์หมุนจริง `Assets/[06]Dialogue/YarnScript/Day1_Demo.yarn` (นอก `Demo/`) ยังมีคำสั่งเก่า
 - แผนปลดล็อควัตถุดิบ: `Docs/Bar410_IngredientUnlock_Plan.md` + ร่าง `Docs/adr/0003-ingredient-unlock.md` รออนุมัติ ยังไม่มีโค้ด
 - Button Feedback (Hover/Hold/Release/Click scale ด้วย DOTween + SO preset) เสร็จ Stage 1-4 แล้ว (2026-10-28) ติดให้ปุ่มใต้ `Canvas_HUD` 13 ตัว + เพิ่ม event `Fired` และ `ButtonFeedbackSound` (Sound ID ใน preset ยังว่างทุกช่อง) และแปลงทั้ง 13 ปุ่มเป็น instance ของ `PF_Button_Hub` แล้ว (sprite/ขนาด/onClick ของแต่ละปุ่มเป็น override แก้ prefab แล้วค่าที่ไม่ได้ override จะเปลี่ยนตามทุกปุ่ม) แผน: `Docs/Bar410_ButtonFeedback_Plan.md` ยังไม่ได้ทดสอบ: เมาส์/controller จริง (ทดสอบด้วย event สังเคราะห์เท่านั้น), ค่า scale ช่วง Click (~1.12), ปุ่มที่ซ่อนอยู่ (Book, SkipWarning, EndShift, Thx) commit `db03a9e` (2026-10-28 เพิ่ม: ปุ่ม Cocktail/Garnish/Minigame 33 ตัวเป็น instance ของ `PF_Button_Hub` + `BTN_CloseEventLog` commit `0a6c503` ข้าม `BTN - OpenOrder` กับ `Panel - Note` เพราะ `Post_It_Order` scale อยู่แล้ว)
 - TODO(เจ้าของ): ในตอนนี้จะให้วางแผนการจัดการงาน Structure Ui เพื่อให้ง่ายต่อการใช้งานและโครงสร้างที่ชัดเจน
