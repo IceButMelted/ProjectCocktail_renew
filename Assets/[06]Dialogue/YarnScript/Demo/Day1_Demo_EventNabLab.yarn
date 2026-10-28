@@ -6,16 +6,23 @@ title: D1_NL_00_Start
 <<Reset_Camera CamController>>
 <<Switch_Camera CamController "MainCam">>
 
-// Walter is already seated and waiting when Isla walks in
-<<MoveIn NPC_Name.Walter 1>>
-<<SetEmotion NPC_Name.Walter "neutral">>
-<<wait 2>>
+Player : This is a great day.
+Player : For first Opening day in this town.
+Player : I looking forawrd to see who will come first.
 
+
+
+<<flow_open_bar>>
 <<jump D1_NL_01_Isla_Arrive>>
 ===
 
 title: D1_NL_01_Isla_Arrive
 ---
+// Walter is already seated and waiting when Isla walks in
+<<MoveIn NPC_Name.Walter 1>>
+<<SetEmotion NPC_Name.Walter "neutral">>
+<<wait 2>>
+
 <<MoveIn NPC_Name.Isla 2>>
 <<Switch_Camera CamController CenterCam>>
 <<SetEmotion NPC_Name.Isla "happy">>

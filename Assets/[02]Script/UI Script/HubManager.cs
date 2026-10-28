@@ -10,7 +10,7 @@ using UnityEditor;
 
 /// <summary>Phases a Hub UI can be shown in. Mirrors the flow's steps; the flow itself is not referenced.</summary>
 [Flags]
-public enum HubPhase { None = 0, Talking = 1, AddIngredient = 2, Minigame = 4, Garnish = 8, Serve = 16, Close = 32 }
+public enum HubPhase { None = 0, BeforeOpen = 1, Talking = 2, AddIngredient = 4, Minigame = 8, Garnish = 16, Serve = 32, Close = 64 }
 
 /// <summary>
 /// Shows and hides Hub UI (buttons on Canvas_HUD) per Phase, from a table set in the Inspector.

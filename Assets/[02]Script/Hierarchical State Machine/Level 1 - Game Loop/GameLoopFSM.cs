@@ -4,11 +4,12 @@ namespace Bar410.GameFlow
 {
     // ── Level 1 Keys ───────────────────────────────────────
 
-    /// <summary>Top-level day loop. Strictly linear: Open → Close → Open.</summary>
+    /// <summary>Top-level day loop. Strictly linear: BeforeOpen → Open → Close → BeforeOpen.</summary>
     public enum GamePhase
     {
         Open,
-        Close
+        Close,
+        BeforeOpen // appended, not first, so existing int values don't shift
     }
 
     // ── Level 1 Machine ────────────────────────────────────
@@ -32,13 +33,14 @@ namespace Bar410.GameFlow
         [Header("Debug")]
         [SerializeField] private bool _logTransitions = true;
 
-        [Tooltip("Enter the Prepare phase automatically on Start. Turn off if a bootstrap/save-load flow starts the day instead.")]
+        [Tooltip("Enter the BeforeOpen phase automatically on Start. Turn off if a bootstrap/save-load flow starts the day instead.")]
         [SerializeField] private bool _autoStart = true;
 
         // ── Public Access ──────────────────────────────────
 
         public StateMachine<GamePhase> Machine { get; } = new StateMachine<GamePhase>();
 
+        public BeforeOpenPhase BeforeOpen { get; private set; }
         public OpenBarPhase OpenBar { get; private set; }
         public ClosingBarPhase ClosingBar { get; private set; }
 
@@ -63,15 +65,18 @@ namespace Bar410.GameFlow
 
         private void Build()
         {
+            BeforeOpen = new BeforeOpenPhase();
             OpenBar = new OpenBarPhase();
             ClosingBar = new ClosingBarPhase();
 
             // Each phase raises its own "I'm done" event; this level decides what that means.
+            BeforeOpen.OnRequestOpen += () => Machine.TryTransition(GamePhase.Open);
             OpenBar.OnRequestExitToClose += () => Machine.TryTransition(GamePhase.Close);
-            ClosingBar.OnRequestNextDay += () => Machine.TryTransition(GamePhase.Open);
+            ClosingBar.OnRequestNextDay += () => Machine.TryTransition(GamePhase.BeforeOpen);
 
+            Machine.AddState(GamePhase.BeforeOpen, BeforeOpen, new[] { GamePhase.Open });
             Machine.AddState(GamePhase.Open, OpenBar, new[] { GamePhase.Close });
-            Machine.AddState(GamePhase.Close, ClosingBar, new[] { GamePhase.Open });
+            Machine.AddState(GamePhase.Close, ClosingBar, new[] { GamePhase.BeforeOpen });
 
             if (_logTransitions)
                 Machine.OnTransition += (from, to) => Debug.Log($"[GameLoop] {from} -> {to}");
@@ -81,7 +86,7 @@ namespace Bar410.GameFlow
         public void StartDay()
         {
             if (Machine.IsRunning) return;
-            Machine.SetInitial(GamePhase.Open);
+            Machine.SetInitial(GamePhase.BeforeOpen);
         }
     }
 }

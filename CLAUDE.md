@@ -28,6 +28,8 @@ Loop ของหนึ่งวัน: คุยกับลูกค้า →
 ## สถาปัตยกรรม (ต้องรักษา)
 - **Game flow:** `GameLoopFSM` (HSM 3 ระดับใน `[02]Script/Hierarchical State Machine/`)
   - state เป็น C# ล้วน ไม่รู้จัก Unity object
+  - Level 1: BeforeOpen → Open → Close → BeforeOpen (เกมเริ่มที่ BeforeOpen)
+  - **BeforeOpen (`BeforeOpenPhase`) มีไว้สำหรับ Event ก่อนเริ่มวัน** เช่น ปลดล็อควัตถุดิบใหม่ หรือเนื้อเรื่องก่อนเปิดร้าน ไปได้แค่ Open ผ่านปุ่ม (`GameFlowCommands.OpenBar` ผูก OnClick) หรือ Yarn `<<flow_open_bar>>` yarn ของแต่ละวันต้องเรียกคำสั่งนี้ ไม่งั้นค้างอยู่ที่ BeforeOpen
   - Step 1 Talking → 2 Prepare Drinks (2.1 AddIngredient ⇄ 2.2 Minigame) → 3 Garnish → 4 Serve → 1
   - Close (ClosingBarPhase) ยังไม่มี UI
 - **`FlowWiring` คือที่เดียวที่ flow กับ manager มาเจอกัน:**
@@ -49,12 +51,20 @@ Loop ของหนึ่งวัน: คุยกับลูกค้า →
 - แผนผัง UI ปัจจุบันอยู่ที่ FigJam board "Project Cocktails" › section "UI List" › "Table C" (อัปเดต 2026-10-28)
 - เสร็จแล้วในรอบนี้: Event Log, AutoPlay + Skip-to-order, ความเร็ว/แบบการแสดงตัวอักษรใน Pause › Setting, แท็บหน้า Setting, `HubManager`
 - ยังไม่ได้ทดสอบด้วยการเล่นจริง: คลิกเมาส์/controller, save/load, `*Silent*` (ยังไม่มี yarn ไหนใส่ `#timeout`), Phase Close (ยังไม่มีทางเข้า)
+- เพิ่ม Phase BeforeOpen ใน Level 1 แล้ว (2026-10-28) ยังไม่ commit
+- แผนปลดล็อควัตถุดิบ: `Docs/Bar410_IngredientUnlock_Plan.md` + ร่าง `Docs/adr/0003-ingredient-unlock.md` รออนุมัติ ยังไม่มีโค้ด
 - TODO(เจ้าของ): ในตอนนี้จะให้วางแผนการจัดการงาน Structure Ui เพื่อให้ง่ายต่อการใช้งานและโครงสร้างที่ชัดเจน
 
 ## สิ่งที่ต้องแก้
 - Input ซ้ำกัน: กด Pause แล้ว Yarn Spinner เลื่อนบทพูดไปพร้อมกัน (น่าจะแก้แล้ว: เอา Esc ออกจาก Next line ใน `PauseAwareKeyCodes` รอทดสอบด้วยการกดจริง)
 - มี EventSystem 2 ตัวในฉาก
 - Save/Load ในฉากหลักไม่กลับมาที่บรรทัดเดิม: `LinePresenterCocktailProject` ไม่ตั้ง `SceneLoaderBridge.CurrentLineId` / ไม่อ่าน `#save_checkpoint` / ไม่ทำ silent replay และ `OptionPresenterCocktailProject` ไม่เก็บคำตอบลง `SessionOptionChoices` (logic เดิมอยู่ใน `BubblePresenter` / `OptionPresenterType2` ที่ไม่ได้อยู่ในฉากแล้ว)
+- **Save/Load ต้องแก้และ refactor อย่างหนัก (พักไว้ก่อน 2026-10-28)** สภาพตอนนี้ในฉากหลัก: load = เริ่มวันใหม่จาก `startNode` ตายตัวของ `DialogueRunner` (คืนค่าแค่ตัวแปร Yarn) ไม่มีใครอ่าน `ChapterName` ที่ save ไว้ ปัญหาที่ต้องตอบตอน refactor:
+  - Phase ของ FSM ไม่ถูก save → load แล้วเริ่มที่ BeforeOpen เสมอ ถ้า save กลาง Open แล้วบทไปต่อที่ node เดิมจะค้าง (`<<flow_*>>` ผิด transition)
+  - ระหว่าง silent replay `GameFlowCommands` ข้ามคำสั่ง flow ทุกตัว พึ่ง replay พา FSM ไปถึง Phase เดิมไม่ได้
+  - popup ปลดล็อควัตถุดิบ (Event) ต้องเก็บรายการ "แจ้งแล้ว" ลง save ไม่งั้นขึ้นซ้ำ
+  - save ระหว่าง Close ได้ `$day` ของวันเดิม (บวกตอน Close → BeforeOpen) load แล้วจะเล่นวันเดิมซ้ำ
+  - ทางเลือกที่คุยไว้: (ก) save Phase แล้ว load ข้าม Event/Story ไป Open ตรงๆ (ข) save ได้แค่ตอนเริ่มวัน (ค) ทำ (ข) ก่อนแล้วขยายเป็น (ก)
 - `MainMenu_V2.unity` มี component Volume บน Global Volume ถูกลบค้างอยู่ (ยังไม่ commit รอเจ้าของยืนยัน)
 
 ## Request พิเศษจาก Designer
@@ -78,7 +88,7 @@ Loop ของหนึ่งวัน: คุยกับลูกค้า →
 | `EventLogPresenter` | `Assets/[06]Dialogue/EventLog/EventLogPresenter.cs` | `New Drag Drop System` › `[EventLogSystem]` | เก็บบทพูดและคำตอบลง Event Log, บันทึกลง save, ล้างด้วย `<<eventlog_clear>>` |
 | `PauseAwareKeyCodes` | `Assets/[06]Dialogue/PauseAwareKeyCodes.cs` | prefab `Assets/[06]Dialogue/Text Animator Dialogue System.prefab` › `Line Advancer` | ปุ่มเร่ง/ไปบทถัดไป (ลิสต์ปุ่ม + cooldown) ไม่รับตอน Pause |
 | `DialogueControls` | `Assets/[06]Dialogue/DialogueControls.cs` | `New Drag Drop System` › `Canvas_HUD` | ปุ่ม AutoPlay, Skip และ `Panel_SkipWarning` การแสดง/ซ่อนปุ่มตาม Phase ไม่อยู่ที่นี่แล้ว ย้ายไป `HubManager` |
-| `HubManager` | `Assets/[02]Script/UI Script/HubManager.cs` | `New Drag Drop System` › `[GameLoop]` › `Canvas_HUD` | ตาราง Odin ใน Inspector: แต่ละแถวคือ Hub UI หนึ่งตัว พร้อมปุ่มเลือก Phase ที่แสดง (Talking / AddIngredient / Minigame / Garnish / Serve / Close) นอก Phase จะ fade หายและกดไม่ได้ (CanvasGroup ไม่เรียก `SetActive`) UI ที่ไม่อยู่ในตารางแสดงตลอด `FlowWiring` เรียก `SetPhase` ทุก Phase มีปุ่ม Preview ตอน edit mode (Undo ได้) |
+| `HubManager` | `Assets/[02]Script/UI Script/HubManager.cs` | `New Drag Drop System` › `[GameLoop]` › `Canvas_HUD` | ตาราง Odin ใน Inspector: แต่ละแถวคือ Hub UI หนึ่งตัว พร้อมปุ่มเลือก Phase ที่แสดง (Talking / AddIngredient / Minigame / Garnish / Serve / Close / BeforeOpen) นอก Phase จะ fade หายและกดไม่ได้ (CanvasGroup ไม่เรียก `SetActive`) UI ที่ไม่อยู่ในตารางแสดงตลอด `FlowWiring` เรียก `SetPhase` ทุก Phase มีปุ่ม Preview ตอน edit mode (Undo ได้) |
 | `DialogueSettingStepper` | `Assets/[06]Dialogue/Settings/DialogueSettingStepper.cs` | `PauseScene` › `Panel - Setting` › `Panel_DialougeSetting` › `Setting TypeWriteSpeed` (Text Speed) และ `Setting TypeWriterStyle` (Display Type) | แถว `◀ ค่า ▶` เลือก Text Speed (Slow/Normal/Fast) / Display Type (Character/Word/Instant) เก็บใน PlayerPrefs `dlg.speed` / `dlg.display` |
 | `SettingWindowTabs` | `Assets/[02]Script/Pause/SettingWindowTabs.cs` | `PauseScene` › `Panel - Setting` › `Panel_BTN_ChangeSettingWindow` | แท็บของหน้า Settings: กดปุ่มแล้วเปิด panel ของปุ่มนั้น ปิดตัวอื่น (Sound / Dialogue / Language) เปิด Settings ใหม่จะกลับไปแท็บแรก |
 

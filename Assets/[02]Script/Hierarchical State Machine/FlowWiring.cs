@@ -127,7 +127,8 @@ namespace Bar410.GameFlow
             openBar.Serve.Entered += OnServeEntered;
             openBar.Serve.Exited += OnServeExited;
 
-            // Close
+            // Before Open / Close
+            _gameLoop.BeforeOpen.Entered += OnBeforeOpenEntered;
             _gameLoop.ClosingBar.Entered += OnClosingEntered;
 
             if (_garnish != null)
@@ -145,6 +146,7 @@ namespace Bar410.GameFlow
         private void OnDestroy()
         {
             if (_gameLoop != null && _gameLoop.ClosingBar != null) _gameLoop.ClosingBar.Entered -= OnClosingEntered;
+            if (_gameLoop != null && _gameLoop.BeforeOpen != null) _gameLoop.BeforeOpen.Entered -= OnBeforeOpenEntered;
 
             if (_cocktail != null && _customers != null)
             {
@@ -453,7 +455,16 @@ namespace Bar410.GameFlow
             _garnish?.OpenServe();
         }
 
-        // ── Close ──────────────────────────────────────────
+        // ── Before Open / Close ────────────────────────────
+
+        private void OnBeforeOpenEntered()
+        {
+            // Same locked bar as Talking: day events play out before anything can be poured.
+            _ingredients?.Disable();
+            _cameras?.SetLookFixed(true);
+            _bookUI?.CloseBook();
+            _hub?.SetPhase(HubPhase.BeforeOpen);
+        }
 
         private void OnClosingEntered() => _hub?.SetPhase(HubPhase.Close);
 

@@ -49,9 +49,14 @@ namespace Bar410.GameFlow
             if (Instance == this) Instance = null;
         }
 
+        // ── Level 1 · Before Open ──────────────────────────
+
+        /// <summary>Day events done — open the bar. BeforeOpen → Open. Bind to a Button's OnClick.</summary>
+        public void OpenBar() => _gameLoop.BeforeOpen.RequestOpen();
+
         // ── Level 1 · Close ─────────────────────────────────
 
-        /// <summary>End-of-day actions done — start the next day. Close → Open.</summary>
+        /// <summary>End-of-day actions done — start the next day. Close → BeforeOpen.</summary>
         public void NextDay() => _gameLoop.ClosingBar.RequestNextDay();
 
         // ── Level 2 · Step 1 · Talking ─────────────────────
@@ -140,6 +145,9 @@ namespace Bar410.GameFlow
         // dialogue is only being fast-forwarded to the saved line, so a flow command must not
         // move the machines. The Yarn functions below still answer, so <<if>> branches replay
         // the way they ran the first time.
+
+        [YarnCommand("flow_open_bar")]
+        public static void Yarn_OpenBar() => CommandTarget()?.OpenBar();
 
         [YarnCommand("flow_next_day")]
         public static void Yarn_NextDay() => CommandTarget()?.NextDay();
