@@ -103,3 +103,15 @@
 - **แก้ที่ prefab แล้วเปลี่ยนตามทุกปุ่ม:** preset ของ `ButtonScaleFeedback`, `ButtonFeedbackSound`, component ใหม่ที่เพิ่มบน prefab และค่าใดๆ ที่ปุ่มยังไม่ได้ override
 - ถ้าอยากให้ค่าที่ override อยู่ (เช่น transition) กลับมาเป็นของ prefab ให้คลิกขวาที่ช่องนั้นใน Inspector แล้วเลือก Revert
 - backup ของฉากก่อนแปลงอยู่ใน scratchpad ของ session นี้เท่านั้น ถ้าต้องย้อนกลับให้ใช้ git
+
+## ส่วนเพิ่ม: ปุ่มใน Manager อื่น (2026-10-28 ทำแล้ว)
+- แปลงเป็น instance ของ `PF_Button_Hub` วิธีเดียวกับ Canvas_HUD ทั้งหมด 33 ปุ่ม
+  - `Canvas_Cocktail/Panel - Method`: `BTN_Mixing`, `BTN_Shaking`, `BTN_Reset`
+  - `Canvas_Garnish`: ทุกปุ่ม 28 ตัว (รวมปุ่มลูกศร `Button (1)/(2)` ที่ไม่มีชื่อ)
+  - `BTN - Cancel Minigame` ของ Mixing และ Shaking: Animator ของ canvas ไม่ได้แตะ scale ของปุ่ม
+- เช็คแล้วว่าค่าเดิมทุกปุ่มตรงกับก่อนแปลง ต่างกันแค่มี component feedback/sound เพิ่มเข้ามา และ reference จากระบบอื่นยังครบ 31 จุด
+- `BTN_CloseEventLog` อยู่ใน prefab `Assets/[06]Dialogue/Text Animator Dialogue System.prefab` จึงใส่ `ButtonScaleFeedback` + `ButtonFeedbackSound` ใน prefab นั้นตรงๆ (ไม่ได้เป็น instance ของ `PF_Button_Hub` แต่ใช้ preset Default ตัวเดียวกัน)
+- ข้าม:
+  - `BTN - OpenOrder` และ `Panel - Note`: `Post_It_Order` scale สองตัวนี้ตอนเปิด/ปิดอยู่แล้ว
+  - `Continue Button`: ปุ่มเลื่อนบทพูด
+  - ปุ่ม Save/Load และ `Panel_EventLog/Blocker`
