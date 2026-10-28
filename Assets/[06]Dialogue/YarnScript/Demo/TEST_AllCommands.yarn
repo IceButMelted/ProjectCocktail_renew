@@ -1,0 +1,188 @@
+title: TEST_Start
+---
+// Test sheet for every Yarn command and function in the project.
+// Run: in DaySchedule_Demo.asset set Day 1's Start Node to TEST_Start, then Play. Set it back afterwards.
+// Docs per command: Docs/YarnCommands/
+// The flow starts in BeforeOpen › StoryBeforeOpen (this node is the "story before opening").
+Player: (TEST) Start. flow_phase = {flow_phase()}, flow_step = {flow_step()}
+Player: (TEST) Expect BeforeOpen / StoryBeforeOpen.
+
+// flow_check_events: Story -> Event -> back to Story, then the next line plays.
+<<flow_check_events>>
+Player: (TEST) After flow_check_events. flow_step = {flow_step()} (expect StoryBeforeOpen)
+
+-> Test the BeforeOpen-only commands, then open the bar
+    <<jump TEST_BeforeOpen>>
+-> Open the bar now
+    <<jump TEST_OpenBar>>
+===
+
+title: TEST_BeforeOpen
+---
+// Panel_Transition (instance commands: target is the GameObject name).
+<<Panel_FadeOut Panel_Transition>>
+Player: (TEST) Panel_FadeOut done (screen should be covered).
+<<Panel_FadeIn Panel_Transition>>
+Player: (TEST) Panel_FadeIn done (screen should be clear again).
+<<jump TEST_OpenBar>>
+===
+
+title: TEST_OpenBar
+---
+<<flow_open_bar>>
+Player: (TEST) After flow_open_bar. flow_phase = {flow_phase()}, flow_step = {flow_step()} (expect Open / TalkingWithCustomer)
+// Calling it again from Open must only warn in the Console.
+<<flow_open_bar>>
+Player: (TEST) Second flow_open_bar should have logged a warning, nothing else.
+<<jump TEST_Hub>>
+===
+
+title: TEST_Hub
+---
+Player: (TEST) Hub. flow_phase = {flow_phase()}, flow_step = {flow_step()}
+-> Camera
+    <<jump TEST_Camera>>
+-> NPC (Isla)
+    <<jump TEST_NPC>>
+-> Order functions (no drink made)
+    <<jump TEST_Orders>>
+-> Flow steps without making a drink
+    <<jump TEST_FlowSteps>>
+-> Real order: make and serve a drink
+    <<jump TEST_RealOrder>>
+-> Misc (wait, interactables, event log, summary)
+    <<jump TEST_Misc>>
+-> End of day (close bar, next day) - ends the test
+    <<jump TEST_EndDay>>
+===
+
+title: TEST_Camera
+---
+// Static commands: the first word (CamController) is ignored.
+<<Switch_Camera CamController CenterCam>>
+Player: (TEST) Switch_Camera CenterCam (blend).
+<<Cut_Camera CamController MainCam>>
+Player: (TEST) Cut_Camera MainCam (no blend).
+<<Fix_Camera CamController false>>
+Player: (TEST) Fix_Camera false: the camera may follow the mouse now.
+<<Fix_Camera CamController true>>
+<<Reset_Camera CamController>>
+Player: (TEST) Fix_Camera true + Reset_Camera: look locked and centred.
+<<jump TEST_Hub>>
+===
+
+title: TEST_NPC
+---
+<<MoveIn NPC_Name.Isla 2>>
+Player: (TEST) MoveIn Isla 2 finished (dialogue waited for the walk).
+<<SetEmotion NPC_Name.Isla "happy">>
+Player: (TEST) SetEmotion happy.
+<<SetLookDirection NPC_Name.Isla LookDirection.Left>>
+Player: (TEST) SetLookDirection Left.
+<<SetLookDirection NPC_Name.Isla LookDirection.Forward>>
+<<SetEmotion NPC_Name.Isla "neutral">>
+<<MoveOut NPC_Name.Isla>>
+Player: (TEST) MoveOut Isla finished.
+<<jump TEST_Hub>>
+===
+
+title: TEST_Orders
+---
+// order_customer: optional, names the customer for the next order.
+<<order_customer "[CocktailSystem]" Isla>>
+Player: (TEST) Named order: {Order_Cocktail_ByName_OutName("Gin Fizz")}
+Player: (TEST) Same order described: {Order_Cocktail_ByName_OutDescription("Gin Fizz")}
+Player: (TEST) order_name = {order_name()}, order_type = {order_type()}
+Player: (TEST) order_flavor = {order_flavor()}
+
+// Random from the customer's preferences. Argument is NPC_Name as a number (Isla = 5).
+Player: (TEST) Random for Isla: {Order_Cocktail_OutName(5)}
+Player: (TEST) Its description: {Order_Cocktail_OutDescription(5)} (must be the SAME drink)
+
+// Mode 5: a type only.
+<<order_by_type "[CocktailSystem]" HighAlcohol>>
+Player: (TEST) order_by_type HighAlcohol. order_type = {order_type()}, order_name = {order_name()}
+
+<<Reset_Variable SystemGame>>
+Player: (TEST) Reset_Variable. order_name = "{order_name()}" (expect empty), order_satisfaction = {order_satisfaction()}
+<<jump TEST_Hub>>
+===
+
+title: TEST_FlowSteps
+---
+// Walks every Open Bar step from Yarn. The minigame UI may open at 2.2; ignore it.
+<<order_customer "[CocktailSystem]" Isla>>
+Player: (TEST) Order for the walk: {Order_Cocktail_ByName_OutName("Gin Fizz")}
+<<flow_prepare_drinks>>
+Player: (TEST) flow_prepare_drinks. step = {flow_step()} (expect AddIngredient)
+<<flow_minigame Shaking>>
+Player: (TEST) flow_minigame Shaking. flow_minigame_type = {flow_minigame_type()} (no transition, still {flow_step()})
+<<flow_ingredient_added>>
+Player: (TEST) flow_ingredient_added. step = {flow_step()} (expect Minigame)
+<<flow_another_ingredient>>
+Player: (TEST) flow_another_ingredient. step = {flow_step()} (expect AddIngredient)
+<<flow_ingredient_added Stirring>>
+Player: (TEST) flow_ingredient_added Stirring. step = {flow_step()}, type = {flow_minigame_type()} (expect Minigame / Stiring)
+Player: (TEST) flow_minigame_result = "{flow_minigame_result()}" (empty until a minigame reported back)
+<<flow_drink_complete>>
+Player: (TEST) flow_drink_complete. step = {flow_step()} (expect Garnish)
+<<flow_remake_drink>>
+Player: (TEST) flow_remake_drink from Garnish. step = {flow_step()} (expect AddIngredient)
+<<flow_ingredient_added>>
+<<flow_drink_complete>>
+<<flow_garnish_done>>
+Player: (TEST) flow_garnish_done. step = {flow_step()} (expect Serve)
+<<flow_serve_done>>
+Player: (TEST) flow_serve_done. step = {flow_step()} (expect TalkingWithCustomer). Score is given here.
+Player: (TEST) order_satisfaction = {order_satisfaction()}
+<<Reset_Variable SystemGame>>
+// From Talking these must only warn:
+<<flow_remake_drink>>
+<<flow_check_events>>
+Player: (TEST) flow_remake_drink and flow_check_events from Talking should have only warned.
+<<jump TEST_Hub>>
+===
+
+title: TEST_RealOrder
+---
+<<order_customer "[CocktailSystem]" Isla>>
+Player: (TEST) Make this: [order] {Order_Cocktail_ByName_OutName("Gin Fizz")} [/order]
+<<flow_prepare_drinks>>
+// Suspends here until the drink is served and scored.
+<<wait_for_task SystemGame>>
+Player: (TEST) wait_for_task returned. order_satisfaction = {order_satisfaction()}, served type = {$type_of_cocktail}
+<<Reset_Variable SystemGame>>
+<<jump TEST_Hub>>
+===
+
+title: TEST_Misc
+---
+<<wait_scene 1>>
+Player: (TEST) wait_scene 1 waited one second (skipped while Skip runs).
+<<Enable_InteractableObject SystemGame false>>
+Player: (TEST) Enable_InteractableObject false: bottles locked.
+<<Enable_InteractableObject true>>
+Player: (TEST) Enable_InteractableObject true (one-argument form): bottles usable.
+<<Enable_InteractableObject SystemGame false>>
+<<eventlog_clear>>
+Player: (TEST) eventlog_clear: the Event Log should now start from this line.
+// save_chapter_node is not tested here: [SaveLoadSystem] is inactive in the main scene, and an
+// instance command whose target is missing stops the dialogue. See Docs/YarnCommands/save_chapter_node.md.
+<<Fade_To_Summmary Panel_Transition>>
+Player: (TEST) Fade_To_Summmary done.
+<<Panel_FadeIn Panel_Transition>>
+Player: (TEST) Panel_FadeIn back from the summary.
+<<jump TEST_Hub>>
+===
+
+title: TEST_EndDay
+---
+<<Can_End_Shift SystemGame>>
+Player: (TEST) Can_End_Shift: the End Shift button should appear.
+<<flow_close_bar>>
+Player: (TEST) flow_close_bar. flow_phase = {flow_phase()} (expect Close)
+<<flow_next_day>>
+Player: (TEST) flow_next_day. flow_phase = {flow_phase()}, flow_step = {flow_step()} (expect BeforeOpen / StoryBeforeOpen; the next day's node starts once this dialogue ends)
+<<DisplayThx>>
+Player: (TEST) DisplayThx: the thank-you panel should be on screen. End of test.
+===

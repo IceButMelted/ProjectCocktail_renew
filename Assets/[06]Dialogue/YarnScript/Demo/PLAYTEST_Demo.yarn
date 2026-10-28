@@ -1,0 +1,255 @@
+title: PT_D1_Start
+---
+// ================================================================
+// PLAYTEST_Demo.yarn — a two-day mini demo that is also the play test
+// of one full game loop, and the reference for writing a new day.
+//
+// Run: on [GameLoop] › FlowWiring set Day Schedule to DaySchedule_PlayTest
+//      (Assets/[02]Script/Day Schedule/), then Play. Set it back to
+//      DaySchedule_Demo afterwards.
+//
+// Every command and function in Docs/YarnCommands/ is used once at least,
+// except save_chapter_node (see PT_D2_Close). Lines starting with (PT)
+// print what the game state should be; delete them in a real day.
+// (Not "[PT]": Yarn reads square brackets as markup and the speaker name breaks.)
+//
+// The shape of a day (copy this when writing a new one):
+//   BeforeOpen  › Story  : the day's start node, set in the Day Schedule
+//                          (Day / Start Node / Chapter Name). Pre-opening story.
+//                          <<flow_check_events>> shows the day's popups mid-story.
+//                          <<flow_open_bar>> ends it (required, or the day hangs here).
+//   Open        › Talking: customers walk in, talk, order. Chapter title fades in.
+//                          <<flow_prepare_drinks>> + <<wait_for_task>> = the player
+//                          makes the drink; the story waits until it is served.
+//   Close                : <<flow_close_bar>> from Talking.
+//   next day             : <<flow_next_day>> from Close adds 1 to $day. The next
+//                          day's start node begins when THIS dialogue ends, so
+//                          make flow_next_day the last thing in the day.
+// ================================================================
+
+// A new day starts with a clean Event Log.
+<<eventlog_clear>>
+
+// The bar is locked and the camera fixed until the customer orders.
+<<Enable_InteractableObject SystemGame false>>
+<<Fix_Camera CamController true>>
+<<Reset_Camera CamController>>
+<<Cut_Camera CamController MainCam>>
+
+Player: (PT) Day {$day}. flow_phase = {flow_phase()}, flow_step = {flow_step()} (expect 1 / BeforeOpen / StoryBeforeOpen)
+Player: First night of the play test.
+Player: Let me check the notice board before I open.
+
+// Back to Event: shows any queued popups and waits until the player closes them,
+// then the next line plays. Nothing queues popups yet, so it passes at once.
+<<flow_check_events>>
+Player: (PT) After flow_check_events: flow_step = {flow_step()} (expect StoryBeforeOpen)
+
+Player: Nothing new. Time to open.
+<<wait_scene 1>>
+
+// Leaves BeforeOpen for Open › Talking. The Chapter Name of today's row fades in.
+<<flow_open_bar>>
+Player: (PT) flow_phase = {flow_phase()}, flow_step = {flow_step()} (expect Open / TalkingWithCustomer)
+<<jump PT_D1_Isla>>
+===
+
+title: PT_D1_Isla
+---
+// ── A customer walks in ─────────────────────────────
+<<MoveIn NPC_Name.Isla 2>>
+<<Switch_Camera CamController CenterCam>>
+<<SetEmotion NPC_Name.Isla "happy">>
+Isla: [wave]Evening! Is this place open yet?[/wave]
+Player: Just opened. Take a seat.
+<<SetLookDirection NPC_Name.Isla LookDirection.Left>>
+Isla: Cosy. I like it.
+<<SetLookDirection NPC_Name.Isla LookDirection.Forward>>
+
+// ── The order: a drink by name ──────────────────────
+// order_customer names who the next order is for (it scores their preferences).
+<<order_customer "[CocktailSystem]" Isla>>
+Isla: I'll have a [order]{Order_Cocktail_ByName_OutName("Gin Fizz")}[/order], please.
+Player: {Order_Cocktail_ByName_OutDescription("Gin Fizz")}
+Player: (PT) order_name = {order_name()}, order_type = {order_type()}, order_flavor = {order_flavor()}
+
+<<jump PT_MakeDrink>>
+===
+
+title: PT_MakeDrink
+---
+// Shared by every order in this file. The player normally makes the drink;
+// the second option walks every step from Yarn instead (no ingredients, so it
+// scores Fail) to show the step commands and to speed up a test run.
+
+// Pre-selects the minigame of the next step 2.2. The player's Shake/Stir button overrides it.
+<<flow_minigame Shaking>>
+Player: (PT) flow_minigame_type = {flow_minigame_type()} (expect Shaking)
+
+-> Make the drink
+    <<flow_prepare_drinks>>
+    <<Fix_Camera CamController false>>
+-> (Test) Let Yarn walk the steps
+    <<flow_prepare_drinks>>
+    Player: (PT) step = {flow_step()} (expect AddIngredient)
+    <<flow_ingredient_added>>
+    Player: (PT) flow_ingredient_added: step = {flow_step()} (expect Minigame)
+    <<flow_another_ingredient>>
+    Player: (PT) flow_another_ingredient: step = {flow_step()} (expect AddIngredient)
+    <<flow_ingredient_added Stirring>>
+    <<flow_drink_complete>>
+    Player: (PT) flow_drink_complete: step = {flow_step()} (expect Garnish)
+    <<flow_remake_drink>>
+    Player: (PT) flow_remake_drink: step = {flow_step()} (expect AddIngredient, nothing scored)
+    <<flow_ingredient_added>>
+    <<flow_drink_complete>>
+    <<flow_garnish_done>>
+    Player: (PT) flow_garnish_done: step = {flow_step()} (expect Serve)
+    <<flow_serve_done>>
+    Player: (PT) flow_serve_done: step = {flow_step()} (expect TalkingWithCustomer, scored here)
+
+// Waits until the drink is served and scored, then writes $satisfaction and
+// $type_of_cocktail. After the test option it returns at once.
+<<wait_for_task SystemGame>>
+
+<<Enable_InteractableObject SystemGame false>>
+<<Fix_Camera CamController true>>
+<<Reset_Camera CamController>>
+Player: (PT) order_satisfaction = {order_satisfaction()}, served type = {$type_of_cocktail}, minigame result = "{flow_minigame_result()}"
+
+<<if $day == 1>>
+    <<jump PT_D1_Reaction>>
+<<else>>
+    <<jump PT_D2_Reaction>>
+<<endif>>
+===
+
+title: PT_D1_Reaction
+---
+// ── React to the drink ($satisfaction is set by wait_for_task) ──
+<<if $satisfaction == Satisfaction.Perfect>>
+    <<SetEmotion NPC_Name.Isla "happy">>
+    Isla: [bounce]Perfect. Just how I like it.[/bounce]
+<<elseif $satisfaction == Satisfaction.Acceptable>>
+    Isla: Not bad. A little different, but fine.
+<<else>>
+    <<SetEmotion NPC_Name.Isla "upset">>
+    Isla: [shake]Hmm... that's not what I asked for.[/shake]
+<<endif>>
+
+// Clears the order and the three result variables for the next customer.
+<<Reset_Variable SystemGame>>
+<<SetEmotion NPC_Name.Isla "neutral">>
+Isla: See you tomorrow.
+<<MoveOut NPC_Name.Isla>>
+<<jump PT_D1_Close>>
+===
+
+title: PT_D1_Close
+---
+// ── End of day 1 ────────────────────────────────────
+Player: That's it for tonight.
+<<flow_close_bar>>
+Player: (PT) flow_phase = {flow_phase()} (expect Close)
+
+<<Panel_FadeOut Panel_Transition>>
+// Close -> BeforeOpen: $day becomes 2 and day 2's start node waits for this dialogue to end.
+<<flow_next_day>>
+<<Panel_FadeIn Panel_Transition>>
+// End of node = end of day 1. PT_D2_Start begins next.
+===
+
+title: PT_D2_Start
+---
+<<eventlog_clear>>
+<<Enable_InteractableObject SystemGame false>>
+<<Fix_Camera CamController true>>
+<<Reset_Camera CamController>>
+<<Switch_Camera CamController MainCam>>
+
+Player: (PT) Day {$day}. flow_phase = {flow_phase()}, flow_step = {flow_step()} (expect 2 / BeforeOpen / StoryBeforeOpen)
+Player: Second night. Word must be getting around.
+<<flow_open_bar>>
+<<jump PT_D2_Walter>>
+===
+
+title: PT_D2_Walter
+---
+<<MoveIn NPC_Name.Walter 1>>
+<<SetEmotion NPC_Name.Walter "neutral">>
+Walter: Evening, son. Surprise me. Something I'd like.
+
+// ── The order: random from the customer's preferences ─
+// The argument is NPC_Name as a number: Cole 1, Owen 2, Walter 3, Freya 4, Isla 5.
+// OutName and OutDescription of the same call return the same drink.
+<<order_customer "[CocktailSystem]" Walter>>
+Player: How about a [order]{Order_Cocktail_OutName(3)}[/order]?
+Player: {Order_Cocktail_OutDescription(3)}
+Walter: Go on then.
+<<jump PT_MakeDrink>>
+===
+
+title: PT_D2_Reaction
+---
+<<if $satisfaction == Satisfaction.Fail>>
+    <<SetEmotion NPC_Name.Walter "upset">>
+    Walter: [shake]Not my sort of thing.[/shake]
+<<else>>
+    <<SetEmotion NPC_Name.Walter "happy">>
+    Walter: [wiggle]You've got a knack for this.[/wiggle]
+<<endif>>
+<<Reset_Variable SystemGame>>
+<<SetEmotion NPC_Name.Walter "neutral">>
+<<jump PT_D2_Owen>>
+===
+
+title: PT_D2_Owen
+---
+<<MoveIn NPC_Name.Owen 3>>
+<<Switch_Camera CamController NearRightCam>>
+<<SetEmotion NPC_Name.Owen "happy">>
+Owen: [bounce]Hey hey! Something strong, I don't care what.[/bounce]
+
+// ── The order: a type only ───────────────────────────
+// Any drink of that type counts. Instance command: the GameObject name must be
+// "[CocktailSystem]" (the object it lives on in the scene). order_name() stays empty.
+<<order_customer "[CocktailSystem]" Owen>>
+<<order_by_type "[CocktailSystem]" HighAlcohol>>
+Player: (PT) order_type = {order_type()} (expect HighAlcohol), order_name = "{order_name()}" (expect empty)
+Player: One strong drink coming up.
+
+<<flow_prepare_drinks>>
+<<Fix_Camera CamController false>>
+<<wait_for_task SystemGame>>
+<<Enable_InteractableObject SystemGame false>>
+<<Fix_Camera CamController true>>
+<<Reset_Camera CamController>>
+
+<<if $type_of_cocktail == TypeOfCocktail.HighAlcohol>>
+    Owen: [bounce]Now THAT's strong![/bounce]
+<<else>>
+    <<SetEmotion NPC_Name.Owen "upset">>
+    Owen: That's... juice, buddy.
+<<endif>>
+<<Reset_Variable SystemGame>>
+<<SetEmotion NPC_Name.Owen "neutral">>
+<<MoveOut NPC_Name.Owen>>
+<<MoveOut NPC_Name.Walter>>
+<<jump PT_D2_Close>>
+===
+
+title: PT_D2_Close
+---
+// ── End of the demo ─────────────────────────────────
+// save_chapter_node is left out: [SaveLoadSystem] is inactive in the main scene and the
+// dialogue would hang (Docs/YarnCommands/save_chapter_node.md). Save/Load is parked.
+Player: Last call. That's the end of the play test.
+
+// Shows the End Shift button (and locks the bar).
+<<Can_End_Shift SystemGame>>
+<<flow_close_bar>>
+<<Fade_To_Summmary Panel_Transition>>
+<<Panel_FadeIn Panel_Transition>>
+<<DisplayThx>>
+Player: (PT) End. flow_phase = {flow_phase()} (expect Close). Thank-you panel should be on screen.
+===
