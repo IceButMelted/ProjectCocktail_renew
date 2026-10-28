@@ -15,10 +15,10 @@ using static E_Cocktail;
 public class CharacterData : MonoBehaviour, ICustomerPreferences
 {
     [SerializedDictionary("Character", "Favorite Drink")]
-    public SerializedDictionary<NPC_Name, List<TypeOfCocktail>> NPC_Favorite_Drink = new SerializedDictionary<NPC_Name, List<TypeOfCocktail>>();
+    public SerializedDictionary<CharacterName, List<TypeOfCocktail>> NPC_Favorite_Drink = new SerializedDictionary<CharacterName, List<TypeOfCocktail>>();
 
     /// <inheritdoc/>
-    public bool TryGetPreferredTypes(NPC_Name customer, out IReadOnlyList<TypeOfCocktail> types)
+    public bool TryGetPreferredTypes(CharacterName customer, out IReadOnlyList<TypeOfCocktail> types)
     {
         types = null;
 

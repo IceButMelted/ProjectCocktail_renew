@@ -16,5 +16,5 @@ public interface ICustomerPreferences
     /// Preferred drink types for <paramref name="customer"/>.
     /// False if unknown or unauthored — caller then falls back to every alcoholic/non-alcoholic type.
     /// </summary>
-    bool TryGetPreferredTypes(NPC_Name customer, out IReadOnlyList<TypeOfCocktail> types);
+    bool TryGetPreferredTypes(CharacterName customer, out IReadOnlyList<TypeOfCocktail> types);
 }

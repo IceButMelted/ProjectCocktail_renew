@@ -1,16 +1,16 @@
-using UnityEngine;
-using static E_Cocktail;
 using System.Collections.Generic;
+using static E_Cocktail;
 
-public class SaveNPCData 
+public class SaveNPCData
 {
-   public Dictionary<NPC_Name, NPCData> npcDataDict = new Dictionary<NPC_Name, NPCData>();
+    public Dictionary<CharacterName, NPCData> npcDataDict = new Dictionary<CharacterName, NPCData>();
 }
 
+/// <summary>What the save keeps of one character: in the shop or not, where, and how they look.</summary>
 public class NPCData
 {
-    public Vector3 position;
-    public Quaternion rotation;
-    public int CurrentWayPointIndex;
-    public Direction CurrentLookDirection;
+    public bool isPresent;
+    public int spot;
+    public int expressionIndex;
+    public Facing look;
 }

@@ -8,7 +8,7 @@ public class SO_CustomerRoster : ScriptableObject, ICustomerPreferences
     public List<SO_Customer> Customers = new List<SO_Customer>();
 
     /// <inheritdoc/>
-    public bool TryGetPreferredTypes(NPC_Name customer, out IReadOnlyList<TypeOfCocktail> types)
+    public bool TryGetPreferredTypes(CharacterName customer, out IReadOnlyList<TypeOfCocktail> types)
     {
         types = null;
         if (Customers == null) return false;

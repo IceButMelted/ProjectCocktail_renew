@@ -1,0 +1,40 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 37b7be055636a50f1811b0acf3641f78, type: 3}
+  m_Name: Cole
+  m_EditorClassIdentifier: Assembly-CSharp::SO_Customer
+  Id: 1
+  CustomerName: Cole
+  NameColor: {r: 1, g: 1, b: 1, a: 1}
+  PreferredDrinkTypes: 
+  Forward:
+    Body: {fileID: 21300000, guid: 85c51a303a780d744b5b29783b6654e1, type: 3}
+    FaceOffset: {x: -0.008, y: 1.369}
+  Left:
+    Body: {fileID: 21300000, guid: 85c51a303a780d744b5b29783b6654e1, type: 3}
+    FaceOffset: {x: -0.008, y: 1.369}
+  Right:
+    Body: {fileID: 21300000, guid: 3839feeaedcf44041b4af10c89edf795, type: 3}
+    FaceOffset: {x: 0.0184, y: 1.3623}
+  Expressions:
+  - Id: Neutral
+    Forward: {fileID: 21300000, guid: ff0ff1373cb49a845b5d3459e52c7bad, type: 3}
+    Left: {fileID: 21300000, guid: a65160f36820d7a419f11630995832b9, type: 3}
+    Right: {fileID: 21300000, guid: 2b82667f200b41f4e9468c09756ee028, type: 3}
+  - Id: Happy
+    Forward: {fileID: 21300000, guid: 024ca39fe1d87b04aa9051f30705f17e, type: 3}
+    Left: {fileID: 0}
+    Right: {fileID: 21300000, guid: 2b82667f200b41f4e9468c09756ee028, type: 3}
+  - Id: Sad
+    Forward: {fileID: 21300000, guid: 7a1cb2562fe40554cacb9e1c28a8acbd, type: 3}
+    Left: {fileID: 0}
+    Right: {fileID: 0}

@@ -39,7 +39,7 @@ public class DrinkOrderContext
 
     // ── The order (written when the customer asks) ─────────
 
-    public NPC_Name Customer { get; private set; } = NPC_Name.None;
+    public CharacterName Customer { get; private set; } = CharacterName.None;
     public OrderMode Mode { get; private set; } = OrderMode.None;
 
     /// <summary>The recipe asked for. Null in <see cref="OrderMode.FixedByType"/>.</summary>
@@ -72,7 +72,7 @@ public class DrinkOrderContext
     // ── Mutation ───────────────────────────────────────────
 
     /// <summary>Records a new order and clears any previous result.</summary>
-    public void BeginOrder(NPC_Name customer, OrderMode mode, S_Drink target, TypeOfCocktail orderedType)
+    public void BeginOrder(CharacterName customer, OrderMode mode, S_Drink target, TypeOfCocktail orderedType)
     {
         Customer = customer;
         Mode = mode;
@@ -112,7 +112,7 @@ public class DrinkOrderContext
     /// <summary>Wipes everything. Ready for the next customer.</summary>
     public void Clear()
     {
-        Customer = NPC_Name.None;
+        Customer = CharacterName.None;
         Mode = OrderMode.None;
         Target = null;
         OrderedType = TypeOfCocktail.None;

@@ -3,11 +3,13 @@
 //  bar that is not a drink: who is standing where, what their face
 //  and gaze are, and the Yarn commands that move them.
 //
-//  Sits on the object the NPCs live under (NPCs_And_Set). It owns the
-//  NPC lookup the Yarn commands used to keep in a static dictionary on
-//  NPC_Base, the snapshot / restore the save system uses, the dialogue's
+//  Sits on the object the characters live under (NPCs_And_Set). This
+//  file: the lookup of CharacterViews by name, the dialogue's
 //  variables (the only writer of $task_done, $satisfaction,
 //  $type_of_cocktail and $rel_*) and who likes which drink.
+//
+//  The characters' Yarn commands, spots and save snapshot are in
+//  TalkToCustomerManager.Characters.cs (same partial class).
 //
 //  It does not know the cocktail: a scored order is handed in
 //  (CommitOrderResult) by the bridge that listens to the cocktail.
@@ -24,7 +26,7 @@ using UnityEngine;
 using Yarn.Unity;
 using static E_Cocktail;
 
-public class TalkToCustomerManager : MonoBehaviour
+public partial class TalkToCustomerManager : MonoBehaviour
 {
     /// <summary>The manager of the loaded scene, or null. Set in Awake, cleared in OnDestroy.</summary>
     public static TalkToCustomerManager Current { get; private set; }
@@ -36,7 +38,7 @@ public class TalkToCustomerManager : MonoBehaviour
     [Tooltip("Preferred source (GDD section 19.1). Falls back to the CharacterData component on this object when empty.")]
     [SerializeField] private SO_CustomerRoster _customerRoster;
 
-    private readonly Dictionary<NPC_Name, NPC_Base> _byName = new Dictionary<NPC_Name, NPC_Base>();
+    private readonly Dictionary<CharacterName, CharacterView> _byName = new Dictionary<CharacterName, CharacterView>();
 
     private CharacterData _characterData;
     private YarnVariableSync _variables;
@@ -69,16 +71,16 @@ public class TalkToCustomerManager : MonoBehaviour
 
         Current = this;
 
-        // Every NPC under this object, by the name dialogue and saves use. An NPC left at None
+        // Every character under this object, by the name dialogue and saves use. A view left at None
         // (a placeholder) is not addressable and is skipped.
-        foreach (var npc in GetComponentsInChildren<NPC_Base>(true))
+        foreach (var view in GetComponentsInChildren<CharacterView>(true))
         {
-            if (npc.Name == NPC_Name.None) continue;
+            if (view.Name == CharacterName.None) continue;
 
-            if (_byName.ContainsKey(npc.Name))
-                Debug.LogWarning($"[TalkToCustomerManager] Two NPCs are named {npc.Name}; '{npc.name}' is ignored.", npc);
+            if (_byName.ContainsKey(view.Name))
+                Debug.LogWarning($"[TalkToCustomerManager] Two characters are named {view.Name}; '{view.name}' is ignored.", view);
             else
-                _byName[npc.Name] = npc;
+                _byName[view.Name] = view;
         }
     }
 
@@ -171,98 +173,24 @@ public class TalkToCustomerManager : MonoBehaviour
 
     // ── Lookup ─────────────────────────────────────────────
 
-    /// <summary>The NPC with this name, or null.</summary>
-    public NPC_Base Find(NPC_Name name) => _byName.TryGetValue(name, out var npc) ? npc : null;
+    /// <summary>The character with this name, or null.</summary>
+    public CharacterView Find(CharacterName name) => _byName.TryGetValue(name, out var view) ? view : null;
 
     /// <summary>
-    /// Resolves the spelling dialogue uses: "Walter" or "NPC_Name.Walter". Warns and returns
-    /// null for a name that is not an NPC, so a typo in a .yarn file shows up in the console.
+    /// Resolves the spelling dialogue uses: "Walter" or "CharacterName.Walter". Warns and returns
+    /// null for a name that is not a character, so a typo in a .yarn file shows up in the console.
     /// </summary>
-    public NPC_Base Find(string npcNameStr)
+    public CharacterView Find(string nameStr)
     {
-        string raw = npcNameStr.Contains(".") ? npcNameStr.Split('.')[1] : npcNameStr;
-        if (!System.Enum.TryParse(raw, true, out NPC_Name target) || target == NPC_Name.None)
+        string raw = nameStr.Contains(".") ? nameStr.Split('.')[1] : nameStr;
+        if (!System.Enum.TryParse(raw, true, out CharacterName target) || target == CharacterName.None)
         {
-            Debug.LogWarning($"[FindNPC] Invalid NPC name: '{npcNameStr}'");
+            Debug.LogWarning($"[FindCharacter] Invalid character name: '{nameStr}'");
             return null;
         }
 
-        var npc = Find(target);
-        if (npc == null) Debug.LogWarning($"[FindNPC] No NPC with NPCName.{target} found in scene.");
-        return npc;
-    }
-
-    // ── Save / load ────────────────────────────────────────
-
-    /// <summary>Where every NPC is, for the save system.</summary>
-    public Dictionary<NPC_Name, NPCData> Snapshot()
-    {
-        var snapshot = new Dictionary<NPC_Name, NPCData>();
-
-        foreach (var pair in _byName)
-        {
-            var npc = pair.Value;
-            snapshot[pair.Key] = new NPCData
-            {
-                position = npc.transform.position,
-                rotation = npc.transform.rotation,
-                CurrentWayPointIndex = npc.CurrentWaypointIndex,
-                CurrentLookDirection = npc.CurrentLookDirection
-            };
-        }
-
-        return snapshot;
-    }
-
-    /// <summary>Puts NPCs back where <see cref="Snapshot"/> found them. Names with no NPC are skipped.</summary>
-    public void Restore(IReadOnlyDictionary<NPC_Name, NPCData> saved)
-    {
-        foreach (var pair in saved)
-        {
-            var npc = Find(pair.Key);
-            if (npc == null) continue;
-
-            var state = pair.Value;
-            npc.transform.position = state.position;
-            npc.transform.rotation = state.rotation;
-            npc.CurrentWaypointIndex = state.CurrentWayPointIndex;
-            npc.CurrentLookDirection = state.CurrentLookDirection;
-
-            // An NPC that never moved has no waypoint (-1) and is already where it was saved.
-            if (state.CurrentWayPointIndex >= 0) npc.TeleportToWaypoint(state.CurrentWayPointIndex);
-        }
-    }
-
-    // ── Yarn commands (names are a contract with the .yarn files) ──
-
-    [YarnCommand("SetEmotion")]
-    public static void SetEmotion(string npcNameStr, string emotion)
-        => Current?.Find(npcNameStr)?.SetEmotion(emotion);
-
-    [YarnCommand("SetLookDirection")]
-    public static void SetLookDirection(string npcNameStr, string direction)
-        => Current?.Find(npcNameStr)?.LookDirection(direction);
-
-    [YarnCommand("MoveIn")]
-    public static IEnumerator MoveIn(string npcNameStr, int waypointIndex)
-    {
-        if (SceneLoaderBridge.IsSilentReplay) yield break;
-        yield return MoveTo(npcNameStr, waypointIndex);
-    }
-
-    [YarnCommand("MoveOut")]
-    public static IEnumerator MoveOut(string npcNameStr)
-    {
-        if (SceneLoaderBridge.IsSilentReplay) yield break;
-        yield return MoveTo(npcNameStr, 0);
-    }
-
-    private static IEnumerator MoveTo(string npcNameStr, int waypointIndex)
-    {
-        var npc = Current?.Find(npcNameStr);
-        if (npc == null) yield break;
-
-        // Runs on the NPC, as it always has, so the walk stops with the NPC.
-        yield return npc.StartCoroutine(npc.MoveTo(waypointIndex));
+        var view = Find(target);
+        if (view == null) Debug.LogWarning($"[FindCharacter] No CharacterView named {target} found in scene.");
+        return view;
     }
 }

@@ -90,7 +90,7 @@ public class YarnVariableSync
     /// GDD §22 / D8 — relationship lives in Yarn and nowhere else. Never mirror into a
     /// ScriptableObject; an SO written at runtime keeps its value between Play sessions.
     /// </summary>
-    public float ReadRelationship(NPC_Name customer)
+    public float ReadRelationship(CharacterName customer)
     {
         if (!Guard()) return 0f;
         _runner.VariableStorage.TryGetValue($"$rel_{customer}", out float value);
@@ -98,7 +98,7 @@ public class YarnVariableSync
     }
 
     /// <summary>GDD §18.2 — applies the post-serve relationship change.</summary>
-    public void ApplyRelationshipDelta(NPC_Name customer, float delta)
+    public void ApplyRelationshipDelta(CharacterName customer, float delta)
     {
         if (!Guard() || Mathf.Approximately(delta, 0f)) return;
 

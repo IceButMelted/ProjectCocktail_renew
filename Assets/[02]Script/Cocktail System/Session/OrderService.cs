@@ -31,7 +31,7 @@ public class OrderService
 
     // ── GDD §12 modes 1-2 — a named recipe ─────────────────
 
-    public bool OrderByName(DrinkOrderContext context, NPC_Name customer, string recipeName, bool byFlavor)
+    public bool OrderByName(DrinkOrderContext context, CharacterName customer, string recipeName, bool byFlavor)
     {
         if (_lookup == null || !_lookup.TryGetByName(recipeName, out var drink))
         {
@@ -48,7 +48,7 @@ public class OrderService
 
     // ── GDD §12 modes 3-4 — random from what they like ─────
 
-    public bool OrderByPreference(DrinkOrderContext context, NPC_Name customer, bool byFlavor)
+    public bool OrderByPreference(DrinkOrderContext context, CharacterName customer, bool byFlavor)
     {
         var drink = PickForCustomer(customer);
         if (drink == null)
@@ -66,7 +66,7 @@ public class OrderService
 
     // ── GDD §12 mode 5 — a type, no specific recipe ────────
 
-    public bool OrderByType(DrinkOrderContext context, NPC_Name customer, TypeOfCocktail type)
+    public bool OrderByType(DrinkOrderContext context, CharacterName customer, TypeOfCocktail type)
     {
         if (type == TypeOfCocktail.None || type == TypeOfCocktail.NotMatch)
         {
@@ -93,7 +93,7 @@ public class OrderService
     ///
     /// GDD §24 keeps weighted selection out of v1 — uniform is the decision, not a stub.
     /// </summary>
-    public S_Drink PickForCustomer(NPC_Name customer)
+    public S_Drink PickForCustomer(CharacterName customer)
     {
         if (_randomPool == null) return null;
 

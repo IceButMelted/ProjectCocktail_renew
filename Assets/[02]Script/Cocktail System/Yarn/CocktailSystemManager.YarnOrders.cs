@@ -38,12 +38,12 @@ public partial class CocktailSystemManager
     /// <summary>Returns the name of a random cocktail suited to the given NPC.</summary>
     [YarnFunction("Order_Cocktail_OutName")]
     public static string RandomOrderCocktail_OutName(int NPC)
-        => Resolve()?.PlacePreferenceOrder((NPC_Name)NPC, byFlavor: false) ?? string.Empty;
+        => Resolve()?.PlacePreferenceOrder((CharacterName)NPC, byFlavor: false) ?? string.Empty;
 
     /// <summary>Returns the description of a random cocktail suited to the given NPC.</summary>
     [YarnFunction("Order_Cocktail_OutDescription")]
     public static string RandomOrderCocktail_OutDescription(int NPC)
-        => Resolve()?.PlacePreferenceOrder((NPC_Name)NPC, byFlavor: true) ?? string.Empty;
+        => Resolve()?.PlacePreferenceOrder((CharacterName)NPC, byFlavor: true) ?? string.Empty;
 
     // ── GDD §12 modes 1-2 — a named recipe ─────────────────
 
@@ -79,9 +79,9 @@ public partial class CocktailSystemManager
     [YarnCommand("order_customer")]
     public void SetOrderCustomer(string npcName)
     {
-        if (!System.Enum.TryParse(npcName, ignoreCase: true, out NPC_Name parsed))
+        if (!System.Enum.TryParse(npcName, ignoreCase: true, out CharacterName parsed))
         {
-            Debug.LogWarning($"[CocktailSystemManager] '{npcName}' is not an NPC_Name.", this);
+            Debug.LogWarning($"[CocktailSystemManager] '{npcName}' is not an CharacterName.", this);
             return;
         }
 
@@ -110,7 +110,7 @@ public partial class CocktailSystemManager
     /// node calling both named one cocktail and described a different one. Now reuses a
     /// standing, unserved order for the same customer.
     /// </summary>
-    private string PlacePreferenceOrder(NPC_Name customer, bool byFlavor)
+    private string PlacePreferenceOrder(CharacterName customer, bool byFlavor)
     {
         bool reuse = Order.HasOrder && Order.Customer == customer && !Order.IsScored && Order.Target != null;
 
