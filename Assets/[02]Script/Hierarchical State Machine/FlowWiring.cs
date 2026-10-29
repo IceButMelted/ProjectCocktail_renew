@@ -79,6 +79,8 @@ namespace Bar410.GameFlow
         {
             _gameLoop = GetComponent<GameLoopFSM>();
             _commands = GetComponent<GameFlowCommands>();
+            // <<flow_open_bar>> waits for the chapter title to fade out.
+            if (_commands != null && _chapterTitle != null) _commands.OpeningBusy = () => _chapterTitle.IsPlaying;
 
             var openBar = _gameLoop.OpenBar;
             var prepareDrinks = openBar.PrepareDrinks;

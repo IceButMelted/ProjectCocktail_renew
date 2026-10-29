@@ -11,7 +11,7 @@
 target: `Panel_Transition`
 
 ## ทำอะไร
-เล่น transition FadeIn (เปิดฉาก) บทรอจนจบ
+เล่น transition FadeIn (เปิดฉาก) บทรอจน animation `Transition_FadeIn` เล่นจบแล้วค่อยไปบรรทัดถัดไป
 
 ## ใช้ได้เมื่อ
 ได้ทุกเมื่อ

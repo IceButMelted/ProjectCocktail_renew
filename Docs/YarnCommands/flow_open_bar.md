@@ -13,6 +13,8 @@
 ## ทำอะไร
 ออกจาก BeforeOpen ไป Open (เริ่มที่ TalkingWithCustomer) เหมือนกดปุ่มที่ผูก `GameFlowCommands.OpenBar`
 
+**บทรอ (2026-10-29):** ชื่อ Chapter (`ChapterTitleUI`) ขึ้นตอนเข้า Open บทหยุดรอจนชื่อ fade เข้า-ค้าง-ออกครบ (ค่าเริ่มต้น 0.5 + 1.5 + 0.5 = 2.5 วินาที ตั้งที่ `Panel_ChapterTitle`) แล้วค่อยเล่นบรรทัดถัดไป ตอน Skip ไม่รอ วันไหนไม่มีแถวใน `SO_DaySchedule` ไม่มีชื่อขึ้น = ไม่รอ
+
 ## ใช้ได้เมื่อ
 เฉพาะตอนอยู่ใน BeforeOpen › StoryBeforeOpen ที่อื่นจะ warning และไม่เปลี่ยน Phase
 

@@ -26,6 +26,9 @@ public class ChapterTitleUI : MonoBehaviour
 
     private void OnDestroy() => _group.DOKill();
 
+    /// <summary>True from <see cref="Show"/> until the title has faded out.</summary>
+    public bool IsPlaying => _group != null && DOTween.IsTweening(_group);
+
     public void Show(string text)
     {
         if (_label != null) _label.text = text;

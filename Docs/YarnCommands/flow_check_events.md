@@ -17,7 +17,7 @@
 เฉพาะตอนอยู่ใน StoryBeforeOpen ที่อื่นจะ warning
 
 ## หมายเหตุ
-popup มาจาก `EventPopupQueue` (บทรอจนผู้เล่นปิดครบ) คิวว่าง = ผ่านทันที ตอนนี้ยังไม่มีระบบไหนใส่คิว · ระหว่าง silent replay (หลัง load) คำสั่งนี้ไม่ทำอะไร
+popup มาจาก `EventPopupQueue` บทรอจนผู้เล่นปิดครบ **และ panel fade ออกจบ** (`Fade Seconds` ค่าเริ่มต้น 0.25 วินาที) คิวว่าง = ผ่านทันที ระบบที่ใส่คิวตอนนี้: ปลดล็อควัตถุดิบ · ระหว่าง silent replay (หลัง load) คำสั่งนี้ไม่ทำอะไร
 
 ## โค้ด
 `Assets/[02]Script/Hierarchical State Machine/GameFlowCommands.cs`

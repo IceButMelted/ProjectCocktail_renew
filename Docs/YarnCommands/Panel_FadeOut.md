@@ -11,7 +11,7 @@
 target: `Panel_Transition`
 
 ## ทำอะไร
-เล่น transition FadeOut (ปิดฉาก) บทรอจนจบ
+เล่น transition FadeOut (ปิดฉาก) บทรอจน animation `Transition_FadeOut` เล่นจบ (ประมาณ 1.33 วินาที วัดใน Play 2026-10-29) แล้วค่อยไปบรรทัดถัดไป
 
 ## ใช้ได้เมื่อ
 ได้ทุกเมื่อ

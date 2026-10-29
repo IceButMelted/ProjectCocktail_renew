@@ -161,8 +161,26 @@ namespace Bar410.GameFlow
         // move the machines. The Yarn functions below still answer, so <<if>> branches replay
         // the way they ran the first time.
 
+        /// <summary>
+        /// Set by FlowWiring: true while the bar-opening presentation (the chapter title) is still on
+        /// screen. <c>&lt;&lt;flow_open_bar&gt;&gt;</c> waits on it. Null = nothing to wait for.
+        /// </summary>
+        public Func<bool> OpeningBusy { get; set; }
+
+        /// <summary>
+        /// <c>&lt;&lt;flow_open_bar&gt;&gt;</c> — opens the bar, then waits until the chapter title has faded
+        /// out before the next line (not while Skip runs).
+        /// </summary>
         [YarnCommand("flow_open_bar")]
-        public static void Yarn_OpenBar() => CommandTarget()?.OpenBar();
+        public static System.Collections.IEnumerator Yarn_OpenBar()
+        {
+            var flow = CommandTarget();
+            if (flow == null) yield break;
+
+            flow.OpenBar();
+            while (flow.OpeningBusy != null && flow.OpeningBusy() && !DialogueControls.IsSkipping)
+                yield return null;
+        }
 
         /// <summary>
         /// <c>&lt;&lt;flow_check_events&gt;&gt;</c> — shows any new day events and waits until they are
