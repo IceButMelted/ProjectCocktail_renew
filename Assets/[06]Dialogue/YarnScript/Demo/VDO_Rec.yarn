@@ -1,0 +1,256 @@
+title: VDO_Start
+---
+// ================================================================
+// VDO_Rec.yarn — a hands-free run for recording video.
+// Each character walks in at their DEMO_3Days.yarn spot, the camera focuses on
+// them, and they show Neutral -> (order + a simulated cocktail) -> Happy -> Sad,
+// each beat about 5 seconds, with their lines from DEMO_3Days.yarn.
+//
+// Run: on [GameLoop] › FlowWiring set Day Schedule to DaySchedule_VDO
+//      (Assets/[02]Script/Day Schedule/), then Play and turn AutoPlay ON (HUD
+//      button) so lines advance by themselves. Set the schedule back afterwards.
+//
+// Beat length: AutoPlay holds a line for 0.3 s + 0.03 s per letter after it has
+// typed, then the <<wait_scene>> after it holds the pose. Change those numbers to retime.
+//
+// Spots and cameras (DEMO_3Days.yarn): spot 1 = Char1Cam, 2 = Char2Cam, 3 = Char3Cam.
+//   Walter 1, Isla 2, Owen 3 (day 1) · Cole 2, Eliana 3 (day 2) · Faye 1, Arthur 3 (day 3)
+// Characters without Happy / Sad pictures use the closest ones:
+//   Eliana Sad = Disappointed · Arthur Happy = Mockery, Arthur Sad = Angry
+// ================================================================
+<<declare $vdo_order = "">>
+<<eventlog_clear>>
+// Opens the bar (the chapter title plays first, the next line waits for it).
+<<flow_open_bar>>
+<<jump VDO_Walter>>
+===
+
+title: VDO_MakeDrink
+---
+// Simulated cocktail: Yarn walks every step so the camera and stations show on screen.
+// No ingredients go in, so nothing is scored; the reactions after it are acted out.
+<<flow_minigame Shaking>>
+<<flow_prepare_drinks>>
+<<wait_scene 2.5>>
+<<flow_ingredient_added>>
+<<wait_scene 2.5>>
+<<flow_drink_complete>>
+<<wait_scene 2.5>>
+<<flow_garnish_done>>
+<<wait_scene 2>>
+<<flow_serve_done>>
+<<Reset_Variable SystemGame>>
+===
+
+// ════════════════════════════════════════════════════════════════
+//  Day 1 positions — Walter 1, Isla 2, Owen 3
+// ════════════════════════════════════════════════════════════════
+
+title: VDO_Walter
+---
+<<Walter Enter 1>>
+<<Switch_Camera CamController Char1Cam>>
+
+<<Walter Neutral>>
+Walter: Good evening.[waitfor=0.2/] It's been a long time since I last saw someone open something new in this town.
+<<wait_scene 1>>
+
+<<order_customer "[CocktailSystem]" Walter>>
+Walter: Just keep it simple, son.
+Walter: [order] "{Order_Cocktail_ByName_OutName("Sea Breeze")}" [/order] should be enough for tonight.
+<<detour VDO_MakeDrink>>
+<<Switch_Camera CamController Char1Cam>>
+
+<<Walter Happy>>
+Walter: [bounce]Spot on, son.[/bounce] [wave]Balanced and clean.[/wave]
+<<wait_scene 2.5>>
+
+<<Walter Sad>>
+Walter: [shake]I don't think this is what I asked for.[/shake]
+<<wait_scene 2.5>>
+
+<<Walter Neutral>>
+<<jump VDO_Isla>>
+===
+
+title: VDO_Isla
+---
+<<Switch_Camera CamController "MainCam">>
+<<Isla Enter 2>>
+<<Switch_Camera CamController Char2Cam>>
+
+<<Isla Neutral>>
+Isla: Did you just move here?
+<<wait_scene 3>>
+
+<<order_customer "[CocktailSystem]" Isla>>
+Isla: Okay, I'll have [order] {Order_Cocktail_ByName_OutName("Cranberry Fizz")} [/order].
+<<detour VDO_MakeDrink>>
+<<Switch_Camera CamController Char2Cam>>
+
+<<Isla Happy>>
+Isla: [bounce]Oh, wow... this is incredible.[/bounce]
+<<wait_scene 2.5>>
+
+<<Isla Sad>>
+Isla: [shake]Uh... Bartender?[/shake] I think you might have grabbed the wrong bottle.
+<<wait_scene 1.5>>
+
+<<Isla Neutral>>
+<<jump VDO_Owen>>
+===
+
+title: VDO_Owen
+---
+<<Switch_Camera CamController "MainCam">>
+<<Owen Enter 3>>
+<<Switch_Camera CamController Char3Cam>>
+
+<<Owen Neutral>>
+Owen: Oh right, I should probably order before the bartender kicks me out.
+<<wait_scene 1.5>>
+
+<<order_customer "[CocktailSystem]" Owen>>
+Owen: I'll have [order] {Order_Cocktail_ByName_OutName("Gin Fizz")}. [/order]
+<<detour VDO_MakeDrink>>
+<<Switch_Camera CamController Char3Cam>>
+
+<<Owen Happy>>
+Owen: [shake][rainb]Unbelievable![/rainb][/shake] This is amazing.
+<<wait_scene 2.5>>
+
+<<Owen Sad>>
+Owen: Hmm...[waitfor=0.2/] I hate to say it, but I think something went sideways here.
+<<wait_scene 1>>
+
+<<Owen Neutral>>
+// Day 1 group leaves; Walter stays for day 2 (spot 1 in both days).
+<<Isla Exit>>
+<<Owen Exit>>
+<<jump VDO_Cole>>
+===
+
+// ════════════════════════════════════════════════════════════════
+//  Day 2 positions — (Walter 1), Cole 2, Eliana 3
+// ════════════════════════════════════════════════════════════════
+
+title: VDO_Cole
+---
+<<Switch_Camera CamController "MainCam">>
+<<Cole Enter 2>>
+<<Switch_Camera CamController Char2Cam>>
+
+<<Cole Neutral>>
+Cole: Long shift. Needed somewhere quiet.
+<<wait_scene 3>>
+
+Cole: Just get me [order]{Order_Cocktail_OutName(1)}[/order]. Nothing complicated.
+<<detour VDO_MakeDrink>>
+<<Switch_Camera CamController Char2Cam>>
+
+<<Cole Happy>>
+Cole: Huh. Not bad. Didn't expect much, honestly.
+<<wait_scene 2>>
+
+<<Cole Sad>>
+Cole: ...You sure you made this right?
+<<wait_scene 3>>
+
+<<Cole Neutral>>
+<<jump VDO_Eliana>>
+===
+
+title: VDO_Eliana
+---
+<<Switch_Camera CamController "MainCam">>
+<<Eliana Enter 3>>
+<<Switch_Camera CamController Char3Cam>>
+
+<<Eliana Neutral>>
+Eliana: I'm Eliana, by the way. I'm the town lawyer.
+<<wait_scene 2.5>>
+
+<<order_customer "[CocktailSystem]" Eliana>>
+<<order_by_type "[CocktailSystem]" HighAlcohol>>
+Eliana: Surprise me. Something strong. I earned it today.
+<<detour VDO_MakeDrink>>
+<<Switch_Camera CamController Char3Cam>>
+
+<<Eliana Happy>>
+Eliana: Okay, that's exactly what I needed.
+<<wait_scene 2.5>>
+
+// Eliana has no Sad picture: Disappointed.
+<<Eliana Disappointed>>
+Eliana: Rough day, rough drink. Seems about right.
+<<wait_scene 2>>
+
+<<Eliana Neutral>>
+<<Walter Exit>>
+<<Cole Exit>>
+<<Eliana Exit>>
+<<jump VDO_Faye>>
+===
+
+// ════════════════════════════════════════════════════════════════
+//  Day 3 positions — Faye 1, Arthur 3
+// ════════════════════════════════════════════════════════════════
+
+title: VDO_Faye
+---
+<<Switch_Camera CamController "MainCam">>
+<<Faye Enter 1>>
+<<Switch_Camera CamController Char1Cam>>
+
+<<Faye Neutral>>
+Faye: Just looking for a quiet corner tonight, if that's alright.
+<<wait_scene 2>>
+
+<<set $vdo_order = Order_Cocktail_OutName(4)>>
+Faye: Something dry, please. Nothing fruity.
+<<detour VDO_MakeDrink>>
+<<Switch_Camera CamController Char1Cam>>
+
+<<Faye Happy>>
+Faye: Hm. Not bad.
+<<wait_scene 3.5>>
+
+<<Faye Sad>>
+Faye: Goodness, what did you make?
+<<wait_scene 3>>
+
+<<Faye Neutral>>
+<<jump VDO_Arthur>>
+===
+
+title: VDO_Arthur
+---
+<<Switch_Camera CamController "MainCam">>
+<<Arthur Enter 3>>
+<<Switch_Camera CamController Char3Cam>>
+
+<<Arthur Neutral>>
+Arthur: Huh. So this is the new spot everyone's talking about.
+<<wait_scene 2>>
+
+<<set $vdo_order = Order_Cocktail_OutName(8)>>
+<<Arthur HandIn>>
+Arthur: Whatever's expensive and good. I'll know if it's not.
+<<detour VDO_MakeDrink>>
+<<Switch_Camera CamController Char3Cam>>
+
+// Arthur has no Happy / Sad pictures: Mockery (smirk) and Angry.
+<<Arthur Mockery>>
+Arthur: Huh. Actually good. Wasn't expecting that.
+<<wait_scene 2.5>>
+
+<<Arthur Angry>>
+Arthur: This is... not it. Try again sometime, maybe.
+<<wait_scene 2.5>>
+
+<<Arthur Neutral>>
+<<Faye Exit>>
+<<Arthur Exit>>
+<<Switch_Camera CamController "MainCam">>
+// End of the recording.
+===
