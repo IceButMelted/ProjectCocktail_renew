@@ -125,6 +125,7 @@ Loop ของหนึ่งวัน: คุยกับลูกค้า →
 - AutoPlay / Skip: `Docs/Bar410_DialogueSkipAutoPlay_Plan.md`
 - ความเร็ว / แบบการแสดงตัวอักษร: `Docs/Bar410_DialogueTextSettings_Plan.md`
 - Hub UI ตาม Phase: `Docs/Bar410_HubManager_Plan.md`
+- **เดโม 3 วัน:** `Assets/[06]Dialogue/YarnScript/Demo/DEMO_3Days.yarn` (วัน 1 Walter/Isla/Owen, วัน 2 Walter/Cole/Eliana, วัน 3 Faye/Isla/Arthur/Owen) ผูกใน `DaySchedule_Demo.asset` ส่วน playtest ใช้ `DaySchedule_PlayTest.asset`
 - **เขียนบทวันใหม่:** ดูตัวอย่าง `Assets/[06]Dialogue/YarnScript/Demo/PLAYTEST_Demo.yarn` (หัวไฟล์คือโครงของหนึ่งวัน) แล้วเพิ่มแถวใน `SO_DaySchedule` (วัน / Start Node / ชื่อ Chapter) `<<flow_next_day>>` ควรเป็นคำสั่งท้ายวัน วันใหม่เริ่มเมื่อบทเดิมจบ
 - คำสั่ง/ฟังก์ชัน Yarn ทั้งหมด (หนึ่งไฟล์ต่อคำสั่ง): `Docs/YarnCommands/README.md` ทดสอบด้วย `Assets/[06]Dialogue/YarnScript/Demo/TEST_AllCommands.yarn` (Start Node = `TEST_Start`) เพิ่ม/แก้คำสั่ง Yarn แล้วให้อัปเดตทั้งสองที่
 - ภาพรวมล่าสุด: `Docs/Bar410_Status_Report_2026-10-24.html`

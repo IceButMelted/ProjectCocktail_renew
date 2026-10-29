@@ -64,6 +64,7 @@ PauseScene (โหลดซ้อน)        หน้า Pause / Setting
   - `DaySchedule_Demo.asset`: แถว วัน / Start Node / ชื่อ Chapter
   - หน้าตา `Panel_ChapterTitle`
   - บทวันใหม่ ดูตัวอย่าง `Assets/[06]Dialogue/YarnScript/Demo/PLAYTEST_Demo.yarn`
+  - เดโม 3 วันจริง: `DEMO_3Days.yarn` ผูกใน `DaySchedule_Demo.asset` ส่วน playtest ใช้ `DaySchedule_PlayTest.asset` (สลับที่ช่อง Day Schedule ของ `FlowWiring`)
 - **อ่านเพิ่ม:** `Docs/Bar410_BeforeOpen_Plan.md`
 
 ## 3. Popup ของ Event

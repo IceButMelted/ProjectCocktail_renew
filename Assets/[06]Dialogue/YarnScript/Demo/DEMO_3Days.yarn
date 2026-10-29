@@ -1,0 +1,1501 @@
+title: D1_00_Start
+---
+// ================================================================
+// DEMO_3Days.yarn — the three-day demo (Bar 410).
+//   Day 1  Walter, Isla, Owen     (start node D1_00_Start)
+//   Day 2  Walter, Cole, Eliana   (start node D2_00_Start)
+//   Day 3  Faye, Isla, Arthur, Owen (start node D3_00_Start, at most 3 in the bar at once)
+// Day 1 was Day1_Demo.yarn; days 2-3 come from the team's script
+// bar_script_day2_day3 (Freya is called Faye in the game).
+//
+// Run: the Day Schedule on [GameLoop] › FlowWiring (DaySchedule_Demo) lists the
+// three start nodes. Same shape as PLAYTEST_Demo.yarn:
+//   BeforeOpen  : the day's popups (new ingredients, from IngredientUnlockTable), then the start node.
+//                 <<flow_open_bar>> opens the bar and waits for the chapter title.
+//   Open        : order -> <<flow_prepare_drinks>> -> <<wait_for_task>> -> reaction
+//                 -> <<Reset_Variable>>.
+//   end of day  : <<flow_close_bar>> ... <<flow_next_day>> as the very last command.
+// Orders whose name is not spoken are placed with <<set $order_note = ...>>.
+// Customer numbers for Order_Cocktail_OutName: Cole 1, Owen 2, Walter 3, Faye 4,
+// Isla 5, Claire 6, Eliana 7, Arthur 8.
+// ================================================================
+
+<<enum TypeOfCocktail>>
+    <<case None>>
+    <<case HighAlcohol>>
+    <<case LowAlcohol>>
+    <<case NoneAlcohol>>
+    <<case NotMatch>>
+<<endenum>>
+<<enum Satisfaction>>
+    <<case None>>
+    <<case Fail>>
+    <<case Acceptable>>
+    <<case Perfect>>
+<<endenum>>
+<<enum CharacterName>>
+    <<case None>>
+    <<case Cole>>
+    <<case Owen>>
+    <<case Walter>>
+    <<case Faye>>
+    <<case Isla>>
+    <<case Claire>>
+    <<case Eliana>>
+    <<case Arthur>>
+<<endenum>>
+// Declare the variable (set false by default)
+<<declare $type_of_cocktail = TypeOfCocktail.None>>
+<<declare $satisfaction = Satisfaction.None>>
+// Day number. C# (FlowWiring) picks each day's start node from SO_DaySchedule by this.
+<<declare $day = 1>>
+// Holds the name of an order the customer does not say out loud.
+<<declare $order_note = "">>
+
+<<eventlog_clear>>
+<<flow_open_bar>>
+<<jump D1_01_Walter_Arrive>>
+===
+
+title: D1_01_Walter_Arrive
+---
+<<Walter Enter 1>>
+<<Switch_Camera CamController NearLeftCam>>
+<<Walter Happy>>
+
+
+//Walter greeting
+Walter: Good evening.[waitfor=0.2/] It's been a long time since I last saw someone open something new in this town. #line:0
+Walter: You must be the new face in town. #line:1
+-> Welcome #line:2
+    Player: Good evening, welcome to the bar. #line:3
+    Player: Please, take your time and make yourself comfortable. #line:4
+-> Honest #line:5
+    Player: Yes, I just opened tonight. #line:6
+    Player: Still trying to get used to how quiet this town is. #line:7
+-> Friendly #line:8
+    Player: Really? I thought I've been running this place since the 20th century. #line:9
+    Walter: [wiggle]Haha... quite a talker.[/wiggle] #line:A
+-> Formal #line:B
+    Player: Welcome. It's a pleasure to have you as my first guest. #line:C
+
+Walter: I'm Walter, by the way. #line:D
+Player: Nice to meet you Mr. Walter. #line:E
+Player: You can call me bartender. #line:F
+Walter: Normally at this hour, I'd just be sitting in front of the TV. #line:10
+Walter: [dangle]Old habits, I suppose.[/dangle] #line:11
+Walter: But I saw a new place opening up, so I thought I'd drop by. #line:12
+Walter: Wanted to see the new face in town for myself. #line:13
+Player: Well, glad I opened the doors tonight. #line:14
+Player: I'm sure this place will be better than TV. #line:15
+Player: So, what will it be tonight? #line:16
+<<jump D1_02_Walter_Order>>
+
+===
+
+title: D1_02_Walter_Order
+---
+//Walter's Order
+Walter: Just keep it simple, son. #line:17
+Walter: [order] "{Order_Cocktail_ByName_OutName("Sea Breeze")}" [/order] should be enough for tonight. #line:18
+Player: Coming right up. #line:19
+<<Owen Neutral>>
+
+<<flow_prepare_drinks>>
+
+<<wait_for_task SystemGame>>
+
+//After Walter's order
+<<Switch_Camera CamController NearLeftCam>>
+
+<<if $satisfaction == Satisfaction.Perfect>>
+    <<Walter Happy>>
+    Walter: [bounce]Spot on, son.[/bounce] #line:1A
+    Walter: [wave]Balanced and clean.[/wave] You've got a steady hand for a new face. #line:1B
+    Player: Thank you. #line:1C
+<<elseif $satisfaction == Satisfaction.Acceptable>>
+    Walter: A bit off, but it's alright. #line:1D
+<<elseif $satisfaction == Satisfaction.Fail>>
+    <<Walter Sad>>
+    Walter: [shake]I don't think this is what I asked for.[/shake] #line:1E
+    Walter: [wiggle]My memory might be fading, but my tongue still works.[/wiggle] #line:1F
+<<endif>>
+
+<<Reset_Variable SystemGame>>
+
+<<Walter Neutral>>
+<<jump D1_03_Walter_Talk>>
+===
+
+title: D1_03_Walter_Talk
+---
+//Town topic
+Walter: Anyway, officially... welcome to our little valley, Bartender. #line:20
+Walter: We don't get many newcomers around here. #line:21
+Walter: So, tell me. What's your first impression? #line:22
+Walter: How do you like our quiet town so far? #line:23
+
+-> It feels cozy. #line:24
+-> A bit too quiet. #line:25
+-> Good for sleeping. #line:26
+-> Peaceful. #line:27
+
+Walter: Fair enough. #line:28
+Walter: But don't worry, people will start trickling in once word gets out. #line:29
+
+<<jump D1_04_Isla_Arrive>>
+===
+
+title: D1_04_Isla_Arrive
+---
+//Isla come in 
+<<Switch_Camera CamController "MainCam">>
+
+
+<<wait_scene 2>>
+
+
+<<Isla Enter 2>>
+<<Switch_Camera CamController NearLeftCam>>
+<<Walter Happy>>
+<<Isla Happy>>
+
+Isla: [fade]Good evening.[/fade] #line:2A
+Player: Good evening. #line:2B
+Isla: [wave]Wow, you've really done a wonderful job with this place.[/wave] #line:2C
+<<Walter Look R>>
+Walter: Good evening Isla. How's work treating you? #line:2D
+<<Isla Look L>>
+Isla: Same as always. Busy enough to forget what day it is. #line:2E
+//<<Isla Neutral>>
+Isla: More importantly, how is that back pain of yours doing, Mr. Walter? #line:2F
+Walter: Ah, don't worry about it, dear. #line:30
+Walter: I'll just take a pill or two, and it'll clear right up. #line:31
+Isla: Take care of yourself. Taking medicine alone won't help. #line:32
+-> Get well soon. #line:33
+    Player: Take it easy, Walter. I need my favorite regular staying healthy. #line:34
+    <<Walter Look F>>
+    Walter: Thank you, Mr. Bartender. #line:35
+-> She's right. #line:36
+    Player: She's right, Walter. #line:37
+    Player: Medicine only masks the pain, it doesn't fix it. #line:38
+    <<Walter Look F>>
+    Walter: [wiggle]Alright, alright, I'm surrounded by caretakers tonight, I see.[/wiggle] #line:39
+-> I feel your pain. #line:3A
+    Player: Just standing behind this counter all night is already killing my back. #line:3B
+    <<Isla Look F>>
+    Isla: [wave]Are you Ok?[/wave]  #line:3C
+    Isla: You can let me check for you. #line:3D
+    Player: Nah, it's ok. #line:3E
+-> A toast to health. #line:3F
+    Player: Well, they say the right drink can comfort any ache. #line:40
+    <<Isla Look F>>
+    Isla: [wiggle]Hey, but don't drink too much either.[/wiggle] #line:41
+
+<<Walter Look F>>
+<<Isla Happy>>
+Isla: Oh by the way. my name is Isla. #line:42
+Isla: I'm a nurse at the local clinic. #line:43
+Player: I'm Bartender. Nice to meet you. #line:44
+Isla: Yeah nice to meet you too. #line:45
+Player: Would you like anything to drink? #line:461
+Isla: Do you have anything to recommend? #line:49
+<<jump D1_05_Isla_Order>>
+===
+
+title: D1_05_Isla_Order
+---
+//-> Gin Fizz.
+//-> Sea Breeze.
+//-> Cranberry Fizz.
+//-> Everything is recommended here.
+Player: [swing]Everything is recommended here.[/swing] #line:4A
+Isla: Umm... #line:4B
+Isla: Okay, I'll have [order] {Order_Cocktail_ByName_OutName("Cranberry Fizz")} [/order]. #line:4C
+Player: Got it. #line:4D
+
+<<Isla Neutral>>
+
+<<flow_prepare_drinks>>
+
+<<wait_for_task SystemGame>>
+
+//After Isla's order
+<<Switch_Camera CamController CenterCam>>
+
+<<if $satisfaction == Satisfaction.Perfect>>
+    <<Isla Happy>>
+    Isla: [bounce]Oh, wow... this is incredible.[/bounce] #line:4E
+    Isla: [rainb]Seriously, you have magic hands.[/rainb] #line:4F
+
+<<elseif $satisfaction == Satisfaction.Acceptable>>
+    Isla: Oh, it tastes... a bit different from what I expected. #line:50
+    Isla: But it's fine. #line:51
+
+<<elseif $satisfaction == Satisfaction.Fail>>
+    <<Isla Sad>>
+    Isla: [shake]Uh... Bartender?[/shake] #line:52
+    Isla: I think you might have grabbed the wrong bottle. #line:53
+    Isla: It's definitely not what I asked for. #line:54
+
+<<endif>>
+
+<<Reset_Variable SystemGame>>
+
+<<Isla Neutral>>
+<<jump D1_06_Isla_Talk>>
+===
+
+title: D1_06_Isla_Talk
+---
+Isla: Did you just move here? #line:55
+Player: Yes, just a few days ago. #line:56
+Isla: It's a nice little town, once you get used to the quiet. #line:57
+Isla: Actually, I'm not from around here. #line:58
+Isla: I was transferred here for work. #line:59
+Walter: [wave]But she's become a part of the town now.[/wave] #line:5A
+<<Isla Look L>>
+Isla: [wiggle]You're exaggerating, Mr. Walter.[/wiggle] #line:5B
+Isla: I just... ended up staying longer than I planned. #line:5C
+<<Isla Look F>>
+<<jump D1_07_Owen_Arrive>>
+===
+
+
+title: D1_07_Owen_Arrive
+---
+//Owen come in 
+<<Switch_Camera CamController "MainCam">>
+<<Panel_FadeOut Panel_Transition>>
+<<Panel_FadeIn Panel_Transition>>
+
+
+<<Owen Enter 3>>
+<<Switch_Camera CamController CenterCam>>
+<<Walter Happy>>
+<<Owen Happy>>
+
+Owen: [bounce a=3]Hey! hey!! Owen here![/bounce] #line:5D
+<<Isla Look R>>
+Isla: [wiggle]Ugh keep your voice down Owen.[/wiggle] #line:5E
+<<Owen Look L>>
+Owen: My bad, Isla. Nice to see you. #line:5F
+Owen: Oh and good evening Mr. Walter. How's your back? #line:60
+<<Walter Look R>>
+Walter: Isla already asked. I'm fine, Owen. #line:61
+<<Walter Neutral>>
+<<Isla Neutral>>
+Owen: [shake]Wait, wait, wait[/shake] — new face behind the bar? #line:62
+Owen: I thought I knew everyone in town. #line:63
+Owen: Since when did this place have a bartender? #line:64
+-> Hello! #line:65
+    Player: Hello. I'm a Bartender. #line:66
+    Player: I just opened a few days ago. #line:67
+    <<Isla Happy>>
+    Owen: Newcomer? Glad to see you. #line:68
+-> Just the bartender. #line:69
+    Player: Just the bartender. #line:6A
+    Owen: [swing]Just the bartender? No name, no story?[/swing] #line:6B
+    Owen: Mysterious. I like it. #line:6C
+-> Hey! Hey!! #line:6D
+    Player: hey! Hey!! Bartender here! #line:6E
+    <<Isla Happy>>
+    Owen: [bounce]Now that's the spirit![/bounce] #line:6F
+-> Good evening. #line:70
+    Player: Good evening. I'm Bartender, nice to meet you. #line:71
+    <<Isla Neutral>>
+    Owen: [wiggle]Whoa, so formal. I'm speechless.[/wiggle] #line:72
+    Owen: Nice to meet you. #line:73
+
+Owen: Well, you picked the right town to open a bar. #line:74
+Owen: Looks like I've finally got a regular spot. #line:75
+<<Isla Look R>>
+Isla: [wiggle]You show up everywhere, Owen.[/wiggle] #line:76
+<<Owen Look L>>
+Owen: I'm easy-going. I'm fine with anywhere. #line:77
+<<jump D1_08_Owen_Order>>
+===
+
+title: D1_08_Owen_Order
+---
+<<Owen Look F>>
+<<Isla Look F>>
+<<Walter Look F>>
+
+Owen: Oh right, I should probably order before the bartender kicks me out. #line:78
+Owen: I'll have [order] {Order_Cocktail_ByName_OutName("Gin Fizz")}. [/order] #line:79
+Player: One moment. #line:7A
+<<Owen Neutral>>
+
+<<flow_prepare_drinks>>
+
+<<wait_for_task SystemGame>>
+
+//After Owen's order
+<<Switch_Camera CamController CenterCam>>
+
+<<if $satisfaction == Satisfaction.Perfect>>
+    <<Owen Happy>>
+    Owen: [shake][rainb]Unbelievable![/rainb][/shake] This is amazing. #line:7B
+    Owen: [bounce]I should have gone to bartender school instead.[/bounce] #line:7C
+
+<<elseif $satisfaction == Satisfaction.Acceptable>>
+    Owen: I'm not sure, but it feels like something's missing. #line:7D
+    Owen: [wiggle]But it's better than not being able to drink.[/wiggle] #line:7E
+
+<<elseif $satisfaction == Satisfaction.Fail>>
+    <<Owen Sad>>
+    Owen: Hmm...[waitfor=0.2/] I hate to say it, but I think something went sideways here. #line:7F
+<<endif>>
+
+<<Reset_Variable SystemGame>>
+
+<<Owen Neutral>>
+<<jump D1_09_Owen_Talk>>
+===
+
+title: D1_09_Owen_Talk
+---
+Owen: Anyway. #line:80
+Owen: I didn't tell you what I do for a living, did I? #line:81
+Owen: Guess what I do for a living. #line:82
+Owen: The hint is nature. #line:83
+-> Gardener #line:84
+    Owen: [wiggle]Nope. Do I look like that?[/wiggle] #line:85
+-> Lumberjack #line:86
+    Owen: [shake]The opposite![/shake] #line:87
+-> Wildlife conservationist #line:88
+    Owen: [bounce]Close! You're actually the first person to get that close.[/bounce] #line:89
+-> You have a job? #line:8A
+    Owen: [shake]Hey! What's that supposed to mean?[/shake] #line:8B
+
+Owen: I'm a forest ranger. #line:8C
+Owen: I take care of the forests and the wildlife. #line:8D
+<<Owen Look L>>
+Owen: You got closer than Isla ever did. #line:8E
+Owen: First time we met, she thought I was homeless. #line:8F
+<<Isla Look R>>
+<<Walter Look R>>
+Isla: [shake a=2]It's because you were climbing a tree behind my dorm![/shake] #line:90
+Isla: And you looked all scruffy. #line:91
+Owen: Because I climbed up to catch the raccoon. #line:92
+Isla: [shake]Then you fell off the tree. I was shocked.[/shake] #line:93
+Owen: Luckily, it wasn't anything serious. #line:94
+<<Owen Happy>>
+Isla: Your ankle sprained. #line:95
+Owen: At least it's not broken. #line:96
+Player: And what about the raccoon? #line:97
+<<Owen Neutral>>
+Owen: It ran away before we could catch it. #line:98
+Owen: It was rummaging through the trash at Cole's house. #line:99
+<<Isla Neutral>>
+Isla: [wiggle]That poor raccoon probably didn't know what hit him.[/wiggle] #line:9A
+Owen: [wiggle]Hey, I was very gentle.[/wiggle] #line:9B
+<<jump D1_10_Walter_Leave>>
+===
+
+title: D1_10_Walter_Leave
+---
+<<Panel_FadeOut Panel_Transition>>
+<<wait_scene 1.6>>
+<<Panel_FadeIn Panel_Transition>>
+
+<<Walter Neutral>>
+Walter: I think I should go now. #line:9C
+<<Isla Look L>>
+Owen: [wiggle]Already? But I just got here.[/wiggle] #line:9D
+<<Walter Look R>>
+Walter: It's late now, Owen. #line:9E
+Walter: [dangle]I'm not as young as I used to be.[/dangle] #line:9F
+Walter: I guess I'll have to let the young people continue the conversation. #line:A0
+Owen: [bounce]You're still a youth.[/bounce] #line:A1
+<<Owen Neutral>>
+Walter: [wiggle]Ha. Nice try, Owen.[/wiggle] But flattery won't keep me up past my bedtime. #line:A2
+<<Isla Look L>>
+Isla: Take care of yourself, Mr. Walter. #line:A3
+Player: Get home safely, Mr. Walter. #line:A4
+Walter: Thank you. You guys take care too. #line:A5
+Owen: [wiggle]Take care, old man.[/wiggle] #line:A6
+<<Walter Exit>>
+<<jump D1_11_Bar_Talk>>
+===
+
+title: D1_11_Bar_Talk
+---
+//After Walter leave
+<<Isla Look F>>
+Isla: Hey, Mr. Bartender. #line:A7
+Player: Yes. #line:A8
+Isla: Do you mind if I ask why you moved here? #line:A9
+Player: Of course not. #line:AA
+
+-> I needed a change of pace. #line:AB
+    Player: You know, I just want to find something new in my life. #line:AC
+    Isla: Did you find it? #line:AD
+    Player: Nope, still looking. #line:AE
+-> I'm bored with the city. #line:AF
+    Player: The bright lights of the city aren't really my thing. #line:B0
+    Isla: I get that. #line:B1
+    <<Owen Look F>>
+    Owen: Don't worry, it's so quiet here you can hear the leaves falling. #line:B2
+    Owen: [wiggle]Some people find it peaceful. Others last two weeks.[/wiggle] #line:B3
+-> Someone recommended this place. #line:B4
+    Player: They said this is the perfect place to unwind. #line:B5
+    Isla: May I ask who? #line:B6
+    Player: It doesn't matter. I'm here now. #line:B7
+-> I Don't know. #line:B8
+    Player: I just want to come here. #line:B9
+    Isla: [wave]That's... actually kind of freeing to hear.[/wave] #line:BA
+    Owen: [bounce]Honestly? Respect. That takes guts.[/bounce] #line:BB
+
+<<Isla Happy>>
+Isla: [wave]Anyway, welcome to town.[/wave] #line:BC
+Isla: You'll get used to it soon. #line:BD
+Player: Thank you. #line:BE
+<<Isla Neutral>>
+Owen: Just don't provoke Cole, okay? #line:BF
+Player: Who's Cole? #line:C0
+Owen: He's our local officer. #line:C1
+Owen: I don't talk to him much, but he's [shake]incredibly scary[/shake]. #line:C2
+<<Isla Look R>>
+Isla: Not quite that bad. He's a good person. #line:C3
+<<Owen Look L>>
+Owen: [wiggle]Maybe, but it's still scary.[/wiggle] #line:C4
+Isla: [wiggle]You talk as if you're not terrifying yourself, climbing trees in people's yards.[/wiggle] #line:C5
+Owen: [shake]It's a job![/shake] #line:C6
+Player: If I find a raccoon, I'll call. #line:C7
+<<Owen Look F>>
+Owen: Anytime, except when sleeping. #line:C8
+<<jump D1_12_Isla_Leave>>
+===
+
+title: D1_12_Isla_Leave
+---
+<<Isla Look F>>
+Isla: I think it's already late. #line:C9
+Isla: I should probably go. #line:CA
+<<Owen Look L>>
+Owen: [wiggle]Come on, I was enjoying the conversation.[/wiggle] #line:CB
+<<Isla Look R>>
+Isla: I have an early shift tomorrow. #line:CC
+Owen: [dangle]Fine...[/dangle] #line:CD
+Player: Get home safe! #line:CE
+<<Isla Happy>>
+Isla: [bounce]Thanks! See you guys.[/bounce] #line:CF
+<<Owen Happy>>
+Owen: Yup, see you. #line:D0
+<<Isla Look L>>
+<<Isla Exit>>
+<<jump D1_13_Owen_Talk_Outro>>
+===
+
+title: D1_13_Owen_Talk_Outro
+position: 307,317
+---
+//After isla leave
+<<Owen Neutral>>
+Owen: [fade]...[/fade] #line:D1
+Owen: It's become a lot quieter. #line:D2
+Player: At least you still have me. #line:D3
+Owen: Yeah, you're right. #line:D4
+Player: So how's the job? #line:D5
+Owen: Mine? Oh, it's alright. #line:D6
+Player: What do you usually do? #line:D7
+Owen: sometimes I explore on foot, or I give educational presentations to tourists. #line:D8
+Player: And also chase raccoons. #line:D9
+Owen: [wiggle]Ha, that too.[/wiggle] #line:DA
+Owen: But I mostly stay on the observation tower. #line:DB
+Owen: Keep an eye out for signs of stray animals or watch out for wildfires. #line:DC
+Owen: Mostly quiet. Nothing much ever happens up there. #line:DD
+Player: Sounds peaceful. #line:DE
+Owen: Yeah. #line:DF
+Owen: [fade]...It is.[/fade] #line:E0
+<<jump D1_14_Owen_Leave>>
+===
+
+title: D1_14_Owen_Leave
+position: 691,633
+---
+
+Owen: Anyway, I should head out. #line:E1
+Owen: Early morning tomorrow. #line:E2
+Owen: The work never has a day off. #line:E3
+Player: Good luck, see you again. #line:E4
+Owen: Thanks, see you later. #line:E5
+Owen: [bounce]Owen, signing out.[/bounce] #line:E6
+<<Owen Look L>>
+<<Owen Exit>>
+
+
+<<jump D1_15_Close>>
+===
+
+title: D1_15_Close
+---
+// ── End of day 1 ────────────────────────────────────
+<<flow_close_bar>>
+<<Switch_Camera CamController "MainCam">>
+<<Panel_FadeOut Panel_Transition>>
+<<wait_scene 1>>
+<<Panel_FadeIn Panel_Transition>>
+// $day becomes 2. D2_00_Start begins when this dialogue ends.
+<<flow_next_day>>
+===
+
+// ════════════════════════════════════════════════════════════════
+//  DAY 2 — Walter, Cole, Eliana
+//  Bar starts empty -> Walter -> Cole and Eliana -> Walter leaves -> Cole and Eliana leave
+// ════════════════════════════════════════════════════════════════
+
+title: D2_00_Start
+---
+<<eventlog_clear>>
+<<flow_open_bar>>
+<<jump D2_01_Walter_Sit>>
+===
+
+title: D2_01_Walter_Sit
+---
+// Bar is empty. Walter enters and sits down.
+<<Walter Enter 1>>
+<<Switch_Camera CamController NearLeftCam>>
+<<Walter Neutral>>
+Walter: Evening.
+<<Walter Happy>>
+Walter: Back again, as you can see.
+Player: Back again already?
+<<Walter Neutral>>
+Walter: What can I say. Not much else to do with my evenings.
+Walter: Might as well spend them somewhere with decent company.
+
+-> I'm glad
+    Player: I'm glad you keep coming back, Walter.
+    <<Walter Happy>>
+    Walter: That's kind of you to say, son.
+-> Makes sense
+    Player: That makes sense. It's close, and you already know the place.
+    Walter: Practical thinking. I like that.
+-> Tease about rent
+    Player: Careful, keep this up and I'll start charging rent for that seat.
+    <<Walter Happy>>
+    Walter: [wiggle]Ha! Cheeky. I like that too.[/wiggle]
+-> Welcome
+    Player: We're always glad to have you, Walter.
+    Walter: Well-mannered, this one.
+
+<<Walter Neutral>>
+// "The usual": what he ordered on day 1.
+<<order_customer "[CocktailSystem]" Walter>>
+<<set $order_note = Order_Cocktail_ByName_OutName("Sea Breeze")>>
+Walter: Just the usual for me tonight.
+Player: Coming right up.
+<<jump D2_02_Walter_Order>>
+===
+
+title: D2_02_Walter_Order
+---
+<<flow_prepare_drinks>>
+<<wait_for_task SystemGame>>
+<<Switch_Camera CamController NearLeftCam>>
+
+<<if $satisfaction == Satisfaction.Perfect>>
+    <<Walter Happy>>
+    Walter: [bounce]Still got it.[/bounce]
+<<elseif $satisfaction == Satisfaction.Acceptable>>
+    Walter: Close enough for an old man's taste.
+<<else>>
+    <<Walter Sad>>
+    Walter: Hm. Rough one tonight?
+    Player: Sorry.
+<<endif>>
+<<Reset_Variable SystemGame>>
+<<Walter Neutral>>
+<<jump D2_03_Cole_Eliana_Arrive>>
+===
+
+title: D2_03_Cole_Eliana_Arrive
+---
+// Cole and Eliana enter together.
+<<Switch_Camera CamController "MainCam">>
+<<Cole Enter 2>>
+<<Eliana Enter 3>>
+<<Switch_Camera CamController CenterCam>>
+<<Walter Look R>>
+<<Walter Happy>>
+Walter: Cole! Didn't expect you tonight.
+Walter: What brings you here?
+<<Cole Neutral>>
+Cole: Long shift. Needed somewhere quiet.
+Walter: And Eliana too. Small town, smaller bar.
+<<Eliana Happy>>
+Eliana: Guilty.
+<<Walter Neutral>>
+<<Walter Look F>>
+
+Cole: (Looks you over for a beat, then gives a small nod.)
+
+-> Good evening
+    Player: Good evening, officer. Hope the day's been kind to you.
+    Cole: ...Kind is a strong word. But thanks.
+-> Introduce yourself
+    Player: New face, I know. Nice to finally put a name to the badge.
+    Cole: You settling in alright?
+-> Joke
+    Player: Relax, officer. I haven't broken any laws yet.
+    Cole: (A faint smirk.) Yet.
+-> Formal greeting
+    Player: Good evening. What can I get started for you?
+    Cole: Straight to business. I can respect that.
+
+<<Eliana Look L>>
+Eliana: Don't mind him. He does that with everyone new.
+<<Cole Look R>>
+Cole: ...
+Eliana: What? Did I say something wrong?
+Cole: Nothing.
+<<Cole Look F>>
+<<Eliana Look F>>
+
+<<Eliana Neutral>>
+Eliana: I'm Eliana, by the way.
+Eliana: I'm the town lawyer, and this is our officer.
+Cole: Cole.
+Player: Nice to meet you both. Rough day?
+<<Eliana Disappointed>>
+Eliana: You have no idea.
+Cole: Same, actually.
+<<Walter Happy>>
+Walter: Well, you're both in the right place then.
+<<Walter Neutral>>
+<<Eliana Neutral>>
+<<jump D2_04_Cole_Order>>
+===
+
+title: D2_04_Cole_Order
+---
+Player: What can I get you, officer?
+Cole: Just get me [order]{Order_Cocktail_OutName(1)}[/order].
+Cole: Nothing complicated.
+Player: Got it.
+
+<<flow_prepare_drinks>>
+<<wait_for_task SystemGame>>
+<<Switch_Camera CamController CenterCam>>
+
+<<if $satisfaction == Satisfaction.Perfect>>
+    <<Cole Happy>>
+    Cole: Huh. Not bad.
+    Cole: Didn't expect much, honestly.
+    Player: Thank you.
+<<elseif $satisfaction == Satisfaction.Acceptable>>
+    Cole: It's fine. Does the job.
+<<else>>
+    <<Cole Sad>>
+    Cole: ...You sure you made this right?
+<<endif>>
+<<Reset_Variable SystemGame>>
+<<Cole Neutral>>
+<<jump D2_05_Eliana_Order>>
+===
+
+title: D2_05_Eliana_Order
+---
+Player: And for you, lady?
+Eliana: Surprise me. Something strong.
+Eliana: I earned it today.
+// Any HighAlcohol drink is right (on day 2: White Lady or Cosmopolitan).
+<<order_customer "[CocktailSystem]" Eliana>>
+<<order_by_type "[CocktailSystem]" HighAlcohol>>
+Player: I'll see what I can do.
+
+<<flow_prepare_drinks>>
+<<wait_for_task SystemGame>>
+<<Switch_Camera CamController CenterCam>>
+
+<<if $satisfaction == Satisfaction.Perfect>>
+    <<Eliana Happy>>
+    Eliana: Okay, that's exactly what I needed.
+    Eliana: Remind me to come here more often.
+<<elseif $satisfaction == Satisfaction.Acceptable>>
+    Eliana: Mm. Good enough to forget about work for a minute.
+<<else>>
+    <<Eliana Disappointed>>
+    Eliana: Rough day, rough drink. Seems about right.
+<<endif>>
+<<Reset_Variable SystemGame>>
+<<Eliana Neutral>>
+<<jump D2_06_Cole_Eliana_Talk>>
+===
+
+title: D2_06_Cole_Eliana_Talk
+---
+<<Walter Look R>>
+Walter: You two work together again, or just drink together?
+Eliana: Both, unfortunately.
+Cole: She handles the cases I bring in.
+Walter: What's it about this time? Is it Owen trespassing on private property again?
+<<Eliana Look L>>
+Eliana: Nope. Wait, does he actually do that?
+<<Walter Happy>>
+Walter: [wiggle]Ha, no, I'm just joking.[/wiggle]
+<<Eliana Disappointed>>
+Eliana: (Sighs.) I fell for it.
+<<Walter Neutral>>
+<<Eliana Neutral>>
+Cole: Just a noise problem, Walter. We received a complaint.
+Walter: Claire? That highly driven girl?
+Eliana: Yep. It wasn't a big deal, just a warning.
+Cole: But this is the third time this month.
+<<Eliana Look R>>
+Eliana: She has a lot going on. Go easy on her.
+Eliana: Who would listen if you lectured her like a boss?
+Walter: She's right. You look gloomy.
+<<Cole Sad>>
+Cole: No, I'm not.
+Walter: Ask the bartender.
+<<Eliana Look F>>
+<<Walter Look F>>
+
+-> Huh?
+    Player: Why me?
+    Cole: ...
+    Player: You look fine, man.
+    Eliana: See?
+-> A bit right
+    Player: Well, you do look a bit gloomy right now.
+    Player: Um, maybe take a sip to relax.
+    Cole: ...
+-> Not quite Grinch-level
+    Player: It's not quite Grinch-level.
+    Cole: What?
+    Player: Um, the Grinch. From The Grinch.
+    Eliana: It's a movie, Cole.
+    Cole: I don't watch movies.
+    Player: You're missing out.
+-> Formal
+    Player: With all due respect, officer, you do appear a little tired this evening.
+    Cole: ...
+    Cole: You sound like you're giving a statement.
+    <<Eliana Happy>>
+    Eliana: [wiggle]Careful. That's my department.[/wiggle]
+
+<<Walter Happy>>
+Walter: Haha, it's quite a colorful night.
+Eliana: For once.
+<<Cole Neutral>>
+Cole: ...
+<<Walter Neutral>>
+<<Eliana Neutral>>
+<<jump D2_07_Cole_Personal>>
+===
+
+title: D2_07_Cole_Personal
+---
+<<Walter Look R>>
+Walter: Anyway, how's your girl doing, Cole?
+Cole: ...Fine. She's fine.
+<<Eliana Look L>>
+Eliana: That pause said a lot.
+Cole: It didn't say anything.
+Eliana: Cole.
+<<Cole Sad>>
+Cole: She wants to move out after graduating, to attend university in the capital.
+Walter: And?
+Cole: And I told her it's not safe. It's too far.
+Eliana: Did you tell her that, or did you tell her no?
+Cole: ...Same thing.
+Eliana: It's really not.
+Eliana: Or is it because it's an art university?
+Cole: It's not... about that.
+
+-> Show sympathy
+    Player: That sounds really hard, for both of you.
+    Cole: ...How do you know?
+    Eliana: We know, Cole.
+-> Take her side
+    Player: Sounds like she just wants a bit of independence.
+    Cole: I know what it sounds like. Doesn't mean I have to like it.
+-> Joke about kids
+    Player: Kids, huh. Always gotta test the waters eventually.
+    Cole: ...
+-> ...
+    Player: ...
+    Cole: ...
+    Eliana: ...
+
+Eliana: For what it's worth, she's not wrong for wanting it.
+Eliana: And you're not wrong for worrying.
+Eliana: You're just both bad at saying it out loud.
+<<Cole Neutral>>
+Cole: ...Noted, counselor.
+Walter: She's got a point, son.
+Cole: I said noted.
+<<Walter Look F>>
+<<Eliana Look F>>
+<<jump D2_08_Eliana_Personal>>
+===
+
+title: D2_08_Eliana_Personal
+---
+Player: What about you, lady? How was your day?
+Eliana: Just call me Eliana.
+<<Eliana Disappointed>>
+Eliana: Always busy.
+<<Walter Look R>>
+Walter: You look exhausted, dear.
+Eliana: Yeah. It's been one of those weeks.
+Walter: Well, you've done more than enough for our sake.
+Eliana: Yeah... I guess. Thirty years of it now.
+<<Walter Look F>>
+
+-> Acknowledge the toll
+    Player: That's a long time to keep showing up, love for it or not.
+    Eliana: Tell me about it.
+-> Do you enjoy it?
+    Player: Do you enjoy it? What you've been doing all these years?
+    Eliana: Some days. Today wasn't one of them.
+-> Tease about her age
+    Player: Thirty years? You don't look a day over cross-examination.
+    <<Eliana Happy>>
+    Eliana: (Small laugh.) Flattery noted.
+-> Offer a break
+    Player: Well, let this be your thirty seconds off the clock.
+    <<Eliana Happy>>
+    Eliana: I'll take it.
+
+<<Cole Look R>>
+Cole: Half this town would be lost without you.
+<<Eliana Look L>>
+<<Eliana Happy>>
+Eliana: Coming from you, that almost sounds like a compliment.
+Eliana: But thanks.
+<<Cole Look F>>
+<<Eliana Look F>>
+<<Eliana Neutral>>
+<<jump D2_09_Walter_Leave>>
+===
+
+title: D2_09_Walter_Leave
+---
+<<Panel_FadeOut Panel_Transition>>
+<<wait_scene 1>>
+<<Panel_FadeIn Panel_Transition>>
+Walter: Well. On that note, I'll leave you two to it.
+Eliana: Already?
+Walter: It's past my hour.
+<<Walter Happy>>
+Walter: Besides, I forgot to take my medicine again.
+Player: I'll tell Isla.
+<<Walter Sad>>
+Walter: Please don't.
+Eliana: Goodnight, Walter.
+Cole: Night.
+Player: Get home safe, Walter.
+<<Walter Neutral>>
+Walter: Always do.
+// Walter exits.
+<<Walter Look L>>
+<<Walter Exit>>
+<<jump D2_10_Closing_Talk>>
+===
+
+title: D2_10_Closing_Talk
+---
+<<Cole Look R>>
+Cole: He's not wrong, you know.
+<<Eliana Look L>>
+Eliana: About which part?
+Cole: You've done more than enough.
+Eliana: I couldn't tell.
+<<Cole Look F>>
+<<Eliana Look F>>
+
+Cole: Anyway. Thanks for this.
+Cole: Didn't think a new bar in this town would actually be any good.
+<<Eliana Happy>>
+Eliana: He means that as a compliment.
+Player: I'll take it.
+Eliana: We'll be back. Probably too often.
+Cole: Speak for yourself.
+Eliana: [wiggle]I am. You're just also right.[/wiggle]
+
+Player: See you both around, then.
+Cole: Yeah. See you.
+Eliana: Night, bartender.
+// Cole and Eliana exit.
+<<Cole Exit>>
+<<Eliana Exit>>
+<<jump D2_11_Close>>
+===
+
+title: D2_11_Close
+---
+// ── End of day 2 ────────────────────────────────────
+<<flow_close_bar>>
+<<Switch_Camera CamController "MainCam">>
+<<Panel_FadeOut Panel_Transition>>
+<<wait_scene 1>>
+<<Panel_FadeIn Panel_Transition>>
+// $day becomes 3. Day 3's Event shows an "Unlock New Ingredient" popup before
+// D3_00_Start only if IngredientUnlockTable unlocks something on day 3.
+<<flow_next_day>>
+===
+
+// ════════════════════════════════════════════════════════════════
+//  DAY 3 — Faye, Isla, Arthur, Owen (at most 3 in the bar at once)
+//  Faye -> Isla -> Arthur -> Isla leaves -> Owen, Faye leaves -> Arthur leaves -> Owen leaves
+// ════════════════════════════════════════════════════════════════
+
+title: D3_00_Start
+---
+<<eventlog_clear>>
+<<flow_open_bar>>
+<<jump D3_01_Faye_Arrive>>
+===
+
+title: D3_01_Faye_Arrive
+---
+// Bar is empty. Faye enters.
+<<Faye Enter 1>>
+<<Switch_Camera CamController NearLeftCam>>
+<<Faye Neutral>>
+Faye: Evening.
+Player: Good evening. Welcome in.
+Faye: Just looking for a quiet corner tonight, if that's alright.
+Player: Take your pick. Not exactly crowded in here.
+Faye: No, I can see that.
+
+-> Need anything?
+    Player: Can I get you started with anything?
+    Faye: Let me take a look at the menu first.
+-> Compliment
+    Player: That's a striking coat, by the way.
+    <<Faye Happy>>
+    Faye: Thank you. I made it, actually.
+    Player: Really? Impressive work.
+-> Give her space
+    Player: Take your time. I'll be around.
+    Faye: Appreciated.
+-> Small talk
+    Player: First time stopping by, or just haven't made it in yet?
+    Faye: Neither. I just don't go out much.
+
+<<Faye Neutral>>
+<<jump D3_02_Isla_Arrive>>
+===
+
+title: D3_02_Isla_Arrive
+---
+// Isla enters.
+<<Isla Enter 2>>
+<<Isla Neutral>>
+Isla: Oh - hi. Sorry, is this seat taken?
+Faye: Not at all. Sit, please.
+Isla: Thanks. Long day. Needed somewhere that wasn't the clinic or my apartment.
+Faye: I know the feeling. Different kind of long day, but still.
+<<Isla Look L>>
+<<Faye Look R>>
+<<Isla Happy>>
+Isla: I don't think we've met. I'm Isla.
+Faye: Faye.
+Isla: Oh, is that your shop at the end of the street?
+Isla: Faye Fashion?
+Faye: Yeah, that's my shop.
+Isla: I went there once to buy some shoes, but I didn't see you at the time.
+Faye: I was quite busy.
+<<Isla Sad>>
+Isla: The shoes are really good, but it's a shame I tore them a little.
+Faye: Is the fabric torn? You can bring them to me to fix.
+Isla: No, no, it's fine. I might just be clumsy.
+Faye: But you can show them to me first.
+<<Isla Happy>>
+Isla: In that case, I'll look for an opportunity.
+<<Isla Neutral>>
+<<Isla Look F>>
+<<Faye Look F>>
+<<jump D3_03_Faye_Order>>
+===
+
+title: D3_03_Faye_Order
+---
+Player: What can I get you?
+// "Something dry": the script names no drink, so a random one from her preferences.
+// (A Martini would fit, but Dry Vermouth unlocks on day 5 in IngredientUnlockTable.)
+<<set $order_note = Order_Cocktail_OutName(4)>>
+Faye: Something dry, please. Nothing fruity.
+Player: Coming right up.
+
+<<flow_prepare_drinks>>
+<<wait_for_task SystemGame>>
+<<Switch_Camera CamController NearLeftCam>>
+
+<<if $satisfaction == Satisfaction.Perfect>>
+    <<Faye Happy>>
+    Faye: Hm. Not bad.
+<<elseif $satisfaction == Satisfaction.Acceptable>>
+    Faye: A bit off, but I get it.
+<<else>>
+    <<Faye Sad>>
+    Faye: Goodness, what did you make?
+    Faye: Sorry.
+<<endif>>
+<<Reset_Variable SystemGame>>
+<<Faye Neutral>>
+<<jump D3_04_Isla_Order>>
+===
+
+title: D3_04_Isla_Order
+---
+Player: And for you, Isla?
+<<set $order_note = Order_Cocktail_OutName(5)>>
+Isla: Surprise me. I trust the place, so far.
+Player: Coming right up.
+
+<<flow_prepare_drinks>>
+<<wait_for_task SystemGame>>
+<<Switch_Camera CamController NearLeftCam>>
+
+<<if $satisfaction == Satisfaction.Perfect>>
+    <<Isla Happy>>
+    Isla: [bounce]Refreshing. This is exactly what I need right now.[/bounce]
+<<elseif $satisfaction == Satisfaction.Acceptable>>
+    Isla: It still feels like something is missing.
+    Isla: But I think it's okay as it is.
+<<else>>
+    <<Isla Sad>>
+    Isla: Hm. It's not quite what I was looking for.
+<<endif>>
+<<Reset_Variable SystemGame>>
+<<Isla Neutral>>
+<<jump D3_05_Faye_Isla_Talk>>
+===
+
+title: D3_05_Faye_Isla_Talk
+---
+<<Faye Look R>>
+Faye: You're a nurse at the local clinic, right?
+<<Isla Look L>>
+Isla: Yeah, how do you know?
+Faye: I think I saw you there once, when I went in.
+Isla: Eh? I really can't remember that.
+Faye: Don't give it a second thought. You were probably busy at the time.
+Faye: Working hard is a good thing.
+<<Isla Sad>>
+Isla: I don't really feel that great about it, to be honest.
+<<Isla Happy>>
+Isla: But coming here is a good thing.
+Isla: [bounce]Having a place to relax like this in such a remote town is absolutely amazing![/bounce]
+Faye: You're not from here?
+<<Isla Neutral>>
+Isla: No, I come from a city in the west.
+Faye: A port city? That's a long way from here.
+<<Isla Sad2>>
+Isla: Yeah. I miss home sometimes.
+<<Isla Neutral>>
+Isla: Did you grow up here?
+Faye: Yeah, I just came back a few months ago.
+Faye: To escape from the noise.
+Isla: Have you been to the capital before?
+Faye: I studied there, at National University.
+<<Isla Happy>>
+Isla: Whoa, you must be a genius.
+Faye: That's an exaggeration.
+<<Isla Neutral>>
+<<Faye Look F>>
+<<Isla Look F>>
+Faye: And you, bartender? Where are you from?
+
+-> I've come from a lot of places.
+    Player: I've come from a lot of places.
+    Faye: Could you elaborate?
+    Player: Let's just say I've come a long way.
+    Faye: Fair enough. I won't pry.
+-> Honest
+    Player: Honestly? Somewhere a lot louder than here. I needed the quiet.
+    Faye: Then we have that in common.
+    Isla: Well, you picked the right town.
+-> That's a secret.
+    Player: Sorry, this is a trade secret.
+    Isla: Are you a smuggler or something?
+    Player: Yes, trading in happiness.
+    Isla: ...
+-> It doesn't matter.
+    Player: It doesn't matter where I come from. What matters is where we are.
+    Isla: Is that some kind of poem?
+    Player: Shakespeare.
+    Isla: Really?
+    Player: I don't know.
+<<jump D3_06_Arthur_Arrive>>
+===
+
+title: D3_06_Arthur_Arrive
+---
+// Arthur enters.
+<<Arthur Enter 3>>
+<<Switch_Camera CamController CenterCam>>
+<<Arthur Neutral>>
+Arthur: Huh. So this is the new spot everyone's talking about.
+<<Isla Look R>>
+Isla: Arthur? Didn't expect to see you here.
+Arthur: Yeah, well. Nothing else going on tonight.
+<<Faye Look R>>
+Faye: Arthur.
+<<Arthur NeutralLeft>>
+Arthur: Faye.
+Isla: You two... know each other?
+Faye: Unfortunately.
+<<Arthur Neutral>>
+Arthur: Small town. Hard not to.
+<<Isla Look F>>
+<<Faye Look F>>
+
+-> Break tension
+    Player: Well, the seats are open either way. No cover charge for tension.
+    <<Arthur Mockery>>
+    Arthur: (A faint smirk.) Noted.
+-> Address it directly
+    Player: Should I be worried about keeping the peace tonight?
+    Faye: No promises.
+-> Introduce yourself
+    Player: Haven't seen you before. I'm the new bartender.
+    <<Arthur Mockery>>
+    Arthur: Figured. I'd remember a face this eager to please.
+-> Keep working
+    Player: (You get back to wiping down glasses, letting the silence sit.)
+    Isla: (Under her breath.) Smart.
+<<Arthur Neutral>>
+<<jump D3_07_Arthur_Faye_Isla_Talk>>
+===
+
+title: D3_07_Arthur_Faye_Isla_Talk
+---
+Isla: So how do you two know each other, exactly?
+Arthur: Went to the same school. Different circles.
+Faye: Very different circles.
+<<Arthur Angry>>
+Arthur: You say that like it's my fault.
+Faye: I didn't say anything.
+Arthur: You didn't have to.
+Isla: (To you, quietly.) Is it always like this?
+
+-> "Sounds like history."
+    Player: Sounds like there's some history there.
+    Arthur: There's nothing to it.
+    Faye: Sure.
+-> "Maybe start over?"
+    Player: Maybe you two could just start over from here?
+    <<Arthur Neutral>>
+    Arthur: Fine by me.
+-> Change the subject
+    Player: So, Arthur - what brings you in tonight?
+    <<Arthur Neutral>>
+    Arthur: Boredom, mostly. Same as every night.
+-> Let them work it out
+    Player: (You stay quiet, letting them sort it out themselves.)
+<<Arthur Neutral>>
+<<jump D3_08_Arthur_Order>>
+===
+
+title: D3_08_Arthur_Order
+---
+Player: What can I get you?
+<<set $order_note = Order_Cocktail_OutName(8)>>
+<<Arthur HandIn>>
+Arthur: Whatever's expensive and good. I'll know if it's not.
+Faye: (Mutters.) Of course you will.
+<<Arthur Angry>>
+Arthur: Something wrong with wanting quality?
+Faye: Not at all. Just easy to want, when someone else always paid for it.
+Player: (You start on the drink.)
+<<Arthur Neutral>>
+
+<<flow_prepare_drinks>>
+<<wait_for_task SystemGame>>
+<<Switch_Camera CamController CenterCam>>
+
+<<if $satisfaction == Satisfaction.Perfect>>
+    Arthur: Huh. Actually good. Wasn't expecting that.
+<<elseif $satisfaction == Satisfaction.Acceptable>>
+    <<Arthur Mockery>>
+    Arthur: It's fine. Not what I'd get in the city, but fine.
+<<else>>
+    <<Arthur Angry>>
+    Arthur: This is... not it. Try again sometime, maybe.
+<<endif>>
+<<Reset_Variable SystemGame>>
+<<Arthur Neutral>>
+<<jump D3_09_Isla_Leave>>
+===
+
+title: D3_09_Isla_Leave
+---
+Isla: Oh - I should get going. Early shift tomorrow.
+Faye: Already?
+<<Isla Sad>>
+Isla: Sadly, yes. Patients don't care how tired I am.
+
+-> Walter's medicine
+    Player: Walter said he forgot to take his medicine again.
+    <<Isla Sad2>>
+    Isla: Again? I'll make sure he takes it next time.
+    Player: Scary.
+    <<Isla Happy>>
+    Isla: Thank you for telling me.
+-> Get home safe
+    Player: Get home safe, Isla.
+    <<Isla Happy>>
+    Isla: Thank you.
+
+<<Isla Happy>>
+Isla: It was really nice meeting you.
+Faye: Likewise.
+<<Isla Neutral>>
+Isla: ...See you around.
+Arthur: See you.
+// Isla exits.
+<<Isla Look L>>
+<<Isla Exit>>
+<<jump D3_10_Quiet_Faye_Arthur>>
+===
+
+title: D3_10_Quiet_Faye_Arthur
+---
+<<Arthur Look L>>
+<<Arthur Mockery>>
+Arthur: You still mad about that thing in senior year?
+Faye: I don't even remember what you're talking about.
+Arthur: Liar.
+<<Arthur Look F>>
+
+-> Ask what happened
+    Player: What thing in senior year?
+    <<Arthur Neutral>>
+    Arthur: Nothing. Old news.
+    Faye: Drop it.
+-> Refill their drinks, stay out of it
+    Player: (You quietly top off their glasses and step back.)
+    Faye: (A small, appreciative glance.)
+-> Comment on the tension
+    Player: You two really don't let things go, huh.
+    Arthur: She doesn't.
+    Faye: Says the one who brought it up.
+-> Redirect to something neutral
+    Player: So, Faye - how's the shop been?
+    <<Faye Happy>>
+    Faye: Busy. Good busy.
+<<Arthur Neutral>>
+<<Faye Neutral>>
+<<jump D3_11_Owen_Arrive>>
+===
+
+title: D3_11_Owen_Arrive
+---
+// Owen enters (Isla's seat). Faye leaves after.
+<<Switch_Camera CamController "MainCam">>
+<<Owen Enter 2>>
+<<Switch_Camera CamController CenterCam>>
+<<Owen Happy>>
+Owen: [bounce]Hey hey! Anyone still serving around here or- oh. Hey, Faye![/bounce]
+Faye: Owen.
+Owen: Didn't expect to see you out tonight.
+<<Owen Look R>>
+<<Owen Neutral>>
+Owen: Um... Arthur, I suppose?
+<<Arthur Look L>>
+Arthur: Yes. Do I know you?
+Owen: You haven't been living here long, have you? I know everyone in this town.
+Owen: I just happened to talk to Claire about someone who moved here recently.
+<<Owen Happy>>
+Owen: Owen. Forest ranger. Nice to meet you.
+<<Arthur NeutralLeft>>
+Arthur: If it weren't for my dad telling me to go live a bit further away from the city...
+<<Faye Look R>>
+Faye: Well, who was it that messed around so much they had to repeat a year at university?
+<<Arthur Rage>>
+Arthur: [shake]Faye![/shake]
+Faye: Just saying.
+<<Owen Neutral>>
+Owen: Oh, you know each other.
+Faye: No.
+<<Arthur Neutral>>
+Arthur: Probably.
+<<Arthur Look F>>
+<<Owen Look F>>
+<<Faye Look F>>
+
+Faye: Actually, I should head out.
+<<Owen Look L>>
+Owen: Already? I just got here.
+Faye: It's been a long night. I'll catch you next time.
+Player: Get home safe, Faye.
+<<Faye Happy>>
+Faye: Thank you.
+<<Faye Neutral>>
+<<Faye Look R>>
+Faye: Arthur.
+Arthur: Faye.
+// Faye exits.
+<<Faye Exit>>
+<<Owen Look F>>
+<<jump D3_12_Owen_Order>>
+===
+
+title: D3_12_Owen_Order
+---
+<<set $order_note = Order_Cocktail_OutName(2)>>
+<<Owen Happy>>
+Owen: Well! Guess it's just us. I'll have something easy - surprise me.
+Player: Coming up.
+
+<<flow_prepare_drinks>>
+<<wait_for_task SystemGame>>
+<<Switch_Camera CamController CenterCam>>
+
+<<if $satisfaction == Satisfaction.Perfect>>
+    <<Owen Happy1>>
+    Owen: [bounce]Now THAT'S a drink. You've got a gift, my friend.[/bounce]
+<<elseif $satisfaction == Satisfaction.Acceptable>>
+    Owen: Not bad! Little different than I expected, but hey, I'll take it.
+<<else>>
+    <<Owen Sad>>
+    Owen: Oh- oh boy. Well. It's got personality, I'll give it that.
+<<endif>>
+<<Reset_Variable SystemGame>>
+<<Owen Neutral>>
+<<jump D3_13_Owen_Arthur_Talk>>
+===
+
+title: D3_13_Owen_Arthur_Talk
+---
+<<Owen Look R>>
+Owen: So, Arthur, was it? What do you do?
+<<Arthur Look L>>
+Arthur: Student. Sort of.
+Owen: Sort of?
+Arthur: Studying. Not really doing anything with it yet.
+<<Owen Happy>>
+Owen: Hey, no rush. I didn't figure out what I wanted to do 'til I was climbing trees for a living, chasing raccoons out of people's attics.
+Arthur: Wait, that's an actual job?
+Owen: Forest ranger. Wildlife, trails, the works. Best decision I ever made.
+<<Owen Look F>>
+<<Arthur Look F>>
+
+-> Ask Arthur what he'd want to do
+    Player: What about you, Arthur? Anything you'd want to do, if you could?
+    Arthur: I've never really thought about it.
+    <<Owen Neutral>>
+    Owen: Really? Never?
+    Arthur: Didn't need to.
+-> Encourage the moment
+    Player: Sounds like you two might actually have something to talk about.
+    Owen: [wiggle]Ha! Maybe.[/wiggle]
+-> Keep it light
+    Player: Careful, Owen, you might convert him to a life of chasing raccoons.
+    Owen: [bounce]Hey, it's a noble calling![/bounce]
+-> Stay out of it
+    Player: (You let the conversation run its course without jumping in.)
+    Owen: (Keeps talking easily, filling the quiet space Arthur leaves.)
+
+<<Owen Neutral>>
+Owen: And hey, how do you know Faye?
+Arthur: Just... same place. Same university.
+Owen: What a coincidence. No wonder you two seem so close.
+<<Owen Happy>>
+Owen: Don't worry, you're not the only newcomer here.
+Owen: The other one is standing right in front of you.
+<<Arthur NeutralLeft>>
+Arthur: Aren't you from around here?
+
+-> Yes
+    Player: Yes, I'm from here. Just from upstairs.
+    Owen: [shake]Hey! Coming from upstairs doesn't count.[/shake]
+-> No
+    Player: No, I'm not from here.
+    Owen: Our town really seems to be getting famous.
+-> I blend right in, don't I?
+    Player: I must look like someone from around here.
+    Arthur: You really can't tell the difference.
+    Owen: Or did you shapeshift? Like a werewolf.
+    Player: I'm not you, Owen.
+    <<Owen Sad>>
+    Owen: [shake]Hey! What's that supposed to mean?[/shake]
+-> Distract
+    Player: Raccoon!
+    Owen: [shake]What! Where![/shake]
+    Player: Never mind, just a shadow.
+    Owen: You really scared me!
+<<Owen Neutral>>
+<<Arthur Neutral>>
+<<jump D3_14_Arthur_Leave>>
+===
+
+title: D3_14_Arthur_Leave
+---
+<<Arthur Mockery>>
+Arthur: You guys are funny.
+<<Arthur Neutral>>
+Arthur: But I guess I'm good to go now.
+<<Owen Sad>>
+Owen: Oh, okay. So it's just me again.
+<<Owen Neutral>>
+Owen: If you'd like a tour of the town, I can show you around.
+Arthur: I'll give it some thought.
+<<Arthur HandIn>>
+Arthur: Let me take some time to work on the project first.
+<<Arthur Neutral>>
+Arthur: Good night, everyone.
+Player: Good night. Take care.
+<<Owen Happy>>
+Owen: Night night.
+// Arthur exits.
+<<Arthur Look R>>
+<<Arthur Exit>>
+<<jump D3_15_Closing>>
+===
+
+title: D3_15_Closing
+---
+<<Owen Neutral>>
+Owen: And now I'm all alone again.
+Player: I told you, you have me.
+Owen: That's true.
+Owen: What do you think they are to each other?
+Player: Faye and Arthur?
+Player: How am I supposed to know?
+Owen: I suppose so.
+Owen: The town is actually quieter than the forest.
+Player: That's normal. The louder the sound, the quieter it seems once it stops.
+Owen: You're right again.
+Owen: Anyway, I have to go now.
+Player: Morning shift?
+<<Owen Happy>>
+Owen: Nope. I'm going to play a game.
+Player: ...
+<<Owen Neutral>>
+Owen: Just kidding. I have to head back into the forest tomorrow.
+Owen: I'm going to conduct a survey to see if any bears are wandering close to town.
+Player: That sounds serious.
+Owen: [fade]It's normal. They're just lost, or... lonely.[/fade]
+Owen: See you another day.
+Player: Good luck catching the bear.
+Owen: [shake]I don't catch them, damn it. I herd them.[/shake]
+Player: Haha. Good night.
+<<Owen Happy>>
+Owen: Night night.
+// Owen exits. End of Day 3.
+<<Owen Look L>>
+<<Owen Exit>>
+<<jump D3_16_End>>
+===
+
+title: D3_16_End
+---
+// ── End of the demo ─────────────────────────────────
+<<Can_End_Shift SystemGame>>
+<<flow_close_bar>>
+<<Fade_To_Summmary Panel_Transition>>
+<<Switch_Camera CamController SummaryCam>>
+<<wait_scene 2>>
+<<Panel_FadeIn Panel_Transition>>
+<<DisplayThx>>
+===

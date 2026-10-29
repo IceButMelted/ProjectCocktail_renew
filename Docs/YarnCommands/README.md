@@ -4,6 +4,8 @@
 
 **ตัวอย่างการเขียนวัน + Play test ครบรอบ:** `Assets/[06]Dialogue/YarnScript/Demo/PLAYTEST_Demo.yarn` เกมสั้น 3 วัน วันละ 3 คน (วัน 1 Isla / Cole / Faye, วัน 2 Walter / Owen / Claire, วัน 3 Eliana / Arthur / Isla) ใช้ทุกคำสั่งในหน้านี้ ยกเว้น `save_chapter_node` รวมถึงปลดล็อควัตถุดิบ (Rum จากเนื้อเรื่องวัน 2, popup วัน 3) หัวไฟล์บอกว่าแต่ละวันทดสอบอะไร และอธิบายโครงของหนึ่งวัน ใช้เป็นแม่แบบตอนเขียนวันใหม่ วิธีรัน: Day Schedule ที่ `[GameLoop]` › `FlowWiring` ต้องมีแถววัน 1-3 ที่ Start Node เป็น `PT_D1_Start` / `PT_D2_Start` / `PT_D3_Start` (ทั้ง `DaySchedule_Demo` และ `DaySchedule_PlayTest` ตั้งไว้แล้ว 2026-10-29) แล้ว Play ตอนชงเครื่องดื่มมีตัวเลือก "(Test) Let Yarn walk the steps" ให้ Yarn เดินทุก step แทนการชงเอง (ได้ Fail)
 
+**เดโมจริง 3 วัน:** `Assets/[06]Dialogue/YarnScript/Demo/DEMO_3Days.yarn` (เดิมคือ `Day1_Demo.yarn` + วัน 2-3 จากบทของทีม) ใช้โครงเดียวกับ playtest Start Node `D1_00_Start` / `D2_00_Start` / `D3_00_Start` อยู่ใน `DaySchedule_Demo.asset` (ตารางที่ `FlowWiring` ใช้ตอนนี้) ถ้าจะรัน playtest ให้เปลี่ยน Day Schedule ของ `FlowWiring` เป็น `DaySchedule_PlayTest`
+
 **ทดสอบทีละคำสั่ง:** `Assets/[06]Dialogue/YarnScript/Demo/TEST_AllCommands.yarn`
 เปิด `Assets/[02]Script/Day Schedule/DaySchedule_Demo.asset` แล้วเปลี่ยน Start Node ของแถว Day 1 เป็น `TEST_Start` แล้ว Play (Start Node ของ `DialogueRunner` ไม่ถูกใช้แล้วตั้งแต่มีตารางวัน) เลือกหัวข้อจากเมนู Hub ทุกบรรทัดขึ้นต้นด้วย `(TEST)` และบอกค่าที่ควรเห็น เปลี่ยนกลับเป็น `D1_NL_00_Start` เมื่อเสร็จ
 
