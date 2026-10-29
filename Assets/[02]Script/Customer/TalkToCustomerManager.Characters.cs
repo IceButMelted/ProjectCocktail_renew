@@ -96,7 +96,9 @@ public partial class TalkToCustomerManager
 
             var state = pair.Value;
             view.SetExpression(state.expressionIndex.ToString());
-            view.SetLook(state.look);
+            // LEGACY VISUAL: single-sheet art. Remove when every character has layered art (Docs/Bar410_LegacyCharacterVisual_Plan.md).
+            // Legacy art shows whichever came last; the save keeps no order, so a side look wins and Look F after an expression loads as the expression.
+            if (!view.UsesLegacyVisual || state.look != Facing.Forward) view.SetLook(state.look);
             view.Spot = state.spot;
 
             if (state.isPresent && _spots != null && state.spot >= 0 && state.spot < _spots.Length && _spots[state.spot] != null)

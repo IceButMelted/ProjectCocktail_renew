@@ -43,16 +43,41 @@ public class SO_Customer : ScriptableObject
 
     // ── Visual (plan: Docs/Bar410_CharacterPresentation_Plan.md) ──
 
-    [TabGroup("T", "Visual"), HorizontalGroup("T/Visual/Looks"), LabelText("Forward")]
+    // LEGACY VISUAL: single-sheet art. Remove when every character has layered art (Docs/Bar410_LegacyCharacterVisual_Plan.md).
+    [TabGroup("T", "Visual"), ToggleLeft]
+    [InfoBox("Single-sheet art: one whole-body picture per expression, plus whole-body Look Forward / Left / Right. The last command wins: an expression replaces the look picture, a look replaces the expression picture. Tick only while this character has no layered body/face art.")]
+    public bool UseLegacyVisual;
+
+    // LEGACY VISUAL: single-sheet art. Remove when every character has layered art (Docs/Bar410_LegacyCharacterVisual_Plan.md).
+    [TabGroup("T", "Visual"), ShowIf(nameof(UseLegacyVisual))]
+    [Tooltip("Index 0 is the default (Neutral). Whole body, facing forward. <<Isla 1>> uses the index shown here.")]
+    [TableList(ShowIndexLabels = true)]
+    [ValidateInput(nameof(ValidateLegacyExpressions), "Expression ids must be unique and not empty, Look, Enter or Exit.")]
+    public List<LegacyExpression> LegacyExpressions = new List<LegacyExpression>();
+
+    // LEGACY VISUAL: single-sheet art. Remove when every character has layered art (Docs/Bar410_LegacyCharacterVisual_Plan.md).
+    [TabGroup("T", "Visual"), ShowIf(nameof(UseLegacyVisual)), HorizontalGroup("T/Visual/LegacyLooks"), PreviewField(80), LabelText("Look F")]
+    [Tooltip("Whole body, face included. Shown by Look F / L / R until the next expression. Empty side: the other side mirrored; nothing: the current expression (warns).")]
+    public Sprite LegacyLookForward;
+
+    // LEGACY VISUAL: single-sheet art. Remove when every character has layered art (Docs/Bar410_LegacyCharacterVisual_Plan.md).
+    [TabGroup("T", "Visual"), ShowIf(nameof(UseLegacyVisual)), HorizontalGroup("T/Visual/LegacyLooks"), PreviewField(80), LabelText("Look L")]
+    public Sprite LegacyLookLeft;
+
+    // LEGACY VISUAL: single-sheet art. Remove when every character has layered art (Docs/Bar410_LegacyCharacterVisual_Plan.md).
+    [TabGroup("T", "Visual"), ShowIf(nameof(UseLegacyVisual)), HorizontalGroup("T/Visual/LegacyLooks"), PreviewField(80), LabelText("Look R")]
+    public Sprite LegacyLookRight;
+
+    [TabGroup("T", "Visual"), HideIf(nameof(UseLegacyVisual)), HorizontalGroup("T/Visual/Looks"), LabelText("Forward")]
     public LookSprites Forward;
 
-    [TabGroup("T", "Visual"), HorizontalGroup("T/Visual/Looks"), LabelText("Left")]
+    [TabGroup("T", "Visual"), HideIf(nameof(UseLegacyVisual)), HorizontalGroup("T/Visual/Looks"), LabelText("Left")]
     public LookSprites Left;
 
-    [TabGroup("T", "Visual"), HorizontalGroup("T/Visual/Looks"), LabelText("Right")]
+    [TabGroup("T", "Visual"), HideIf(nameof(UseLegacyVisual)), HorizontalGroup("T/Visual/Looks"), LabelText("Right")]
     public LookSprites Right;
 
-    [TabGroup("T", "Visual")]
+    [TabGroup("T", "Visual"), HideIf(nameof(UseLegacyVisual))]
     [Tooltip("Index 0 is the default face (Neutral). The index shown here is the number Yarn can use: <<Isla 1>>.")]
     [TableList(ShowIndexLabels = true)]
     [ValidateInput(nameof(ValidateExpressions), "Expression ids must be unique and not empty, Look, Enter or Exit.")]
@@ -66,8 +91,8 @@ public class SO_Customer : ScriptableObject
         get
         {
             var sb = new StringBuilder();
-            for (int i = 0; i < Expressions.Count; i++)
-                sb.Append($"<<{Id} {Expressions[i].Id}>>   <<{Id} {i}>>" + "\n");
+            for (int i = 0; i < ExpressionCount; i++)
+                sb.Append($"<<{Id} {ExpressionId(i)}>>   <<{Id} {i}>>" + "\n");
             sb.Append($"<<{Id} Look L>>   <<{Id} Enter 0>>   <<{Id} Exit>>");
             return sb.ToString();
         }
@@ -81,12 +106,35 @@ public class SO_Customer : ScriptableObject
         _ => Forward
     };
 
+    // The expression list of the active mode: callers ask these, never the lists directly.
+    public int ExpressionCount => UseLegacyVisual ? LegacyExpressions.Count : Expressions.Count; // LEGACY VISUAL: single-sheet art. Remove when every character has layered art (Docs/Bar410_LegacyCharacterVisual_Plan.md).
+
+    public string ExpressionId(int i) => UseLegacyVisual ? LegacyExpressions[i].Id : Expressions[i].Id; // LEGACY VISUAL: single-sheet art. Remove when every character has layered art (Docs/Bar410_LegacyCharacterVisual_Plan.md).
+
     /// <summary>Index of the expression with this id (case-insensitive), or -1.</summary>
     public int IndexOf(string id)
     {
-        for (int i = 0; i < Expressions.Count; i++)
-            if (string.Equals(Expressions[i].Id, id, StringComparison.OrdinalIgnoreCase)) return i;
+        for (int i = 0; i < ExpressionCount; i++)
+            if (string.Equals(ExpressionId(i), id, StringComparison.OrdinalIgnoreCase)) return i;
         return -1;
+    }
+
+    // LEGACY VISUAL: single-sheet art. Remove when every character has layered art (Docs/Bar410_LegacyCharacterVisual_Plan.md).
+    /// <summary>
+    /// The whole-body Look picture. A missing side borrows the other side mirrored (<paramref name="flip"/>);
+    /// with nothing it falls back to the expression's picture and warns.
+    /// </summary>
+    public Sprite GetLegacyLook(int expression, Facing look, out bool flip)
+    {
+        flip = false;
+        Sprite own = look == Facing.Left ? LegacyLookLeft : look == Facing.Right ? LegacyLookRight : LegacyLookForward;
+        Sprite other = look == Facing.Left ? LegacyLookRight : look == Facing.Right ? LegacyLookLeft : null;
+        if (own != null) return own;
+        if (other != null) { flip = true; return other; }
+
+        var row = LegacyExpressions[expression];
+        Debug.LogWarning($"[SO_Customer] {name}: no Look {look} picture, using expression '{row.Id}'.", this);
+        return row.Sprite;
     }
 
     /// <summary>
@@ -109,11 +157,17 @@ public class SO_Customer : ScriptableObject
     }
 
     private bool ValidateExpressions(List<ExpressionRow> rows, ref string message)
+        => ValidateIds(rows.ConvertAll(r => r.Id), ref message);
+
+    // LEGACY VISUAL: single-sheet art. Remove when every character has layered art (Docs/Bar410_LegacyCharacterVisual_Plan.md).
+    private bool ValidateLegacyExpressions(List<LegacyExpression> rows, ref string message)
+        => ValidateIds(rows.ConvertAll(r => r.Id), ref message);
+
+    private static bool ValidateIds(List<string> ids, ref string message)
     {
         var seen = new HashSet<string>(StringComparer.OrdinalIgnoreCase);
-        foreach (var row in rows)
+        foreach (string id in ids)
         {
-            string id = row.Id;
             if (string.IsNullOrWhiteSpace(id)) { message = "An expression id is empty."; return false; }
             if (id == "Look" || id == "Enter" || id == "Exit") { message = $"'{id}' is a Yarn short-form verb and cannot be an expression id."; return false; }
             if (!seen.Add(id)) { message = $"Duplicate expression id '{id}'."; return false; }
@@ -131,6 +185,17 @@ public struct LookSprites
     public Sprite Body;
 
     public Vector2 FaceOffset;
+}
+
+// LEGACY VISUAL: single-sheet art. Remove when every character has layered art (Docs/Bar410_LegacyCharacterVisual_Plan.md).
+/// <summary>One whole-body picture, facing forward.</summary>
+[Serializable]
+public struct LegacyExpression
+{
+    public string Id;
+
+    [Required, PreviewField(60)]
+    public Sprite Sprite;
 }
 
 /// <summary>One face. Left and Right may be empty: the other side is then used mirrored.</summary>

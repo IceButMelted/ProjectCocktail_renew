@@ -16,6 +16,19 @@ MonoBehaviour:
   CustomerName: Walter
   NameColor: {r: 0.27751, g: 0.5943396, b: 0, a: 1}
   PreferredDrinkTypes: 01000000
+  UseLegacyVisual: 1
+  LegacyExpressions:
+  - Id: Neutral
+    Sprite: {fileID: 21300000, guid: 2c80a2100dd86bb49bdf211976e907c4, type: 3}
+  - Id: Happy
+    Sprite: {fileID: 21300000, guid: 921b023ae5993124f88b42bb9690d80d, type: 3}
+  - Id: Sad
+    Sprite: {fileID: 21300000, guid: 74ad184fdeab71148bf91672a9aa3017, type: 3}
+  - Id: KneeUp
+    Sprite: {fileID: 21300000, guid: 711a50486dd32054a9452986d7cbf88f, type: 3}
+  LegacyLookForward: {fileID: 21300000, guid: 2c80a2100dd86bb49bdf211976e907c4, type: 3}
+  LegacyLookLeft: {fileID: 21300000, guid: 3a6e58b07bbffd0449d59d8aaf725fb7, type: 3}
+  LegacyLookRight: {fileID: 21300000, guid: b6ab69682ac7aa54d8ee671228224d52, type: 3}
   Forward:
     Body: {fileID: 21300000, guid: 85c51a303a780d744b5b29783b6654e1, type: 3}
     FaceOffset: {x: -0.008, y: 1.369}
@@ -27,14 +40,14 @@ MonoBehaviour:
     FaceOffset: {x: 0.0184, y: 1.3623}
   Expressions:
   - Id: Neutral
-    Forward: {fileID: 21300000, guid: ff0ff1373cb49a845b5d3459e52c7bad, type: 3}
-    Left: {fileID: 21300000, guid: a65160f36820d7a419f11630995832b9, type: 3}
-    Right: {fileID: 21300000, guid: 2b82667f200b41f4e9468c09756ee028, type: 3}
-  - Id: Happy
-    Forward: {fileID: 21300000, guid: 024ca39fe1d87b04aa9051f30705f17e, type: 3}
+    Forward: {fileID: 0}
     Left: {fileID: 0}
-    Right: {fileID: 21300000, guid: 2b82667f200b41f4e9468c09756ee028, type: 3}
+    Right: {fileID: 0}
+  - Id: Happy
+    Forward: {fileID: 0}
+    Left: {fileID: 0}
+    Right: {fileID: 0}
   - Id: Sad
-    Forward: {fileID: 21300000, guid: 7a1cb2562fe40554cacb9e1c28a8acbd, type: 3}
+    Forward: {fileID: 0}
     Left: {fileID: 0}
     Right: {fileID: 0}

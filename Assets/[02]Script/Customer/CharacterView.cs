@@ -30,10 +30,14 @@ public class CharacterView : MonoBehaviour
 
     /// <summary>The character's name, from the data asset.</summary>
     public CharacterName Name => _data != null ? _data.Id : CharacterName.None;
+    public bool UsesLegacyVisual => _data != null && _data.UseLegacyVisual; // LEGACY VISUAL: single-sheet art. Remove when every character has layered art (Docs/Bar410_LegacyCharacterVisual_Plan.md).
 
     public int ExpressionIndex { get; private set; }
     public Facing Look { get; private set; }
     public bool IsPresent { get; private set; }
+    // LEGACY VISUAL: single-sheet art. Remove when every character has layered art (Docs/Bar410_LegacyCharacterVisual_Plan.md).
+    /// <summary>Legacy art only: true while the last command was a look (its picture shows), false after an expression.</summary>
+    public bool LegacyShowsLook { get; private set; }
     /// <summary>Index into the manager's spots while present, otherwise the last one used.</summary>
     public int Spot { get; set; }
 
@@ -53,13 +57,14 @@ public class CharacterView : MonoBehaviour
     public bool SetExpression(string idOrIndex)
     {
         int index = int.TryParse(idOrIndex, out int n) ? n : _data.IndexOf(idOrIndex);
-        if (index < 0 || index >= _data.Expressions.Count)
+        if (index < 0 || index >= _data.ExpressionCount)
         {
             Debug.LogWarning($"[CharacterView] {Name} has no expression '{idOrIndex}'.", this);
             return false;
         }
 
         ExpressionIndex = index;
+        if (_data.UseLegacyVisual) { Look = Facing.Forward; LegacyShowsLook = false; } // LEGACY VISUAL: single-sheet art. Remove when every character has layered art (Docs/Bar410_LegacyCharacterVisual_Plan.md).
         Apply();
         return true;
     }
@@ -67,6 +72,7 @@ public class CharacterView : MonoBehaviour
     public void SetLook(Facing look)
     {
         Look = look;
+        LegacyShowsLook = true; // LEGACY VISUAL: single-sheet art. Remove when every character has layered art (Docs/Bar410_LegacyCharacterVisual_Plan.md).
         Apply();
     }
 
@@ -77,11 +83,24 @@ public class CharacterView : MonoBehaviour
     /// </summary>
     public void Apply()
     {
-        if (_data == null || _data.Expressions.Count == 0) return;
+        if (_data == null || _data.ExpressionCount == 0) return;
+
+        // LEGACY VISUAL: single-sheet art. Remove when every character has layered art (Docs/Bar410_LegacyCharacterVisual_Plan.md).
+        if (_data.UseLegacyVisual)
+        {
+            _face.sprite = null;
+            int expression = Mathf.Clamp(ExpressionIndex, 0, _data.ExpressionCount - 1);
+            bool legacyFlip = false;
+            _body.sprite = LegacyShowsLook
+                ? _data.GetLegacyLook(expression, Look, out legacyFlip)
+                : _data.LegacyExpressions[expression].Sprite;
+            _body.flipX = legacyFlip;
+            return;
+        }
 
         var look = _data.GetLook(Look);
         _body.sprite = look.Body;
-        _face.sprite = _data.GetFace(Mathf.Clamp(ExpressionIndex, 0, _data.Expressions.Count - 1), Look, out bool flip);
+        _face.sprite = _data.GetFace(Mathf.Clamp(ExpressionIndex, 0, _data.ExpressionCount - 1), Look, out bool flip);
         _face.flipX = flip;
 
         var p = _face.transform.localPosition;
@@ -144,7 +163,7 @@ public class CharacterView : MonoBehaviour
 
     private IEnumerable<string> ExpressionIds()
     {
-        if (_data != null) foreach (var e in _data.Expressions) yield return e.Id;
+        if (_data != null) for (int i = 0; i < _data.ExpressionCount; i++) yield return _data.ExpressionId(i);
     }
 
     [SerializeField, ValueDropdown(nameof(ExpressionIds)), HideInPlayMode, PropertyOrder(10)]
@@ -152,7 +171,7 @@ public class CharacterView : MonoBehaviour
     [SerializeField, HideInPlayMode, PropertyOrder(10)]
     private Facing _previewLook;
 
-    [Button("Preview"), HideInPlayMode, PropertyOrder(11)]
+    [Button("Preview"), HideInPlayMode, HideIf(nameof(UsesLegacyVisual)), PropertyOrder(11)]
     private void Preview()
     {
         if (_data == null) return;
@@ -163,6 +182,25 @@ public class CharacterView : MonoBehaviour
         ExpressionIndex = index;
         Look = _previewLook;
         Apply();
+        EditorUtility.SetDirty(this);
+    }
+
+    // LEGACY VISUAL: single-sheet art. Remove when every character has layered art (Docs/Bar410_LegacyCharacterVisual_Plan.md).
+    // Legacy art shows one picture: the last command wins, so expression and look preview separately.
+    [ButtonGroup("LegacyPreview"), Button("Preview Expression"), HideInPlayMode, ShowIf(nameof(UsesLegacyVisual)), PropertyOrder(11)]
+    private void PreviewLegacyExpression()
+    {
+        Undo.RecordObjects(new Object[] { this, _body, _face }, "Preview character");
+        SetExpression(_previewExpression);
+        EditorUtility.SetDirty(this);
+    }
+
+    // LEGACY VISUAL: single-sheet art. Remove when every character has layered art (Docs/Bar410_LegacyCharacterVisual_Plan.md).
+    [ButtonGroup("LegacyPreview"), Button("Preview Look"), HideInPlayMode, ShowIf(nameof(UsesLegacyVisual)), PropertyOrder(11)]
+    private void PreviewLegacyLook()
+    {
+        Undo.RecordObjects(new Object[] { this, _body, _face }, "Preview character");
+        SetLook(_previewLook);
         EditorUtility.SetDirty(this);
     }
 #endif

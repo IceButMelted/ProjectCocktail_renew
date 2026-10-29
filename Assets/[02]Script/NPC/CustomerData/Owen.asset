@@ -16,6 +16,19 @@ MonoBehaviour:
   CustomerName: Owen
   NameColor: {r: 1, g: 0.31541085, b: 0, a: 1}
   PreferredDrinkTypes: 0300000002000000
+  UseLegacyVisual: 1
+  LegacyExpressions:
+  - Id: Neutral
+    Sprite: {fileID: 21300000, guid: c3cabcdcfb1824d4da67be3f525d8763, type: 3}
+  - Id: Happy
+    Sprite: {fileID: 21300000, guid: 10d98bf9b9f048a4e84f0e1b8a64d313, type: 3}
+  - Id: Sad
+    Sprite: {fileID: 21300000, guid: b71c76fc8f33f014eb366e16cf286a65, type: 3}
+  - Id: Happy1
+    Sprite: {fileID: 21300000, guid: f90307f3718226c438cd56ea993f7a95, type: 3}
+  LegacyLookForward: {fileID: 21300000, guid: c3cabcdcfb1824d4da67be3f525d8763, type: 3}
+  LegacyLookLeft: {fileID: 21300000, guid: 070d657bc3560a64d9b3018aac073a20, type: 3}
+  LegacyLookRight: {fileID: 21300000, guid: 0e75120d1e9c2044590ea80e17b79863, type: 3}
   Forward:
     Body: {fileID: 21300000, guid: 85c51a303a780d744b5b29783b6654e1, type: 3}
     FaceOffset: {x: -0.008, y: 1.369}
@@ -27,14 +40,14 @@ MonoBehaviour:
     FaceOffset: {x: 0.0184, y: 1.3623}
   Expressions:
   - Id: Neutral
-    Forward: {fileID: 21300000, guid: ff0ff1373cb49a845b5d3459e52c7bad, type: 3}
-    Left: {fileID: 21300000, guid: a65160f36820d7a419f11630995832b9, type: 3}
-    Right: {fileID: 21300000, guid: 2b82667f200b41f4e9468c09756ee028, type: 3}
-  - Id: Happy
-    Forward: {fileID: 21300000, guid: 024ca39fe1d87b04aa9051f30705f17e, type: 3}
+    Forward: {fileID: 0}
     Left: {fileID: 0}
-    Right: {fileID: 21300000, guid: 2b82667f200b41f4e9468c09756ee028, type: 3}
+    Right: {fileID: 0}
+  - Id: Happy
+    Forward: {fileID: 0}
+    Left: {fileID: 0}
+    Right: {fileID: 0}
   - Id: Sad
-    Forward: {fileID: 21300000, guid: 7a1cb2562fe40554cacb9e1c28a8acbd, type: 3}
+    Forward: {fileID: 0}
     Left: {fileID: 0}
     Right: {fileID: 0}

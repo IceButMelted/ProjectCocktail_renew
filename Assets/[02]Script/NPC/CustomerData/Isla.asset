@@ -16,6 +16,21 @@ MonoBehaviour:
   CustomerName: Isla
   NameColor: {r: 0.017065525, g: 0, b: 1, a: 1}
   PreferredDrinkTypes: 03000000
+  UseLegacyVisual: 1
+  LegacyExpressions:
+  - Id: Neutral
+    Sprite: {fileID: 21300000, guid: 28778e56e9aaa134ba7b8073a11ed52f, type: 3}
+  - Id: Happy
+    Sprite: {fileID: 21300000, guid: ce5149436803cf940bedb8dd9b3275c6, type: 3}
+  - Id: Sad
+    Sprite: {fileID: 21300000, guid: 8dd2a21526deeb148bea0df98761ffe1, type: 3}
+  - Id: Sad2
+    Sprite: {fileID: 21300000, guid: bf9db84d540472b40b3034aa4475a1b9, type: 3}
+  - Id: KneeUp
+    Sprite: {fileID: 21300000, guid: 7ea2018c4721c2a4a8c07fc8e981f04f, type: 3}
+  LegacyLookForward: {fileID: 21300000, guid: 28778e56e9aaa134ba7b8073a11ed52f, type: 3}
+  LegacyLookLeft: {fileID: 21300000, guid: 2a736ebb2c3b2434fbe26c3418c4fca7, type: 3}
+  LegacyLookRight: {fileID: 21300000, guid: 10e5b82ec02982443a28d78a89902383, type: 3}
   Forward:
     Body: {fileID: 21300000, guid: 85c51a303a780d744b5b29783b6654e1, type: 3}
     FaceOffset: {x: -0.008, y: 1.369}
@@ -27,14 +42,14 @@ MonoBehaviour:
     FaceOffset: {x: 0.0184, y: 1.3623}
   Expressions:
   - Id: Neutral
-    Forward: {fileID: 21300000, guid: ff0ff1373cb49a845b5d3459e52c7bad, type: 3}
-    Left: {fileID: 21300000, guid: a65160f36820d7a419f11630995832b9, type: 3}
-    Right: {fileID: 21300000, guid: 2b82667f200b41f4e9468c09756ee028, type: 3}
-  - Id: Happy
-    Forward: {fileID: 21300000, guid: 024ca39fe1d87b04aa9051f30705f17e, type: 3}
+    Forward: {fileID: 0}
     Left: {fileID: 0}
-    Right: {fileID: 21300000, guid: 2b82667f200b41f4e9468c09756ee028, type: 3}
+    Right: {fileID: 0}
+  - Id: Happy
+    Forward: {fileID: 0}
+    Left: {fileID: 0}
+    Right: {fileID: 0}
   - Id: Sad
-    Forward: {fileID: 21300000, guid: 7a1cb2562fe40554cacb9e1c28a8acbd, type: 3}
+    Forward: {fileID: 0}
     Left: {fileID: 0}
     Right: {fileID: 0}
