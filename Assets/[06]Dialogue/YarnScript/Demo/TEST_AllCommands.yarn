@@ -6,13 +6,16 @@ title: TEST_Start
 // The flow starts in BeforeOpen › StoryBeforeOpen (this node is the "story before opening").
 Player: (TEST) Start. flow_phase = {flow_phase()}, flow_step = {flow_step()}
 Player: (TEST) Expect BeforeOpen / StoryBeforeOpen.
+Player: (TEST) Day {$day}. Day-1 kit: Gin = {ingredient_unlocked("Gin")} (expect True), Whiskey = {ingredient_unlocked("Whiskey")} (expect False on day 1)
 
 // flow_check_events: Story -> Event -> back to Story, then the next line plays.
 <<flow_check_events>>
-Player: (TEST) After flow_check_events. flow_step = {flow_step()} (expect StoryBeforeOpen)
+Player: (TEST) After flow_check_events. flow_step = {flow_step()} (expect StoryBeforeOpen). Day 1: no unlock popup.
 
 -> Test the BeforeOpen-only commands, then open the bar
     <<jump TEST_BeforeOpen>>
+-> Test the ingredient unlock popup (BeforeOpen), then open the bar
+    <<jump TEST_UnlockPopup>>
 -> Open the bar now
     <<jump TEST_OpenBar>>
 ===
@@ -37,6 +40,166 @@ Player: (TEST) Second flow_open_bar should have logged a warning, nothing else.
 <<jump TEST_Hub>>
 ===
 
+title: TEST_AllCharacters
+---
+// Every character: enter, every expression by name, then by number, look L/F/R, exit.
+// Legacy art: an expression shows its picture, a look shows the Look picture (the last command wins).
+// Cole and Faye have no Left/Right picture yet: their Look L/R shows the expression and warns.
+<<Cole Enter 0>>
+<<Cole Neutral>>
+Player: (TEST) Cole 0 = Neutral.
+<<Cole Happy>>
+Player: (TEST) Cole 1 = Happy.
+<<Cole Sad>>
+Player: (TEST) Cole 2 = Sad.
+<<Cole 2>>
+Player: (TEST) Cole by number 2 = Sad.
+<<Cole Look L>>
+Player: (TEST) Cole Look L.
+<<Cole Look F>>
+Player: (TEST) Cole Look F.
+<<Cole Look R>>
+Player: (TEST) Cole Look R.
+<<Cole Neutral>>
+<<Cole Exit>>
+<<Owen Enter 0>>
+<<Owen Neutral>>
+Player: (TEST) Owen 0 = Neutral.
+<<Owen Happy>>
+Player: (TEST) Owen 1 = Happy.
+<<Owen Sad>>
+Player: (TEST) Owen 2 = Sad.
+<<Owen Happy1>>
+Player: (TEST) Owen 3 = Happy1.
+<<Owen 3>>
+Player: (TEST) Owen by number 3 = Happy1.
+<<Owen Look L>>
+Player: (TEST) Owen Look L.
+<<Owen Look F>>
+Player: (TEST) Owen Look F.
+<<Owen Look R>>
+Player: (TEST) Owen Look R.
+<<Owen Neutral>>
+<<Owen Exit>>
+<<Walter Enter 0>>
+<<Walter Neutral>>
+Player: (TEST) Walter 0 = Neutral.
+<<Walter Happy>>
+Player: (TEST) Walter 1 = Happy.
+<<Walter Sad>>
+Player: (TEST) Walter 2 = Sad.
+<<Walter KneeUp>>
+Player: (TEST) Walter 3 = KneeUp.
+<<Walter 3>>
+Player: (TEST) Walter by number 3 = KneeUp.
+<<Walter Look L>>
+Player: (TEST) Walter Look L.
+<<Walter Look F>>
+Player: (TEST) Walter Look F.
+<<Walter Look R>>
+Player: (TEST) Walter Look R.
+<<Walter Neutral>>
+<<Walter Exit>>
+<<Faye Enter 0>>
+<<Faye Neutral>>
+Player: (TEST) Faye 0 = Neutral.
+<<Faye Happy>>
+Player: (TEST) Faye 1 = Happy.
+<<Faye Sad>>
+Player: (TEST) Faye 2 = Sad.
+<<Faye 2>>
+Player: (TEST) Faye by number 2 = Sad.
+<<Faye Look L>>
+Player: (TEST) Faye Look L.
+<<Faye Look F>>
+Player: (TEST) Faye Look F.
+<<Faye Look R>>
+Player: (TEST) Faye Look R.
+<<Faye Neutral>>
+<<Faye Exit>>
+<<Isla Enter 0>>
+<<Isla Neutral>>
+Player: (TEST) Isla 0 = Neutral.
+<<Isla Happy>>
+Player: (TEST) Isla 1 = Happy.
+<<Isla Sad>>
+Player: (TEST) Isla 2 = Sad.
+<<Isla Sad2>>
+Player: (TEST) Isla 3 = Sad2.
+<<Isla KneeUp>>
+Player: (TEST) Isla 4 = KneeUp.
+<<Isla 4>>
+Player: (TEST) Isla by number 4 = KneeUp.
+<<Isla Look L>>
+Player: (TEST) Isla Look L.
+<<Isla Look F>>
+Player: (TEST) Isla Look F.
+<<Isla Look R>>
+Player: (TEST) Isla Look R.
+<<Isla Neutral>>
+<<Isla Exit>>
+<<Claire Enter 0>>
+<<Claire Neutral>>
+Player: (TEST) Claire 0 = Neutral.
+<<Claire Happy>>
+Player: (TEST) Claire 1 = Happy.
+<<Claire Amaze>>
+Player: (TEST) Claire 2 = Amaze.
+<<Claire Rage>>
+Player: (TEST) Claire 3 = Rage.
+<<Claire 3>>
+Player: (TEST) Claire by number 3 = Rage.
+<<Claire Look L>>
+Player: (TEST) Claire Look L.
+<<Claire Look F>>
+Player: (TEST) Claire Look F.
+<<Claire Look R>>
+Player: (TEST) Claire Look R.
+<<Claire Neutral>>
+<<Claire Exit>>
+<<Eliana Enter 0>>
+<<Eliana Neutral>>
+Player: (TEST) Eliana 0 = Neutral.
+<<Eliana Happy>>
+Player: (TEST) Eliana 1 = Happy.
+<<Eliana Disappointed>>
+Player: (TEST) Eliana 2 = Disappointed.
+<<Eliana 2>>
+Player: (TEST) Eliana by number 2 = Disappointed.
+<<Eliana Look L>>
+Player: (TEST) Eliana Look L.
+<<Eliana Look F>>
+Player: (TEST) Eliana Look F.
+<<Eliana Look R>>
+Player: (TEST) Eliana Look R.
+<<Eliana Neutral>>
+<<Eliana Exit>>
+<<Arthur Enter 0>>
+<<Arthur Neutral>>
+Player: (TEST) Arthur 0 = Neutral.
+<<Arthur NeutralLeft>>
+Player: (TEST) Arthur 1 = NeutralLeft.
+<<Arthur Mockery>>
+Player: (TEST) Arthur 2 = Mockery.
+<<Arthur HandIn>>
+Player: (TEST) Arthur 3 = HandIn.
+<<Arthur Angry>>
+Player: (TEST) Arthur 4 = Angry.
+<<Arthur Rage>>
+Player: (TEST) Arthur 5 = Rage.
+<<Arthur 5>>
+Player: (TEST) Arthur by number 5 = Rage.
+<<Arthur Look L>>
+Player: (TEST) Arthur Look L.
+<<Arthur Look F>>
+Player: (TEST) Arthur Look F.
+<<Arthur Look R>>
+Player: (TEST) Arthur Look R.
+<<Arthur Neutral>>
+<<Arthur Exit>>
+<<jump TEST_Hub>>
+===
+
 title: TEST_Hub
 ---
 Player: (TEST) Hub. flow_phase = {flow_phase()}, flow_step = {flow_step()}
@@ -50,6 +213,8 @@ Player: (TEST) Hub. flow_phase = {flow_phase()}, flow_step = {flow_step()}
     <<jump TEST_FlowSteps>>
 -> Real order: make and serve a drink
     <<jump TEST_RealOrder>>
+-> Ingredient unlock
+    <<jump TEST_Unlock>>
 -> Misc (wait, interactables, event log, summary)
     <<jump TEST_Misc>>
 -> End of day (close bar, next day) - ends the test
@@ -69,7 +234,7 @@ Player: (TEST) Cut_Camera MainCam (no blend).
 title: TEST_NPC
 ---
 // Characters: long form, short form, expression by name and by number, look L/F/R, spots.
-// Isla's placeholder data: 0 Neutral (own L/R faces), 1 Happy (only Right: Left is Right flipped), 2 Sad (Forward only: L/R warn).
+// Isla uses legacy art: a look shows the whole-body Look picture, an expression shows its picture and turns her forward.
 // Enter and Exit hold the dialogue until the fade is over.
 <<Isla Look L>>
 <<Isla Sad>>
@@ -102,7 +267,7 @@ Player: (TEST) Exit (short form) finished: Isla faded out.
 Player: (TEST) Exit while outside (both forms): nothing happens.
 <<Isla Neutral>>
 <<Isla Look F>>
-<<jump TEST_Hub>>
+<<jump TEST_AllCharacters>>
 ===
 
 title: TEST_Orders
@@ -174,6 +339,103 @@ Player: (TEST) wait_for_task returned. order_satisfaction = {order_satisfaction(
 <<jump TEST_Hub>>
 ===
 
+title: TEST_UnlockPopup
+---
+// BeforeOpen only: the Event popup. Pretends it is day 3, then puts $day back.
+<<declare $test_saved_day = 1>>
+<<set $test_saved_day to $day>>
+<<set $day to 3>>
+<<unlock_ingredient Rum>>
+Player: (TEST) $day set to 3 and Rum unlocked by the story. Whiskey = {ingredient_unlocked("Whiskey")}, Rum = {ingredient_unlocked("Rum")} (expect True, True)
+Player: (TEST) Next: flow_check_events. Expect ONE popup "Unlock New Ingredient" listing Whiskey, Dry Vermouth, Peppermint, Rum (one per line). Close it to go on.
+<<flow_check_events>>
+Player: (TEST) Back in the story. flow_step = {flow_step()} (expect StoryBeforeOpen)
+<<flow_check_events>>
+Player: (TEST) Second flow_check_events: NO popup (all already announced).
+<<set $day to $test_saved_day>>
+Player: (TEST) $day back to {$day}. Whiskey = {ingredient_unlocked("Whiskey")} (False again on day 1), Rum = {ingredient_unlocked("Rum")} (still True: story unlocks are permanent)
+<<jump TEST_OpenBar>>
+===
+
+title: TEST_Unlock
+---
+// Ingredient unlock (Docs/YarnCommands/unlock_ingredient.md, ingredient_unlocked.md).
+// Day table: 1 Vodka Gin Triplesec Soda CranberryJuice LemonJuice GrapefruitJuice Syrup,
+// 3 Whiskey DryVermouth PepperMint, 5 Rum SweetVermouth LimeJuice OrangeJuice, 7 Tequila Campari.
+Player: (TEST) Unlock hub. Day {$day}.
+-> What is unlocked today
+    <<jump TEST_Unlock_Today>>
+-> Story unlock (command, repeat, letter case, bad name)
+    <<jump TEST_Unlock_Story>>
+-> Bar: bottles on the shelf
+    <<jump TEST_Unlock_Bar>>
+-> Orders: random only makeable, named warns
+    <<jump TEST_Unlock_Orders>>
+-> Back to the hub
+    <<jump TEST_Hub>>
+===
+
+title: TEST_Unlock_Today
+---
+Player: (TEST) Day 1 - Vodka {ingredient_unlocked("Vodka")}, Gin {ingredient_unlocked("Gin")}, Triplesec {ingredient_unlocked("Triplesec")}, Soda {ingredient_unlocked("Soda")}
+Player: (TEST) Day 1 - CranberryJuice {ingredient_unlocked("CranberryJuice")}, LemonJuice {ingredient_unlocked("LemonJuice")}, GrapefruitJuice {ingredient_unlocked("GrapefruitJuice")}, Syrup {ingredient_unlocked("Syrup")} (all True)
+Player: (TEST) Day 3 - Whiskey {ingredient_unlocked("Whiskey")}, DryVermouth {ingredient_unlocked("DryVermouth")}, PepperMint {ingredient_unlocked("PepperMint")} (True from day 3)
+Player: (TEST) Day 5 - Rum {ingredient_unlocked("Rum")}, SweetVermouth {ingredient_unlocked("SweetVermouth")}, LimeJuice {ingredient_unlocked("LimeJuice")}, OrangeJuice {ingredient_unlocked("OrangeJuice")} (True from day 5, Rum also after the popup test)
+Player: (TEST) Day 7 - Tequila {ingredient_unlocked("Tequila")}, Campari {ingredient_unlocked("Campari")} (True from day 7 or after a story unlock)
+<<jump TEST_Unlock>>
+===
+
+title: TEST_Unlock_Story
+---
+// Run before day 7: Tequila starts locked.
+Player: (TEST) Before: Tequila = {ingredient_unlocked("Tequila")} (expect False before day 7)
+<<unlock_ingredient Tequila>>
+<<unlock_ingredient Tequila>>
+<<unlock_ingredient tequila>>
+Player: (TEST) unlock_ingredient Tequila, again, and "tequila": no error. Tequila = {ingredient_unlocked("Tequila")}, "TEQUILA" = {ingredient_unlocked("TEQUILA")} (expect True, True)
+Player: (TEST) Next: an unknown name. The Console should show one LogError and the dialogue should go on.
+<<unlock_ingredient NotAnIngredient>>
+Player: (TEST) After the error. ingredient_unlocked("NotAnIngredient") = {ingredient_unlocked("NotAnIngredient")} (expect False, with a second LogError)
+Player: (TEST) Its popup is not shown today: it waits for the next Event.
+<<jump TEST_Unlock>>
+===
+
+title: TEST_Unlock_Bar
+---
+// Look at the shelf: only unlocked bottles show. Ice, Method and Reset always stay.
+<<order_customer "[CocktailSystem]" Isla>>
+Player: (TEST) Order for the look: {Order_Cocktail_ByName_OutName("Gin Fizz")}
+<<flow_prepare_drinks>>
+Player: (TEST) At the bar (step = {flow_step()}). Day 1: 8 bottles (+ any story unlocks: Rum, Tequila if run). Whiskey, Campari... hidden.
+<<unlock_ingredient Campari>>
+<<flow_ingredient_added>>
+<<flow_another_ingredient>>
+Player: (TEST) Campari unlocked, then left and came back to AddIngredient: the Campari bottle should now show.
+<<flow_ingredient_added>>
+<<flow_drink_complete>>
+<<flow_garnish_done>>
+<<flow_serve_done>>
+<<Reset_Variable SystemGame>>
+Player: (TEST) Back to Talking. step = {flow_step()}
+<<jump TEST_Unlock>>
+===
+
+title: TEST_Unlock_Orders
+---
+// Random orders pick only drinks whose every ingredient is unlocked (day 1: John Collins, White Lady, Gin Fizz,
+// Sea Breeze, Cosmopolitan, Greyhound, Cranberry Fizz, Grapefruit Spritz, plus any opened by story unlocks).
+Player: (TEST) Random for Isla: {Order_Cocktail_OutName(5)}
+Player: (TEST) Random for Isla: {Order_Cocktail_OutName(5)}
+Player: (TEST) Random for Isla: {Order_Cocktail_OutName(5)}
+Player: (TEST) Random for Owen: {Order_Cocktail_OutName(2)}
+Player: (TEST) Random for Walter: {Order_Cocktail_OutName(3)}
+Player: (TEST) Every name above must be makeable today.
+// A drink the writer names is never filtered: it only warns in the Console when it cannot be made yet.
+Player: (TEST) Named: {Order_Cocktail_ByName_OutName("Paloma")} (Tequila, Soda, LimeJuice, GrapefruitJuice, Syrup: warns while LimeJuice, day 5, is locked)
+<<Reset_Variable SystemGame>>
+<<jump TEST_Unlock>>
+===
+
 title: TEST_Misc
 ---
 <<wait_scene 1>>
@@ -197,6 +459,7 @@ Player: (TEST) Can_End_Shift: the End Shift button should appear.
 Player: (TEST) flow_close_bar. flow_phase = {flow_phase()} (expect Close)
 <<flow_next_day>>
 Player: (TEST) flow_next_day. flow_phase = {flow_phase()}, flow_step = {flow_step()} (expect BeforeOpen / StoryBeforeOpen; the next day's node starts once this dialogue ends)
+Player: (TEST) Day is now {$day}. Unlocks announced at the next day's Event (popup if anything new: story unlocks from today, or day 3/5/7 ingredients).
 <<DisplayThx>>
 Player: (TEST) DisplayThx: the thank-you panel should be on screen. End of test.
 ===
