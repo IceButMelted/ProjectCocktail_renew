@@ -8,6 +8,8 @@
 
 **อัดวิดีโอ:** `Assets/[06]Dialogue/YarnScript/Demo/VDO_Rec.yarn` เล่นเองทั้งหมด ตัวละคร 7 ตัวเข้าที่จุดเดียวกับเดโม 3 วัน กล้องโฟกัส แล้วโชว์ Neutral → สั่ง + จำลองชง → Happy → Sad จังหวะละประมาณ 5 วิ วิธีรัน: ที่ `[GameLoop]` › `FlowWiring` เปลี่ยน Day Schedule เป็น `DaySchedule_VDO` แล้ว Play และเปิด AutoPlay
 
+**อัดวิดีโอ (บทสนทนาอย่างเดียว):** `Assets/[06]Dialogue/YarnScript/Demo/VDO_Rec_Conversation.yarn` บทพูดและตัวเลือกของผู้เล่นทั้งหมดจากเดโม 3 วัน ไม่มีสั่ง/ชงเครื่องดื่ม ตัวเลือกแรกของทุกชุดติด `#timeout` (เลือกเองหลัง 10 วิ หรือกดเลือกเองก่อนได้) วิธีรัน: Day Schedule = `DaySchedule_VDO_Conversation` แล้ว Play + เปิด AutoPlay
+
 **ทดสอบทีละคำสั่ง:** `Assets/[06]Dialogue/YarnScript/Demo/TEST_AllCommands.yarn`
 เปิด `Assets/[02]Script/Day Schedule/DaySchedule_Demo.asset` แล้วเปลี่ยน Start Node ของแถว Day 1 เป็น `TEST_Start` แล้ว Play (Start Node ของ `DialogueRunner` ไม่ถูกใช้แล้วตั้งแต่มีตารางวัน) เลือกหัวข้อจากเมนู Hub ทุกบรรทัดขึ้นต้นด้วย `(TEST)` และบอกค่าที่ควรเห็น เปลี่ยนกลับเป็น `D1_NL_00_Start` เมื่อเสร็จ
 

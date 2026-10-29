@@ -146,7 +146,7 @@ PauseScene (โหลดซ้อน)        หน้า Pause / Setting
   - `TalkToCustomerManager` บน `NPCs_And_Set` เป็นคนสั่งตัวละครและเริ่มบท
 - **แก้เองได้:**
   - `Assets/[02]Script/NPC/CustomerData/<ชื่อ>.asset`: ชื่อ, สีชื่อ, รูปทุกสีหน้า, Look F/L/R, Use Legacy Visual
-  - `TalkToCustomerManager`: จุดยืน (Spots), เวลา fade, ท่าเดินตอน fade (`Walk Bob`: Height = ความสูงแต่ละก้าวเป็นเมตร, Steps = จำนวนก้าวต่อหนึ่ง fade, Height 0 = ไม่ขยับ), เสียงเข้า/ออกร้านของทุกตัวละคร (`Enter Sound Id` + `Enter Sound Lead` = เล่นก่อน fade เข้ากี่วินาที, `Exit Sound Id` + `Exit Sound Delay` = เล่นหลัง fade ออกจบกี่วินาที, ว่าง = เงียบ, ไม่เล่นตอน Skip/โหลด)
+  - `TalkToCustomerManager`: จุดยืน (Spots), เวลา fade, ท่าเดินตอน fade (`Walk Bob`: Height = ความสูงแต่ละก้าวเป็นเมตร, Steps = จำนวนก้าวต่อหนึ่ง fade, Height 0 = ไม่ขยับ), ท่ายืน (`Idle Bob`: ขึ้นลงช้าๆ ตอนยืนที่จุด ต่อจาก fade เข้า Height เป็นเมตร Frequency เป็นรอบ/วินาที ค่าเริ่มต้น 0.008 ม. 0.4 รอบ/วิ ปรับสดได้ตอน Play), เสียงเข้า/ออกร้านของทุกตัวละคร (`Enter Sound Id` + `Enter Sound Lead` = เล่นก่อน fade เข้ากี่วินาที, `Exit Sound Id` + `Exit Sound Delay` = เล่นหลัง fade ออกจบกี่วินาที, ว่าง = เงียบ, ไม่เล่นตอน Skip/โหลด)
   - ปุ่ม Preview บน `CharacterView` ตอน edit mode
   - Yarn: `<<Isla Sad>>`, `<<Isla Look L>>`, `<<Isla Enter 2>>`, `<<Isla Exit>>`
 - **อ่านเพิ่ม:** `Docs/Bar410_CharacterPresentation_Plan.md`, `Docs/Bar410_LegacyCharacterVisual_Plan.md`, `Docs/YarnCommands/CharacterShortForm.md`
