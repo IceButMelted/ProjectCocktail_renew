@@ -1,6 +1,6 @@
 # Bar410: คู่มือระบบทั้งหมด (Systems Guide)
 
-อัปเดตล่าสุด: 2026-10-29 (Yarn รอ fade ของชื่อ Chapter / popup Event / Panel_Transition)
+อัปเดตล่าสุด: 2026-10-30 (ID กล้องใหม่ Char1Cam ฯลฯ)
 
 ไฟล์นี้รวมทุกระบบในฉากเกมหลัก `New Drag Drop System` ไว้ที่เดียว แต่ละระบบบอก 4 เรื่อง:
 - หลักการทำงานแบบสั้น
@@ -131,7 +131,8 @@ PauseScene (โหลดซ้อน)        หน้า Pause / Setting
   - หมุนกล้องด้วยเมาส์ได้เฉพาะตอน AddIngredient ขณะ shaker ยังไม่เต็ม
   - Yarn กำกับภาพด้วย `Switch_Camera` / `Cut_Camera`
 - **Script หลัก:** `CameraManager` + `CameraController` บน `[GameLoop]` › `CamController`
-- **แก้เองได้:** Global Blend Time / Style และชื่อ shot (`Bar Shot` = MainCam, `Shaker Shot` = PrepareCam, `Garnish Shot` = GranishCam)
+- **แก้เองได้:** Global Blend Time / Style และชื่อ shot (`Bar Shot` = MainCam, `Shaker Shot` = PrepareCam, `Garnish Shot` = GarnishCam)
+  - เพิ่ม/แก้กล้อง: ใส่ `CameraEntry` บน virtual camera ใน prefab `Assets/[04]Prefab/GameSystemPrefab/CamController.prefab` ตั้ง `cameraId` (ID ห้ามซ้ำ ตั้งชื่อ GameObject ให้ตรงกัน) ID ตอนนี้: `MainCam`, `Char1Cam`, `Char2Cam`, `Char3Cam`, `Char12Cam`, `Char23Cam`, `WideCam`, `FrontCam`, `BackCam`, `PrepareCam`, `GarnishCam`, `SummaryCam` (ตารางความหมายใน `Docs/YarnCommands/Switch_Camera.md`)
 - **อ่านเพิ่ม:** `Docs/Bar410_WriterCommands_Plan.md`, `Docs/adr/0002*`
 
 ## 9. ตัวละคร (Characters)
@@ -145,7 +146,7 @@ PauseScene (โหลดซ้อน)        หน้า Pause / Setting
   - `TalkToCustomerManager` บน `NPCs_And_Set` เป็นคนสั่งตัวละครและเริ่มบท
 - **แก้เองได้:**
   - `Assets/[02]Script/NPC/CustomerData/<ชื่อ>.asset`: ชื่อ, สีชื่อ, รูปทุกสีหน้า, Look F/L/R, Use Legacy Visual
-  - `TalkToCustomerManager`: จุดยืน (Spots), เวลา fade
+  - `TalkToCustomerManager`: จุดยืน (Spots), เวลา fade, ท่าเดินตอน fade (`Walk Bob`: Height = ความสูงแต่ละก้าวเป็นเมตร, Steps = จำนวนก้าวต่อหนึ่ง fade, Height 0 = ไม่ขยับ), เสียงเข้า/ออกร้านของทุกตัวละคร (`Enter Sound Id` + `Enter Sound Lead` = เล่นก่อน fade เข้ากี่วินาที, `Exit Sound Id` + `Exit Sound Delay` = เล่นหลัง fade ออกจบกี่วินาที, ว่าง = เงียบ, ไม่เล่นตอน Skip/โหลด)
   - ปุ่ม Preview บน `CharacterView` ตอน edit mode
   - Yarn: `<<Isla Sad>>`, `<<Isla Look L>>`, `<<Isla Enter 2>>`, `<<Isla Exit>>`
 - **อ่านเพิ่ม:** `Docs/Bar410_CharacterPresentation_Plan.md`, `Docs/Bar410_LegacyCharacterVisual_Plan.md`, `Docs/YarnCommands/CharacterShortForm.md`
@@ -220,6 +221,21 @@ PauseScene (โหลดซ้อน)        หน้า Pause / Setting
 - **แก้เองได้:** ยังไม่แนะนำ รอ refactor
 
 ---
+
+## 16. ฉากร้านและแสง (Environment / Lighting) *2026-10-29*
+- **หลักการ:**
+  - ตัวร้านคือ prefab `BarInteriorV3` (instance ชื่อ `BarInteriorV2` ในฉาก) มีไฟผนัง `WallLight` ×7 และไฟเพดาน `CeilingLight` ×3 เป็นแบบ Baked
+  - แสง bake ลง lightmap ของฉากหลัก (`New Drag Drop System/Lightmap-*`, `LightingData.asset`) ใช้ค่าเดียวกับฉาก `BarInteriorV2.unity`
+  - ท้องฟ้าคือ Default-Skybox (Procedural) ดวงอาทิตย์คือ `Directional Light (BarInteriorV2)` (ความสว่าง 0 ใช้แค่ทิศของท้องฟ้า)
+  - ร้านเก่า `BarVer_3` ยังอยู่ในฉากแต่ถูกปิดไว้ (สลับกลับได้)
+  - ของที่ขยับได้ (ขวด/วัตถุดิบ, แก้ว, ตัวละคร) ไม่อยู่ใน lightmap จึงรับแสงที่ bake ผ่าน Light Probe `LightProbes_Bar` (184 จุด: ตารางทั้งห้องระยะ ~1 ม. + ถี่ 0.4 ม. รอบวัตถุดิบ) ถ้าไม่มี probe ของพวกนี้จะดำ
+- **อยู่ที่:** `New Drag Drop System` › `BarInteriorV2` (prefab `Assets/[04]Prefab/BarInteriorV3.prefab`), `Directional Light (BarInteriorV2)`, `BarVer_3` (ปิด), `LightProbes_Bar`
+- **แก้เองได้:**
+  - ตำแหน่งร้าน แล้วจัดกล้อง / จุดยืนลูกค้า (`TalkToCustomerManager` › Spots) / ขวดให้ตรงกับร้านใหม่
+  - Window › Rendering › Lighting: Skybox, Environment Lighting, Lighting Settings (ตอนนี้เป็นค่าเริ่มต้นของ Unity: Progressive GPU, Shadowmask, 40 texel, lightmap 1024)
+  - `LightProbes_Bar` › Edit Light Probes: เพิ่ม/ย้ายจุด ถ้าย้ายร้านหรือวัตถุดิบไปที่อื่น ให้ย้าย probe ตามด้วย
+  - **ย้ายร้านหรือไฟแล้วต้องกด Generate Lighting ใหม่** ไม่งั้นเงาและแสงที่ bake ไว้จะไม่ตรง
+- **HDRI เดิม:** `M_Skybox` (`HDR_WarmBar_1k`) ไม่ได้ใช้ในฉากหลักแล้ว ถ้าจะกลับไปใช้ ใส่ใน Lighting › Skybox Material แล้ว bake ใหม่
 
 ## ระบบที่ยังไม่มีหรือยังไม่ครบ
 - **Close (จบวัน):** ยังไม่มี UI

@@ -6,6 +6,8 @@
 
 **เดโมจริง 3 วัน:** `Assets/[06]Dialogue/YarnScript/Demo/DEMO_3Days.yarn` (เดิมคือ `Day1_Demo.yarn` + วัน 2-3 จากบทของทีม) ใช้โครงเดียวกับ playtest Start Node `D1_00_Start` / `D2_00_Start` / `D3_00_Start` อยู่ใน `DaySchedule_Demo.asset` (ตารางที่ `FlowWiring` ใช้ตอนนี้) ถ้าจะรัน playtest ให้เปลี่ยน Day Schedule ของ `FlowWiring` เป็น `DaySchedule_PlayTest`
 
+**อัดวิดีโอ:** `Assets/[06]Dialogue/YarnScript/Demo/VDO_Rec.yarn` เล่นเองทั้งหมด ตัวละคร 7 ตัวเข้าที่จุดเดียวกับเดโม 3 วัน กล้องโฟกัส แล้วโชว์ Neutral → สั่ง + จำลองชง → Happy → Sad จังหวะละประมาณ 5 วิ วิธีรัน: ที่ `[GameLoop]` › `FlowWiring` เปลี่ยน Day Schedule เป็น `DaySchedule_VDO` แล้ว Play และเปิด AutoPlay
+
 **ทดสอบทีละคำสั่ง:** `Assets/[06]Dialogue/YarnScript/Demo/TEST_AllCommands.yarn`
 เปิด `Assets/[02]Script/Day Schedule/DaySchedule_Demo.asset` แล้วเปลี่ยน Start Node ของแถว Day 1 เป็น `TEST_Start` แล้ว Play (Start Node ของ `DialogueRunner` ไม่ถูกใช้แล้วตั้งแต่มีตารางวัน) เลือกหัวข้อจากเมนู Hub ทุกบรรทัดขึ้นต้นด้วย `(TEST)` และบอกค่าที่ควรเห็น เปลี่ยนกลับเป็น `D1_NL_00_Start` เมื่อเสร็จ
 
@@ -58,7 +60,7 @@
 
 | ชื่อ | ประเภท | วิธีเขียน |
 |---|---|---|
-| [`Switch_Camera`](Switch_Camera.md) | Command | `<<Switch_Camera CamController CenterCam>>` |
+| [`Switch_Camera`](Switch_Camera.md) | Command | `<<Switch_Camera CamController Char2Cam>>` |
 | [`Cut_Camera`](Cut_Camera.md) | Command | `<<Cut_Camera CamController MainCam>>` |
 
 ## หลังบ้านทำให้เอง (ไม่ต้องเขียน)
@@ -71,7 +73,7 @@
 | 1 Talking | fix กล้อง + ล็อควัตถุดิบ (ช็อตที่ writer ตั้งไว้ไม่ถูกแตะ) |
 | 2.1 เลือกวัตถุดิบ | MainCam + หมุนกล้องด้วยเมาส์ได้ + ปลดล็อควัตถุดิบ (เฉพาะขณะ shaker ยังไม่เต็ม) |
 | shaker เต็ม / มินิเกม 2.2 | PrepareCam + fix |
-| 3 Garnish | GranishCam + fix + ล็อควัตถุดิบ |
+| 3 Garnish | GarnishCam + fix + ล็อควัตถุดิบ |
 | เสิร์ฟเสร็จ | กลับ MainCam + ล็อควัตถุดิบ |
 
 ## ลูกค้า (`TalkToCustomerManager`)
