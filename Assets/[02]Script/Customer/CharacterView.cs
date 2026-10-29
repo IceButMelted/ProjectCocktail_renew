@@ -32,6 +32,16 @@ public struct WalkBob
     [Min(0)] public int Steps;
 }
 
+/// <summary>A slow, small up-and-down while a character stands at a spot (breathing). Default = still.</summary>
+[System.Serializable]
+public struct IdleBob
+{
+    [Tooltip("Height of the movement in metres. 0 = still.")]
+    [Min(0f)] public float Height;
+    [Tooltip("Up-and-down cycles per second.")]
+    [Min(0f)] public float Frequency;
+}
+
 public class CharacterView : MonoBehaviour
 {
     [SerializeField, Required] private SO_Customer _data;
@@ -50,12 +60,41 @@ public class CharacterView : MonoBehaviour
     public bool LegacyShowsLook { get; private set; }
     /// <summary>Index into the manager's spots while present, otherwise the last one used.</summary>
     public int Spot { get; set; }
+    /// <summary>Movement while standing at a spot. Set by TalkToCustomerManager for every character.</summary>
+    public IdleBob Idle { get; set; }
+
+    // Idle movement: where the character stands, and since when (so it starts at 0, right where the fade in ends).
+    private bool _idling;
+    private Vector3 _standing;
+    private float _idleSince;
 
     private void Awake()
     {
         // The scene is authored with everyone visible; at runtime they start outside the shop.
         Apply();
         SetTint(0f);
+    }
+
+    private void Update()
+    {
+        if (!_idling) return;
+        float t = (Time.time - _idleSince) * Idle.Frequency * 2f * Mathf.PI;
+        transform.position = _standing + Vector3.up * (Idle.Height * Mathf.Sin(t));
+    }
+
+    private void StartIdle()
+    {
+        _standing = transform.position;
+        _idleSince = Time.time;
+        _idling = true;
+    }
+
+    /// <summary>Puts the character back on its standing position and stops the idle movement.</summary>
+    private void StopIdle()
+    {
+        if (!_idling) return;
+        transform.position = _standing;
+        _idling = false;
     }
 
     // ── Look ───────────────────────────────────────────────
@@ -124,11 +163,13 @@ public class CharacterView : MonoBehaviour
     {
         IsPresent = true;
         SetTint(1f);
+        StartIdle();
     }
 
     /// <summary>Takes the character out of the shop at once, without a fade.</summary>
     public void HideInstant()
     {
+        StopIdle();
         IsPresent = false;
         SetTint(0f);
     }
@@ -150,6 +191,7 @@ public class CharacterView : MonoBehaviour
 
     private IEnumerator Fade(float from, float to, float duration, WalkBob bob)
     {
+        StopIdle(); // back on the spot itself before the walk starts from it
         SetTint(from);
         Vector3 standing = transform.position;
         if (duration > 0f)
@@ -166,6 +208,7 @@ public class CharacterView : MonoBehaviour
         transform.position = standing;
         SetTint(to);
         IsPresent = to > 0f;
+        if (IsPresent) StartIdle(); // carries on from the fade in, starting at 0
     }
 
     /// <summary>0 = invisible, 0.5 = solid black, 1 = normal colours.</summary>

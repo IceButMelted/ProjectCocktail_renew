@@ -82,6 +82,8 @@ public partial class TalkToCustomerManager : MonoBehaviour
             else
                 _byName[view.Name] = view;
         }
+
+        ApplyIdleBob();
     }
 
     private void OnDestroy()

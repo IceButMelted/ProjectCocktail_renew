@@ -30,6 +30,21 @@ public partial class TalkToCustomerManager
     [Tooltip("Small up-and-down steps during every fade in and out, as if walking. Height 0 = no motion.")]
     [SerializeField] private WalkBob _walkBob = new WalkBob { Height = 0.03f, Steps = 2 };
 
+    [Tooltip("Slow, small up-and-down while a character stands at a spot, carrying on from the fade in. " +
+             "Keep it smaller and slower than Walk Bob. Height 0 = still. Editable during Play.")]
+    [SerializeField] private IdleBob _idleBob = new IdleBob { Height = 0.008f, Frequency = 0.4f };
+
+    private void ApplyIdleBob()
+    {
+        foreach (var view in _byName.Values) view.Idle = _idleBob;
+    }
+
+    // Lets the idle movement be tuned live in the Inspector during Play.
+    private void OnValidate()
+    {
+        if (Application.isPlaying) ApplyIdleBob();
+    }
+
     [Tooltip("SFX Sound ID (SoundManager) played when a character comes into the shop. Empty = silent.")]
     [SerializeField] private string _enterSoundId;
 
