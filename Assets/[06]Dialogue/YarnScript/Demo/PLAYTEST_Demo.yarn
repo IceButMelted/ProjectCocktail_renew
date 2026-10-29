@@ -42,8 +42,9 @@ title: PT_D1_Start
 //
 // Camera and bar lock are the flow's job (the day opens on MainCam, mouse look only
 // while picking ingredients, back to MainCam after serving). Writers only use
-// Switch_Camera / Cut_Camera to direct a shot. Camera ids: MainCam, CenterCam,
-// NearLeftCam, NearRightCam, FarLeftCam, FarRightCam, BackCam, SummaryCam.
+// Switch_Camera / Cut_Camera to direct a shot. Camera ids: MainCam (the bar),
+// Char1Cam / Char2Cam / Char3Cam (one customer), Char12Cam / Char23Cam (two side by
+// side), WideCam (everyone), FrontCam / BackCam, SummaryCam.
 // Customer numbers (Order_Cocktail_OutName): Cole 1, Owen 2, Walter 3, Faye 4,
 // Isla 5, Claire 6, Eliana 7, Arthur 8. Standing spots: 0-3.
 // ================================================================
@@ -114,7 +115,7 @@ title: PT_D1_Isla
 ---
 // ── Customer 1: a named order ───────────────────────
 <<Isla Enter 1>>
-<<Switch_Camera CamController CenterCam>>
+<<Switch_Camera CamController Char2Cam>>
 <<Isla Happy>>
 Isla: [wave]Evening! Is this place open?[/wave]
 Player: Just opened. You're my very first customer.
@@ -153,7 +154,7 @@ title: PT_D1_Cole
 ---
 // ── Customer 2: an order by flavour (description only, no name) ──
 <<Cole Enter 2>>
-<<Switch_Camera CamController NearRightCam>>
+<<Switch_Camera CamController Char23Cam>>
 <<Cole Neutral>>
 Cole: Long shift at the mill. I don't know drink names.
 <<Cole Sad>>
@@ -273,7 +274,7 @@ title: PT_D2_Owen
 ---
 // ── Customer 2: an order by type (any drink of that type counts) ──
 <<Owen Enter 3>>
-<<Switch_Camera CamController NearRightCam>>
+<<Switch_Camera CamController Char23Cam>>
 <<Owen Happy>>
 Owen: [bounce]Hey hey! Walter, you old fox, you found the new place first![/bounce]
 <<Walter Look R>>
@@ -395,7 +396,7 @@ title: PT_D3_Arthur
 ---
 // ── Customer 2: random order, every Arthur expression ──
 <<Arthur Enter 2>>
-<<Switch_Camera CamController CenterCam>>
+<<Switch_Camera CamController Char2Cam>>
 <<Arthur Neutral>>
 Arthur: So you're the one who reopened this place.
 <<Arthur NeutralLeft>>

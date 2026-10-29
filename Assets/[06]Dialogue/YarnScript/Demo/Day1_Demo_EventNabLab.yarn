@@ -19,7 +19,7 @@ title: D1_NL_01_Isla_Arrive
 <<wait 2>>
 
 <<Isla Enter 2>>
-<<Switch_Camera CamController CenterCam>>
+<<Switch_Camera CamController Char2Cam>>
 <<Isla Happy>>
 
 Isla: [wave]Good evening.[/wave]
@@ -74,7 +74,7 @@ Player: Got it.
 <<wait_for_task SystemGame>>
 
 //After Isla's order
-<<Switch_Camera CamController CenterCam>>
+<<Switch_Camera CamController Char2Cam>>
 
 <<if $satisfaction == Satisfaction.Perfect>>
     <<Isla Happy>>
@@ -121,7 +121,7 @@ title: D1_NL_04_Owen_Arrive
 <<Switch_Camera CamController "MainCam">>
 
 <<Owen Enter 3>>
-<<Switch_Camera CamController NearRightCam>>
+<<Switch_Camera CamController Char23Cam>>
 <<Owen Happy>>
 
 Owen: [bounce a=3]Hey! hey!! Owen here![/bounce]
@@ -182,7 +182,7 @@ Player: One moment.
 <<wait_for_task SystemGame>>
 
 //After Owen's order
-<<Switch_Camera CamController FarRightCam>>
+<<Switch_Camera CamController Char3Cam>>
 
 <<if $satisfaction == Satisfaction.Perfect>>
     <<Owen Happy>>
@@ -226,7 +226,7 @@ Owen: You got closer than Isla ever did.
 Owen: First time we met, she thought I was homeless.
 <<Isla Look R>>
 
-<<Switch_Camera CamController NearRightCam>>
+<<Switch_Camera CamController Char23Cam>>
 
 Isla: [shake a=2]It's because you were climbing a tree behind my dorm![/shake]
 Isla: And you looked all scruffy.
@@ -304,7 +304,7 @@ Player: Coming right up.
 <<wait_for_task SystemGame>>
 
 //After Owen's second order
-<<Switch_Camera CamController FarRightCam>>
+<<Switch_Camera CamController Char3Cam>>
 
 <<if $satisfaction == Satisfaction.Perfect>>
     <<Owen Happy>>

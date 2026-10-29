@@ -224,8 +224,8 @@ Player: (TEST) Hub. flow_phase = {flow_phase()}, flow_step = {flow_step()}
 title: TEST_Camera
 ---
 // Static commands: the first word (CamController) is ignored.
-<<Switch_Camera CamController CenterCam>>
-Player: (TEST) Switch_Camera CenterCam (blend).
+<<Switch_Camera CamController Char2Cam>>
+Player: (TEST) Switch_Camera Char2Cam (blend).
 <<Cut_Camera CamController MainCam>>
 Player: (TEST) Cut_Camera MainCam (no blend).
 <<jump TEST_Hub>>

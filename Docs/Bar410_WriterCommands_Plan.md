@@ -21,7 +21,7 @@ Writer เขียนแค่ว่าตอนนี้อยู่ช่ว�
 | `<<flow_before_open_bar>>` | **ไม่ต้องมี** BeforeOpen เริ่มเองตอนต้นวันอยู่แล้ว (หลัง `Panel_Transition` หรือหลัง `<<flow_next_day>>`) |
 | คำสั่งเดิม `Enable_InteractableObject` / `Fix_Camera` / `Reset_Camera` | **ลบคำสั่งทิ้ง** ทั้งจากโค้ดและจาก yarn |
 | `<<Reset_Camera CamController>>` โดยเฉพาะ | **ลบ** การหันกล้องกลับหน้าตรงเป็นงานของหลังบ้านทั้งหมด: เริ่มวัน (`OnBeforeOpenEntered` → `ResetLook`), เข้า Prepare (`ResetLook` ที่มีอยู่), ออกจาก Prepare (`SetLookFixed(true)` หันหน้าตรงเอง) จึงไม่มีจุดไหนที่ writer ต้องสั่ง |
-| `Switch_Camera` / `Cut_Camera` | **เก็บไว้** เป็นเครื่องมือกำกับภาพของ writer (CenterCam, NearLeftCam ฯลฯ) ลบเฉพาะบรรทัดตั้งกล้องตอนเริ่มวัน |
+| `Switch_Camera` / `Cut_Camera` | **เก็บไว้** เป็นเครื่องมือกำกับภาพของ writer (Char2Cam, Char12Cam ฯลฯ) ลบเฉพาะบรรทัดตั้งกล้องตอนเริ่มวัน |
 
 ## สภาพตอนนี้ (สำรวจแล้ว)
 หลังบ้านทำส่วนใหญ่อยู่แล้ว บรรทัดใน yarn จึงซ้ำ:
@@ -93,7 +93,7 @@ Writer เขียนแค่ว่าตอนนี้อยู่ช่ว�
    - `CocktailSystemManager.YarnTask.cs`: ลบ `Yarn_EnableInteractable` (รวม attribute และ doc comment) แก้ header comment ของไฟล์ (บรรทัด 4–7 ที่พูดถึง `<<Enable_InteractableObject ...>>`) **เก็บ** `EnableButtonInYarn` ไว้ เพราะ `CanEndShift` และ `CommitTaskResult` ยังใช้
 2. yarn ทุกไฟล์ใน `Assets/[06]Dialogue/YarnScript/Demo/` (มีแค่ไฟล์ในโฟลเดอร์นี้ที่อยู่ใน `Bar_410Demo.yarnproject`)
    - ลบทุกบรรทัด `<<Enable_InteractableObject ...>>`, `<<Fix_Camera ...>>`, `<<Reset_Camera ...>>`
-   - ลบ `<<Cut_Camera ... MainCam>>` / `<<Switch_Camera ... MainCam>>` / `<<Switch_Camera ... "MainCam">>` **เฉพาะ** ที่อยู่ในบล็อกตั้งกล้องตอนต้น node เริ่มวัน (ก่อนบรรทัดพูดแรก) และที่อยู่ติดกับ `wait_for_task` ซึ่งหลังบ้านทำแทนแล้ว ส่วน `Switch_Camera` อื่นๆ (CenterCam, Near*, FarRightCam, SummaryCam และ MainCam กลางเรื่อง) เป็นการกำกับภาพ **ห้ามลบ**
+   - ลบ `<<Cut_Camera ... MainCam>>` / `<<Switch_Camera ... MainCam>>` / `<<Switch_Camera ... "MainCam">>` **เฉพาะ** ที่อยู่ในบล็อกตั้งกล้องตอนต้น node เริ่มวัน (ก่อนบรรทัดพูดแรก) และที่อยู่ติดกับ `wait_for_task` ซึ่งหลังบ้านทำแทนแล้ว ส่วน `Switch_Camera` อื่นๆ (Char2Cam, Near*, Char3Cam, SummaryCam และ MainCam กลางเรื่อง) เป็นการกำกับภาพ **ห้ามลบ**
    - ไฟล์และจุดที่เจอ (ตรวจซ้ำด้วย grep ก่อนแก้):
      - `Day1_Demo_EventNabLab.yarn`: `D1_NL_00_Start` บรรทัดตั้งกล้อง 4 บรรทัดแรก และบล็อกก่อน/หลัง `wait_for_task` 3 จุด (Isla, Owen, Owen ครั้งที่สอง)
      - `Day1_Demo.yarn` (ใน `Demo/`): แบบเดียวกัน
@@ -108,7 +108,7 @@ Writer เขียนแค่ว่าตอนนี้อยู่ช่ว�
    - หลังแก้: `grep -rnE "Enable_InteractableObject|Fix_Camera|Reset_Camera" "Assets/[06]Dialogue/YarnScript/Demo" "Assets/[02]Script"` ต้องไม่เจออะไร (ยกเว้น comment ที่ตั้งใจเขียน)
 3. Docs
    - ลบ `Docs/YarnCommands/Enable_InteractableObject.md`, `Fix_Camera.md`, `Reset_Camera.md`
-   - `Docs/YarnCommands/README.md`: ลบสามแถวออกจากตาราง และเพิ่มหัวข้อสั้นๆ **"หลังบ้านทำให้เอง (ไม่ต้องเขียน)"** เป็นตารางตาม Phase: เริ่มวัน → ตัด MainCam + fix + ล็อคบาร์ / Talking → fix + ล็อค / เลือกวัตถุดิบ → MainCam + หมุนได้ / shaker เต็ม + มินิเกม → PrepareCam + fix / Garnish → GranishCam + fix / เสิร์ฟเสร็จ → MainCam + ล็อค
+   - `Docs/YarnCommands/README.md`: ลบสามแถวออกจากตาราง และเพิ่มหัวข้อสั้นๆ **"หลังบ้านทำให้เอง (ไม่ต้องเขียน)"** เป็นตารางตาม Phase: เริ่มวัน → ตัด MainCam + fix + ล็อคบาร์ / Talking → fix + ล็อค / เลือกวัตถุดิบ → MainCam + หมุนได้ / shaker เต็ม + มินิเกม → PrepareCam + fix / Garnish → GarnishCam + fix / เสิร์ฟเสร็จ → MainCam + ล็อค
    - `Switch_Camera.md` / `Cut_Camera.md`: หมายเหตุว่าเริ่มวันและหลังเสิร์ฟกล้องกลับ MainCam เอง
    - เอกสารเก่าใน `Docs/` (refactor plans, `Docs/baseline/`) เป็นประวัติ **ไม่ต้องแก้**
 4. `ProjectSettings/Packages/dev.yarnspinner/Assembly-CSharp-generated.ysls.json` จะสร้างใหม่เองหลัง compile ตรวจว่าไม่มีสามคำสั่งนี้แล้ว
@@ -124,13 +124,13 @@ Writer เขียนแค่ว่าตอนนี้อยู่ช่ว�
 |---|---|---|---|
 | หลัง transition (ต้นวัน 1) | MainCam | true | ล็อค |
 | `flow_check_events` กลางบท | ไม่เปลี่ยนจากที่ writer ตั้ง | true | ล็อค |
-| Talking (หลัง `flow_open_bar`) | ช็อตของ writer (CenterCam) | true | ล็อค |
+| Talking (หลัง `flow_open_bar`) | ช็อตของ writer (Char2Cam) | true | ล็อค |
 | `flow_prepare_drinks` → AddIngredient | MainCam | **false** | ใช้ได้ |
 | shaker เต็ม (ช็อต shaker) | PrepareCam | true | ล็อค |
 | มินิเกม 2.2 | PrepareCam | true | – |
 | ยกเลิกมินิเกมกลับ 2.1 (shaker ยังเต็ม) | PrepareCam | true | – |
 | Reset ใน Method panel | MainCam | false | ใช้ได้ |
-| Garnish | GranishCam | true | ล็อค |
+| Garnish | GarnishCam | true | ล็อค |
 | เสิร์ฟ → Talking (ก่อน yarn สั่งบรรทัดถัดไป) | MainCam | true | ล็อค |
 | ต้นวัน 2 | MainCam (cut) | true | ล็อค |
 
@@ -165,20 +165,20 @@ Writer เขียนแค่ว่าตอนนี้อยู่ช่ว�
 | จุด | กล้อง | fix | วัตถุดิบ (bottle เปิด/ทั้งหมด) | ผล |
 |---|---|---|---|---|
 | หลัง transition (ต้นวัน 1) | MainCam | true | 0/11 | ผ่าน |
-| `flow_check_events` กลางบท (writer ตั้ง CenterCam ก่อน) | CenterCam | true | 0/11 | ผ่าน |
-| Talking หลัง `flow_open_bar` (Isla, CenterCam) | CenterCam | true | 0/11 | ผ่าน |
-| `wait_for_task` ตอนอยู่ Talking | CenterCam | true | 0/11 | ผ่าน ไม่ปลดล็อค |
+| `flow_check_events` กลางบท (writer ตั้ง Char2Cam ก่อน) | Char2Cam | true | 0/11 | ผ่าน |
+| Talking หลัง `flow_open_bar` (Isla, Char2Cam) | Char2Cam | true | 0/11 | ผ่าน |
+| `wait_for_task` ตอนอยู่ Talking | Char2Cam | true | 0/11 | ผ่าน ไม่ปลดล็อค |
 | `flow_prepare_drinks` → AddIngredient | MainCam | false | 11/11 | ผ่าน |
 | ใส่ 1 หน่วย (ยังมีที่ว่าง) | MainCam | false | – | ผ่าน |
 | shaker เต็ม | PrepareCam | true | 0/11 | ผ่าน |
 | มินิเกม 2.2 | PrepareCam | true | – | ผ่าน |
 | ยกเลิกมินิเกมกลับ 2.1 (shaker ยังเต็ม) | PrepareCam | true | – | ผ่าน |
 | Reset ใน Method panel | MainCam | false | 11/11 | ผ่าน |
-| Garnish | GranishCam | true | 0/11 | ผ่าน |
+| Garnish | GarnishCam | true | 0/11 | ผ่าน |
 | remake จาก Garnish | MainCam | false | 11/11 | ผ่าน |
 | เสิร์ฟ → Talking | MainCam | true | 0/11 | ผ่าน |
 | ต้นวัน 2 | MainCam | true | 0/11 | ผ่าน |
-| Close → BeforeOpen (ตั้ง CenterCam + ปลด fix ก่อน) | MainCam | true | – | ผ่าน (cut ทำงานจริง) |
+| Close → BeforeOpen (ตั้ง Char2Cam + ปลด fix ก่อน) | MainCam | true | – | ผ่าน (cut ทำงานจริง) |
 
 - `DaySchedule_Demo` (วันจริง `D1_NL_00_Start`) เล่นจนถึง `wait_for_task` ของ Isla แล้วเสิร์ฟ ไม่มี error ใหม่
 - ข้อสังเกต: การเปลี่ยนวันตอนทดสอบ cut ใช้ `GameFlowCommands.NextDay()` ตรงๆ จึงมี Error "DaySchedule_PlayTest has no row for day 3" (คาดไว้ ไม่เกี่ยวกับงานนี้)

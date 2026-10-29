@@ -40,7 +40,7 @@ public class CameraManager : MonoBehaviour
     [Header("Shots the game flow asks for (CameraEntry ids)")]
     [SerializeField] private string _barShot = "MainCam";
     [SerializeField] private string _shakerShot = "PrepareCam";
-    [SerializeField] private string _garnishShot = "GranishCam";
+    [SerializeField] private string _garnishShot = "GarnishCam";
 
     [Header("Debug")]
     [SerializeField] private bool logTransitions = true;

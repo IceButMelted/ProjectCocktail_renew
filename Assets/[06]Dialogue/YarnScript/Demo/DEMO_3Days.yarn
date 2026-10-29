@@ -60,7 +60,7 @@ title: D1_00_Start
 title: D1_01_Walter_Arrive
 ---
 <<Walter Enter 1>>
-<<Switch_Camera CamController NearLeftCam>>
+<<Switch_Camera CamController Char1Cam>>
 <<Walter Happy>>
 
 
@@ -106,7 +106,7 @@ Player: Coming right up. #line:19
 <<wait_for_task SystemGame>>
 
 //After Walter's order
-<<Switch_Camera CamController NearLeftCam>>
+<<Switch_Camera CamController Char1Cam>>
 
 <<if $satisfaction == Satisfaction.Perfect>>
     <<Walter Happy>>
@@ -156,7 +156,7 @@ title: D1_04_Isla_Arrive
 
 
 <<Isla Enter 2>>
-<<Switch_Camera CamController NearLeftCam>>
+<<Switch_Camera CamController Char12Cam>>
 <<Walter Happy>>
 <<Isla Happy>>
 
@@ -221,7 +221,7 @@ Player: Got it. #line:4D
 <<wait_for_task SystemGame>>
 
 //After Isla's order
-<<Switch_Camera CamController CenterCam>>
+<<Switch_Camera CamController Char2Cam>>
 
 <<if $satisfaction == Satisfaction.Perfect>>
     <<Isla Happy>>
@@ -271,7 +271,7 @@ title: D1_07_Owen_Arrive
 
 
 <<Owen Enter 3>>
-<<Switch_Camera CamController CenterCam>>
+<<Switch_Camera CamController Char23Cam>>
 <<Walter Happy>>
 <<Owen Happy>>
 
@@ -282,6 +282,7 @@ Isla: [wiggle]Ugh keep your voice down Owen.[/wiggle] #line:5E
 Owen: My bad, Isla. Nice to see you. #line:5F
 Owen: Oh and good evening Mr. Walter. How's your back? #line:60
 <<Walter Look R>>
+<<Switch_Camera CamController WideCam>>
 Walter: Isla already asked. I'm fine, Owen. #line:61
 <<Walter Neutral>>
 <<Isla Neutral>>
@@ -332,7 +333,7 @@ Player: One moment. #line:7A
 <<wait_for_task SystemGame>>
 
 //After Owen's order
-<<Switch_Camera CamController CenterCam>>
+<<Switch_Camera CamController Char2Cam>>
 
 <<if $satisfaction == Satisfaction.Perfect>>
     <<Owen Happy>>
@@ -356,6 +357,7 @@ Player: One moment. #line:7A
 
 title: D1_09_Owen_Talk
 ---
+<<Switch_Camera CamController Char3Cam>>
 Owen: Anyway. #line:80
 Owen: I didn't tell you what I do for a living, did I? #line:81
 Owen: Guess what I do for a living. #line:82
@@ -371,6 +373,7 @@ Owen: The hint is nature. #line:83
 
 Owen: I'm a forest ranger. #line:8C
 Owen: I take care of the forests and the wildlife. #line:8D
+<<Switch_Camera CamController WideCam>>
 <<Owen Look L>>
 Owen: You got closer than Isla ever did. #line:8E
 Owen: First time we met, she thought I was homeless. #line:8F
@@ -423,6 +426,7 @@ Owen: [wiggle]Take care, old man.[/wiggle] #line:A6
 title: D1_11_Bar_Talk
 ---
 //After Walter leave
+<<Switch_Camera CamController Char23Cam>>
 <<Isla Look F>>
 Isla: Hey, Mr. Bartender. #line:A7
 Player: Yes. #line:A8
@@ -493,6 +497,7 @@ title: D1_13_Owen_Talk_Outro
 position: 307,317
 ---
 //After isla leave
+<<Switch_Camera CamController Char3Cam>>
 <<Owen Neutral>>
 Owen: [fade]...[/fade] #line:D1
 Owen: It's become a lot quieter. #line:D2
@@ -536,8 +541,9 @@ title: D1_15_Close
 <<flow_close_bar>>
 <<Switch_Camera CamController "MainCam">>
 <<Panel_FadeOut Panel_Transition>>
-<<wait_scene 1>>
-<<Panel_FadeIn Panel_Transition>>
+Player: Another good day. 
+<<wait_scene 3>>
+
 // $day becomes 2. D2_00_Start begins when this dialogue ends.
 <<flow_next_day>>
 ===
@@ -549,6 +555,7 @@ title: D1_15_Close
 
 title: D2_00_Start
 ---
+<<Panel_FadeIn Panel_Transition>>
 <<eventlog_clear>>
 <<flow_open_bar>>
 <<jump D2_01_Walter_Sit>>
@@ -558,7 +565,7 @@ title: D2_01_Walter_Sit
 ---
 // Bar is empty. Walter enters and sits down.
 <<Walter Enter 1>>
-<<Switch_Camera CamController NearLeftCam>>
+<<Switch_Camera CamController Char1Cam>>
 <<Walter Neutral>>
 Walter: Evening.
 <<Walter Happy>>
@@ -596,7 +603,7 @@ title: D2_02_Walter_Order
 ---
 <<flow_prepare_drinks>>
 <<wait_for_task SystemGame>>
-<<Switch_Camera CamController NearLeftCam>>
+<<Switch_Camera CamController Char12Cam>>
 
 <<if $satisfaction == Satisfaction.Perfect>>
     <<Walter Happy>>
@@ -616,22 +623,25 @@ title: D2_02_Walter_Order
 title: D2_03_Cole_Eliana_Arrive
 ---
 // Cole and Eliana enter together.
-<<Switch_Camera CamController "MainCam">>
+<<Switch_Camera CamController Char1Cam>>
 <<Cole Enter 2>>
-<<Eliana Enter 3>>
-<<Switch_Camera CamController CenterCam>>
+<<Switch_Camera CamController Char12Cam>>
+
 <<Walter Look R>>
 <<Walter Happy>>
 Walter: Cole! Didn't expect you tonight.
 Walter: What brings you here?
 <<Cole Neutral>>
 Cole: Long shift. Needed somewhere quiet.
+<<Switch_Camera CamController WideCam>>
+<<Eliana Enter 3>>
 Walter: And Eliana too. Small town, smaller bar.
 <<Eliana Happy>>
 Eliana: Guilty.
 <<Walter Neutral>>
 <<Walter Look F>>
 
+<<Switch_Camera CamController Char2Cam>>
 Cole: (Looks you over for a beat, then gives a small nod.)
 
 -> Good evening
@@ -647,6 +657,7 @@ Cole: (Looks you over for a beat, then gives a small nod.)
     Player: Good evening. What can I get started for you?
     Cole: Straight to business. I can respect that.
 
+<<Switch_Camera CamController Char23Cam>>
 <<Eliana Look L>>
 Eliana: Don't mind him. He does that with everyone new.
 <<Cole Look R>>
@@ -664,6 +675,7 @@ Player: Nice to meet you both. Rough day?
 <<Eliana Disappointed>>
 Eliana: You have no idea.
 Cole: Same, actually.
+<<Switch_Camera CamController WideCam>>
 <<Walter Happy>>
 Walter: Well, you're both in the right place then.
 <<Walter Neutral>>
@@ -680,7 +692,7 @@ Player: Got it.
 
 <<flow_prepare_drinks>>
 <<wait_for_task SystemGame>>
-<<Switch_Camera CamController CenterCam>>
+<<Switch_Camera CamController Char2Cam>>
 
 <<if $satisfaction == Satisfaction.Perfect>>
     <<Cole Happy>>
@@ -710,7 +722,7 @@ Player: I'll see what I can do.
 
 <<flow_prepare_drinks>>
 <<wait_for_task SystemGame>>
-<<Switch_Camera CamController CenterCam>>
+<<Switch_Camera CamController Char2Cam>>
 
 <<if $satisfaction == Satisfaction.Perfect>>
     <<Eliana Happy>>
@@ -957,7 +969,7 @@ title: D3_01_Faye_Arrive
 ---
 // Bar is empty. Faye enters.
 <<Faye Enter 1>>
-<<Switch_Camera CamController NearLeftCam>>
+<<Switch_Camera CamController Char12Cam>>
 <<Faye Neutral>>
 Faye: Evening.
 Player: Good evening. Welcome in.
@@ -1027,7 +1039,7 @@ Player: Coming right up.
 
 <<flow_prepare_drinks>>
 <<wait_for_task SystemGame>>
-<<Switch_Camera CamController NearLeftCam>>
+<<Switch_Camera CamController Char12Cam>>
 
 <<if $satisfaction == Satisfaction.Perfect>>
     <<Faye Happy>>
@@ -1053,7 +1065,7 @@ Player: Coming right up.
 
 <<flow_prepare_drinks>>
 <<wait_for_task SystemGame>>
-<<Switch_Camera CamController NearLeftCam>>
+<<Switch_Camera CamController Char12Cam>>
 
 <<if $satisfaction == Satisfaction.Perfect>>
     <<Isla Happy>>
@@ -1132,7 +1144,7 @@ title: D3_06_Arthur_Arrive
 ---
 // Arthur enters.
 <<Arthur Enter 3>>
-<<Switch_Camera CamController CenterCam>>
+<<Switch_Camera CamController Char2Cam>>
 <<Arthur Neutral>>
 Arthur: Huh. So this is the new spot everyone's talking about.
 <<Isla Look R>>
@@ -1211,7 +1223,7 @@ Player: (You start on the drink.)
 
 <<flow_prepare_drinks>>
 <<wait_for_task SystemGame>>
-<<Switch_Camera CamController CenterCam>>
+<<Switch_Camera CamController Char2Cam>>
 
 <<if $satisfaction == Satisfaction.Perfect>>
     Arthur: Huh. Actually good. Wasn't expecting that.
@@ -1293,7 +1305,7 @@ title: D3_11_Owen_Arrive
 // Owen enters (Isla's seat). Faye leaves after.
 <<Switch_Camera CamController "MainCam">>
 <<Owen Enter 2>>
-<<Switch_Camera CamController CenterCam>>
+<<Switch_Camera CamController Char2Cam>>
 <<Owen Happy>>
 Owen: [bounce]Hey hey! Anyone still serving around here or- oh. Hey, Faye![/bounce]
 Faye: Owen.
@@ -1349,7 +1361,7 @@ Player: Coming up.
 
 <<flow_prepare_drinks>>
 <<wait_for_task SystemGame>>
-<<Switch_Camera CamController CenterCam>>
+<<Switch_Camera CamController Char2Cam>>
 
 <<if $satisfaction == Satisfaction.Perfect>>
     <<Owen Happy1>>
