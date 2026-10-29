@@ -34,6 +34,18 @@ public class IngredientButtonUI : MonoBehaviour
              "Anything else may leave it empty and will find the scene's one on first use.")]
     [SerializeField] private ShakerContents _shaker;
 
+    /// <summary>
+    /// Enum name of the ingredient this button pours (the key IngredientUnlocks uses), or null
+    /// for Ice / Method / Reset buttons.
+    /// </summary>
+    public string IngredientKey => _action switch
+    {
+        ButtonAction.AddAlcohol => _alcohol.ToString(),
+        ButtonAction.AddLiqueur => _liqueur.ToString(),
+        ButtonAction.AddMixer => _mixer.ToString(),
+        _ => null,
+    };
+
     /// <summary>Hands the button the shaker it pours into, so it never has to search for it.</summary>
     public void Bind(ShakerContents shaker)
     {

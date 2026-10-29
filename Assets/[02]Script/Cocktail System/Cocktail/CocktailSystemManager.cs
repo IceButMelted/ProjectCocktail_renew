@@ -39,6 +39,10 @@ public partial class CocktailSystemManager : MonoBehaviour
     // through UsePreferences and only passes it on to the order service.
     private ICustomerPreferences _preferences;
 
+    // Whether the player can make a recipe right now (has all its ingredients). Handed in by
+    // FlowWiring (UseRecipeFilter); null = every recipe. Random orders pick only makeable recipes.
+    private Func<S_Drink, bool> _canMake;
+
     // ── Repositories (as interfaces) ───────────────────────
 
     /// <summary>Everything searchable by name — normal + special (plan §4.7).</summary>
@@ -84,7 +88,7 @@ public partial class CocktailSystemManager : MonoBehaviour
         if (_allDrinks == null || _allDrinks.Count == 0)
             Debug.LogError("[CocktailSystemManager] No cocktail recipes loaded — assign a Cocktail Repository.", this);
 
-        Orders = new OrderService(_lookup, _randomPool, _preferences);
+        Orders = new OrderService(_lookup, _randomPool, _preferences, _canMake);
         Scoring = new DrinkScoringService(_lookup);
 
         // The bottles pour into the shaker this manager owns; hand it over once here instead of
@@ -99,7 +103,17 @@ public partial class CocktailSystemManager : MonoBehaviour
     public void UsePreferences(ICustomerPreferences preferences)
     {
         _preferences = preferences;
-        if (_lookup != null) Orders = new OrderService(_lookup, _randomPool, _preferences);
+        if (_lookup != null) Orders = new OrderService(_lookup, _randomPool, _preferences, _canMake);
+    }
+
+    /// <summary>
+    /// Hands over the rule for which recipes the player can make now. Random orders pick only
+    /// those; a named order is placed anyway (with a warning). Safe to call before or after Awake.
+    /// </summary>
+    public void UseRecipeFilter(Func<S_Drink, bool> canMake)
+    {
+        _canMake = canMake;
+        if (_lookup != null) Orders = new OrderService(_lookup, _randomPool, _preferences, _canMake);
     }
 
     /// <summary>
@@ -138,7 +152,7 @@ public partial class CocktailSystemManager : MonoBehaviour
     /// <summary>Picks a uniformly random cocktail as the current target.</summary>
     public S_Drink RandomCocktail()
     {
-        var drink = _randomPool != null ? _randomPool.GetRandom() : null;
+        var drink = Orders?.PickRandom();
         if (drink != null)
             Order.BeginOrder(Order.Customer, OrderMode.RandomByPreferenceName, drink, AlcoholClassifier.Resolve(drink));
 
@@ -148,7 +162,7 @@ public partial class CocktailSystemManager : MonoBehaviour
     /// <summary>Picks a random cocktail of a specific type as the current target.</summary>
     public S_Drink RandomCocktail(TypeOfCocktail type)
     {
-        var drink = _randomPool != null ? _randomPool.GetRandom(type) : null;
+        var drink = Orders?.PickRandom(type);
         if (drink != null)
             Order.BeginOrder(Order.Customer, OrderMode.RandomByPreferenceName, drink, AlcoholClassifier.Resolve(drink));
 

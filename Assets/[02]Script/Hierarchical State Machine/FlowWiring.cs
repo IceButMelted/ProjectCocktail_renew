@@ -18,8 +18,8 @@ namespace Bar410.GameFlow
     ///   1   Talking      lock the ingredients, fix the camera look, close the book;
     ///                     carry a scored order into the dialogue's variables
     ///   2   Prepare       fresh drink, bar camera, post-it in; leaving closes the book
-    ///   2.1 AddIngredient bottles and shaker usable; the method panel follows the shaker's contents;
-    ///                     mouse look only here, while the shaker has room
+    ///   2.1 AddIngredient bottles and shaker usable (locked bottles hidden, IngredientUnlocks); the method
+    ///                     panel follows the shaker's contents; mouse look only here, while the shaker has room
     ///   2.2 Minigame      start/stop the minigame; look fixed; a win finishes the drink; back leaves for 2.1
     ///   3   Garnish       frame the plate, lock the ingredients, open the station; pour, ice, finish, remake
     ///   4   Serve         open/close the serve panel, take the post-it away; serve or remake;
@@ -66,6 +66,9 @@ namespace Bar410.GameFlow
         [SerializeField] private ChapterTitleUI _chapterTitle;
         [Tooltip("The day's event popups. BeforeOpen › Event waits until the player has closed them all. Empty = Event passes at once.")]
         [SerializeField] private EventPopupQueue _eventPopups;
+        [Tooltip("Which ingredients the player has. The bar shows only those, random orders use only recipes made of them, " +
+                 "and Event announces the new ones. Empty = everything is available.")]
+        [SerializeField] private IngredientUnlocks _unlocks;
 
         private GameLoopFSM _gameLoop;
         private GameFlowCommands _commands;
@@ -91,6 +94,11 @@ namespace Bar410.GameFlow
                 _cocktail.OrderCleared += _customers.ResetVariables;
             }
             else Debug.LogWarning("[FlowWiring] Cocktail or customers missing: scored orders will not reach the dialogue.", this);
+
+            // Random orders only ask for drinks made of ingredients the player has.
+            if (_cocktail != null && _unlocks != null) _cocktail.UseRecipeFilter(_unlocks.IsRecipeComplete);
+            // The bar is on screen in every phase, so an unlock shows its bottle at once.
+            if (_unlocks != null) _unlocks.Changed += RefreshBottles;
 
             // 2 Prepare drinks, 2.1 AddIngredient
             prepareDrinks.Entered += OnPrepareDrinksEntered;
@@ -183,6 +191,7 @@ namespace Bar410.GameFlow
                 _gameLoop.ClosingBar.Exited -= OnClosingExited;
             }
             if (_eventPopups != null) _eventPopups.AllClosed -= OnEventPopupsClosed;
+            if (_unlocks != null) _unlocks.Changed -= RefreshBottles;
             if (_gameLoop != null && _gameLoop.BeforeOpen != null)
             {
                 _gameLoop.BeforeOpen.Entered -= OnBeforeOpenEntered;
@@ -307,6 +316,9 @@ namespace Bar410.GameFlow
         private void OnAddIngredientEntered()
         {
             _hub?.SetPhase(HubPhase.AddIngredient);
+
+            // Today's bottles: hide the locked ones, show any that unlocked since the last visit.
+            RefreshBottles();
             _ingredients?.SetInteractable(true);
 
             // Phase-specific interactable policy (bottle drag + click).
@@ -545,10 +557,33 @@ namespace Bar410.GameFlow
             // day events play out before anything can be poured. Harmless again on Story → Event.
             LockBar();
             _hub?.SetPhase(HubPhase.BeforeOpen);
+            // A new $day may have unlocked bottles; show them before the day starts.
+            RefreshBottles();
 
             // Nothing queued (or no popup UI) passes straight on; ShowAll raises AllClosed at once then.
-            if (_eventPopups != null) _eventPopups.ShowAll();
-            else _gameLoop.BeforeOpen.Event.Finish();
+            if (_eventPopups == null) { _gameLoop.BeforeOpen.Event.Finish(); return; }
+
+            // Ingredients unlocked since the last Event, announced in one popup.
+            var unlocked = _unlocks != null ? _unlocks.TakeNewUnlocks() : null;
+            if (unlocked != null && unlocked.Count > 0)
+            {
+                var names = new System.Collections.Generic.List<string>();
+                var icons = new System.Collections.Generic.List<Sprite>();
+                foreach (var row in unlocked)
+                {
+                    names.Add(row.DisplayOrName);
+                    if (row.icon != null) icons.Add(row.icon);
+                }
+                _eventPopups.Enqueue("Unlock New Ingredient", string.Join("\n", names), icons);
+            }
+
+            _eventPopups.ShowAll();
+        }
+
+        /// <summary>Shows the bottles the player has, hides the locked ones.</summary>
+        private void RefreshBottles()
+        {
+            if (_unlocks != null) _ingredients?.Refresh(_unlocks.IsUnlocked);
         }
 
         private void OnEventPopupsClosed()

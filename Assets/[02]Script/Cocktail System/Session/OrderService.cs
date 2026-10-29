@@ -21,13 +21,22 @@ public class OrderService
     private readonly IDrinkRepository _lookup;
     private readonly IDrinkRepository _randomPool;
     private readonly ICustomerPreferences _preferences;
+    private readonly System.Func<S_Drink, bool> _canMake;
 
-    public OrderService(IDrinkRepository lookup, IDrinkRepository randomPool, ICustomerPreferences preferences)
+    /// <param name="canMake">
+    /// Whether the player has every ingredient of a recipe right now (null = anything goes).
+    /// Random picks use only recipes that pass; a named order is placed either way, with a warning.
+    /// </param>
+    public OrderService(IDrinkRepository lookup, IDrinkRepository randomPool, ICustomerPreferences preferences,
+                        System.Func<S_Drink, bool> canMake = null)
     {
         _lookup = lookup;
         _randomPool = randomPool;
         _preferences = preferences;
+        _canMake = canMake;
     }
+
+    private bool CanMake(S_Drink drink) => drink != null && (_canMake == null || _canMake(drink));
 
     // ── GDD §12 modes 1-2 — a named recipe ─────────────────
 
@@ -38,6 +47,10 @@ public class OrderService
             Debug.LogWarning($"[OrderService] No cocktail named '{recipeName}'.");
             return false;
         }
+
+        // The writer asked for this one on purpose, so it is not filtered, but they should know.
+        if (!CanMake(drink))
+            Debug.LogWarning($"[OrderService] '{recipeName}' was ordered by name but the player has not unlocked all of its ingredients.");
 
         context.BeginOrder(customer,
                            byFlavor ? OrderMode.FixedByFlavor : OrderMode.FixedByName,
@@ -74,6 +87,9 @@ public class OrderService
             return false;
         }
 
+        if (!AnyMakeableOfType(type))
+            Debug.LogWarning($"[OrderService] Ordered type {type}, but no recipe of that type can be made with the unlocked ingredients.");
+
         // No Target: any recipe of this type satisfies the order (GDD §12 mode 5);
         // satisfaction is decided purely by ServedType == OrderedType.
         context.BeginOrder(customer, OrderMode.FixedByType, null, type);
@@ -105,24 +121,66 @@ public class OrderService
         }
 
         var candidates = new List<S_Drink>();
-        var all = _randomPool.GetDrinks();
-
-        if (all != null)
-        {
-            foreach (var drink in all)
-            {
-                if (drink == null) continue;
-                if (Contains(preferred, AlcoholClassifier.Resolve(drink))) candidates.Add(drink);
-            }
-        }
+        foreach (var drink in Makeable())
+            if (Contains(preferred, AlcoholClassifier.Resolve(drink))) candidates.Add(drink);
 
         if (candidates.Count == 0)
         {
-            Debug.LogWarning($"[OrderService] No recipe matches {customer}'s preferences; falling back to random.");
-            return _randomPool.GetRandom();
+            Debug.LogWarning($"[OrderService] No recipe the player can make matches {customer}'s preferences; picking any recipe they can make.");
+            return PickRandom();
         }
 
         return candidates[Random.Range(0, candidates.Count)];
+    }
+
+    /// <summary>A uniformly random recipe the player can make. Null (and an error) when there is none.</summary>
+    public S_Drink PickRandom()
+    {
+        var makeable = Makeable();
+        if (makeable.Count == 0)
+        {
+            Debug.LogError("[OrderService] The player cannot make any recipe — nothing to order.");
+            return null;
+        }
+
+        return makeable[Random.Range(0, makeable.Count)];
+    }
+
+    /// <summary>A random recipe of this type the player can make; any makeable recipe (with a warning) when there is none.</summary>
+    public S_Drink PickRandom(TypeOfCocktail type)
+    {
+        var matches = new List<S_Drink>();
+        foreach (var drink in Makeable())
+            if (AlcoholClassifier.Resolve(drink) == type) matches.Add(drink);
+
+        if (matches.Count == 0)
+        {
+            Debug.LogWarning($"[OrderService] No makeable recipe of type {type}; picking any recipe the player can make.");
+            return PickRandom();
+        }
+
+        return matches[Random.Range(0, matches.Count)];
+    }
+
+    /// <summary>The random pool's recipes the player can make now.</summary>
+    private List<S_Drink> Makeable()
+    {
+        var result = new List<S_Drink>();
+        var all = _randomPool?.GetDrinks();
+        if (all == null) return result;
+
+        foreach (var drink in all)
+            if (CanMake(drink)) result.Add(drink);
+
+        return result;
+    }
+
+    private bool AnyMakeableOfType(TypeOfCocktail type)
+    {
+        foreach (var drink in Makeable())
+            if (AlcoholClassifier.Resolve(drink) == type) return true;
+
+        return false;
     }
 
     private static bool Contains(IReadOnlyList<TypeOfCocktail> list, TypeOfCocktail type)

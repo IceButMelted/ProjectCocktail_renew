@@ -103,6 +103,7 @@ public class SaveLoadManager : MonoBehaviour
             ApplyYarnData();
             ApplyNPCData();
             FindFirstObjectByType<EventLogPresenter>()?.Restore(_saveData.EventLogData?.Entries ?? new List<EventLogEntry>());
+            IngredientUnlocks.Current?.Restore(_saveData.UnlockData);
             Debug.Log("[SaveLoadManager] Pending load applied after scene ready.");
         }
     }
@@ -207,6 +208,7 @@ public class SaveLoadManager : MonoBehaviour
         CollectYarnData();
         CollectNPCData();
         _saveData.EventLogData.Entries = FindFirstObjectByType<EventLogPresenter>()?.Snapshot() ?? new List<EventLogEntry>();
+        _saveData.UnlockData = IngredientUnlocks.Current?.Snapshot() ?? new SaveUnlockData();
 
         _saveData.MetaData.Slot = slot;
         _saveData.MetaData.SaveName = $"Save {slot + 1}";
@@ -469,6 +471,7 @@ public class SaveData
     public SaveSettingData SettingData = new SaveSettingData();
     public SaveNPCData NPCData = new SaveNPCData();
     public SaveEventLogData EventLogData = new SaveEventLogData();
+    public SaveUnlockData UnlockData = new SaveUnlockData();
 }
 
 // ─── Unity type JSON converters ───────────────────────────────────────────────

@@ -16,3 +16,11 @@ player never chooses the roster, it only grows.
 One component (`IngredientUnlocks`) is the single source of truth. Day unlocks are derived from
 `$day` (already saved with Yarn data); only story unlocks are stored, in C#, and saved in their own
 `SaveData` section.
+
+## Owner answers (2026-10-29)
+
+- Random orders only pick recipes the player can make now; writer-named orders are not filtered (warning only).
+- Unlock days come from the owner's table: day 1 (8 ingredients), 3, 5, 7 (all 17). Plan: `Docs/Bar410_IngredientUnlock_Plan.md`.
+- Each unlock is announced with a popup and a sound, through the existing `EventPopupQueue`.
+- Unlocks are permanent; there is no re-lock.
+- One popup per day ("Unlock New Ingredient" + the ingredient names) in BeforeOpen › Event; a story unlock waits for the next day's Event. No popup on day 1. No sound file yet.

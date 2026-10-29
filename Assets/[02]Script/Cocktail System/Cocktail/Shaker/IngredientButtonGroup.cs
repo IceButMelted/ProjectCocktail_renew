@@ -60,6 +60,23 @@ public class IngredientButtonGroup : MonoBehaviour
             InteractableToggle.Apply(members[i], interactable);
     }
 
+    /// <summary>
+    /// Shows the ingredient buttons the player has and hides the locked ones. Only AddAlcohol /
+    /// AddLiqueur / AddMixer buttons are touched; Ice, Method, Reset and the other members stay as they are.
+    /// </summary>
+    public void Refresh(System.Func<string, bool> isUnlocked)
+    {
+        if (isUnlocked == null) return;
+
+        foreach (var member in Members)
+        {
+            if (member == null || !member.TryGetComponent<IngredientButtonUI>(out var button)) continue;
+
+            string key = button.IngredientKey;
+            if (key != null) member.SetActive(isUnlocked(key));
+        }
+    }
+
     public void Enable() => SetInteractable(true);
     public void Disable() => SetInteractable(false);
 
