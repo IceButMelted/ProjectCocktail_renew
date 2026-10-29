@@ -22,6 +22,16 @@ using UnityEditor;
 /// <summary>Which way a character faces. Left and Right are the player's screen, not the character's.</summary>
 public enum Facing { Forward, Left, Right }
 
+/// <summary>Small up-and-down steps while a character fades in or out, as if walking. Default = no motion.</summary>
+[System.Serializable]
+public struct WalkBob
+{
+    [Tooltip("Height of each step in metres. 0 = no motion.")]
+    [Min(0f)] public float Height;
+    [Tooltip("Steps (hops) during one fade.")]
+    [Min(0)] public int Steps;
+}
+
 public class CharacterView : MonoBehaviour
 {
     [SerializeField, Required] private SO_Customer _data;
@@ -127,26 +137,33 @@ public class CharacterView : MonoBehaviour
     /// Silhouette in: transparent black fades to solid black, then black to the real colours.
     /// Yarn waits on this. v2 (2D bone rig): play the enter motion alongside, the wait stays.
     /// </summary>
-    public IEnumerator FadeIn(float duration)
+    public IEnumerator FadeIn(float duration, WalkBob bob = default)
     {
-        return Fade(0f, 1f, duration);
+        return Fade(0f, 1f, duration, bob);
     }
 
     /// <summary>The reverse of <see cref="FadeIn"/>. v2 (2D bone rig): play the exit motion alongside.</summary>
-    public IEnumerator FadeOut(float duration)
+    public IEnumerator FadeOut(float duration, WalkBob bob = default)
     {
-        return Fade(1f, 0f, duration);
+        return Fade(1f, 0f, duration, bob);
     }
 
-    private IEnumerator Fade(float from, float to, float duration)
+    private IEnumerator Fade(float from, float to, float duration, WalkBob bob)
     {
         SetTint(from);
+        Vector3 standing = transform.position;
         if (duration > 0f)
         {
             // One number drives every renderer under the character, so a v2 rig fades together too.
             // Do not key SpriteRenderer colour in animation clips: this tint would fight them.
-            yield return DOVirtual.Float(from, to, duration, SetTint).SetEase(Ease.Linear).WaitForCompletion();
+            // The same progress bobs the character: |sin| gives one small hop per step, 0 at both ends.
+            yield return DOVirtual.Float(0f, 1f, duration, p =>
+            {
+                SetTint(Mathf.Lerp(from, to, p));
+                transform.position = standing + Vector3.up * (bob.Height * Mathf.Abs(Mathf.Sin(p * bob.Steps * Mathf.PI)));
+            }).SetEase(Ease.Linear).WaitForCompletion();
         }
+        transform.position = standing;
         SetTint(to);
         IsPresent = to > 0f;
     }

@@ -27,8 +27,26 @@ public partial class TalkToCustomerManager
     [Tooltip("Seconds for one fade in or out, for every character.")]
     [SerializeField, Min(0f)] private float _fadeSeconds = 0.8f;
 
+    [Tooltip("Small up-and-down steps during every fade in and out, as if walking. Height 0 = no motion.")]
+    [SerializeField] private WalkBob _walkBob = new WalkBob { Height = 0.03f, Steps = 2 };
+
+    [Tooltip("SFX Sound ID (SoundManager) played when a character comes into the shop. Empty = silent.")]
+    [SerializeField] private string _enterSoundId;
+
+    [Tooltip("Seconds between the enter sound and the start of the fade in. Yarn waits for it.")]
+    [SerializeField, Min(0f)] private float _enterSoundLead = 0.6f;
+
+    [Tooltip("SFX Sound ID played after a character has left the shop. Empty = silent.")]
+    [SerializeField] private string _exitSoundId;
+
+    [Tooltip("Seconds after the fade out ends before the exit sound plays. Yarn does not wait for it.")]
+    [SerializeField, Min(0f)] private float _exitSoundDelay = 0.6f;
+
     /// <summary>Skipping or loading finishes a fade at once, like wait_scene.</summary>
     private float FadeSeconds => SceneLoaderBridge.IsSilentReplay || DialogueControls.IsSkipping ? 0f : _fadeSeconds;
+
+    /// <summary>Enter/exit sounds and their waits, off while skipping or loading.</summary>
+    private bool SoundsOn => !SceneLoaderBridge.IsSilentReplay && !DialogueControls.IsSkipping;
 
     // ── Enter / Exit ───────────────────────────────────────
 
@@ -45,7 +63,13 @@ public partial class TalkToCustomerManager
         }
 
         if (view.IsPresent && view.Spot == spot) yield break;
-        if (view.IsPresent) yield return view.FadeOut(FadeSeconds);
+        // Moving between spots stays inside the shop: no enter sound.
+        if (view.IsPresent) yield return view.FadeOut(FadeSeconds, _walkBob);
+        else if (SoundsOn && !string.IsNullOrEmpty(_enterSoundId))
+        {
+            SoundManager.Instance?.PlaySFX(_enterSoundId);
+            if (_enterSoundLead > 0f) yield return new WaitForSeconds(_enterSoundLead);
+        }
 
         // ponytail: only warns, the other character is not asked to leave. Add when a script needs it.
         foreach (var other in _byName.Values)
@@ -54,14 +78,21 @@ public partial class TalkToCustomerManager
 
         view.Spot = spot;
         view.transform.position = _spots[spot].position;
-        yield return view.FadeIn(FadeSeconds);
+        yield return view.FadeIn(FadeSeconds, _walkBob);
     }
 
     /// <summary>Fades a character out of the shop. Not in the shop: nothing.</summary>
     public IEnumerator Exit(CharacterView view)
     {
         if (!view.IsPresent) yield break;
-        yield return view.FadeOut(FadeSeconds);
+        yield return view.FadeOut(FadeSeconds, _walkBob);
+        if (SoundsOn && !string.IsNullOrEmpty(_exitSoundId)) StartCoroutine(PlayExitSound());
+    }
+
+    private IEnumerator PlayExitSound()
+    {
+        if (_exitSoundDelay > 0f) yield return new WaitForSeconds(_exitSoundDelay);
+        SoundManager.Instance?.PlaySFX(_exitSoundId);
     }
 
     // ── Save / load ────────────────────────────────────────
