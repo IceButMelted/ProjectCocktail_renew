@@ -26,6 +26,9 @@ public class CocktailGlass : MonoBehaviour
     public Vector2 iceScaleRange = new Vector2(0.8f, 1.2f);
     [Tooltip("Time to grow from 0 to full size. Ice holds still until fully grown, then drops.")]
     public float iceGrowDuration = 0.15f;
+    [Tooltip("Local Z of the ice visuals. The glass sprite writes depth, so ice on its plane z-fights with it. " +
+             "Keep it between the glass (0) and the water.")]
+    public float iceLocalZ = -0.02f;
 
     [Header("Surface Spring")]
     [Range(8, 256)] public int surfacePoints = 64;
@@ -253,7 +256,7 @@ public class CocktailGlass : MonoBehaviour
     {
         Transform b = ice.body.transform;
         Vector3 local = proxyRoot.InverseTransformPoint(b.position);
-        local.z = 0f;
+        local.z = iceLocalZ;
         ice.visual.SetPositionAndRotation(transform.TransformPoint(local), transform.rotation * Quaternion.Euler(0f, 0f, b.eulerAngles.z));
         ice.visual.localScale = b.localScale;
     }
