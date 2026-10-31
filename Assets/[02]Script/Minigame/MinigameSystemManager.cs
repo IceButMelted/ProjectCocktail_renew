@@ -110,6 +110,18 @@ public class MinigameSystemManager : MonoBehaviour, IMinigameContext
             return;
         }
         _activeMinigame.ProcessedGame();
+        UpdateBackButtons();
+    }
+
+    // Cancelling during the intro would snap the panels to the outro's start, so the buttons
+    // stay hidden until Play. They remain visible in the outro to slide out with their panel.
+    private void UpdateBackButtons()
+    {
+        if (_btnBack == null) return;
+
+        bool visible = ActivePhase != MinigamePhase.Intro;
+        foreach (var btn in _btnBack)
+            if (btn != null && btn.gameObject.activeSelf != visible) btn.gameObject.SetActive(visible);
     }
 
     /// <summary>

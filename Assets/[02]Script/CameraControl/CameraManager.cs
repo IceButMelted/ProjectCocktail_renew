@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Cinemachine;
 using Yarn.Unity;
+using Mono.Cecil.Cil;
 
 /// <summary>
 /// The one owner of the camera: which virtual camera is live, and whether the mouse may move the view.
@@ -42,8 +43,17 @@ public class CameraManager : MonoBehaviour
     [SerializeField] private string _shakerShot = "PrepareCam";
     [SerializeField] private string _garnishShot = "GarnishCam";
 
+    [Header("Customer inset (minigame picture)")]
+    [Tooltip("Disabled camera that renders to the inset's RenderTexture. No Brain, no CameraEntry, no AudioListener.")]
+    [SerializeField] private Camera _customerInsetCamera;
+    [Tooltip("The panel (Panel_CharacterView) that holds the inset's RawImage. Hidden when there is no customer.")]
+    [SerializeField] private GameObject _customerInsetPanel;
+    [Tooltip("Where the inset camera sits relative to the customer. Tune by eye.")]
+    [SerializeField] private Vector3 _customerInsetOffset = new Vector3(0f, 1.2f, 2f);
+
     [Header("Debug")]
     [SerializeField] private bool logTransitions = true;
+    [SerializeField] private bool IsOnShakerView = false;
 
     private readonly Dictionary<string, CameraEntry> registry = new();
     private readonly Dictionary<string, CinemachineVirtualCameraBase> vcamRegistry = new();
@@ -103,14 +113,45 @@ public class CameraManager : MonoBehaviour
     /// <summary>The bar, over the shelves: the view while ingredients are picked.</summary>
     public void ShowBar() => SwitchCamera(_barShot);
 
+    public void ToggleShakerView() {
+        if (IsOnShakerView)
+        {
+            SwitchCamera(_barShot);
+            IsOnShakerView = false;
+        }
+        else
+        {
+            SwitchCamera(_shakerShot);
+            IsOnShakerView = true;
+        }
+    }
+
     /// <summary>The bar shot with no blend: the start of a day.</summary>
     public void CutToBar() => CutToCamera(_barShot);
 
     /// <summary>Close on the shaker: the view once the drink is full.</summary>
-    public void ShowShaker() => SwitchCamera(_shakerShot);
+    public void ShowShaker() {
+        SwitchCamera(_shakerShot);
+        IsOnShakerView = true;
+    }
 
     /// <summary>The garnish station.</summary>
     public void ShowGarnish() => SwitchCamera(_garnishShot);
+
+    /// <summary>Points the inset camera at the customer. Null hides the inset picture.</summary>
+    public void ShowCustomerInset(Transform customer)
+    {
+        if (_customerInsetPanel != null) _customerInsetPanel.SetActive(customer != null);
+        if (_customerInsetCamera == null) return;
+
+        _customerInsetCamera.enabled = customer != null;
+        if (customer != null) _customerInsetCamera.transform.position = customer.position + _customerInsetOffset;
+    }
+
+    public void HideCustomerInset()
+    {
+        if (_customerInsetCamera != null) _customerInsetCamera.enabled = false;
+    }
 
     /// <summary>
     /// While fixed, the mouse cannot move the view; fixing it also snaps the view back to forward.
@@ -141,6 +182,8 @@ public class CameraManager : MonoBehaviour
                 Debug.Log($"CameraManager: Camera '{id}' is already active.");
             return;
         }
+
+        IsOnShakerView = false;
 
         float blend = entry.BlendTime > 0f ? entry.BlendTime : globalBlendTime;
         ApplyTransition(id, vcam, blend, globalBlendStyle);

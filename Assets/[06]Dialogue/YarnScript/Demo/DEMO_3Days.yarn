@@ -97,6 +97,7 @@ title: D1_02_Walter_Order
 ---
 //Walter's Order
 Walter: Just keep it simple, son. #line:17
+<<order_customer "[CocktailSystem]" Walter>>
 Walter: [order] "{Order_Cocktail_ByName_OutName("Sea Breeze")}" [/order] should be enough for tonight. #line:18
 Player: Coming right up. #line:19
 <<Owen Neutral>>
@@ -211,6 +212,7 @@ title: D1_05_Isla_Order
 //-> Everything is recommended here.
 Player: [swing]Everything is recommended here.[/swing] #line:4A
 Isla: Umm... #line:4B
+<<order_customer "[CocktailSystem]" Isla>>
 Isla: Okay, I'll have [order] {Order_Cocktail_ByName_OutName("Cranberry Fizz")} [/order]. #line:4C
 Player: Got it. #line:4D
 
@@ -324,6 +326,7 @@ title: D1_08_Owen_Order
 <<Walter Look F>>
 
 Owen: Oh right, I should probably order before the bartender kicks me out. #line:78
+<<order_customer "[CocktailSystem]" Owen>>
 Owen: I'll have [order] {Order_Cocktail_ByName_OutName("Gin Fizz")}. [/order] #line:79
 Player: One moment. #line:7A
 <<Owen Neutral>>

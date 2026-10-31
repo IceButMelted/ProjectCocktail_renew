@@ -117,12 +117,17 @@ PauseScene (โหลดซ้อน)        หน้า Pause / Setting
 - **หลักการ:** Shaking / Mixing แพ้ไม่ได้ จบได้แค่ `Completed` หรือ `Cancelled` เข้า/ออกตาม Phase 2.2
 - **Script หลัก:** `MinigameSystemManager` + `ShakingMinigame` + `MixingMinigame` บน `[GameLoop]` › `[MiniGameSystem]` (UI ใน `Canvas_MiniGame`)
 - **แก้เองได้:** Default Type และปุ่ม Back ใน `MinigameSystemManager` รวมถึงค่าของมินิเกมแต่ละตัวใน Inspector
+- **Animation ตอนเข้ามินิเกม (ยาว 4.8 วิ):** Art002 แล้ว Art001 ลอยจากล่างมากลางจอ (Y = 0, ถึง 3.0 วิ) ค้างถึง 3.3 วิ แล้วเลื่อนลงให้ขอบล่างชนจอ (Y = -270, ถึง 3.7 วิ) จากนั้น Panel ของมินิเกมเลื่อนจากขวา (X 618.6 ถึง -618.6, ถึง 4.8 วิ) ขอบขวาชนจอ Art อยู่ทับ Panel และแสดงตลอดตอนเล่น ตอนออก (1.2 วิ) Art ทั้งคู่เลื่อนไปทางขวาพ้นจอพร้อม Panel ระยะเท่ากัน (+1267.2) ปุ่ม `BTN - Cancel Minigame` ซ่อนระหว่าง Intro (`MinigameSystemManager.UpdateBackButtons`) และแสดงตั้งแต่เข้า Play มินิเกมรับ input ด้วย `Input.GetMouseButtonDown` ไม่ผ่าน UI จึงไม่โดน Art บัง
+  - **แก้เองได้:** clip `MinigameStage_*` (Art) กับ `MinigamePanel_*` / `MixingPanel_*` (Panel) ใน `Assets/[08]Animation/MinigamePanel/` ถ้าเปลี่ยนความยาว Intro เกิน 5 วิ ต้องเพิ่ม `Intro Fallback Duration` ที่ `MinigamePanelAnimator` และย้าย event `OnIntroFinished` ด้วย
+- **ภาพลูกค้าข้างจอตอนมินิเกม:** `Panel_CharacterView` (ใน `Canvas_MiniGame` มี `RawImage_CharacterCameraView` เป็น child และเป็นพื้นหลังของจุดที่ภาพโปร่งใส เช่น หน้าต่างในฉาก) เลื่อนเข้าจากซ้ายตั้งแต่เริ่ม Intro แสดงลูกค้าที่สั่ง (`Order.Customer` จาก `<<order_customer>>`) ภาพมาจากกล้อง `[MiniGameSystem]` › `MinigameCharacterView` (ปิดไว้ เปิดเฉพาะตอนมินิเกม) ที่เรนเดอร์ลง `RT_CharacterCameraView` `FlowWiring` สั่ง `CameraManager.ShowCustomerInset` ตอนเริ่ม และ `HideCustomerInset` ตอนจบ การเลื่อนอยู่ใน 4 clip `Assets/[08]Animation/MinigamePanel/MinigameStage_*` (path `Panel_CharacterView`, X -1286.4 ถึง -633.6 ถ้าเปลี่ยนชื่อหรือย้าย GameObject ต้องแก้ path ใน clip ด้วย ถ้าเปลี่ยนความกว้าง W ของ Panel ให้ตั้งใหม่: ซ่อน = -960 - W/2, จุดหยุด = -960 + W/2 และปรับขนาด `RT_CharacterCameraView` ตามสัดส่วนใหม่ ส่วน `RawImage_CharacterCameraView` ยืดเต็ม Panel อยู่แล้ว) ไม่มี `<<order_customer>>` = ปิด `Panel_CharacterView` + warning
+  - **แก้เองได้:** ตำแหน่ง/มุมกล้องที่ `CameraManager` › `Customer Inset Offset` (ตอนนี้ `0, 0.6, -2.2` เทียบกับตัวละคร) และหมุนกล้อง `MinigameCharacterView` เอง, `Culling Mask` ของกล้อง, ความเร็วเลื่อนที่ clip Intro/Outro, สีของ `Panel_CharacterView` (เห็นผ่านส่วนโปร่งใสของภาพ), ตำแหน่ง X ของ Panel (กล้องตั้งตำแหน่งครั้งเดียวตอนเริ่ม ไม่ตามตัวละครที่ขยับ)
+  - แผน + ผลทดสอบ: `Docs/Bar410_MinigameCustomerView_Plan.md`
 - **อ่านเพิ่ม:** `Docs/Bar410_Minigame_Integration_Report.md`, `Docs/Bar410_Minigame_FSM_Simplification_Summary.md`
 
 ## 7. ตกแต่งและเสิร์ฟ (Garnish / Serve)
 - **หลักการ:** แก้ว น้ำแข็ง และของตกแต่งอยู่ใน Garnish เท่านั้น ตำแหน่งแก้ว/กล้องตายตัว เลือกด้วยปุ่ม (ADR 0002)
 - **Script หลัก:** `GarnishManager` บน `[GameLoop]` › `[GarnishSystem]` (UI `Canvas_Garnish`)
-- **แก้เองได้:** จุดวางแก้ว, ปุ่มทั้งหมด, `Slide Duration`, panel เสิร์ฟ
+- **แก้เองได้:** จุดวางแก้ว, ปุ่มทั้งหมด, `Slide Duration`, panel เสิร์ฟ, `CocktailGlass` › `Ice Local Z` (-0.02: ระยะน้ำแข็งหน้า sprite แก้ว เพราะ `SG_SpriteShadow` เขียน depth ถ้าเป็น 0 ภาพน้ำแข็งจะแหว่งแบบ z-fighting ควรอยู่ระหว่างแก้ว (0) กับ `Water` (-0.03))
 - **อ่านเพิ่ม:** `Docs/Bar410_GarnishRestructure_HANDOFF.md`, `Docs/Bar410_Garnish_Decoration_Plan.md`
 
 ## 8. กล้อง (Camera)
@@ -229,8 +234,14 @@ PauseScene (โหลดซ้อน)        หน้า Pause / Setting
   - ท้องฟ้าคือ Default-Skybox (Procedural) ดวงอาทิตย์คือ `Directional Light (BarInteriorV2)` (ความสว่าง 0 ใช้แค่ทิศของท้องฟ้า)
   - ร้านเก่า `BarVer_3` ยังอยู่ในฉากแต่ถูกปิดไว้ (สลับกลับได้)
   - ของที่ขยับได้ (ขวด/วัตถุดิบ, แก้ว, ตัวละคร) ไม่อยู่ใน lightmap จึงรับแสงที่ bake ผ่าน Light Probe `LightProbes_Bar` (184 จุด: ตารางทั้งห้องระยะ ~1 ม. + ถี่ 0.4 ม. รอบวัตถุดิบ) ถ้าไม่มี probe ของพวกนี้จะดำ
-- **อยู่ที่:** `New Drag Drop System` › `BarInteriorV2` (prefab `Assets/[04]Prefab/BarInteriorV3.prefab`), `Directional Light (BarInteriorV2)`, `BarVer_3` (ปิด), `LightProbes_Bar`
+  - Particle ที่ใช้ shader แบบ Lit ต้องตั้ง `Light Probes` = Blend Probes ที่ Renderer ด้วย ไม่งั้นจะดำสนิท เพราะไฟทุกดวงเป็น Baked (ตัวอย่าง: `PullOutVFX` ใน prefab `BaseFruitPieceInstance`) Particle ทั้งชุดรับแสงค่าเดียวจากตำแหน่งกลางของมัน
+  - เงาบนวัตถุดิบ: ไฟ Baked ไม่ให้เงากับของที่ขยับได้ จึงมี Spot แบบ Realtime `IngredientShadowLight` 1 ดวง ให้ `Capsule` (ShadowsOnly) ในวัตถุดิบทอดเงาลง `Sprite` ของมันเอง
+    - ไฟดวงนี้โดนเฉพาะ Renderer ที่เปิด Rendering Layer บิต 1 (`Rendering Layer Mask` = 3) เพราะ Forward+ ไม่สนใจ `Culling Mask` เรื่องแสง ตั้งไว้ที่ `Sprite` + `Capsule` ของ `BaseInteractbleIngredient` และ `BaseGlass`, `Ice` ส่วนฉาก ตัวละคร และ shaker ไม่โดนไฟนี้
+    - `SG_SpriteShadow` เปิด Receive Shadows แล้ว ต้องเปิด `Receive Shadows` ที่ SpriteRenderer ด้วย (ตั้งผ่าน Debug Inspector หรือ prefab ฐาน) `Sprite` ของวัตถุดิบตั้ง Cast Shadows = Off กันเงาตัวเอง
+    - แก้ว (`BaseGlass`) และน้ำแข็ง (`Ice`) รับแสงได้แล้ว แต่ไม่มี mesh ข้างใน จึงยังไม่มีเงาของตัวเอง แก้วทอดเงาจาก sprite ของมัน (Cast = On)
+- **อยู่ที่:** `New Drag Drop System` › `BarInteriorV2` (prefab `Assets/[04]Prefab/BarInteriorV3.prefab`), `Directional Light (BarInteriorV2)`, `IngredientShadowLight`, `BarVer_3` (ปิด), `LightProbes_Bar`
 - **แก้เองได้:**
+  - เงาวัตถุดิบ: ตำแหน่ง / Intensity / Spot Angle ของ `IngredientShadowLight`, รูปเงาที่ขนาดและตำแหน่งของ `Capsule` ใน prefab แต่ละตัว, ความเข้มเงาที่ Light › Shadows › Strength (ไฟดวงนี้เป็น Realtime เปลี่ยนแล้วไม่ต้อง bake ใหม่)
   - ตำแหน่งร้าน แล้วจัดกล้อง / จุดยืนลูกค้า (`TalkToCustomerManager` › Spots) / ขวดให้ตรงกับร้านใหม่
   - Window › Rendering › Lighting: Skybox, Environment Lighting, Lighting Settings (ตอนนี้เป็นค่าเริ่มต้นของ Unity: Progressive GPU, Shadowmask, 40 texel, lightmap 1024)
   - `LightProbes_Bar` › Edit Light Probes: เพิ่ม/ย้ายจุด ถ้าย้ายร้านหรือวัตถุดิบไปที่อื่น ให้ย้าย probe ตามด้วย

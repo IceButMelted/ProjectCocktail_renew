@@ -369,6 +369,8 @@ namespace Bar410.GameFlow
             _cameras?.SetLookFixed(true);
             _shakerPanels?.ShowMethod();
             if (_btnBook != null) _btnBook.interactable = true;
+            _ingredients.Disable();
+            _btnBook.interactable = true;
             _cameras?.ShowShaker();
         }
 
@@ -422,7 +424,19 @@ namespace Bar410.GameFlow
                 ? _shakerContents.RequiredMinigame
                 : Enum_MiniGameType.None;
 
+            ShowCustomerInset();
             _minigames.StartMinigame(_minigames.Resolve(selected, fromDrink));
+        }
+
+        /// <summary>Shows the customer who ordered in the minigame's side picture; hides it if unknown.</summary>
+        private void ShowCustomerInset()
+        {
+            if (_cameras == null) return;
+
+            var customer = _cocktail != null ? _cocktail.Order.Customer : CharacterName.None;
+            var view = customer != CharacterName.None && _customers != null ? _customers.Find(customer) : null;
+            if (view == null) Debug.LogWarning("[FlowWiring] The order has no customer: add <<order_customer>> to the Yarn. Customer picture hidden.");
+            _cameras.ShowCustomerInset(view != null ? view.transform : null);
         }
 
         private void OnMinigameStopRequested()
@@ -441,6 +455,7 @@ namespace Bar410.GameFlow
             // still reports here a moment later; MinigameState clears LastOutcome on every
             // entry, so a stale report can never be mistaken for the next run's result.
             _gameLoop.OpenBar.PrepareDrinks.Minigame.ReportResult(outcome);
+            _cameras?.HideCustomerInset();
 
             // Cancelling means the player backed out, so the shaker has to become grabbable
             // again. It is a member of IngredientButtonGroup, which locks it when the drink fills.

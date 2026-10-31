@@ -64,6 +64,7 @@ title: D1_NL_02_Isla_Order
 ---
 Player: [swing]Everything is recommended here.[/swing]
 Isla: Umm...
+<<order_customer "[CocktailSystem]" Isla>>
 Isla: Okay, I'll have [order] {Order_Cocktail_ByName_OutName("Cranberry Fizz")} [/order].
 Player: Got it.
 
@@ -173,6 +174,7 @@ title: D1_NL_05_Owen_Order
 <<Walter Look F>>
 
 Owen: Oh right, I should probably order before the bartender kicks me out.
+<<order_customer "[CocktailSystem]" Owen>>
 Owen: I'll have [order] {Order_Cocktail_ByName_OutName("Gin Fizz")}. [/order]
 Player: One moment.
 <<Owen Neutral>>
@@ -295,6 +297,7 @@ title: D1_NL_09_Owen_SecondOrder
 ---
 Owen: Actually, hold on before I head out.
 Owen: One more for the road, if that's alright.
+<<order_customer "[CocktailSystem]" Owen>>
 Owen: I'll have [order] {Order_Cocktail_ByName_OutName("Greyhound")}. [/order]
 Player: Coming right up.
 <<Owen Neutral>>
