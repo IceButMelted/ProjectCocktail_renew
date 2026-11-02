@@ -272,6 +272,7 @@ namespace Bar410.GameFlow
             _cameras?.SetLookFixed(true);
             _bookUI?.CloseBook();
             _hub?.SetPhase(HubPhase.Talking);
+            _cameras?.ShowBar();
             _ingredients?.Disable();
         }
 
@@ -624,6 +625,7 @@ namespace Bar410.GameFlow
         private void OnOpenEntered()
         {
             if (_chapterTitle != null && TryGetToday(out var row)) _chapterTitle.Show(row.chapterName);
+            _cameras?.ShowBar();
         }
 
         /// <summary>Today's row of the day schedule ($day), or false when there is no schedule or row.</summary>

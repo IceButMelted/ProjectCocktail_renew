@@ -227,6 +227,7 @@ Player: (Wiping the counter in the dark, I count the takings. Not bad for a firs
 
 title: PT_D2_Start
 ---
+<<Panel_FadeOut Panel_Transition>>
 <<eventlog_clear>>
 Player: (PT) Day {$day}. flow_phase = {flow_phase()}, flow_step = {flow_step()} (expect 2 / BeforeOpen / StoryBeforeOpen, no popup: nothing unlocks on day 2)
 Player: Second night. Word must be getting around.
@@ -240,7 +241,6 @@ title: PT_D2_Walter
 <<Walter Enter 1>>
 <<Walter Neutral>>
 Walter: Evening, son. I knew the old owner.
-<<Walter KneeUp>>
 Walter: He left this with me. Said to give it to whoever took over.
 Player: A bottle of rum?
 <<Walter Happy>>
