@@ -69,6 +69,38 @@ namespace Bar410.Flow.Tests
             cts.Cancel();
             try { await aw2; Assert.Fail("expected OCE"); } catch (OperationCanceledException) { }
             CollectionAssert.AreEqual(new[] { "WaitTransition", "ShowDayEvents" }, ui.Calls);
+            Assert.IsFalse(ui.TransitionPending); Assert.IsFalse(ui.EventsPending);
+        }
+
+        [Test]
+        public async Task DayUi_NoWaitTitle_IsAlreadyComplete()
+        {
+            var ui = new FakeDayUi();
+            var aw = ui.ShowChapterTitleAsync("k", false, CancellationToken.None);
+            await aw; // would hang if it needed a frame or an external Complete
+        }
+
+        [Test]
+        public void Minigame_RunWhileBusy_Throws()
+        {
+            var m = new FakeMinigames();
+            var req = new MinigameRequest(Enum_MiniGameType.Shaking, Enum_MiniGameType.Shaking, false);
+            m.RunAsync(req, CancellationToken.None);
+            Assert.Throws<InvalidOperationException>(() => m.RunAsync(req, CancellationToken.None));
+            m.Complete(MinigameOutcome.Completed); // release the first so nothing hangs
+        }
+
+        [Test]
+        public void Orders_CommitServe_IsIdempotent()
+        {
+            var o = new FakeOrders { NextScore = new ScoreResult { payout = 5f } };
+            int scored = 0; o.Scored += _ => scored++;
+            var a = o.CommitServe();
+            o.NextScore = new ScoreResult { payout = 9f };
+            var b = o.CommitServe();
+            Assert.AreEqual(1, scored);
+            Assert.AreEqual(5f, a.payout); Assert.AreEqual(5f, b.payout);
+            CollectionAssert.AreEqual(new[] { "CommitServe", "CommitServe" }, o.Calls);
         }
     }
 }

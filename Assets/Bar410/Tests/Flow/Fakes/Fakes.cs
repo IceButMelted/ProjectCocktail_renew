@@ -64,7 +64,16 @@ namespace Bar410.Flow.Tests.Fakes
         public void SetCustomer(CharacterName c) => Log($"SetCustomer({c})");
         public void ClearOrder() { Log("ClearOrder"); Cleared?.Invoke(); }
         public bool EnsureOrder() { Log("EnsureOrder"); return EnsureResult; }
-        public ScoreResult CommitServe() { Log("CommitServe"); Scored?.Invoke(NextScore); return NextScore; }
+        ScoreResult? _committed;
+        /// <summary>Idempotent like the real desk: every call is logged, Scored fires and the result is cached on the first.</summary>
+        public ScoreResult CommitServe()
+        {
+            Log("CommitServe");
+            if (_committed.HasValue) return _committed.Value;
+            _committed = NextScore;
+            Scored?.Invoke(NextScore);
+            return NextScore;
+        }
         public void UseRecipeFilter(Func<S_Drink, bool> canMake) => Log("UseRecipeFilter");
         public void UsePreferences(ICustomerPreferences prefs) => Log("UsePreferences");
     }
@@ -78,6 +87,7 @@ namespace Bar410.Flow.Tests.Fakes
         public Awaitable<MinigameOutcome> RunAsync(MinigameRequest r, CancellationToken ct)
         {
             Log($"RunAsync({r.Selected},{r.FromDrink},{r.ShowCustomer})");
+            if (IsBusy) throw new InvalidOperationException("FakeMinigames.RunAsync: busy");
             LastRequest = r;
             var src = _pending = new AwaitableCompletionSource<MinigameOutcome>();
             Started?.Invoke(r.Selected);
@@ -132,19 +142,30 @@ namespace Bar410.Flow.Tests.Fakes
         AwaitableCompletionSource _transition, _events, _title;
         public bool TransitionPending => _transition != null;
         public bool EventsPending => _events != null;
-        public Awaitable WaitTransitionAsync(CancellationToken ct) { Log("WaitTransition"); return Wait(ref _transition, ct); }
-        public Awaitable ShowDayEventsAsync(CancellationToken ct) { Log("ShowDayEvents"); return Wait(ref _events, ct); }
+        public Awaitable WaitTransitionAsync(CancellationToken ct)
+        {
+            Log("WaitTransition");
+            var src = _transition = new AwaitableCompletionSource();
+            return Wait(src, () => { if (_transition == src) _transition = null; }, ct);
+        }
+        public Awaitable ShowDayEventsAsync(CancellationToken ct)
+        {
+            Log("ShowDayEvents");
+            var src = _events = new AwaitableCompletionSource();
+            return Wait(src, () => { if (_events == src) _events = null; }, ct);
+        }
         public Awaitable ShowChapterTitleAsync(string key, bool wait, CancellationToken ct)
         {
             Log($"ShowChapterTitle({key},{wait})");
-            return wait ? Wait(ref _title, ct) : Done();
+            if (!wait) return Done();
+            var src = _title = new AwaitableCompletionSource();
+            return Wait(src, () => { if (_title == src) _title = null; }, ct);
         }
-        static async Awaitable Done() { await Awaitable.NextFrameAsync(); }
-        // Own source per wait (FlowAwait rule). The field is cleared when the wait ends.
-        Awaitable Wait(ref AwaitableCompletionSource slot, CancellationToken ct)
+        static Awaitable Done() { var s = new AwaitableCompletionSource(); s.SetResult(); return s.Awaitable; }
+        // Own source per wait (FlowAwait rule). The slot is cleared when the wait ends (complete, cancel or throw).
+        static async Awaitable Wait(AwaitableCompletionSource src, Action clear, CancellationToken ct)
         {
-            var src = slot = new AwaitableCompletionSource();
-            return FlowAwait.Wait(src, ct);
+            try { await FlowAwait.Wait(src, ct); } finally { clear(); }
         }
         public void CompleteTransition() => _transition.SetResult();
         public void CompleteEvents() => _events.SetResult();
