@@ -1,4 +1,4 @@
-title: D1_00_Start
+﻿title: D1_00_Start
 ---
 // ================================================================
 // DEMO_3Days.yarn — the three-day demo (Bar 410).
@@ -544,7 +544,7 @@ title: D1_15_Close
 <<flow_close_bar>>
 <<Switch_Camera CamController "MainCam">>
 <<Panel_FadeOut Panel_Transition>>
-Player: Another good day. 
+Player: Another good day.  #line:085db83 
 <<wait_scene 3>>
 
 // $day becomes 2. D2_00_Start begins when this dialogue ends.
@@ -570,35 +570,35 @@ title: D2_01_Walter_Sit
 <<Walter Enter 1>>
 <<Switch_Camera CamController Char1Cam>>
 <<Walter Neutral>>
-Walter: Evening.
+Walter: Evening. #line:0019101 
 <<Walter Happy>>
-Walter: Back again, as you can see.
-Player: Back again already?
+Walter: Back again, as you can see. #line:0818546 
+Player: Back again already? #line:0091715 
 <<Walter Neutral>>
-Walter: What can I say. Not much else to do with my evenings.
-Walter: Might as well spend them somewhere with decent company.
+Walter: What can I say. Not much else to do with my evenings. #line:02b7b7d 
+Walter: Might as well spend them somewhere with decent company. #line:0e73085 
 
--> I'm glad
-    Player: I'm glad you keep coming back, Walter.
+-> I'm glad #line:0f280ec 
+    Player: I'm glad you keep coming back, Walter. #line:0316b28 
     <<Walter Happy>>
-    Walter: That's kind of you to say, son.
--> Makes sense
-    Player: That makes sense. It's close, and you already know the place.
-    Walter: Practical thinking. I like that.
--> Tease about rent
-    Player: Careful, keep this up and I'll start charging rent for that seat.
+    Walter: That's kind of you to say, son. #line:07a80c9 
+-> Makes sense #line:0748540 
+    Player: That makes sense. It's close, and you already know the place. #line:03670ff 
+    Walter: Practical thinking. I like that. #line:0605b25 
+-> Tease about rent #line:0ca5826 
+    Player: Careful, keep this up and I'll start charging rent for that seat. #line:0b13ce8 
     <<Walter Happy>>
-    Walter: [wiggle]Ha! Cheeky. I like that too.[/wiggle]
--> Welcome
-    Player: We're always glad to have you, Walter.
-    Walter: Well-mannered, this one.
+    Walter: [wiggle]Ha! Cheeky. I like that too.[/wiggle] #line:01e3716 
+-> Welcome #line:00fc636 
+    Player: We're always glad to have you, Walter. #line:0149f56 
+    Walter: Well-mannered, this one. #line:06f1ae5 
 
 <<Walter Neutral>>
 // "The usual": what he ordered on day 1.
 <<order_customer "[CocktailSystem]" Walter>>
 <<set $order_note = Order_Cocktail_ByName_OutName("Sea Breeze")>>
-Walter: Just the usual for me tonight.
-Player: Coming right up.
+Walter: Just the usual for me tonight. #line:04e3c03 
+Player: Coming right up. #line:0910bdf 
 <<jump D2_02_Walter_Order>>
 ===
 
@@ -610,13 +610,13 @@ title: D2_02_Walter_Order
 
 <<if $satisfaction == Satisfaction.Perfect>>
     <<Walter Happy>>
-    Walter: [bounce]Still got it.[/bounce]
+    Walter: [bounce]Still got it.[/bounce] #line:07529a6 
 <<elseif $satisfaction == Satisfaction.Acceptable>>
-    Walter: Close enough for an old man's taste.
+    Walter: Close enough for an old man's taste. #line:0f59698 
 <<else>>
     <<Walter Sad>>
-    Walter: Hm. Rough one tonight?
-    Player: Sorry.
+    Walter: Hm. Rough one tonight? #line:04b6540 
+    Player: Sorry. #line:0c34d94 
 <<endif>>
 <<Reset_Variable SystemGame>>
 <<Walter Neutral>>
@@ -632,55 +632,55 @@ title: D2_03_Cole_Eliana_Arrive
 
 <<Walter Look R>>
 <<Walter Happy>>
-Walter: Cole! Didn't expect you tonight.
-Walter: What brings you here?
+Walter: Cole! Didn't expect you tonight. #line:0425674 
+Walter: What brings you here? #line:091d222 
 <<Cole Neutral>>
-Cole: Long shift. Needed somewhere quiet.
+Cole: Long shift. Needed somewhere quiet. #line:04afaaf 
 <<Switch_Camera CamController WideCam>>
 <<Eliana Enter 3>>
-Walter: And Eliana too. Small town, smaller bar.
+Walter: And Eliana too. Small town, smaller bar. #line:0133c36 
 <<Eliana Happy>>
-Eliana: Guilty.
+Eliana: Guilty. #line:0b309f7 
 <<Walter Neutral>>
 <<Walter Look F>>
 
 <<Switch_Camera CamController Char2Cam>>
-Cole: (Looks you over for a beat, then gives a small nod.)
+Cole: (Looks you over for a beat, then gives a small nod.) #line:0d61889 
 
--> Good evening
-    Player: Good evening, officer. Hope the day's been kind to you.
-    Cole: ...Kind is a strong word. But thanks.
--> Introduce yourself
-    Player: New face, I know. Nice to finally put a name to the badge.
-    Cole: You settling in alright?
--> Joke
-    Player: Relax, officer. I haven't broken any laws yet.
-    Cole: (A faint smirk.) Yet.
--> Formal greeting
-    Player: Good evening. What can I get started for you?
-    Cole: Straight to business. I can respect that.
+-> Good evening #line:004d37f 
+    Player: Good evening, officer. Hope the day's been kind to you. #line:07d237f 
+    Cole: ...Kind is a strong word. But thanks. #line:0bc8a51 
+-> Introduce yourself #line:09e160d 
+    Player: New face, I know. Nice to finally put a name to the badge. #line:03d24c4 
+    Cole: You settling in alright? #line:0a6b13c 
+-> Joke #line:09b447a 
+    Player: Relax, officer. I haven't broken any laws yet. #line:0b9775b 
+    Cole: (A faint smirk.) Yet. #line:05583df 
+-> Formal greeting #line:080abab 
+    Player: Good evening. What can I get started for you? #line:0841d8a 
+    Cole: Straight to business. I can respect that. #line:07d3aa4 
 
 <<Switch_Camera CamController Char23Cam>>
 <<Eliana Look L>>
-Eliana: Don't mind him. He does that with everyone new.
+Eliana: Don't mind him. He does that with everyone new. #line:0d2265b 
 <<Cole Look R>>
-Cole: ...
-Eliana: What? Did I say something wrong?
-Cole: Nothing.
+Cole: ... #line:0184462 
+Eliana: What? Did I say something wrong? #line:0a26cca 
+Cole: Nothing. #line:020f07a 
 <<Cole Look F>>
 <<Eliana Look F>>
 
 <<Eliana Neutral>>
-Eliana: I'm Eliana, by the way.
-Eliana: I'm the town lawyer, and this is our officer.
-Cole: Cole.
-Player: Nice to meet you both. Rough day?
+Eliana: I'm Eliana, by the way. #line:011dd78 
+Eliana: I'm the town lawyer, and this is our officer. #line:0667269 
+Cole: Cole. #line:08895f2 
+Player: Nice to meet you both. Rough day? #line:077b99a 
 <<Eliana Disappointed>>
-Eliana: You have no idea.
-Cole: Same, actually.
+Eliana: You have no idea. #line:0c7afc5 
+Cole: Same, actually. #line:03096df 
 <<Switch_Camera CamController WideCam>>
 <<Walter Happy>>
-Walter: Well, you're both in the right place then.
+Walter: Well, you're both in the right place then. #line:01adcce 
 <<Walter Neutral>>
 <<Eliana Neutral>>
 <<jump D2_04_Cole_Order>>
@@ -688,10 +688,10 @@ Walter: Well, you're both in the right place then.
 
 title: D2_04_Cole_Order
 ---
-Player: What can I get you, officer?
-Cole: Just get me [order]{Order_Cocktail_OutName(1)}[/order].
-Cole: Nothing complicated.
-Player: Got it.
+Player: What can I get you, officer? #line:0d57ba8 
+Cole: Just get me [order]{Order_Cocktail_OutName(1)}[/order]. #line:0d84ca1 
+Cole: Nothing complicated. #line:09044eb 
+Player: Got it. #line:0b62bc1 
 
 <<flow_prepare_drinks>>
 <<wait_for_task SystemGame>>
@@ -699,14 +699,14 @@ Player: Got it.
 
 <<if $satisfaction == Satisfaction.Perfect>>
     <<Cole Happy>>
-    Cole: Huh. Not bad.
-    Cole: Didn't expect much, honestly.
-    Player: Thank you.
+    Cole: Huh. Not bad. #line:0be37b2 
+    Cole: Didn't expect much, honestly. #line:0c6c0a0 
+    Player: Thank you. #line:099a95a 
 <<elseif $satisfaction == Satisfaction.Acceptable>>
-    Cole: It's fine. Does the job.
+    Cole: It's fine. Does the job. #line:09c35d6 
 <<else>>
     <<Cole Sad>>
-    Cole: ...You sure you made this right?
+    Cole: ...You sure you made this right? #line:0df44b6 
 <<endif>>
 <<Reset_Variable SystemGame>>
 <<Cole Neutral>>
@@ -715,13 +715,13 @@ Player: Got it.
 
 title: D2_05_Eliana_Order
 ---
-Player: And for you, lady?
-Eliana: Surprise me. Something strong.
-Eliana: I earned it today.
+Player: And for you, lady? #line:07e6130 
+Eliana: Surprise me. Something strong. #line:0a4683f 
+Eliana: I earned it today. #line:06fb1c0 
 // Any HighAlcohol drink is right (on day 2: White Lady or Cosmopolitan).
 <<order_customer "[CocktailSystem]" Eliana>>
 <<order_by_type "[CocktailSystem]" HighAlcohol>>
-Player: I'll see what I can do.
+Player: I'll see what I can do. #line:0b94d80 
 
 <<flow_prepare_drinks>>
 <<wait_for_task SystemGame>>
@@ -729,13 +729,13 @@ Player: I'll see what I can do.
 
 <<if $satisfaction == Satisfaction.Perfect>>
     <<Eliana Happy>>
-    Eliana: Okay, that's exactly what I needed.
-    Eliana: Remind me to come here more often.
+    Eliana: Okay, that's exactly what I needed. #line:0a3d0d3 
+    Eliana: Remind me to come here more often. #line:02c4218 
 <<elseif $satisfaction == Satisfaction.Acceptable>>
-    Eliana: Mm. Good enough to forget about work for a minute.
+    Eliana: Mm. Good enough to forget about work for a minute. #line:0741824 
 <<else>>
     <<Eliana Disappointed>>
-    Eliana: Rough day, rough drink. Seems about right.
+    Eliana: Rough day, rough drink. Seems about right. #line:07785d9 
 <<endif>>
 <<Reset_Variable SystemGame>>
 <<Eliana Neutral>>
@@ -745,60 +745,60 @@ Player: I'll see what I can do.
 title: D2_06_Cole_Eliana_Talk
 ---
 <<Walter Look R>>
-Walter: You two work together again, or just drink together?
-Eliana: Both, unfortunately.
-Cole: She handles the cases I bring in.
-Walter: What's it about this time? Is it Owen trespassing on private property again?
+Walter: You two work together again, or just drink together? #line:07481bb 
+Eliana: Both, unfortunately. #line:05b27fb 
+Cole: She handles the cases I bring in. #line:0199706 
+Walter: What's it about this time? Is it Owen trespassing on private property again? #line:0cd9058 
 <<Eliana Look L>>
-Eliana: Nope. Wait, does he actually do that?
+Eliana: Nope. Wait, does he actually do that? #line:00cee55 
 <<Walter Happy>>
-Walter: [wiggle]Ha, no, I'm just joking.[/wiggle]
+Walter: [wiggle]Ha, no, I'm just joking.[/wiggle] #line:0f7ef02 
 <<Eliana Disappointed>>
-Eliana: (Sighs.) I fell for it.
+Eliana: (Sighs.) I fell for it. #line:023703d 
 <<Walter Neutral>>
 <<Eliana Neutral>>
-Cole: Just a noise problem, Walter. We received a complaint.
-Walter: Claire? That highly driven girl?
-Eliana: Yep. It wasn't a big deal, just a warning.
-Cole: But this is the third time this month.
+Cole: Just a noise problem, Walter. We received a complaint. #line:03320dd 
+Walter: Claire? That highly driven girl? #line:020e0ca 
+Eliana: Yep. It wasn't a big deal, just a warning. #line:02165fa 
+Cole: But this is the third time this month. #line:07ff4a9 
 <<Eliana Look R>>
-Eliana: She has a lot going on. Go easy on her.
-Eliana: Who would listen if you lectured her like a boss?
-Walter: She's right. You look gloomy.
+Eliana: She has a lot going on. Go easy on her. #line:0e48845 
+Eliana: Who would listen if you lectured her like a boss? #line:08aa643 
+Walter: She's right. You look gloomy. #line:03b505c 
 <<Cole Sad>>
-Cole: No, I'm not.
-Walter: Ask the bartender.
+Cole: No, I'm not. #line:00e68c4 
+Walter: Ask the bartender. #line:0d43ca0 
 <<Eliana Look F>>
 <<Walter Look F>>
 
--> Huh?
-    Player: Why me?
-    Cole: ...
-    Player: You look fine, man.
-    Eliana: See?
--> A bit right
-    Player: Well, you do look a bit gloomy right now.
-    Player: Um, maybe take a sip to relax.
-    Cole: ...
--> Not quite Grinch-level
-    Player: It's not quite Grinch-level.
-    Cole: What?
-    Player: Um, the Grinch. From The Grinch.
-    Eliana: It's a movie, Cole.
-    Cole: I don't watch movies.
-    Player: You're missing out.
--> Formal
-    Player: With all due respect, officer, you do appear a little tired this evening.
-    Cole: ...
-    Cole: You sound like you're giving a statement.
+-> Huh? #line:06246b0 
+    Player: Why me? #line:0e70ea8 
+    Cole: ... #line:0c5c96c 
+    Player: You look fine, man. #line:0acdfd8 
+    Eliana: See? #line:0f0857b 
+-> A bit right #line:0dd0cc8 
+    Player: Well, you do look a bit gloomy right now. #line:0f2b6bb 
+    Player: Um, maybe take a sip to relax. #line:0bbda84 
+    Cole: ... #line:0e475d4 
+-> Not quite Grinch-level #line:0a4d8d4 
+    Player: It's not quite Grinch-level. #line:0fed973 
+    Cole: What? #line:02dbe1b 
+    Player: Um, the Grinch. From The Grinch. #line:0a892a1 
+    Eliana: It's a movie, Cole. #line:0e91f49 
+    Cole: I don't watch movies. #line:07d1fa6 
+    Player: You're missing out. #line:0e59b60 
+-> Formal #line:0f25a45 
+    Player: With all due respect, officer, you do appear a little tired this evening. #line:0111019 
+    Cole: ... #line:00337df 
+    Cole: You sound like you're giving a statement. #line:06c87ca 
     <<Eliana Happy>>
-    Eliana: [wiggle]Careful. That's my department.[/wiggle]
+    Eliana: [wiggle]Careful. That's my department.[/wiggle] #line:016ffd9 
 
 <<Walter Happy>>
-Walter: Haha, it's quite a colorful night.
-Eliana: For once.
+Walter: Haha, it's quite a colorful night. #line:04d4c75 
+Eliana: For once. #line:0c88d53 
 <<Cole Neutral>>
-Cole: ...
+Cole: ... #line:0e05d9e 
 <<Walter Neutral>>
 <<Eliana Neutral>>
 <<jump D2_07_Cole_Personal>>
@@ -807,44 +807,44 @@ Cole: ...
 title: D2_07_Cole_Personal
 ---
 <<Walter Look R>>
-Walter: Anyway, how's your girl doing, Cole?
-Cole: ...Fine. She's fine.
+Walter: Anyway, how's your girl doing, Cole? #line:06cd4ad 
+Cole: ...Fine. She's fine. #line:0830ae3 
 <<Eliana Look L>>
-Eliana: That pause said a lot.
-Cole: It didn't say anything.
-Eliana: Cole.
+Eliana: That pause said a lot. #line:09d56e8 
+Cole: It didn't say anything. #line:0a55aa5 
+Eliana: Cole. #line:019b4b1 
 <<Cole Sad>>
-Cole: She wants to move out after graduating, to attend university in the capital.
-Walter: And?
-Cole: And I told her it's not safe. It's too far.
-Eliana: Did you tell her that, or did you tell her no?
-Cole: ...Same thing.
-Eliana: It's really not.
-Eliana: Or is it because it's an art university?
-Cole: It's not... about that.
+Cole: She wants to move out after graduating, to attend university in the capital. #line:0b7ad91 
+Walter: And? #line:0549e72 
+Cole: And I told her it's not safe. It's too far. #line:04310d3 
+Eliana: Did you tell her that, or did you tell her no? #line:095ff7a 
+Cole: ...Same thing. #line:09b7520 
+Eliana: It's really not. #line:05706cf 
+Eliana: Or is it because it's an art university? #line:0bcc22a 
+Cole: It's not... about that. #line:06678ab 
 
--> Show sympathy
-    Player: That sounds really hard, for both of you.
-    Cole: ...How do you know?
-    Eliana: We know, Cole.
--> Take her side
-    Player: Sounds like she just wants a bit of independence.
-    Cole: I know what it sounds like. Doesn't mean I have to like it.
--> Joke about kids
-    Player: Kids, huh. Always gotta test the waters eventually.
-    Cole: ...
--> ...
-    Player: ...
-    Cole: ...
-    Eliana: ...
+-> Show sympathy #line:0c7384b 
+    Player: That sounds really hard, for both of you. #line:087005d 
+    Cole: ...How do you know? #line:09774f3 
+    Eliana: We know, Cole. #line:068713f 
+-> Take her side #line:05dbc81 
+    Player: Sounds like she just wants a bit of independence. #line:0e91a84 
+    Cole: I know what it sounds like. Doesn't mean I have to like it. #line:0681580 
+-> Joke about kids #line:0f9158e 
+    Player: Kids, huh. Always gotta test the waters eventually. #line:0f5b222 
+    Cole: ... #line:08a8e3c 
+-> ... #line:037c180 
+    Player: ... #line:0a44654 
+    Cole: ... #line:09a5948 
+    Eliana: ... #line:0f22e00 
 
-Eliana: For what it's worth, she's not wrong for wanting it.
-Eliana: And you're not wrong for worrying.
-Eliana: You're just both bad at saying it out loud.
+Eliana: For what it's worth, she's not wrong for wanting it. #line:079962a 
+Eliana: And you're not wrong for worrying. #line:038187d 
+Eliana: You're just both bad at saying it out loud. #line:0a1e0fa 
 <<Cole Neutral>>
-Cole: ...Noted, counselor.
-Walter: She's got a point, son.
-Cole: I said noted.
+Cole: ...Noted, counselor. #line:0bd3cc6 
+Walter: She's got a point, son. #line:014fa3a 
+Cole: I said noted. #line:01e8155 
 <<Walter Look F>>
 <<Eliana Look F>>
 <<jump D2_08_Eliana_Personal>>
@@ -852,38 +852,38 @@ Cole: I said noted.
 
 title: D2_08_Eliana_Personal
 ---
-Player: What about you, lady? How was your day?
-Eliana: Just call me Eliana.
+Player: What about you, lady? How was your day? #line:0e56bce 
+Eliana: Just call me Eliana. #line:0400b2b 
 <<Eliana Disappointed>>
-Eliana: Always busy.
+Eliana: Always busy. #line:06d7a98 
 <<Walter Look R>>
-Walter: You look exhausted, dear.
-Eliana: Yeah. It's been one of those weeks.
-Walter: Well, you've done more than enough for our sake.
-Eliana: Yeah... I guess. Thirty years of it now.
+Walter: You look exhausted, dear. #line:03fb5df 
+Eliana: Yeah. It's been one of those weeks. #line:04d5c15 
+Walter: Well, you've done more than enough for our sake. #line:0a225d2 
+Eliana: Yeah... I guess. Thirty years of it now. #line:02cc843 
 <<Walter Look F>>
 
--> Acknowledge the toll
-    Player: That's a long time to keep showing up, love for it or not.
-    Eliana: Tell me about it.
--> Do you enjoy it?
-    Player: Do you enjoy it? What you've been doing all these years?
-    Eliana: Some days. Today wasn't one of them.
--> Tease about her age
-    Player: Thirty years? You don't look a day over cross-examination.
+-> Acknowledge the toll #line:0503a62 
+    Player: That's a long time to keep showing up, love for it or not. #line:0bbc89f 
+    Eliana: Tell me about it. #line:097bea0 
+-> Do you enjoy it? #line:00d1d80 
+    Player: Do you enjoy it? What you've been doing all these years? #line:0921879 
+    Eliana: Some days. Today wasn't one of them. #line:0c05d7b 
+-> Tease about her age #line:07f22b5 
+    Player: Thirty years? You don't look a day over cross-examination. #line:02b21f9 
     <<Eliana Happy>>
-    Eliana: (Small laugh.) Flattery noted.
--> Offer a break
-    Player: Well, let this be your thirty seconds off the clock.
+    Eliana: (Small laugh.) Flattery noted. #line:08a0fbb 
+-> Offer a break #line:06bc2ec 
+    Player: Well, let this be your thirty seconds off the clock. #line:004168a 
     <<Eliana Happy>>
-    Eliana: I'll take it.
+    Eliana: I'll take it. #line:0b94357 
 
 <<Cole Look R>>
-Cole: Half this town would be lost without you.
+Cole: Half this town would be lost without you. #line:06431f1 
 <<Eliana Look L>>
 <<Eliana Happy>>
-Eliana: Coming from you, that almost sounds like a compliment.
-Eliana: But thanks.
+Eliana: Coming from you, that almost sounds like a compliment. #line:06077d3 
+Eliana: But thanks. #line:0e74810 
 <<Cole Look F>>
 <<Eliana Look F>>
 <<Eliana Neutral>>
@@ -895,19 +895,19 @@ title: D2_09_Walter_Leave
 <<Panel_FadeOut Panel_Transition>>
 <<wait_scene 1>>
 <<Panel_FadeIn Panel_Transition>>
-Walter: Well. On that note, I'll leave you two to it.
-Eliana: Already?
-Walter: It's past my hour.
+Walter: Well. On that note, I'll leave you two to it. #line:077228b 
+Eliana: Already? #line:0f87ca7 
+Walter: It's past my hour. #line:0659567 
 <<Walter Happy>>
-Walter: Besides, I forgot to take my medicine again.
-Player: I'll tell Isla.
+Walter: Besides, I forgot to take my medicine again. #line:0011451 
+Player: I'll tell Isla. #line:07f5b69 
 <<Walter Sad>>
-Walter: Please don't.
-Eliana: Goodnight, Walter.
-Cole: Night.
-Player: Get home safe, Walter.
+Walter: Please don't. #line:0c57f90 
+Eliana: Goodnight, Walter. #line:0db0848 
+Cole: Night. #line:00af856 
+Player: Get home safe, Walter. #line:0f41e80 
 <<Walter Neutral>>
-Walter: Always do.
+Walter: Always do. #line:0de385a 
 // Walter exits.
 <<Walter Look L>>
 <<Walter Exit>>
@@ -917,26 +917,26 @@ Walter: Always do.
 title: D2_10_Closing_Talk
 ---
 <<Cole Look R>>
-Cole: He's not wrong, you know.
+Cole: He's not wrong, you know. #line:0420c95 
 <<Eliana Look L>>
-Eliana: About which part?
-Cole: You've done more than enough.
-Eliana: I couldn't tell.
+Eliana: About which part? #line:09e40d5 
+Cole: You've done more than enough. #line:0810cdd 
+Eliana: I couldn't tell. #line:0872d20 
 <<Cole Look F>>
 <<Eliana Look F>>
 
-Cole: Anyway. Thanks for this.
-Cole: Didn't think a new bar in this town would actually be any good.
+Cole: Anyway. Thanks for this. #line:01985c5 
+Cole: Didn't think a new bar in this town would actually be any good. #line:057bf13 
 <<Eliana Happy>>
-Eliana: He means that as a compliment.
-Player: I'll take it.
-Eliana: We'll be back. Probably too often.
-Cole: Speak for yourself.
-Eliana: [wiggle]I am. You're just also right.[/wiggle]
+Eliana: He means that as a compliment. #line:01b152a 
+Player: I'll take it. #line:0bb96ae 
+Eliana: We'll be back. Probably too often. #line:0bc5241 
+Cole: Speak for yourself. #line:017db1e 
+Eliana: [wiggle]I am. You're just also right.[/wiggle] #line:03d4cef 
 
-Player: See you both around, then.
-Cole: Yeah. See you.
-Eliana: Night, bartender.
+Player: See you both around, then. #line:05df381 
+Cole: Yeah. See you. #line:07d70bb 
+Eliana: Night, bartender. #line:0a5a907 
 // Cole and Eliana exit.
 <<Cole Exit>>
 <<Eliana Exit>>
@@ -974,26 +974,26 @@ title: D3_01_Faye_Arrive
 <<Faye Enter 1>>
 <<Switch_Camera CamController Char12Cam>>
 <<Faye Neutral>>
-Faye: Evening.
-Player: Good evening. Welcome in.
-Faye: Just looking for a quiet corner tonight, if that's alright.
-Player: Take your pick. Not exactly crowded in here.
-Faye: No, I can see that.
+Faye: Evening. #line:0e3e8d8 
+Player: Good evening. Welcome in. #line:01b3692 
+Faye: Just looking for a quiet corner tonight, if that's alright. #line:0c70c06 
+Player: Take your pick. Not exactly crowded in here. #line:0ef866e 
+Faye: No, I can see that. #line:0cc5591 
 
--> Need anything?
-    Player: Can I get you started with anything?
-    Faye: Let me take a look at the menu first.
--> Compliment
-    Player: That's a striking coat, by the way.
+-> Need anything? #line:09dca70 
+    Player: Can I get you started with anything? #line:003f96e 
+    Faye: Let me take a look at the menu first. #line:0b0c849 
+-> Compliment #line:0be0981 
+    Player: That's a striking coat, by the way. #line:0fe23be 
     <<Faye Happy>>
-    Faye: Thank you. I made it, actually.
-    Player: Really? Impressive work.
--> Give her space
-    Player: Take your time. I'll be around.
-    Faye: Appreciated.
--> Small talk
-    Player: First time stopping by, or just haven't made it in yet?
-    Faye: Neither. I just don't go out much.
+    Faye: Thank you. I made it, actually. #line:0c8e89f 
+    Player: Really? Impressive work. #line:074fdf0 
+-> Give her space #line:0da2077 
+    Player: Take your time. I'll be around. #line:04c47c3 
+    Faye: Appreciated. #line:022ca69 
+-> Small talk #line:06748b2 
+    Player: First time stopping by, or just haven't made it in yet? #line:0753219 
+    Faye: Neither. I just don't go out much. #line:0b0d049 
 
 <<Faye Neutral>>
 <<jump D3_02_Isla_Arrive>>
@@ -1004,27 +1004,27 @@ title: D3_02_Isla_Arrive
 // Isla enters.
 <<Isla Enter 2>>
 <<Isla Neutral>>
-Isla: Oh - hi. Sorry, is this seat taken?
-Faye: Not at all. Sit, please.
-Isla: Thanks. Long day. Needed somewhere that wasn't the clinic or my apartment.
-Faye: I know the feeling. Different kind of long day, but still.
+Isla: Oh - hi. Sorry, is this seat taken? #line:0a3a020 
+Faye: Not at all. Sit, please. #line:02ee526 
+Isla: Thanks. Long day. Needed somewhere that wasn't the clinic or my apartment. #line:0500be4 
+Faye: I know the feeling. Different kind of long day, but still. #line:0221ca6 
 <<Isla Look L>>
 <<Faye Look R>>
 <<Isla Happy>>
-Isla: I don't think we've met. I'm Isla.
-Faye: Faye.
-Isla: Oh, is that your shop at the end of the street?
-Isla: Faye Fashion?
-Faye: Yeah, that's my shop.
-Isla: I went there once to buy some shoes, but I didn't see you at the time.
-Faye: I was quite busy.
+Isla: I don't think we've met. I'm Isla. #line:0fe15d8 
+Faye: Faye. #line:0a3f4d9 
+Isla: Oh, is that your shop at the end of the street? #line:07089f5 
+Isla: Faye Fashion? #line:01403d8 
+Faye: Yeah, that's my shop. #line:0e9015f 
+Isla: I went there once to buy some shoes, but I didn't see you at the time. #line:0fdaca8 
+Faye: I was quite busy. #line:0a7dfaf 
 <<Isla Sad>>
-Isla: The shoes are really good, but it's a shame I tore them a little.
-Faye: Is the fabric torn? You can bring them to me to fix.
-Isla: No, no, it's fine. I might just be clumsy.
-Faye: But you can show them to me first.
+Isla: The shoes are really good, but it's a shame I tore them a little. #line:0489cb4 
+Faye: Is the fabric torn? You can bring them to me to fix. #line:0a9fb20 
+Isla: No, no, it's fine. I might just be clumsy. #line:0192f0a 
+Faye: But you can show them to me first. #line:07b0beb 
 <<Isla Happy>>
-Isla: In that case, I'll look for an opportunity.
+Isla: In that case, I'll look for an opportunity. #line:0bfec60 
 <<Isla Neutral>>
 <<Isla Look F>>
 <<Faye Look F>>
@@ -1033,12 +1033,12 @@ Isla: In that case, I'll look for an opportunity.
 
 title: D3_03_Faye_Order
 ---
-Player: What can I get you?
+Player: What can I get you? #line:01d2b79 
 // "Something dry": the script names no drink, so a random one from her preferences.
 // (A Martini would fit, but Dry Vermouth unlocks on day 5 in IngredientUnlockTable.)
 <<set $order_note = Order_Cocktail_OutName(4)>>
-Faye: Something dry, please. Nothing fruity.
-Player: Coming right up.
+Faye: Something dry, please. Nothing fruity. #line:06424d6 
+Player: Coming right up. #line:0fe738a 
 
 <<flow_prepare_drinks>>
 <<wait_for_task SystemGame>>
@@ -1046,13 +1046,13 @@ Player: Coming right up.
 
 <<if $satisfaction == Satisfaction.Perfect>>
     <<Faye Happy>>
-    Faye: Hm. Not bad.
+    Faye: Hm. Not bad. #line:0eb81d9 
 <<elseif $satisfaction == Satisfaction.Acceptable>>
-    Faye: A bit off, but I get it.
+    Faye: A bit off, but I get it. #line:03ea2c4 
 <<else>>
     <<Faye Sad>>
-    Faye: Goodness, what did you make?
-    Faye: Sorry.
+    Faye: Goodness, what did you make? #line:056540f 
+    Faye: Sorry. #line:0da3eeb 
 <<endif>>
 <<Reset_Variable SystemGame>>
 <<Faye Neutral>>
@@ -1061,10 +1061,10 @@ Player: Coming right up.
 
 title: D3_04_Isla_Order
 ---
-Player: And for you, Isla?
+Player: And for you, Isla? #line:091444b 
 <<set $order_note = Order_Cocktail_OutName(5)>>
-Isla: Surprise me. I trust the place, so far.
-Player: Coming right up.
+Isla: Surprise me. I trust the place, so far. #line:0e03753 
+Player: Coming right up. #line:082e91f 
 
 <<flow_prepare_drinks>>
 <<wait_for_task SystemGame>>
@@ -1072,13 +1072,13 @@ Player: Coming right up.
 
 <<if $satisfaction == Satisfaction.Perfect>>
     <<Isla Happy>>
-    Isla: [bounce]Refreshing. This is exactly what I need right now.[/bounce]
+    Isla: [bounce]Refreshing. This is exactly what I need right now.[/bounce] #line:0be4480 
 <<elseif $satisfaction == Satisfaction.Acceptable>>
-    Isla: It still feels like something is missing.
-    Isla: But I think it's okay as it is.
+    Isla: It still feels like something is missing. #line:0a487d4 
+    Isla: But I think it's okay as it is. #line:07d9e9b 
 <<else>>
     <<Isla Sad>>
-    Isla: Hm. It's not quite what I was looking for.
+    Isla: Hm. It's not quite what I was looking for. #line:0cecd66 
 <<endif>>
 <<Reset_Variable SystemGame>>
 <<Isla Neutral>>
@@ -1088,58 +1088,58 @@ Player: Coming right up.
 title: D3_05_Faye_Isla_Talk
 ---
 <<Faye Look R>>
-Faye: You're a nurse at the local clinic, right?
+Faye: You're a nurse at the local clinic, right? #line:098cc45 
 <<Isla Look L>>
-Isla: Yeah, how do you know?
-Faye: I think I saw you there once, when I went in.
-Isla: Eh? I really can't remember that.
-Faye: Don't give it a second thought. You were probably busy at the time.
-Faye: Working hard is a good thing.
+Isla: Yeah, how do you know? #line:055098e 
+Faye: I think I saw you there once, when I went in. #line:0a2a904 
+Isla: Eh? I really can't remember that. #line:08c7ca5 
+Faye: Don't give it a second thought. You were probably busy at the time. #line:0ba5361 
+Faye: Working hard is a good thing. #line:04e8b95 
 <<Isla Sad>>
-Isla: I don't really feel that great about it, to be honest.
+Isla: I don't really feel that great about it, to be honest. #line:0559d22 
 <<Isla Happy>>
-Isla: But coming here is a good thing.
-Isla: [bounce]Having a place to relax like this in such a remote town is absolutely amazing![/bounce]
-Faye: You're not from here?
+Isla: But coming here is a good thing. #line:0c1cc32 
+Isla: [bounce]Having a place to relax like this in such a remote town is absolutely amazing![/bounce] #line:01d20ba 
+Faye: You're not from here? #line:023172c 
 <<Isla Neutral>>
-Isla: No, I come from a city in the west.
-Faye: A port city? That's a long way from here.
+Isla: No, I come from a city in the west. #line:07efc78 
+Faye: A port city? That's a long way from here. #line:0b851b8 
 <<Isla Sad2>>
-Isla: Yeah. I miss home sometimes.
+Isla: Yeah. I miss home sometimes. #line:0b4c910 
 <<Isla Neutral>>
-Isla: Did you grow up here?
-Faye: Yeah, I just came back a few months ago.
-Faye: To escape from the noise.
-Isla: Have you been to the capital before?
-Faye: I studied there, at National University.
+Isla: Did you grow up here? #line:0064cc5 
+Faye: Yeah, I just came back a few months ago. #line:008e89a 
+Faye: To escape from the noise. #line:0756ccd 
+Isla: Have you been to the capital before? #line:054289d 
+Faye: I studied there, at National University. #line:0afb995 
 <<Isla Happy>>
-Isla: Whoa, you must be a genius.
-Faye: That's an exaggeration.
+Isla: Whoa, you must be a genius. #line:0f9f205 
+Faye: That's an exaggeration. #line:01a3417 
 <<Isla Neutral>>
 <<Faye Look F>>
 <<Isla Look F>>
-Faye: And you, bartender? Where are you from?
+Faye: And you, bartender? Where are you from? #line:02f1c4a 
 
--> I've come from a lot of places.
-    Player: I've come from a lot of places.
-    Faye: Could you elaborate?
-    Player: Let's just say I've come a long way.
-    Faye: Fair enough. I won't pry.
--> Honest
-    Player: Honestly? Somewhere a lot louder than here. I needed the quiet.
-    Faye: Then we have that in common.
-    Isla: Well, you picked the right town.
--> That's a secret.
-    Player: Sorry, this is a trade secret.
-    Isla: Are you a smuggler or something?
-    Player: Yes, trading in happiness.
-    Isla: ...
--> It doesn't matter.
-    Player: It doesn't matter where I come from. What matters is where we are.
-    Isla: Is that some kind of poem?
-    Player: Shakespeare.
-    Isla: Really?
-    Player: I don't know.
+-> I've come from a lot of places. #line:0bea592 
+    Player: I've come from a lot of places. #line:068d527 
+    Faye: Could you elaborate? #line:089b040 
+    Player: Let's just say I've come a long way. #line:0722d84 
+    Faye: Fair enough. I won't pry. #line:04d4c10 
+-> Honest #line:054a63a 
+    Player: Honestly? Somewhere a lot louder than here. I needed the quiet. #line:0bec799 
+    Faye: Then we have that in common. #line:041e552 
+    Isla: Well, you picked the right town. #line:07b2cb9 
+-> That's a secret. #line:0e5b059 
+    Player: Sorry, this is a trade secret. #line:0cc0220 
+    Isla: Are you a smuggler or something? #line:096653c 
+    Player: Yes, trading in happiness. #line:01a33f9 
+    Isla: ... #line:064e063 
+-> It doesn't matter. #line:052d620 
+    Player: It doesn't matter where I come from. What matters is where we are. #line:0a5f3b0 
+    Isla: Is that some kind of poem? #line:01d7e7a 
+    Player: Shakespeare. #line:05edba8 
+    Isla: Really? #line:02c8056 
+    Player: I don't know. #line:06a4f3d 
 <<jump D3_06_Arthur_Arrive>>
 ===
 
@@ -1149,79 +1149,79 @@ title: D3_06_Arthur_Arrive
 <<Arthur Enter 3>>
 <<Switch_Camera CamController Char2Cam>>
 <<Arthur Neutral>>
-Arthur: Huh. So this is the new spot everyone's talking about.
+Arthur: Huh. So this is the new spot everyone's talking about. #line:05b5f47 
 <<Isla Look R>>
-Isla: Arthur? Didn't expect to see you here.
-Arthur: Yeah, well. Nothing else going on tonight.
+Isla: Arthur? Didn't expect to see you here. #line:047041c 
+Arthur: Yeah, well. Nothing else going on tonight. #line:0db5c5e 
 <<Faye Look R>>
-Faye: Arthur.
+Faye: Arthur. #line:06c8560 
 <<Arthur NeutralLeft>>
-Arthur: Faye.
-Isla: You two... know each other?
-Faye: Unfortunately.
+Arthur: Faye. #line:086510c 
+Isla: You two... know each other? #line:0a18aff 
+Faye: Unfortunately. #line:0d3f225 
 <<Arthur Neutral>>
-Arthur: Small town. Hard not to.
+Arthur: Small town. Hard not to. #line:0885bb1 
 <<Isla Look F>>
 <<Faye Look F>>
 
--> Break tension
-    Player: Well, the seats are open either way. No cover charge for tension.
+-> Break tension #line:06aca86 
+    Player: Well, the seats are open either way. No cover charge for tension. #line:02ec081 
     <<Arthur Mockery>>
-    Arthur: (A faint smirk.) Noted.
--> Address it directly
-    Player: Should I be worried about keeping the peace tonight?
-    Faye: No promises.
--> Introduce yourself
-    Player: Haven't seen you before. I'm the new bartender.
+    Arthur: (A faint smirk.) Noted. #line:00e8aeb 
+-> Address it directly #line:0aa95cf 
+    Player: Should I be worried about keeping the peace tonight? #line:0636a84 
+    Faye: No promises. #line:09fb11b 
+-> Introduce yourself #line:0da26b3 
+    Player: Haven't seen you before. I'm the new bartender. #line:0ec3467 
     <<Arthur Mockery>>
-    Arthur: Figured. I'd remember a face this eager to please.
--> Keep working
-    Player: (You get back to wiping down glasses, letting the silence sit.)
-    Isla: (Under her breath.) Smart.
+    Arthur: Figured. I'd remember a face this eager to please. #line:018f8c4 
+-> Keep working #line:01a4f21 
+    Player: (You get back to wiping down glasses, letting the silence sit.) #line:06d0751 
+    Isla: (Under her breath.) Smart. #line:0f9e55a 
 <<Arthur Neutral>>
 <<jump D3_07_Arthur_Faye_Isla_Talk>>
 ===
 
 title: D3_07_Arthur_Faye_Isla_Talk
 ---
-Isla: So how do you two know each other, exactly?
-Arthur: Went to the same school. Different circles.
-Faye: Very different circles.
+Isla: So how do you two know each other, exactly? #line:096d589 
+Arthur: Went to the same school. Different circles. #line:07fe6df 
+Faye: Very different circles. #line:0a1f400 
 <<Arthur Angry>>
-Arthur: You say that like it's my fault.
-Faye: I didn't say anything.
-Arthur: You didn't have to.
-Isla: (To you, quietly.) Is it always like this?
+Arthur: You say that like it's my fault. #line:03d66d3 
+Faye: I didn't say anything. #line:0b2fa57 
+Arthur: You didn't have to. #line:021ec7b 
+Isla: (To you, quietly.) Is it always like this? #line:09a9517 
 
--> "Sounds like history."
-    Player: Sounds like there's some history there.
-    Arthur: There's nothing to it.
-    Faye: Sure.
--> "Maybe start over?"
-    Player: Maybe you two could just start over from here?
+-> "Sounds like history." #line:0a16c62 
+    Player: Sounds like there's some history there. #line:0b61279 
+    Arthur: There's nothing to it. #line:0cf791d 
+    Faye: Sure. #line:036aa22 
+-> "Maybe start over?" #line:050ddec 
+    Player: Maybe you two could just start over from here? #line:0cd71ae 
     <<Arthur Neutral>>
-    Arthur: Fine by me.
--> Change the subject
-    Player: So, Arthur - what brings you in tonight?
+    Arthur: Fine by me. #line:0afe4d9 
+-> Change the subject #line:0d3bd03 
+    Player: So, Arthur - what brings you in tonight? #line:077a175 
     <<Arthur Neutral>>
-    Arthur: Boredom, mostly. Same as every night.
--> Let them work it out
-    Player: (You stay quiet, letting them sort it out themselves.)
+    Arthur: Boredom, mostly. Same as every night. #line:08d78c9 
+-> Let them work it out #line:01d2adf 
+    Player: (You stay quiet, letting them sort it out themselves.) #line:0ebdc78 
 <<Arthur Neutral>>
 <<jump D3_08_Arthur_Order>>
 ===
 
 title: D3_08_Arthur_Order
 ---
-Player: What can I get you?
+Player: What can I get you? #line:0abc110 
 <<set $order_note = Order_Cocktail_OutName(8)>>
 <<Arthur HandIn>>
-Arthur: Whatever's expensive and good. I'll know if it's not.
-Faye: (Mutters.) Of course you will.
+Arthur: Whatever's expensive and good. I'll know if it's not. #line:080b415 
+Faye: (Mutters.) Of course you will. #line:0366be8 
 <<Arthur Angry>>
-Arthur: Something wrong with wanting quality?
-Faye: Not at all. Just easy to want, when someone else always paid for it.
-Player: (You start on the drink.)
+Arthur: Something wrong with wanting quality? #line:0d71acc 
+Faye: Not at all. Just easy to want, when someone else always paid for it. #line:04c6c37 
+Player: (You start on the drink.) #line:0d7256d 
 <<Arthur Neutral>>
 
 <<flow_prepare_drinks>>
@@ -1229,13 +1229,13 @@ Player: (You start on the drink.)
 <<Switch_Camera CamController Char2Cam>>
 
 <<if $satisfaction == Satisfaction.Perfect>>
-    Arthur: Huh. Actually good. Wasn't expecting that.
+    Arthur: Huh. Actually good. Wasn't expecting that. #line:0216c51 
 <<elseif $satisfaction == Satisfaction.Acceptable>>
     <<Arthur Mockery>>
-    Arthur: It's fine. Not what I'd get in the city, but fine.
+    Arthur: It's fine. Not what I'd get in the city, but fine. #line:032fab7 
 <<else>>
     <<Arthur Angry>>
-    Arthur: This is... not it. Try again sometime, maybe.
+    Arthur: This is... not it. Try again sometime, maybe. #line:07a82dd 
 <<endif>>
 <<Reset_Variable SystemGame>>
 <<Arthur Neutral>>
@@ -1244,29 +1244,29 @@ Player: (You start on the drink.)
 
 title: D3_09_Isla_Leave
 ---
-Isla: Oh - I should get going. Early shift tomorrow.
-Faye: Already?
+Isla: Oh - I should get going. Early shift tomorrow. #line:08ab9af 
+Faye: Already? #line:066a1b9 
 <<Isla Sad>>
-Isla: Sadly, yes. Patients don't care how tired I am.
+Isla: Sadly, yes. Patients don't care how tired I am. #line:08cfaeb 
 
--> Walter's medicine
-    Player: Walter said he forgot to take his medicine again.
+-> Walter's medicine #line:0032f59 
+    Player: Walter said he forgot to take his medicine again. #line:0f1d457 
     <<Isla Sad2>>
-    Isla: Again? I'll make sure he takes it next time.
-    Player: Scary.
+    Isla: Again? I'll make sure he takes it next time. #line:0329afc 
+    Player: Scary. #line:0d379b4 
     <<Isla Happy>>
-    Isla: Thank you for telling me.
--> Get home safe
-    Player: Get home safe, Isla.
+    Isla: Thank you for telling me. #line:0db7867 
+-> Get home safe #line:0a5101b 
+    Player: Get home safe, Isla. #line:09df58b 
     <<Isla Happy>>
-    Isla: Thank you.
+    Isla: Thank you. #line:0b98b09 
 
 <<Isla Happy>>
-Isla: It was really nice meeting you.
-Faye: Likewise.
+Isla: It was really nice meeting you. #line:0646490 
+Faye: Likewise. #line:006f5e8 
 <<Isla Neutral>>
-Isla: ...See you around.
-Arthur: See you.
+Isla: ...See you around. #line:03285c3 
+Arthur: See you. #line:0d24937 
 // Isla exits.
 <<Isla Look L>>
 <<Isla Exit>>
@@ -1277,27 +1277,27 @@ title: D3_10_Quiet_Faye_Arthur
 ---
 <<Arthur Look L>>
 <<Arthur Mockery>>
-Arthur: You still mad about that thing in senior year?
-Faye: I don't even remember what you're talking about.
-Arthur: Liar.
+Arthur: You still mad about that thing in senior year? #line:09b5169 
+Faye: I don't even remember what you're talking about. #line:0f8165f 
+Arthur: Liar. #line:0bdacfe 
 <<Arthur Look F>>
 
--> Ask what happened
-    Player: What thing in senior year?
+-> Ask what happened #line:0dd2420 
+    Player: What thing in senior year? #line:0b385ab 
     <<Arthur Neutral>>
-    Arthur: Nothing. Old news.
-    Faye: Drop it.
--> Refill their drinks, stay out of it
-    Player: (You quietly top off their glasses and step back.)
-    Faye: (A small, appreciative glance.)
--> Comment on the tension
-    Player: You two really don't let things go, huh.
-    Arthur: She doesn't.
-    Faye: Says the one who brought it up.
--> Redirect to something neutral
-    Player: So, Faye - how's the shop been?
+    Arthur: Nothing. Old news. #line:0cbf418 
+    Faye: Drop it. #line:062853e 
+-> Refill their drinks, stay out of it #line:05ebb9e 
+    Player: (You quietly top off their glasses and step back.) #line:0fbcde4 
+    Faye: (A small, appreciative glance.) #line:02e72a9 
+-> Comment on the tension #line:0c14640 
+    Player: You two really don't let things go, huh. #line:0793145 
+    Arthur: She doesn't. #line:06069a1 
+    Faye: Says the one who brought it up. #line:0a8cc12 
+-> Redirect to something neutral #line:05587c9 
+    Player: So, Faye - how's the shop been? #line:0664165 
     <<Faye Happy>>
-    Faye: Busy. Good busy.
+    Faye: Busy. Good busy. #line:0918e06 
 <<Arthur Neutral>>
 <<Faye Neutral>>
 <<jump D3_11_Owen_Arrive>>
@@ -1310,45 +1310,45 @@ title: D3_11_Owen_Arrive
 <<Owen Enter 2>>
 <<Switch_Camera CamController Char2Cam>>
 <<Owen Happy>>
-Owen: [bounce]Hey hey! Anyone still serving around here or- oh. Hey, Faye![/bounce]
-Faye: Owen.
-Owen: Didn't expect to see you out tonight.
+Owen: [bounce]Hey hey! Anyone still serving around here or- oh. Hey, Faye![/bounce] #line:0eef1c3 
+Faye: Owen. #line:0201239 
+Owen: Didn't expect to see you out tonight. #line:016b2b3 
 <<Owen Look R>>
 <<Owen Neutral>>
-Owen: Um... Arthur, I suppose?
+Owen: Um... Arthur, I suppose? #line:04f70bf 
 <<Arthur Look L>>
-Arthur: Yes. Do I know you?
-Owen: You haven't been living here long, have you? I know everyone in this town.
-Owen: I just happened to talk to Claire about someone who moved here recently.
+Arthur: Yes. Do I know you? #line:0427e31 
+Owen: You haven't been living here long, have you? I know everyone in this town. #line:0337ac8 
+Owen: I just happened to talk to Claire about someone who moved here recently. #line:05f0995 
 <<Owen Happy>>
-Owen: Owen. Forest ranger. Nice to meet you.
+Owen: Owen. Forest ranger. Nice to meet you. #line:09ad6b2 
 <<Arthur NeutralLeft>>
-Arthur: If it weren't for my dad telling me to go live a bit further away from the city...
+Arthur: If it weren't for my dad telling me to go live a bit further away from the city... #line:0dc6b25 
 <<Faye Look R>>
-Faye: Well, who was it that messed around so much they had to repeat a year at university?
+Faye: Well, who was it that messed around so much they had to repeat a year at university? #line:0f8449c 
 <<Arthur Rage>>
-Arthur: [shake]Faye![/shake]
-Faye: Just saying.
+Arthur: [shake]Faye![/shake] #line:0d29159 
+Faye: Just saying. #line:0ef833e 
 <<Owen Neutral>>
-Owen: Oh, you know each other.
-Faye: No.
+Owen: Oh, you know each other. #line:0639fd6 
+Faye: No. #line:08777e7 
 <<Arthur Neutral>>
-Arthur: Probably.
+Arthur: Probably. #line:0a4cb28 
 <<Arthur Look F>>
 <<Owen Look F>>
 <<Faye Look F>>
 
-Faye: Actually, I should head out.
+Faye: Actually, I should head out. #line:04e2e52 
 <<Owen Look L>>
-Owen: Already? I just got here.
-Faye: It's been a long night. I'll catch you next time.
-Player: Get home safe, Faye.
+Owen: Already? I just got here. #line:06422b0 
+Faye: It's been a long night. I'll catch you next time. #line:03bc963 
+Player: Get home safe, Faye. #line:05455d8 
 <<Faye Happy>>
-Faye: Thank you.
+Faye: Thank you. #line:019786f 
 <<Faye Neutral>>
 <<Faye Look R>>
-Faye: Arthur.
-Arthur: Faye.
+Faye: Arthur. #line:0444830 
+Arthur: Faye. #line:07f750c 
 // Faye exits.
 <<Faye Exit>>
 <<Owen Look F>>
@@ -1359,8 +1359,8 @@ title: D3_12_Owen_Order
 ---
 <<set $order_note = Order_Cocktail_OutName(2)>>
 <<Owen Happy>>
-Owen: Well! Guess it's just us. I'll have something easy - surprise me.
-Player: Coming up.
+Owen: Well! Guess it's just us. I'll have something easy - surprise me. #line:0ae8ec5 
+Player: Coming up. #line:0283471 
 
 <<flow_prepare_drinks>>
 <<wait_for_task SystemGame>>
@@ -1368,12 +1368,12 @@ Player: Coming up.
 
 <<if $satisfaction == Satisfaction.Perfect>>
     <<Owen Happy1>>
-    Owen: [bounce]Now THAT'S a drink. You've got a gift, my friend.[/bounce]
+    Owen: [bounce]Now THAT'S a drink. You've got a gift, my friend.[/bounce] #line:007e61b 
 <<elseif $satisfaction == Satisfaction.Acceptable>>
-    Owen: Not bad! Little different than I expected, but hey, I'll take it.
+    Owen: Not bad! Little different than I expected, but hey, I'll take it. #line:0912d06 
 <<else>>
     <<Owen Sad>>
-    Owen: Oh- oh boy. Well. It's got personality, I'll give it that.
+    Owen: Oh- oh boy. Well. It's got personality, I'll give it that. #line:0d4bcb0 
 <<endif>>
 <<Reset_Variable SystemGame>>
 <<Owen Neutral>>
@@ -1383,62 +1383,62 @@ Player: Coming up.
 title: D3_13_Owen_Arthur_Talk
 ---
 <<Owen Look R>>
-Owen: So, Arthur, was it? What do you do?
+Owen: So, Arthur, was it? What do you do? #line:0308e17 
 <<Arthur Look L>>
-Arthur: Student. Sort of.
-Owen: Sort of?
-Arthur: Studying. Not really doing anything with it yet.
+Arthur: Student. Sort of. #line:0b969b7 
+Owen: Sort of? #line:0731012 
+Arthur: Studying. Not really doing anything with it yet. #line:032ac54 
 <<Owen Happy>>
-Owen: Hey, no rush. I didn't figure out what I wanted to do 'til I was climbing trees for a living, chasing raccoons out of people's attics.
-Arthur: Wait, that's an actual job?
-Owen: Forest ranger. Wildlife, trails, the works. Best decision I ever made.
+Owen: Hey, no rush. I didn't figure out what I wanted to do 'til I was climbing trees for a living, chasing raccoons out of people's attics. #line:04f8852 
+Arthur: Wait, that's an actual job? #line:037b425 
+Owen: Forest ranger. Wildlife, trails, the works. Best decision I ever made. #line:027fd02 
 <<Owen Look F>>
 <<Arthur Look F>>
 
--> Ask Arthur what he'd want to do
-    Player: What about you, Arthur? Anything you'd want to do, if you could?
-    Arthur: I've never really thought about it.
+-> Ask Arthur what he'd want to do #line:07572cc 
+    Player: What about you, Arthur? Anything you'd want to do, if you could? #line:0e6e3ae 
+    Arthur: I've never really thought about it. #line:01bd310 
     <<Owen Neutral>>
-    Owen: Really? Never?
-    Arthur: Didn't need to.
--> Encourage the moment
-    Player: Sounds like you two might actually have something to talk about.
-    Owen: [wiggle]Ha! Maybe.[/wiggle]
--> Keep it light
-    Player: Careful, Owen, you might convert him to a life of chasing raccoons.
-    Owen: [bounce]Hey, it's a noble calling![/bounce]
--> Stay out of it
-    Player: (You let the conversation run its course without jumping in.)
-    Owen: (Keeps talking easily, filling the quiet space Arthur leaves.)
+    Owen: Really? Never? #line:082d877 
+    Arthur: Didn't need to. #line:058d338 
+-> Encourage the moment #line:0c49b96 
+    Player: Sounds like you two might actually have something to talk about. #line:05ea369 
+    Owen: [wiggle]Ha! Maybe.[/wiggle] #line:0424d6d 
+-> Keep it light #line:0d71a86 
+    Player: Careful, Owen, you might convert him to a life of chasing raccoons. #line:0d3af7c 
+    Owen: [bounce]Hey, it's a noble calling![/bounce] #line:08ff3e4 
+-> Stay out of it #line:06f385f 
+    Player: (You let the conversation run its course without jumping in.) #line:0982e0e 
+    Owen: (Keeps talking easily, filling the quiet space Arthur leaves.) #line:0a6fac1 
 
 <<Owen Neutral>>
-Owen: And hey, how do you know Faye?
-Arthur: Just... same place. Same university.
-Owen: What a coincidence. No wonder you two seem so close.
+Owen: And hey, how do you know Faye? #line:01c7b18 
+Arthur: Just... same place. Same university. #line:02b02f3 
+Owen: What a coincidence. No wonder you two seem so close. #line:0fc46f0 
 <<Owen Happy>>
-Owen: Don't worry, you're not the only newcomer here.
-Owen: The other one is standing right in front of you.
+Owen: Don't worry, you're not the only newcomer here. #line:06d02af 
+Owen: The other one is standing right in front of you. #line:00131f1 
 <<Arthur NeutralLeft>>
-Arthur: Aren't you from around here?
+Arthur: Aren't you from around here? #line:04cc8f5 
 
--> Yes
-    Player: Yes, I'm from here. Just from upstairs.
-    Owen: [shake]Hey! Coming from upstairs doesn't count.[/shake]
--> No
-    Player: No, I'm not from here.
-    Owen: Our town really seems to be getting famous.
--> I blend right in, don't I?
-    Player: I must look like someone from around here.
-    Arthur: You really can't tell the difference.
-    Owen: Or did you shapeshift? Like a werewolf.
-    Player: I'm not you, Owen.
+-> Yes #line:04d45d5 
+    Player: Yes, I'm from here. Just from upstairs. #line:06f7cb7 
+    Owen: [shake]Hey! Coming from upstairs doesn't count.[/shake] #line:0718374 
+-> No #line:0ee7e41 
+    Player: No, I'm not from here. #line:0478aa4 
+    Owen: Our town really seems to be getting famous. #line:0b1512a 
+-> I blend right in, don't I? #line:05ebe18 
+    Player: I must look like someone from around here. #line:02e7b7e 
+    Arthur: You really can't tell the difference. #line:0e16cfb 
+    Owen: Or did you shapeshift? Like a werewolf. #line:0695b12 
+    Player: I'm not you, Owen. #line:0c59847 
     <<Owen Sad>>
-    Owen: [shake]Hey! What's that supposed to mean?[/shake]
--> Distract
-    Player: Raccoon!
-    Owen: [shake]What! Where![/shake]
-    Player: Never mind, just a shadow.
-    Owen: You really scared me!
+    Owen: [shake]Hey! What's that supposed to mean?[/shake] #line:0830907 
+-> Distract #line:0b7cf18 
+    Player: Raccoon! #line:03ba2d3 
+    Owen: [shake]What! Where![/shake] #line:012051b 
+    Player: Never mind, just a shadow. #line:0bde779 
+    Owen: You really scared me! #line:0325b41 
 <<Owen Neutral>>
 <<Arthur Neutral>>
 <<jump D3_14_Arthur_Leave>>
@@ -1447,21 +1447,21 @@ Arthur: Aren't you from around here?
 title: D3_14_Arthur_Leave
 ---
 <<Arthur Mockery>>
-Arthur: You guys are funny.
+Arthur: You guys are funny. #line:0e14a38 
 <<Arthur Neutral>>
-Arthur: But I guess I'm good to go now.
+Arthur: But I guess I'm good to go now. #line:0e2f62b 
 <<Owen Sad>>
-Owen: Oh, okay. So it's just me again.
+Owen: Oh, okay. So it's just me again. #line:08fba41 
 <<Owen Neutral>>
-Owen: If you'd like a tour of the town, I can show you around.
-Arthur: I'll give it some thought.
+Owen: If you'd like a tour of the town, I can show you around. #line:0bad506 
+Arthur: I'll give it some thought. #line:001fac2 
 <<Arthur HandIn>>
-Arthur: Let me take some time to work on the project first.
+Arthur: Let me take some time to work on the project first. #line:0a85a85 
 <<Arthur Neutral>>
-Arthur: Good night, everyone.
-Player: Good night. Take care.
+Arthur: Good night, everyone. #line:0dadf49 
+Player: Good night. Take care. #line:098408d 
 <<Owen Happy>>
-Owen: Night night.
+Owen: Night night. #line:098adbb 
 // Arthur exits.
 <<Arthur Look R>>
 <<Arthur Exit>>
@@ -1471,32 +1471,32 @@ Owen: Night night.
 title: D3_15_Closing
 ---
 <<Owen Neutral>>
-Owen: And now I'm all alone again.
-Player: I told you, you have me.
-Owen: That's true.
-Owen: What do you think they are to each other?
-Player: Faye and Arthur?
-Player: How am I supposed to know?
-Owen: I suppose so.
-Owen: The town is actually quieter than the forest.
-Player: That's normal. The louder the sound, the quieter it seems once it stops.
-Owen: You're right again.
-Owen: Anyway, I have to go now.
-Player: Morning shift?
+Owen: And now I'm all alone again. #line:0f8fef8 
+Player: I told you, you have me. #line:02dc1ef 
+Owen: That's true. #line:01412fe 
+Owen: What do you think they are to each other? #line:08e66c4 
+Player: Faye and Arthur? #line:076c921 
+Player: How am I supposed to know? #line:0c5a9a5 
+Owen: I suppose so. #line:04e5660 
+Owen: The town is actually quieter than the forest. #line:0eaeb2f 
+Player: That's normal. The louder the sound, the quieter it seems once it stops. #line:0dab72c 
+Owen: You're right again. #line:005f614 
+Owen: Anyway, I have to go now. #line:075603a 
+Player: Morning shift? #line:02d54ce 
 <<Owen Happy>>
-Owen: Nope. I'm going to play a game.
-Player: ...
+Owen: Nope. I'm going to play a game. #line:03b4dd3 
+Player: ... #line:0a7820d 
 <<Owen Neutral>>
-Owen: Just kidding. I have to head back into the forest tomorrow.
-Owen: I'm going to conduct a survey to see if any bears are wandering close to town.
-Player: That sounds serious.
-Owen: [fade]It's normal. They're just lost, or... lonely.[/fade]
-Owen: See you another day.
-Player: Good luck catching the bear.
-Owen: [shake]I don't catch them, damn it. I herd them.[/shake]
-Player: Haha. Good night.
+Owen: Just kidding. I have to head back into the forest tomorrow. #line:065dd7e 
+Owen: I'm going to conduct a survey to see if any bears are wandering close to town. #line:03027ea 
+Player: That sounds serious. #line:060e072 
+Owen: [fade]It's normal. They're just lost, or... lonely.[/fade] #line:06dbf74 
+Owen: See you another day. #line:00e1734 
+Player: Good luck catching the bear. #line:00ceadc 
+Owen: [shake]I don't catch them, damn it. I herd them.[/shake] #line:0b76947 
+Player: Haha. Good night. #line:05c8b3a 
 <<Owen Happy>>
-Owen: Night night.
+Owen: Night night. #line:094f5a6 
 // Owen exits. End of Day 3.
 <<Owen Look L>>
 <<Owen Exit>>

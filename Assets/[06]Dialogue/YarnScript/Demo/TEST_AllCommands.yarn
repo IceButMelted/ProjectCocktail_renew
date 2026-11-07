@@ -1,22 +1,22 @@
-title: TEST_Start
+﻿title: TEST_Start
 ---
 // Test sheet for every Yarn command and function in the project.
 // Run: in DaySchedule_Demo.asset set Day 1's Start Node to TEST_Start, then Play. Set it back afterwards.
 // Docs per command: Docs/YarnCommands/
 // The flow starts in BeforeOpen › StoryBeforeOpen (this node is the "story before opening").
-Player: (TEST) Start. flow_phase = {flow_phase()}, flow_step = {flow_step()}
-Player: (TEST) Expect BeforeOpen / StoryBeforeOpen.
-Player: (TEST) Day {$day}. Day-1 kit: Gin = {ingredient_unlocked("Gin")} (expect True), Whiskey = {ingredient_unlocked("Whiskey")} (expect False on day 1)
+Player: (TEST) Start. flow_phase = {flow_phase()}, flow_step = {flow_step()} #line:0330684 
+Player: (TEST) Expect BeforeOpen / StoryBeforeOpen. #line:0a7a233 
+Player: (TEST) Day {$day}. Day-1 kit: Gin = {ingredient_unlocked("Gin")} (expect True), Whiskey = {ingredient_unlocked("Whiskey")} (expect False on day 1) #line:0def93c 
 
 // flow_check_events: Story -> Event -> back to Story, then the next line plays.
 <<flow_check_events>>
-Player: (TEST) After flow_check_events. flow_step = {flow_step()} (expect StoryBeforeOpen). Day 1: no unlock popup.
+Player: (TEST) After flow_check_events. flow_step = {flow_step()} (expect StoryBeforeOpen). Day 1: no unlock popup. #line:09f270f 
 
--> Test the BeforeOpen-only commands, then open the bar
+-> Test the BeforeOpen-only commands, then open the bar #line:06662f5 
     <<jump TEST_BeforeOpen>>
--> Test the ingredient unlock popup (BeforeOpen), then open the bar
+-> Test the ingredient unlock popup (BeforeOpen), then open the bar #line:088731a 
     <<jump TEST_UnlockPopup>>
--> Open the bar now
+-> Open the bar now #line:05fc441 
     <<jump TEST_OpenBar>>
 ===
 
@@ -24,19 +24,19 @@ title: TEST_BeforeOpen
 ---
 // Panel_Transition (instance commands: target is the GameObject name).
 <<Panel_FadeOut Panel_Transition>>
-Player: (TEST) Panel_FadeOut done (screen should be covered).
+Player: (TEST) Panel_FadeOut done (screen should be covered). #line:0e2b359 
 <<Panel_FadeIn Panel_Transition>>
-Player: (TEST) Panel_FadeIn done (screen should be clear again).
+Player: (TEST) Panel_FadeIn done (screen should be clear again). #line:0f06956 
 <<jump TEST_OpenBar>>
 ===
 
 title: TEST_OpenBar
 ---
 <<flow_open_bar>>
-Player: (TEST) After flow_open_bar. flow_phase = {flow_phase()}, flow_step = {flow_step()} (expect Open / TalkingWithCustomer)
+Player: (TEST) After flow_open_bar. flow_phase = {flow_phase()}, flow_step = {flow_step()} (expect Open / TalkingWithCustomer) #line:075bf90 
 // Calling it again from Open must only warn in the Console.
 <<flow_open_bar>>
-Player: (TEST) Second flow_open_bar should have logged a warning, nothing else.
+Player: (TEST) Second flow_open_bar should have logged a warning, nothing else. #line:0faa132 
 <<jump TEST_Hub>>
 ===
 
@@ -47,154 +47,154 @@ title: TEST_AllCharacters
 // Cole and Faye have no Left/Right picture yet: their Look L/R shows the expression and warns.
 <<Cole Enter 0>>
 <<Cole Neutral>>
-Player: (TEST) Cole 0 = Neutral.
+Player: (TEST) Cole 0 = Neutral. #line:0064af9 
 <<Cole Happy>>
-Player: (TEST) Cole 1 = Happy.
+Player: (TEST) Cole 1 = Happy. #line:07fa829 
 <<Cole Sad>>
-Player: (TEST) Cole 2 = Sad.
+Player: (TEST) Cole 2 = Sad. #line:0fbefb5 
 <<Cole 2>>
-Player: (TEST) Cole by number 2 = Sad.
+Player: (TEST) Cole by number 2 = Sad. #line:02865e6 
 <<Cole Look L>>
-Player: (TEST) Cole Look L.
+Player: (TEST) Cole Look L. #line:033f591 
 <<Cole Look F>>
-Player: (TEST) Cole Look F.
+Player: (TEST) Cole Look F. #line:0588d6d 
 <<Cole Look R>>
-Player: (TEST) Cole Look R.
+Player: (TEST) Cole Look R. #line:0aca607 
 <<Cole Neutral>>
 <<Cole Exit>>
 <<Owen Enter 0>>
 <<Owen Neutral>>
-Player: (TEST) Owen 0 = Neutral.
+Player: (TEST) Owen 0 = Neutral. #line:09bfaba 
 <<Owen Happy>>
-Player: (TEST) Owen 1 = Happy.
+Player: (TEST) Owen 1 = Happy. #line:052e746 
 <<Owen Sad>>
-Player: (TEST) Owen 2 = Sad.
+Player: (TEST) Owen 2 = Sad. #line:035ef25 
 <<Owen Happy1>>
-Player: (TEST) Owen 3 = Happy1.
+Player: (TEST) Owen 3 = Happy1. #line:0b069a7 
 <<Owen 3>>
-Player: (TEST) Owen by number 3 = Happy1.
+Player: (TEST) Owen by number 3 = Happy1. #line:0b4b24e 
 <<Owen Look L>>
-Player: (TEST) Owen Look L.
+Player: (TEST) Owen Look L. #line:017e5f3 
 <<Owen Look F>>
-Player: (TEST) Owen Look F.
+Player: (TEST) Owen Look F. #line:0392f26 
 <<Owen Look R>>
-Player: (TEST) Owen Look R.
+Player: (TEST) Owen Look R. #line:0f096c9 
 <<Owen Neutral>>
 <<Owen Exit>>
 <<Walter Enter 0>>
 <<Walter Neutral>>
-Player: (TEST) Walter 0 = Neutral.
+Player: (TEST) Walter 0 = Neutral. #line:0b287cc 
 <<Walter Happy>>
-Player: (TEST) Walter 1 = Happy.
+Player: (TEST) Walter 1 = Happy. #line:03817c9 
 <<Walter Sad>>
-Player: (TEST) Walter 2 = Sad.
+Player: (TEST) Walter 2 = Sad. #line:0a69ad5 
 <<Walter KneeUp>>
-Player: (TEST) Walter 3 = KneeUp.
+Player: (TEST) Walter 3 = KneeUp. #line:0445eaf 
 <<Walter 3>>
-Player: (TEST) Walter by number 3 = KneeUp.
+Player: (TEST) Walter by number 3 = KneeUp. #line:09d8540 
 <<Walter Look L>>
-Player: (TEST) Walter Look L.
+Player: (TEST) Walter Look L. #line:092b322 
 <<Walter Look F>>
-Player: (TEST) Walter Look F.
+Player: (TEST) Walter Look F. #line:0a5c136 
 <<Walter Look R>>
-Player: (TEST) Walter Look R.
+Player: (TEST) Walter Look R. #line:076445c 
 <<Walter Neutral>>
 <<Walter Exit>>
 <<Faye Enter 0>>
 <<Faye Neutral>>
-Player: (TEST) Faye 0 = Neutral.
+Player: (TEST) Faye 0 = Neutral. #line:0f0ec0c 
 <<Faye Happy>>
-Player: (TEST) Faye 1 = Happy.
+Player: (TEST) Faye 1 = Happy. #line:09af9ce 
 <<Faye Sad>>
-Player: (TEST) Faye 2 = Sad.
+Player: (TEST) Faye 2 = Sad. #line:0f91f59 
 <<Faye 2>>
-Player: (TEST) Faye by number 2 = Sad.
+Player: (TEST) Faye by number 2 = Sad. #line:07ee16d 
 <<Faye Look L>>
-Player: (TEST) Faye Look L.
+Player: (TEST) Faye Look L. #line:07b04e6 
 <<Faye Look F>>
-Player: (TEST) Faye Look F.
+Player: (TEST) Faye Look F. #line:04447b4 
 <<Faye Look R>>
-Player: (TEST) Faye Look R.
+Player: (TEST) Faye Look R. #line:003c743 
 <<Faye Neutral>>
 <<Faye Exit>>
 <<Isla Enter 0>>
 <<Isla Neutral>>
-Player: (TEST) Isla 0 = Neutral.
+Player: (TEST) Isla 0 = Neutral. #line:0dce806 
 <<Isla Happy>>
-Player: (TEST) Isla 1 = Happy.
+Player: (TEST) Isla 1 = Happy. #line:0262d79 
 <<Isla Sad>>
-Player: (TEST) Isla 2 = Sad.
+Player: (TEST) Isla 2 = Sad. #line:0210b1c 
 <<Isla Sad2>>
-Player: (TEST) Isla 3 = Sad2.
+Player: (TEST) Isla 3 = Sad2. #line:081aeda 
 <<Isla KneeUp>>
-Player: (TEST) Isla 4 = KneeUp.
+Player: (TEST) Isla 4 = KneeUp. #line:030b209 
 <<Isla 4>>
-Player: (TEST) Isla by number 4 = KneeUp.
+Player: (TEST) Isla by number 4 = KneeUp. #line:0baaa2c 
 <<Isla Look L>>
-Player: (TEST) Isla Look L.
+Player: (TEST) Isla Look L. #line:01d0656 
 <<Isla Look F>>
-Player: (TEST) Isla Look F.
+Player: (TEST) Isla Look F. #line:0201545 
 <<Isla Look R>>
-Player: (TEST) Isla Look R.
+Player: (TEST) Isla Look R. #line:05bd818 
 <<Isla Neutral>>
 <<Isla Exit>>
 <<Claire Enter 0>>
 <<Claire Neutral>>
-Player: (TEST) Claire 0 = Neutral.
+Player: (TEST) Claire 0 = Neutral. #line:06956f4 
 <<Claire Happy>>
-Player: (TEST) Claire 1 = Happy.
+Player: (TEST) Claire 1 = Happy. #line:04fe180 
 <<Claire Amaze>>
-Player: (TEST) Claire 2 = Amaze.
+Player: (TEST) Claire 2 = Amaze. #line:05c9f09 
 <<Claire Rage>>
-Player: (TEST) Claire 3 = Rage.
+Player: (TEST) Claire 3 = Rage. #line:03ef4af 
 <<Claire 3>>
-Player: (TEST) Claire by number 3 = Rage.
+Player: (TEST) Claire by number 3 = Rage. #line:0c59be1 
 <<Claire Look L>>
-Player: (TEST) Claire Look L.
+Player: (TEST) Claire Look L. #line:0829cdc 
 <<Claire Look F>>
-Player: (TEST) Claire Look F.
+Player: (TEST) Claire Look F. #line:0f2efe5 
 <<Claire Look R>>
-Player: (TEST) Claire Look R.
+Player: (TEST) Claire Look R. #line:0c71349 
 <<Claire Neutral>>
 <<Claire Exit>>
 <<Eliana Enter 0>>
 <<Eliana Neutral>>
-Player: (TEST) Eliana 0 = Neutral.
+Player: (TEST) Eliana 0 = Neutral. #line:065f7e9 
 <<Eliana Happy>>
-Player: (TEST) Eliana 1 = Happy.
+Player: (TEST) Eliana 1 = Happy. #line:075cc2b 
 <<Eliana Disappointed>>
-Player: (TEST) Eliana 2 = Disappointed.
+Player: (TEST) Eliana 2 = Disappointed. #line:0d5eb4d 
 <<Eliana 2>>
-Player: (TEST) Eliana by number 2 = Disappointed.
+Player: (TEST) Eliana by number 2 = Disappointed. #line:027ac78 
 <<Eliana Look L>>
-Player: (TEST) Eliana Look L.
+Player: (TEST) Eliana Look L. #line:03c1883 
 <<Eliana Look F>>
-Player: (TEST) Eliana Look F.
+Player: (TEST) Eliana Look F. #line:0ac0aa7 
 <<Eliana Look R>>
-Player: (TEST) Eliana Look R.
+Player: (TEST) Eliana Look R. #line:0d83a50 
 <<Eliana Neutral>>
 <<Eliana Exit>>
 <<Arthur Enter 0>>
 <<Arthur Neutral>>
-Player: (TEST) Arthur 0 = Neutral.
+Player: (TEST) Arthur 0 = Neutral. #line:067ee10 
 <<Arthur NeutralLeft>>
-Player: (TEST) Arthur 1 = NeutralLeft.
+Player: (TEST) Arthur 1 = NeutralLeft. #line:06089c3 
 <<Arthur Mockery>>
-Player: (TEST) Arthur 2 = Mockery.
+Player: (TEST) Arthur 2 = Mockery. #line:00963cc 
 <<Arthur HandIn>>
-Player: (TEST) Arthur 3 = HandIn.
+Player: (TEST) Arthur 3 = HandIn. #line:00b03a9 
 <<Arthur Angry>>
-Player: (TEST) Arthur 4 = Angry.
+Player: (TEST) Arthur 4 = Angry. #line:08d6c17 
 <<Arthur Rage>>
-Player: (TEST) Arthur 5 = Rage.
+Player: (TEST) Arthur 5 = Rage. #line:03ad638 
 <<Arthur 5>>
-Player: (TEST) Arthur by number 5 = Rage.
+Player: (TEST) Arthur by number 5 = Rage. #line:0d9ac00 
 <<Arthur Look L>>
-Player: (TEST) Arthur Look L.
+Player: (TEST) Arthur Look L. #line:031a121 
 <<Arthur Look F>>
-Player: (TEST) Arthur Look F.
+Player: (TEST) Arthur Look F. #line:057b305 
 <<Arthur Look R>>
-Player: (TEST) Arthur Look R.
+Player: (TEST) Arthur Look R. #line:04f2002 
 <<Arthur Neutral>>
 <<Arthur Exit>>
 <<jump TEST_Hub>>
@@ -202,22 +202,22 @@ Player: (TEST) Arthur Look R.
 
 title: TEST_Hub
 ---
-Player: (TEST) Hub. flow_phase = {flow_phase()}, flow_step = {flow_step()}
--> Camera
+Player: (TEST) Hub. flow_phase = {flow_phase()}, flow_step = {flow_step()} #line:059071f 
+-> Camera #line:08a3c2e 
     <<jump TEST_Camera>>
--> NPC (Isla)
+-> NPC (Isla) #line:093a731 
     <<jump TEST_NPC>>
--> Order functions (no drink made)
+-> Order functions (no drink made) #line:0963718 
     <<jump TEST_Orders>>
--> Flow steps without making a drink
+-> Flow steps without making a drink #line:0087d1c 
     <<jump TEST_FlowSteps>>
--> Real order: make and serve a drink
+-> Real order: make and serve a drink #line:035ec9d 
     <<jump TEST_RealOrder>>
--> Ingredient unlock
+-> Ingredient unlock #line:0958176 
     <<jump TEST_Unlock>>
--> Misc (wait, interactables, event log, summary)
+-> Misc (wait, interactables, event log, summary) #line:0180284 
     <<jump TEST_Misc>>
--> End of day (close bar, next day) - ends the test
+-> End of day (close bar, next day) - ends the test #line:04ac2bc 
     <<jump TEST_EndDay>>
 ===
 
@@ -225,9 +225,9 @@ title: TEST_Camera
 ---
 // Static commands: the first word (CamController) is ignored.
 <<Switch_Camera CamController Char2Cam>>
-Player: (TEST) Switch_Camera Char2Cam (blend).
+Player: (TEST) Switch_Camera Char2Cam (blend). #line:0db07ba 
 <<Cut_Camera CamController MainCam>>
-Player: (TEST) Cut_Camera MainCam (no blend).
+Player: (TEST) Cut_Camera MainCam (no blend). #line:04da3bf 
 <<jump TEST_Hub>>
 ===
 
@@ -238,33 +238,33 @@ title: TEST_NPC
 // Enter and Exit hold the dialogue until the fade is over.
 <<Isla Look L>>
 <<Isla Sad>>
-Player: (TEST) Set while Isla is outside: Look L + Sad remembered, nothing on screen yet.
+Player: (TEST) Set while Isla is outside: Look L + Sad remembered, nothing on screen yet. #line:0361418 
 <<CharacterEnter CharacterName.Isla 2>>
-Player: (TEST) CharacterEnter Isla 2 (long form) finished: she is on spot 2 looking Left with the Sad face (Forward face + a warning, Sad has no side face).
+Player: (TEST) CharacterEnter Isla 2 (long form) finished: she is on spot 2 looking Left with the Sad face (Forward face + a warning, Sad has no side face). #line:066cc87 
 <<CharacterExpression CharacterName.Isla Happy>>
-Player: (TEST) CharacterExpression Happy by name (long form). Looking Left: the Right face flipped.
+Player: (TEST) CharacterExpression Happy by name (long form). Looking Left: the Right face flipped. #line:0b0a87b 
 <<Isla 0>>
-Player: (TEST) Short form by number: "Isla 0" = Neutral (its own Left face).
+Player: (TEST) Short form by number: "Isla 0" = Neutral (its own Left face). #line:06e4f2f 
 <<Isla Sad>>
 <<CharacterExpression CharacterName.Isla 1>>
-Player: (TEST) CharacterExpression 1 by number = Happy.
+Player: (TEST) CharacterExpression 1 by number = Happy. #line:0a809e9 
 <<CharacterLook CharacterName.Isla R>>
-Player: (TEST) CharacterLook R (long form): body and face turn to the Right.
+Player: (TEST) CharacterLook R (long form): body and face turn to the Right. #line:0320c10 
 <<Isla Look F>>
-Player: (TEST) Short form "Isla Look F": Forward.
+Player: (TEST) Short form "Isla Look F": Forward. #line:018e984 
 <<Isla Nonsense>>
-Player: (TEST) Unknown expression "Isla Nonsense" must only warn and keep the face.
+Player: (TEST) Unknown expression "Isla Nonsense" must only warn and keep the face. #line:00538ba 
 <<Isla Enter 2>>
-Player: (TEST) Enter the same spot again: nothing happens.
+Player: (TEST) Enter the same spot again: nothing happens. #line:06e5c66 
 <<Isla Enter 3>>
-Player: (TEST) Enter a different spot (3): faded out, moved, faded in. Dialogue waited for all of it.
+Player: (TEST) Enter a different spot (3): faded out, moved, faded in. Dialogue waited for all of it. #line:0dc1aca 
 <<Isla Enter>>
-Player: (TEST) Enter with no number goes to spot 0.
+Player: (TEST) Enter with no number goes to spot 0. #line:0a0cf82 
 <<Isla Exit>>
-Player: (TEST) Exit (short form) finished: Isla faded out.
+Player: (TEST) Exit (short form) finished: Isla faded out. #line:07a22d2 
 <<Isla Exit>>
 <<CharacterExit CharacterName.Isla>>
-Player: (TEST) Exit while outside (both forms): nothing happens.
+Player: (TEST) Exit while outside (both forms): nothing happens. #line:048d0cc 
 <<Isla Neutral>>
 <<Isla Look F>>
 <<jump TEST_AllCharacters>>
@@ -274,21 +274,21 @@ title: TEST_Orders
 ---
 // order_customer: optional, names the customer for the next order.
 <<order_customer "[CocktailSystem]" Isla>>
-Player: (TEST) Named order: {Order_Cocktail_ByName_OutName("Gin Fizz")}
-Player: (TEST) Same order described: {Order_Cocktail_ByName_OutDescription("Gin Fizz")}
-Player: (TEST) order_name = {order_name()}, order_type = {order_type()}
-Player: (TEST) order_flavor = {order_flavor()}
+Player: (TEST) Named order: {Order_Cocktail_ByName_OutName("Gin Fizz")} #line:019c0ca 
+Player: (TEST) Same order described: {Order_Cocktail_ByName_OutDescription("Gin Fizz")} #line:0d02846 
+Player: (TEST) order_name = {order_name()}, order_type = {order_type()} #line:0b1465f 
+Player: (TEST) order_flavor = {order_flavor()} #line:01202ad 
 
 // Random from the customer's preferences. Argument is CharacterName as a number (Isla = 5).
-Player: (TEST) Random for Isla: {Order_Cocktail_OutName(5)}
-Player: (TEST) Its description: {Order_Cocktail_OutDescription(5)} (must be the SAME drink)
+Player: (TEST) Random for Isla: {Order_Cocktail_OutName(5)} #line:092a92d 
+Player: (TEST) Its description: {Order_Cocktail_OutDescription(5)} (must be the SAME drink) #line:02101e0 
 
 // Mode 5: a type only.
 <<order_by_type "[CocktailSystem]" HighAlcohol>>
-Player: (TEST) order_by_type HighAlcohol. order_type = {order_type()}, order_name = {order_name()}
+Player: (TEST) order_by_type HighAlcohol. order_type = {order_type()}, order_name = {order_name()} #line:08faaf4 
 
 <<Reset_Variable SystemGame>>
-Player: (TEST) Reset_Variable. order_name = "{order_name()}" (expect empty), order_satisfaction = {order_satisfaction()}
+Player: (TEST) Reset_Variable. order_name = "{order_name()}" (expect empty), order_satisfaction = {order_satisfaction()} #line:01e405f 
 <<jump TEST_Hub>>
 ===
 
@@ -296,45 +296,45 @@ title: TEST_FlowSteps
 ---
 // Walks every Open Bar step from Yarn. The minigame UI may open at 2.2; ignore it.
 <<order_customer "[CocktailSystem]" Isla>>
-Player: (TEST) Order for the walk: {Order_Cocktail_ByName_OutName("Gin Fizz")}
+Player: (TEST) Order for the walk: {Order_Cocktail_ByName_OutName("Gin Fizz")} #line:004ec04 
 <<flow_prepare_drinks>>
-Player: (TEST) flow_prepare_drinks. step = {flow_step()} (expect AddIngredient)
+Player: (TEST) flow_prepare_drinks. step = {flow_step()} (expect AddIngredient) #line:0efd4ac 
 <<flow_minigame Shaking>>
-Player: (TEST) flow_minigame Shaking. flow_minigame_type = {flow_minigame_type()} (no transition, still {flow_step()})
+Player: (TEST) flow_minigame Shaking. flow_minigame_type = {flow_minigame_type()} (no transition, still {flow_step()}) #line:06c94c2 
 <<flow_ingredient_added>>
-Player: (TEST) flow_ingredient_added. step = {flow_step()} (expect Minigame)
+Player: (TEST) flow_ingredient_added. step = {flow_step()} (expect Minigame) #line:0f860ae 
 <<flow_another_ingredient>>
-Player: (TEST) flow_another_ingredient. step = {flow_step()} (expect AddIngredient)
+Player: (TEST) flow_another_ingredient. step = {flow_step()} (expect AddIngredient) #line:05f48b3 
 <<flow_ingredient_added Stirring>>
-Player: (TEST) flow_ingredient_added Stirring. step = {flow_step()}, type = {flow_minigame_type()} (expect Minigame / Stiring)
-Player: (TEST) flow_minigame_result = "{flow_minigame_result()}" (empty until a minigame reported back)
+Player: (TEST) flow_ingredient_added Stirring. step = {flow_step()}, type = {flow_minigame_type()} (expect Minigame / Stiring) #line:030dc30 
+Player: (TEST) flow_minigame_result = "{flow_minigame_result()}" (empty until a minigame reported back) #line:05d7acc 
 <<flow_drink_complete>>
-Player: (TEST) flow_drink_complete. step = {flow_step()} (expect Garnish)
+Player: (TEST) flow_drink_complete. step = {flow_step()} (expect Garnish) #line:03fdf8e 
 <<flow_remake_drink>>
-Player: (TEST) flow_remake_drink from Garnish. step = {flow_step()} (expect AddIngredient)
+Player: (TEST) flow_remake_drink from Garnish. step = {flow_step()} (expect AddIngredient) #line:04069d7 
 <<flow_ingredient_added>>
 <<flow_drink_complete>>
 <<flow_garnish_done>>
-Player: (TEST) flow_garnish_done. step = {flow_step()} (expect Serve)
+Player: (TEST) flow_garnish_done. step = {flow_step()} (expect Serve) #line:00fa9f4 
 <<flow_serve_done>>
-Player: (TEST) flow_serve_done. step = {flow_step()} (expect TalkingWithCustomer). Score is given here.
-Player: (TEST) order_satisfaction = {order_satisfaction()}
+Player: (TEST) flow_serve_done. step = {flow_step()} (expect TalkingWithCustomer). Score is given here. #line:0f155c6 
+Player: (TEST) order_satisfaction = {order_satisfaction()} #line:0d102ec 
 <<Reset_Variable SystemGame>>
 // From Talking these must only warn:
 <<flow_remake_drink>>
 <<flow_check_events>>
-Player: (TEST) flow_remake_drink and flow_check_events from Talking should have only warned.
+Player: (TEST) flow_remake_drink and flow_check_events from Talking should have only warned. #line:08a9691 
 <<jump TEST_Hub>>
 ===
 
 title: TEST_RealOrder
 ---
 <<order_customer "[CocktailSystem]" Isla>>
-Player: (TEST) Make this: [order] {Order_Cocktail_ByName_OutName("Gin Fizz")} [/order]
+Player: (TEST) Make this: [order] {Order_Cocktail_ByName_OutName("Gin Fizz")} [/order] #line:031d9f7 
 <<flow_prepare_drinks>>
 // Suspends here until the drink is served and scored.
 <<wait_for_task SystemGame>>
-Player: (TEST) wait_for_task returned. order_satisfaction = {order_satisfaction()}, served type = {$type_of_cocktail}
+Player: (TEST) wait_for_task returned. order_satisfaction = {order_satisfaction()}, served type = {$type_of_cocktail} #line:0f9bd3c 
 <<Reset_Variable SystemGame>>
 <<jump TEST_Hub>>
 ===
@@ -346,14 +346,14 @@ title: TEST_UnlockPopup
 <<set $test_saved_day to $day>>
 <<set $day to 3>>
 <<unlock_ingredient Rum>>
-Player: (TEST) $day set to 3 and Rum unlocked by the story. Whiskey = {ingredient_unlocked("Whiskey")}, Rum = {ingredient_unlocked("Rum")} (expect True, True)
-Player: (TEST) Next: flow_check_events. Expect ONE popup "Unlock New Ingredient" listing Whiskey, Dry Vermouth, Peppermint, Rum (one per line). Close it to go on.
+Player: (TEST) $day set to 3 and Rum unlocked by the story. Whiskey = {ingredient_unlocked("Whiskey")}, Rum = {ingredient_unlocked("Rum")} (expect True, True) #line:058bb51 
+Player: (TEST) Next: flow_check_events. Expect ONE popup "Unlock New Ingredient" listing Whiskey, Dry Vermouth, Peppermint, Rum (one per line). Close it to go on. #line:09cb479 
 <<flow_check_events>>
-Player: (TEST) Back in the story. flow_step = {flow_step()} (expect StoryBeforeOpen)
+Player: (TEST) Back in the story. flow_step = {flow_step()} (expect StoryBeforeOpen) #line:0e5622d 
 <<flow_check_events>>
-Player: (TEST) Second flow_check_events: NO popup (all already announced).
+Player: (TEST) Second flow_check_events: NO popup (all already announced). #line:008ca28 
 <<set $day to $test_saved_day>>
-Player: (TEST) $day back to {$day}. Whiskey = {ingredient_unlocked("Whiskey")} (False again on day 1), Rum = {ingredient_unlocked("Rum")} (still True: story unlocks are permanent)
+Player: (TEST) $day back to {$day}. Whiskey = {ingredient_unlocked("Whiskey")} (False again on day 1), Rum = {ingredient_unlocked("Rum")} (still True: story unlocks are permanent) #line:0c0c27b 
 <<jump TEST_OpenBar>>
 ===
 
@@ -362,41 +362,41 @@ title: TEST_Unlock
 // Ingredient unlock (Docs/YarnCommands/unlock_ingredient.md, ingredient_unlocked.md).
 // Day table: 1 Vodka Gin Triplesec Soda CranberryJuice LemonJuice GrapefruitJuice Syrup,
 // 3 Whiskey DryVermouth PepperMint, 5 Rum SweetVermouth LimeJuice OrangeJuice, 7 Tequila Campari.
-Player: (TEST) Unlock hub. Day {$day}.
--> What is unlocked today
+Player: (TEST) Unlock hub. Day {$day}. #line:02c6866 
+-> What is unlocked today #line:0e9569e 
     <<jump TEST_Unlock_Today>>
--> Story unlock (command, repeat, letter case, bad name)
+-> Story unlock (command, repeat, letter case, bad name) #line:0730537 
     <<jump TEST_Unlock_Story>>
--> Bar: bottles on the shelf
+-> Bar: bottles on the shelf #line:0b8379c 
     <<jump TEST_Unlock_Bar>>
--> Orders: random only makeable, named warns
+-> Orders: random only makeable, named warns #line:010195b 
     <<jump TEST_Unlock_Orders>>
--> Back to the hub
+-> Back to the hub #line:04ad665 
     <<jump TEST_Hub>>
 ===
 
 title: TEST_Unlock_Today
 ---
-Player: (TEST) Day 1 - Vodka {ingredient_unlocked("Vodka")}, Gin {ingredient_unlocked("Gin")}, Triplesec {ingredient_unlocked("Triplesec")}, Soda {ingredient_unlocked("Soda")}
-Player: (TEST) Day 1 - CranberryJuice {ingredient_unlocked("CranberryJuice")}, LemonJuice {ingredient_unlocked("LemonJuice")}, GrapefruitJuice {ingredient_unlocked("GrapefruitJuice")}, Syrup {ingredient_unlocked("Syrup")} (all True)
-Player: (TEST) Day 3 - Whiskey {ingredient_unlocked("Whiskey")}, DryVermouth {ingredient_unlocked("DryVermouth")}, PepperMint {ingredient_unlocked("PepperMint")} (True from day 3)
-Player: (TEST) Day 5 - Rum {ingredient_unlocked("Rum")}, SweetVermouth {ingredient_unlocked("SweetVermouth")}, LimeJuice {ingredient_unlocked("LimeJuice")}, OrangeJuice {ingredient_unlocked("OrangeJuice")} (True from day 5, Rum also after the popup test)
-Player: (TEST) Day 7 - Tequila {ingredient_unlocked("Tequila")}, Campari {ingredient_unlocked("Campari")} (True from day 7 or after a story unlock)
+Player: (TEST) Day 1 - Vodka {ingredient_unlocked("Vodka")}, Gin {ingredient_unlocked("Gin")}, Triplesec {ingredient_unlocked("Triplesec")}, Soda {ingredient_unlocked("Soda")} #line:07c764e 
+Player: (TEST) Day 1 - CranberryJuice {ingredient_unlocked("CranberryJuice")}, LemonJuice {ingredient_unlocked("LemonJuice")}, GrapefruitJuice {ingredient_unlocked("GrapefruitJuice")}, Syrup {ingredient_unlocked("Syrup")} (all True) #line:03854d6 
+Player: (TEST) Day 3 - Whiskey {ingredient_unlocked("Whiskey")}, DryVermouth {ingredient_unlocked("DryVermouth")}, PepperMint {ingredient_unlocked("PepperMint")} (True from day 3) #line:084a63d 
+Player: (TEST) Day 5 - Rum {ingredient_unlocked("Rum")}, SweetVermouth {ingredient_unlocked("SweetVermouth")}, LimeJuice {ingredient_unlocked("LimeJuice")}, OrangeJuice {ingredient_unlocked("OrangeJuice")} (True from day 5, Rum also after the popup test) #line:0837ec8 
+Player: (TEST) Day 7 - Tequila {ingredient_unlocked("Tequila")}, Campari {ingredient_unlocked("Campari")} (True from day 7 or after a story unlock) #line:0855956 
 <<jump TEST_Unlock>>
 ===
 
 title: TEST_Unlock_Story
 ---
 // Run before day 7: Tequila starts locked.
-Player: (TEST) Before: Tequila = {ingredient_unlocked("Tequila")} (expect False before day 7)
+Player: (TEST) Before: Tequila = {ingredient_unlocked("Tequila")} (expect False before day 7) #line:029c0dc 
 <<unlock_ingredient Tequila>>
 <<unlock_ingredient Tequila>>
 <<unlock_ingredient tequila>>
-Player: (TEST) unlock_ingredient Tequila, again, and "tequila": no error. Tequila = {ingredient_unlocked("Tequila")}, "TEQUILA" = {ingredient_unlocked("TEQUILA")} (expect True, True)
-Player: (TEST) Next: an unknown name. The Console should show one LogError and the dialogue should go on.
+Player: (TEST) unlock_ingredient Tequila, again, and "tequila": no error. Tequila = {ingredient_unlocked("Tequila")}, "TEQUILA" = {ingredient_unlocked("TEQUILA")} (expect True, True) #line:04b5cc6 
+Player: (TEST) Next: an unknown name. The Console should show one LogError and the dialogue should go on. #line:02f635f 
 <<unlock_ingredient NotAnIngredient>>
-Player: (TEST) After the error. ingredient_unlocked("NotAnIngredient") = {ingredient_unlocked("NotAnIngredient")} (expect False, with a second LogError)
-Player: (TEST) Its popup is not shown today: it waits for the next Event.
+Player: (TEST) After the error. ingredient_unlocked("NotAnIngredient") = {ingredient_unlocked("NotAnIngredient")} (expect False, with a second LogError) #line:0312814 
+Player: (TEST) Its popup is not shown today: it waits for the next Event. #line:076f7da 
 <<jump TEST_Unlock>>
 ===
 
@@ -404,19 +404,19 @@ title: TEST_Unlock_Bar
 ---
 // Look at the shelf: only unlocked bottles show. Ice, Method and Reset always stay.
 <<order_customer "[CocktailSystem]" Isla>>
-Player: (TEST) Order for the look: {Order_Cocktail_ByName_OutName("Gin Fizz")}
+Player: (TEST) Order for the look: {Order_Cocktail_ByName_OutName("Gin Fizz")} #line:04413b9 
 <<flow_prepare_drinks>>
-Player: (TEST) At the bar (step = {flow_step()}). Day 1: 8 bottles (+ any story unlocks: Rum, Tequila if run). Whiskey, Campari... hidden.
+Player: (TEST) At the bar (step = {flow_step()}). Day 1: 8 bottles (+ any story unlocks: Rum, Tequila if run). Whiskey, Campari... hidden. #line:075ee80 
 <<unlock_ingredient Campari>>
 <<flow_ingredient_added>>
 <<flow_another_ingredient>>
-Player: (TEST) Campari unlocked, then left and came back to AddIngredient: the Campari bottle should now show.
+Player: (TEST) Campari unlocked, then left and came back to AddIngredient: the Campari bottle should now show. #line:048c136 
 <<flow_ingredient_added>>
 <<flow_drink_complete>>
 <<flow_garnish_done>>
 <<flow_serve_done>>
 <<Reset_Variable SystemGame>>
-Player: (TEST) Back to Talking. step = {flow_step()}
+Player: (TEST) Back to Talking. step = {flow_step()} #line:0012fdf 
 <<jump TEST_Unlock>>
 ===
 
@@ -424,14 +424,14 @@ title: TEST_Unlock_Orders
 ---
 // Random orders pick only drinks whose every ingredient is unlocked (day 1: John Collins, White Lady, Gin Fizz,
 // Sea Breeze, Cosmopolitan, Greyhound, Cranberry Fizz, Grapefruit Spritz, plus any opened by story unlocks).
-Player: (TEST) Random for Isla: {Order_Cocktail_OutName(5)}
-Player: (TEST) Random for Isla: {Order_Cocktail_OutName(5)}
-Player: (TEST) Random for Isla: {Order_Cocktail_OutName(5)}
-Player: (TEST) Random for Owen: {Order_Cocktail_OutName(2)}
-Player: (TEST) Random for Walter: {Order_Cocktail_OutName(3)}
-Player: (TEST) Every name above must be makeable today.
+Player: (TEST) Random for Isla: {Order_Cocktail_OutName(5)} #line:0bb6eb8 
+Player: (TEST) Random for Isla: {Order_Cocktail_OutName(5)} #line:0c5592b 
+Player: (TEST) Random for Isla: {Order_Cocktail_OutName(5)} #line:02df28f 
+Player: (TEST) Random for Owen: {Order_Cocktail_OutName(2)} #line:0cc70d6 
+Player: (TEST) Random for Walter: {Order_Cocktail_OutName(3)} #line:0af79bb 
+Player: (TEST) Every name above must be makeable today. #line:0a91fe6 
 // A drink the writer names is never filtered: it only warns in the Console when it cannot be made yet.
-Player: (TEST) Named: {Order_Cocktail_ByName_OutName("Paloma")} (Tequila, Soda, LimeJuice, GrapefruitJuice, Syrup: warns while LimeJuice, day 5, is locked)
+Player: (TEST) Named: {Order_Cocktail_ByName_OutName("Paloma")} (Tequila, Soda, LimeJuice, GrapefruitJuice, Syrup: warns while LimeJuice, day 5, is locked) #line:0be3a3b 
 <<Reset_Variable SystemGame>>
 <<jump TEST_Unlock>>
 ===
@@ -439,27 +439,27 @@ Player: (TEST) Named: {Order_Cocktail_ByName_OutName("Paloma")} (Tequila, Soda, 
 title: TEST_Misc
 ---
 <<wait_scene 1>>
-Player: (TEST) wait_scene 1 waited one second (skipped while Skip runs).
+Player: (TEST) wait_scene 1 waited one second (skipped while Skip runs). #line:0e7e6d2 
 <<eventlog_clear>>
-Player: (TEST) eventlog_clear: the Event Log should now start from this line.
+Player: (TEST) eventlog_clear: the Event Log should now start from this line. #line:0d66b09 
 // save_chapter_node is not tested here: [SaveLoadSystem] is inactive in the main scene, and an
 // instance command whose target is missing stops the dialogue. See Docs/YarnCommands/save_chapter_node.md.
 <<Fade_To_Summmary Panel_Transition>>
-Player: (TEST) Fade_To_Summmary done.
+Player: (TEST) Fade_To_Summmary done. #line:0588b0e 
 <<Panel_FadeIn Panel_Transition>>
-Player: (TEST) Panel_FadeIn back from the summary.
+Player: (TEST) Panel_FadeIn back from the summary. #line:0754e33 
 <<jump TEST_Hub>>
 ===
 
 title: TEST_EndDay
 ---
 <<Can_End_Shift SystemGame>>
-Player: (TEST) Can_End_Shift: the End Shift button should appear.
+Player: (TEST) Can_End_Shift: the End Shift button should appear. #line:0ad4700 
 <<flow_close_bar>>
-Player: (TEST) flow_close_bar. flow_phase = {flow_phase()} (expect Close)
+Player: (TEST) flow_close_bar. flow_phase = {flow_phase()} (expect Close) #line:01837b8 
 <<flow_next_day>>
-Player: (TEST) flow_next_day. flow_phase = {flow_phase()}, flow_step = {flow_step()} (expect BeforeOpen / StoryBeforeOpen; the next day's node starts once this dialogue ends)
-Player: (TEST) Day is now {$day}. Unlocks announced at the next day's Event (popup if anything new: story unlocks from today, or day 3/5/7 ingredients).
+Player: (TEST) flow_next_day. flow_phase = {flow_phase()}, flow_step = {flow_step()} (expect BeforeOpen / StoryBeforeOpen; the next day's node starts once this dialogue ends) #line:0cee878 
+Player: (TEST) Day is now {$day}. Unlocks announced at the next day's Event (popup if anything new: story unlocks from today, or day 3/5/7 ingredients). #line:0f1d7f9 
 <<DisplayThx>>
-Player: (TEST) DisplayThx: the thank-you panel should be on screen. End of test.
+Player: (TEST) DisplayThx: the thank-you panel should be on screen. End of test. #line:01b9565 
 ===

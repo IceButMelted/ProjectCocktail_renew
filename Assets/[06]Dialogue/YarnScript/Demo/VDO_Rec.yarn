@@ -1,4 +1,4 @@
-title: VDO_Start
+﻿title: VDO_Start
 ---
 // ================================================================
 // VDO_Rec.yarn — a hands-free run for recording video.
@@ -52,21 +52,21 @@ title: VDO_Walter
 <<Switch_Camera CamController Char1Cam>>
 
 <<Walter Neutral>>
-Walter: Good evening.[waitfor=0.2/] It's been a long time since I last saw someone open something new in this town.
+Walter: Good evening.[waitfor=0.2/] It's been a long time since I last saw someone open something new in this town. #line:07ccf74 
 <<wait_scene 1>>
 
 <<order_customer "[CocktailSystem]" Walter>>
-Walter: Just keep it simple, son.
-Walter: [order] "{Order_Cocktail_ByName_OutName("Sea Breeze")}" [/order] should be enough for tonight.
+Walter: Just keep it simple, son. #line:0b45d25 
+Walter: [order] "{Order_Cocktail_ByName_OutName("Sea Breeze")}" [/order] should be enough for tonight. #line:0e84752 
 <<detour VDO_MakeDrink>>
 <<Switch_Camera CamController Char1Cam>>
 
 <<Walter Happy>>
-Walter: [bounce]Spot on, son.[/bounce] [wave]Balanced and clean.[/wave]
+Walter: [bounce]Spot on, son.[/bounce] [wave]Balanced and clean.[/wave] #line:014724d 
 <<wait_scene 2.5>>
 
 <<Walter Sad>>
-Walter: [shake]I don't think this is what I asked for.[/shake]
+Walter: [shake]I don't think this is what I asked for.[/shake] #line:0b465e2 
 <<wait_scene 2.5>>
 
 <<Walter Neutral>>
@@ -80,20 +80,20 @@ title: VDO_Isla
 <<Switch_Camera CamController Char2Cam>>
 
 <<Isla Neutral>>
-Isla: Did you just move here?
+Isla: Did you just move here? #line:02525f5 
 <<wait_scene 3>>
 
 <<order_customer "[CocktailSystem]" Isla>>
-Isla: Okay, I'll have [order] {Order_Cocktail_ByName_OutName("Cranberry Fizz")} [/order].
+Isla: Okay, I'll have [order] {Order_Cocktail_ByName_OutName("Cranberry Fizz")} [/order]. #line:0bb3951 
 <<detour VDO_MakeDrink>>
 <<Switch_Camera CamController Char2Cam>>
 
 <<Isla Happy>>
-Isla: [bounce]Oh, wow... this is incredible.[/bounce]
+Isla: [bounce]Oh, wow... this is incredible.[/bounce] #line:0bceb0e 
 <<wait_scene 2.5>>
 
 <<Isla Sad>>
-Isla: [shake]Uh... Bartender?[/shake] I think you might have grabbed the wrong bottle.
+Isla: [shake]Uh... Bartender?[/shake] I think you might have grabbed the wrong bottle. #line:08a509d 
 <<wait_scene 1.5>>
 
 <<Isla Neutral>>
@@ -107,20 +107,20 @@ title: VDO_Owen
 <<Switch_Camera CamController Char3Cam>>
 
 <<Owen Neutral>>
-Owen: Oh right, I should probably order before the bartender kicks me out.
+Owen: Oh right, I should probably order before the bartender kicks me out. #line:0c794ea 
 <<wait_scene 1.5>>
 
 <<order_customer "[CocktailSystem]" Owen>>
-Owen: I'll have [order] {Order_Cocktail_ByName_OutName("Gin Fizz")}. [/order]
+Owen: I'll have [order] {Order_Cocktail_ByName_OutName("Gin Fizz")}. [/order] #line:085a626 
 <<detour VDO_MakeDrink>>
 <<Switch_Camera CamController Char3Cam>>
 
 <<Owen Happy>>
-Owen: [shake][rainb]Unbelievable![/rainb][/shake] This is amazing.
+Owen: [shake][rainb]Unbelievable![/rainb][/shake] This is amazing. #line:05b3331 
 <<wait_scene 2.5>>
 
 <<Owen Sad>>
-Owen: Hmm...[waitfor=0.2/] I hate to say it, but I think something went sideways here.
+Owen: Hmm...[waitfor=0.2/] I hate to say it, but I think something went sideways here. #line:000b1e3 
 <<wait_scene 1>>
 
 <<Owen Neutral>>
@@ -141,19 +141,19 @@ title: VDO_Cole
 <<Switch_Camera CamController Char2Cam>>
 
 <<Cole Neutral>>
-Cole: Long shift. Needed somewhere quiet.
+Cole: Long shift. Needed somewhere quiet. #line:082c561 
 <<wait_scene 3>>
 
-Cole: Just get me [order]{Order_Cocktail_OutName(1)}[/order]. Nothing complicated.
+Cole: Just get me [order]{Order_Cocktail_OutName(1)}[/order]. Nothing complicated. #line:014a797 
 <<detour VDO_MakeDrink>>
 <<Switch_Camera CamController Char2Cam>>
 
 <<Cole Happy>>
-Cole: Huh. Not bad. Didn't expect much, honestly.
+Cole: Huh. Not bad. Didn't expect much, honestly. #line:026c5f9 
 <<wait_scene 2>>
 
 <<Cole Sad>>
-Cole: ...You sure you made this right?
+Cole: ...You sure you made this right? #line:09ca0f7 
 <<wait_scene 3>>
 
 <<Cole Neutral>>
@@ -167,22 +167,22 @@ title: VDO_Eliana
 <<Switch_Camera CamController Char3Cam>>
 
 <<Eliana Neutral>>
-Eliana: I'm Eliana, by the way. I'm the town lawyer.
+Eliana: I'm Eliana, by the way. I'm the town lawyer. #line:0079a48 
 <<wait_scene 2.5>>
 
 <<order_customer "[CocktailSystem]" Eliana>>
 <<order_by_type "[CocktailSystem]" HighAlcohol>>
-Eliana: Surprise me. Something strong. I earned it today.
+Eliana: Surprise me. Something strong. I earned it today. #line:00553c2 
 <<detour VDO_MakeDrink>>
 <<Switch_Camera CamController Char3Cam>>
 
 <<Eliana Happy>>
-Eliana: Okay, that's exactly what I needed.
+Eliana: Okay, that's exactly what I needed. #line:0670f3b 
 <<wait_scene 2.5>>
 
 // Eliana has no Sad picture: Disappointed.
 <<Eliana Disappointed>>
-Eliana: Rough day, rough drink. Seems about right.
+Eliana: Rough day, rough drink. Seems about right. #line:0bb640f 
 <<wait_scene 2>>
 
 <<Eliana Neutral>>
@@ -203,20 +203,20 @@ title: VDO_Faye
 <<Switch_Camera CamController Char1Cam>>
 
 <<Faye Neutral>>
-Faye: Just looking for a quiet corner tonight, if that's alright.
+Faye: Just looking for a quiet corner tonight, if that's alright. #line:0a69461 
 <<wait_scene 2>>
 
 <<set $vdo_order = Order_Cocktail_OutName(4)>>
-Faye: Something dry, please. Nothing fruity.
+Faye: Something dry, please. Nothing fruity. #line:008bde0 
 <<detour VDO_MakeDrink>>
 <<Switch_Camera CamController Char1Cam>>
 
 <<Faye Happy>>
-Faye: Hm. Not bad.
+Faye: Hm. Not bad. #line:066f975 
 <<wait_scene 3.5>>
 
 <<Faye Sad>>
-Faye: Goodness, what did you make?
+Faye: Goodness, what did you make? #line:08c9c2a 
 <<wait_scene 3>>
 
 <<Faye Neutral>>
@@ -230,22 +230,22 @@ title: VDO_Arthur
 <<Switch_Camera CamController Char3Cam>>
 
 <<Arthur Neutral>>
-Arthur: Huh. So this is the new spot everyone's talking about.
+Arthur: Huh. So this is the new spot everyone's talking about. #line:0948f7c 
 <<wait_scene 2>>
 
 <<set $vdo_order = Order_Cocktail_OutName(8)>>
 <<Arthur HandIn>>
-Arthur: Whatever's expensive and good. I'll know if it's not.
+Arthur: Whatever's expensive and good. I'll know if it's not. #line:061e9cc 
 <<detour VDO_MakeDrink>>
 <<Switch_Camera CamController Char3Cam>>
 
 // Arthur has no Happy / Sad pictures: Mockery (smirk) and Angry.
 <<Arthur Mockery>>
-Arthur: Huh. Actually good. Wasn't expecting that.
+Arthur: Huh. Actually good. Wasn't expecting that. #line:02c1b2e 
 <<wait_scene 2.5>>
 
 <<Arthur Angry>>
-Arthur: This is... not it. Try again sometime, maybe.
+Arthur: This is... not it. Try again sometime, maybe. #line:00e3095 
 <<wait_scene 2.5>>
 
 <<Arthur Neutral>>

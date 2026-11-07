@@ -1,4 +1,4 @@
-title: PT_D1_Start
+﻿title: PT_D1_Start
 ---
 // ================================================================
 // PLAYTEST_Demo.yarn — a three-day mini game (three customers a day) that is
@@ -52,22 +52,22 @@ title: PT_D1_Start
 // A new day starts with a clean Event Log.
 <<eventlog_clear>>
 
-Player: (PT) Day {$day}. flow_phase = {flow_phase()}, flow_step = {flow_step()} (expect 1 / BeforeOpen / StoryBeforeOpen)
-Player: My first night behind the bar.
-Player: The old owner left me eight bottles and a note: "Learn these first."
-Player: (PT) Gin = {ingredient_unlocked("Gin")} (True), Whiskey = {ingredient_unlocked("Whiskey")} (False until day 3)
+Player: (PT) Day {$day}. flow_phase = {flow_phase()}, flow_step = {flow_step()} (expect 1 / BeforeOpen / StoryBeforeOpen) #line:058471b 
+Player: My first night behind the bar. #line:014673e 
+Player: The old owner left me eight bottles and a note: "Learn these first." #line:0eb602b 
+Player: (PT) Gin = {ingredient_unlocked("Gin")} (True), Whiskey = {ingredient_unlocked("Whiskey")} (False until day 3) #line:03569c7 
 
-Player: Let me check the notice board before I open.
+Player: Let me check the notice board before I open. #line:0346e8b 
 // Back to Event: shows any queued popups and waits until they are closed and faded out.
 // Day 1 has no unlock popup, so it passes at once.
 <<flow_check_events>>
-Player: (PT) After flow_check_events: flow_step = {flow_step()} (expect StoryBeforeOpen, no popup on day 1)
-Player: Nothing on it yet. Right. Lights on.
+Player: (PT) After flow_check_events: flow_step = {flow_step()} (expect StoryBeforeOpen, no popup on day 1) #line:0728a4a 
+Player: Nothing on it yet. Right. Lights on. #line:0bdd410 
 <<wait_scene 1>>
 
 // Leaves BeforeOpen for Open › Talking. The Chapter Name fades in and out; the next line waits.
 <<flow_open_bar>>
-Player: (PT) flow_phase = {flow_phase()}, flow_step = {flow_step()} (expect Open / TalkingWithCustomer, chapter title gone)
+Player: (PT) flow_phase = {flow_phase()}, flow_step = {flow_step()} (expect Open / TalkingWithCustomer, chapter title gone) #line:0545c7c 
 <<jump PT_D1_Isla>>
 ===
 
@@ -76,35 +76,35 @@ title: PT_MakeDrink
 // Shared by every order: <<detour PT_MakeDrink>> comes back to the line after it.
 // The player normally makes the drink; the second option walks every step from Yarn
 // instead (no ingredients, so it scores Fail) to show the step commands and speed up a run.
-Player: (PT) Order: name = "{order_name()}", type = {order_type()}, flavour = "{order_flavor()}"
+Player: (PT) Order: name = "{order_name()}", type = {order_type()}, flavour = "{order_flavor()}" #line:03ddbd1 
 
 // Pre-selects the minigame of step 2.2. The player's Shake/Stir button overrides it.
 <<flow_minigame Shaking>>
 
--> Make the drink
+-> Make the drink #line:0a0bd1a 
     <<flow_prepare_drinks>>
--> (Test) Let Yarn walk the steps
+-> (Test) Let Yarn walk the steps #line:05755fb 
     <<flow_prepare_drinks>>
-    Player: (PT) step = {flow_step()} (expect AddIngredient)
+    Player: (PT) step = {flow_step()} (expect AddIngredient) #line:0a3f1a2 
     <<flow_ingredient_added>>
-    Player: (PT) flow_ingredient_added: step = {flow_step()}, minigame = {flow_minigame_type()} (expect Minigame / Shaking)
+    Player: (PT) flow_ingredient_added: step = {flow_step()}, minigame = {flow_minigame_type()} (expect Minigame / Shaking) #line:000c1d2 
     <<flow_another_ingredient>>
-    Player: (PT) flow_another_ingredient: step = {flow_step()} (expect AddIngredient)
+    Player: (PT) flow_another_ingredient: step = {flow_step()} (expect AddIngredient) #line:0896149 
     <<flow_ingredient_added Stirring>>
     <<flow_drink_complete>>
-    Player: (PT) flow_drink_complete: step = {flow_step()} (expect Garnish)
+    Player: (PT) flow_drink_complete: step = {flow_step()} (expect Garnish) #line:0fa5585 
     <<flow_remake_drink>>
-    Player: (PT) flow_remake_drink: step = {flow_step()} (expect AddIngredient, nothing scored)
+    Player: (PT) flow_remake_drink: step = {flow_step()} (expect AddIngredient, nothing scored) #line:0ce41be 
     <<flow_ingredient_added>>
     <<flow_drink_complete>>
     <<flow_garnish_done>>
-    Player: (PT) flow_garnish_done: step = {flow_step()} (expect Serve)
+    Player: (PT) flow_garnish_done: step = {flow_step()} (expect Serve) #line:0d443ae 
     <<flow_serve_done>>
 
 // Waits until the drink is served and scored, then writes $satisfaction and
 // $type_of_cocktail. After the test option it returns at once.
 <<wait_for_task SystemGame>>
-Player: (PT) Served: order_satisfaction = {order_satisfaction()}, type = {$type_of_cocktail}, minigame = "{flow_minigame_result()}"
+Player: (PT) Served: order_satisfaction = {order_satisfaction()}, type = {$type_of_cocktail}, minigame = "{flow_minigame_result()}" #line:0f21401 
 ===
 
 // ════════════════════════════════════════════════════════════════
@@ -117,35 +117,35 @@ title: PT_D1_Isla
 <<Isla Enter 1>>
 <<Switch_Camera CamController Char2Cam>>
 <<Isla Happy>>
-Isla: [wave]Evening! Is this place open?[/wave]
-Player: Just opened. You're my very first customer.
+Isla: [wave]Evening! Is this place open?[/wave] #line:0967425 
+Player: Just opened. You're my very first customer. #line:0e51152 
 <<Isla Look L>>
-Isla: Cosy. Smells like old wood and lemons.
+Isla: Cosy. Smells like old wood and lemons. #line:056b301 
 <<Isla Look R>>
-Isla: And that window... you can see the whole square from here.
+Isla: And that window... you can see the whole square from here. #line:0045629 
 <<Isla Neutral>>
 
 // order_customer names who the next order is for (it scores their preferences).
 <<order_customer "[CocktailSystem]" Isla>>
-Isla: I'll have a [order]{Order_Cocktail_ByName_OutName("Gin Fizz")}[/order], please.
-Player: A Gin Fizz. Let me see... {Order_Cocktail_ByName_OutDescription("Gin Fizz")}
+Isla: I'll have a [order]{Order_Cocktail_ByName_OutName("Gin Fizz")}[/order], please. #line:0341008 
+Player: A Gin Fizz. Let me see... {Order_Cocktail_ByName_OutDescription("Gin Fizz")} #line:0d24452 
 <<Cut_Camera CamController MainCam>>
 <<detour PT_MakeDrink>>
 
 <<if $satisfaction == Satisfaction.Perfect>>
     <<Isla Happy>>
-    Isla: [bounce]Perfect. Exactly how I like it.[/bounce]
+    Isla: [bounce]Perfect. Exactly how I like it.[/bounce] #line:03ebd5f 
 <<elseif $satisfaction == Satisfaction.Acceptable>>
-    Isla: Not bad. A little different, but fine.
+    Isla: Not bad. A little different, but fine. #line:024a233 
 <<else>>
     <<Isla Sad>>
-    Isla: [shake]Hmm... that's not what I asked for.[/shake]
+    Isla: [shake]Hmm... that's not what I asked for.[/shake] #line:0ec9c31 
     <<Isla Sad2>>
-    Isla: It's fine. Really.
+    Isla: It's fine. Really. #line:07febeb 
 <<endif>>
 <<Reset_Variable SystemGame>>
 <<Isla Neutral>>
-Isla: I'll tell my friends about you.
+Isla: I'll tell my friends about you. #line:062e4ef 
 <<Isla Exit>>
 <<jump PT_D1_Cole>>
 ===
@@ -156,21 +156,21 @@ title: PT_D1_Cole
 <<Cole Enter 2>>
 <<Switch_Camera CamController Char23Cam>>
 <<Cole Neutral>>
-Cole: Long shift at the mill. I don't know drink names.
+Cole: Long shift at the mill. I don't know drink names. #line:01df98b 
 <<Cole Sad>>
-Cole: Just... something like this:
+Cole: Just... something like this: #line:035bb31 
 <<order_customer "[CocktailSystem]" Cole>>
-Cole: "[order]{Order_Cocktail_ByName_OutDescription("Sea Breeze")}[/order]"
-Player: (PT) order_name = "{order_name()}" (the player is not told; the post-it shows the flavour)
-Player: I think I know what you mean.
+Cole: "[order]{Order_Cocktail_ByName_OutDescription("Sea Breeze")}[/order]" #line:04b47d3 
+Player: (PT) order_name = "{order_name()}" (the player is not told; the post-it shows the flavour) #line:02d5bb7 
+Player: I think I know what you mean. #line:072b3f0 
 <<Cut_Camera CamController MainCam>>
 <<detour PT_MakeDrink>>
 
 <<if $satisfaction == Satisfaction.Fail>>
-    Cole: Not quite. Thanks anyway.
+    Cole: Not quite. Thanks anyway. #line:020abc0 
 <<else>>
     <<Cole Happy>>
-    Cole: [wiggle]That's the one.[/wiggle]
+    Cole: [wiggle]That's the one.[/wiggle] #line:043e2ba 
 <<endif>>
 <<Reset_Variable SystemGame>>
 <<Cole 0>>
@@ -183,39 +183,39 @@ title: PT_D1_Faye
 // ── Customer 3: a random order from her preferences ──
 <<Faye Enter 3>>
 <<Faye Happy>>
-Faye: Hi! I've heard there's a new bartender.
-Player: That's me. What can I get you?
+Faye: Hi! I've heard there's a new bartender. #line:0d8b738 
+Player: That's me. What can I get you? #line:00d4337 
 <<Faye Neutral>>
-Faye: Surprise me. Something I'd like.
+Faye: Surprise me. Something I'd like. #line:0a69705 
 // The argument is the customer's number. OutName and OutDescription of the same call
 // return the same drink. Only drinks the player can make today are picked.
 <<order_customer "[CocktailSystem]" Faye>>
-Player: How about a [order]{Order_Cocktail_OutName(4)}[/order]?
-Player: {Order_Cocktail_OutDescription(4)}
-Faye: Sounds lovely.
+Player: How about a [order]{Order_Cocktail_OutName(4)}[/order]? #line:0023e25 
+Player: {Order_Cocktail_OutDescription(4)} #line:074e528 
+Faye: Sounds lovely. #line:02bc9e2 
 <<detour PT_MakeDrink>>
 
 <<if $satisfaction == Satisfaction.Perfect>>
     <<Faye Happy>>
-    Faye: [bounce]You read my mind![/bounce]
+    Faye: [bounce]You read my mind![/bounce] #line:038d851 
 <<else>>
     <<Faye Sad>>
-    Faye: Mm. Maybe next time.
+    Faye: Mm. Maybe next time. #line:0b37d13 
 <<endif>>
 <<Reset_Variable SystemGame>>
 <<Faye Look L>>
-Faye: Oh, it's late. Good night!
+Faye: Oh, it's late. Good night! #line:09bdbd2 
 <<Faye Exit>>
 <<jump PT_D1_Close>>
 ===
 
 title: PT_D1_Close
 ---
-Player: That's everyone for tonight.
+Player: That's everyone for tonight. #line:0387a4d 
 <<flow_close_bar>>
-Player: (PT) flow_phase = {flow_phase()} (expect Close)
+Player: (PT) flow_phase = {flow_phase()} (expect Close) #line:08a956a 
 <<Panel_FadeOut Panel_Transition>>
-Player: (Wiping the counter in the dark, I count the takings. Not bad for a first night.)
+Player: (Wiping the counter in the dark, I count the takings. Not bad for a first night.) #line:0614f4c 
 <<Panel_FadeIn Panel_Transition>>
 // Close -> BeforeOpen: $day becomes 2. Day 2's start node begins when this dialogue ends.
 <<flow_next_day>>
@@ -229,8 +229,8 @@ title: PT_D2_Start
 ---
 <<Panel_FadeOut Panel_Transition>>
 <<eventlog_clear>>
-Player: (PT) Day {$day}. flow_phase = {flow_phase()}, flow_step = {flow_step()} (expect 2 / BeforeOpen / StoryBeforeOpen, no popup: nothing unlocks on day 2)
-Player: Second night. Word must be getting around.
+Player: (PT) Day {$day}. flow_phase = {flow_phase()}, flow_step = {flow_step()} (expect 2 / BeforeOpen / StoryBeforeOpen, no popup: nothing unlocks on day 2) #line:0484ec0 
+Player: Second night. Word must be getting around. #line:0f1158c 
 <<flow_open_bar>>
 <<jump PT_D2_Walter>>
 ===
@@ -240,33 +240,33 @@ title: PT_D2_Walter
 // ── Customer 1: random order + a story unlock mid-day ──
 <<Walter Enter 1>>
 <<Walter Neutral>>
-Walter: Evening, son. I knew the old owner.
-Walter: He left this with me. Said to give it to whoever took over.
-Player: A bottle of rum?
+Walter: Evening, son. I knew the old owner. #line:0fa06fb 
+Walter: He left this with me. Said to give it to whoever took over. #line:0f31f2e 
+Player: A bottle of rum? #line:0732f3d 
 <<Walter Happy>>
-Walter: It's yours now.
+Walter: It's yours now. #line:00f5339 
 // Unlocks Rum for good. The bottle appears on the bar at once; the popup about it
 // waits for tomorrow's Event.
 <<unlock_ingredient Rum>>
-Player: (PT) Rum = {ingredient_unlocked("Rum")} (True, the Rum bottle should be on the bar now)
+Player: (PT) Rum = {ingredient_unlocked("Rum")} (True, the Rum bottle should be on the bar now) #line:0914c14 
 
 <<Walter Neutral>>
-Walter: Now, surprise me. Something I'd like.
+Walter: Now, surprise me. Something I'd like. #line:053f0f1 
 <<order_customer "[CocktailSystem]" Walter>>
-Player: How about a [order]{Order_Cocktail_OutName(3)}[/order]?
-Walter: Go on then.
+Player: How about a [order]{Order_Cocktail_OutName(3)}[/order]? #line:0e05735 
+Walter: Go on then. #line:0191bd9 
 <<detour PT_MakeDrink>>
 
 <<if $satisfaction == Satisfaction.Fail>>
     <<Walter Sad>>
-    Walter: [shake]Not my sort of thing.[/shake]
+    Walter: [shake]Not my sort of thing.[/shake] #line:0f6ac67 
 <<else>>
     <<Walter Happy>>
-    Walter: [wiggle]You've got a knack for this.[/wiggle]
+    Walter: [wiggle]You've got a knack for this.[/wiggle] #line:00fcc58 
 <<endif>>
 <<Reset_Variable SystemGame>>
 <<Walter Neutral>>
-Walter: I'll sit a while, if you don't mind.
+Walter: I'll sit a while, if you don't mind. #line:085ee18 
 <<jump PT_D2_Owen>>
 ===
 
@@ -276,26 +276,26 @@ title: PT_D2_Owen
 <<Owen Enter 3>>
 <<Switch_Camera CamController Char23Cam>>
 <<Owen Happy>>
-Owen: [bounce]Hey hey! Walter, you old fox, you found the new place first![/bounce]
+Owen: [bounce]Hey hey! Walter, you old fox, you found the new place first![/bounce] #line:03de824 
 <<Walter Look R>>
-Walter: Some of us have taste, Owen.
+Walter: Some of us have taste, Owen. #line:0f1778c 
 <<Walter Neutral>>
 <<Owen Happy1>>
-Owen: Something strong for me. I don't care what.
+Owen: Something strong for me. I don't care what. #line:01fe245 
 // Instance command: the first word is the GameObject name "[CocktailSystem]".
 // order_name() stays empty: any HighAlcohol drink is right.
 <<order_customer "[CocktailSystem]" Owen>>
 <<order_by_type "[CocktailSystem]" HighAlcohol>>
-Player: (PT) order_type = {order_type()} (expect HighAlcohol), order_name = "{order_name()}" (expect empty)
-Player: One strong drink coming up.
+Player: (PT) order_type = {order_type()} (expect HighAlcohol), order_name = "{order_name()}" (expect empty) #line:06b01e8 
+Player: One strong drink coming up. #line:00c0e28 
 <<Cut_Camera CamController MainCam>>
 <<detour PT_MakeDrink>>
 
 <<if $type_of_cocktail == TypeOfCocktail.HighAlcohol>>
-    Owen: [bounce]Now THAT's strong![/bounce]
+    Owen: [bounce]Now THAT's strong![/bounce] #line:07695eb 
 <<else>>
     <<Owen Sad>>
-    Owen: That's... juice, buddy.
+    Owen: That's... juice, buddy. #line:08e0de2 
 <<endif>>
 <<Reset_Variable SystemGame>>
 <<Owen Neutral>>
@@ -309,21 +309,21 @@ title: PT_D2_Claire
 // ── Customer 3: the long-form character commands ──
 <<CharacterEnter CharacterName.Claire 2>>
 <<CharacterExpression CharacterName.Claire Amaze>>
-Claire: Oh! It's actually open! The old place has been dark for months.
+Claire: Oh! It's actually open! The old place has been dark for months. #line:068b588 
 <<CharacterLook CharacterName.Claire L>>
-Claire: You kept the old mirror. Good.
+Claire: You kept the old mirror. Good. #line:0b672ca 
 <<CharacterLook CharacterName.Claire F>>
 <<CharacterExpression CharacterName.Claire Neutral>>
 <<order_customer "[CocktailSystem]" Claire>>
-Claire: A [order]{Order_Cocktail_ByName_OutName("Cosmopolitan")}[/order], and don't skimp on the cranberry.
+Claire: A [order]{Order_Cocktail_ByName_OutName("Cosmopolitan")}[/order], and don't skimp on the cranberry. #line:0f58a85 
 <<detour PT_MakeDrink>>
 
 <<if $satisfaction == Satisfaction.Perfect>>
     <<CharacterExpression CharacterName.Claire Happy>>
-    Claire: Lovely. I'll be back.
+    Claire: Lovely. I'll be back. #line:0c70077 
 <<else>>
     <<CharacterExpression CharacterName.Claire Rage>>
-    Claire: [shake]That is NOT a Cosmopolitan.[/shake]
+    Claire: [shake]That is NOT a Cosmopolitan.[/shake] #line:04b7cfb 
 <<endif>>
 <<Reset_Variable SystemGame>>
 <<CharacterExit CharacterName.Claire>>
@@ -332,10 +332,10 @@ Claire: A [order]{Order_Cocktail_ByName_OutName("Cosmopolitan")}[/order], and do
 
 title: PT_D2_Close
 ---
-Player: Quieter than I hoped, but they'll be back.
+Player: Quieter than I hoped, but they'll be back. #line:0943600 
 <<flow_close_bar>>
 <<Panel_FadeOut Panel_Transition>>
-Player: (Rum on the shelf now. Tomorrow the supplier brings more bottles.)
+Player: (Rum on the shelf now. Tomorrow the supplier brings more bottles.) #line:0702c29 
 <<Panel_FadeIn Panel_Transition>>
 // $day becomes 3: day 3's Event shows the unlock popup before PT_D3_Start.
 <<flow_next_day>>
@@ -350,12 +350,12 @@ title: PT_D3_Start
 // Before this node: one "Unlock New Ingredient" popup with Whiskey, Dry Vermouth,
 // Peppermint (day 3 in the table) and Rum (unlocked by the story on day 2).
 <<eventlog_clear>>
-Player: (PT) Day {$day}. flow_step = {flow_step()} (expect 3 / StoryBeforeOpen, after the unlock popup)
-Player: (PT) Whiskey = {ingredient_unlocked("Whiskey")}, DryVermouth = {ingredient_unlocked("DryVermouth")}, PepperMint = {ingredient_unlocked("PepperMint")}, Rum = {ingredient_unlocked("Rum")} (all True)
-Player: The supplier came by. Whiskey, vermouth and fresh mint on the shelf.
+Player: (PT) Day {$day}. flow_step = {flow_step()} (expect 3 / StoryBeforeOpen, after the unlock popup) #line:02ae91e 
+Player: (PT) Whiskey = {ingredient_unlocked("Whiskey")}, DryVermouth = {ingredient_unlocked("DryVermouth")}, PepperMint = {ingredient_unlocked("PepperMint")}, Rum = {ingredient_unlocked("Rum")} (all True) #line:0cb7dd7 
+Player: The supplier came by. Whiskey, vermouth and fresh mint on the shelf. #line:08092f4 
 <<flow_check_events>>
-Player: (PT) flow_check_events again: no popup (all already announced).
-Player: Last night of the week. Let's make it count.
+Player: (PT) flow_check_events again: no popup (all already announced). #line:036687f 
+Player: Last night of the week. Let's make it count. #line:0064311 
 <<flow_open_bar>>
 <<jump PT_D3_Eliana>>
 ===
@@ -365,29 +365,29 @@ title: PT_D3_Eliana
 // ── Customer 1: branch on what the bar has ──
 <<Eliana Enter 1>>
 <<Eliana Neutral>>
-Eliana: Do you have whiskey yet? The last owner never did.
+Eliana: Do you have whiskey yet? The last owner never did. #line:09a0cc8 
 <<order_customer "[CocktailSystem]" Eliana>>
 <<if ingredient_unlocked("Whiskey")>>
-    Player: Fresh in today.
+    Player: Fresh in today. #line:08b4ce5 
     <<Eliana Happy>>
-    Eliana: Then an [order]{Order_Cocktail_ByName_OutName("Old Fashioned")}[/order], please.
+    Eliana: Then an [order]{Order_Cocktail_ByName_OutName("Old Fashioned")}[/order], please. #line:0379d2b 
 <<else>>
-    Player: Not yet, sorry.
+    Player: Not yet, sorry. #line:071cf63 
     <<Eliana Disappointed>>
-    Eliana: Oh. A [order]{Order_Cocktail_ByName_OutName("Gin Fizz")}[/order] then.
+    Eliana: Oh. A [order]{Order_Cocktail_ByName_OutName("Gin Fizz")}[/order] then. #line:023f290 
 <<endif>>
 <<detour PT_MakeDrink>>
 
 <<if $satisfaction == Satisfaction.Fail>>
     <<Eliana Disappointed>>
-    Eliana: Hm. I'll stick to tea.
+    Eliana: Hm. I'll stick to tea. #line:0429c02 
 <<else>>
     <<Eliana Happy>>
-    Eliana: Just like my grandfather made them.
+    Eliana: Just like my grandfather made them. #line:0d81896 
 <<endif>>
 <<Reset_Variable SystemGame>>
 <<Eliana Look L>>
-Eliana: Someone's coming in. Good luck with him.
+Eliana: Someone's coming in. Good luck with him. #line:01e087d 
 <<Eliana Exit>>
 <<jump PT_D3_Arthur>>
 ===
@@ -398,27 +398,27 @@ title: PT_D3_Arthur
 <<Arthur Enter 2>>
 <<Switch_Camera CamController Char2Cam>>
 <<Arthur Neutral>>
-Arthur: So you're the one who reopened this place.
+Arthur: So you're the one who reopened this place. #line:0e167db 
 <<Arthur NeutralLeft>>
-Arthur: The town council wasn't asked.
+Arthur: The town council wasn't asked. #line:0ccbace 
 <<Arthur Mockery>>
-Arthur: Let's see if you're any good. Make me something.
+Arthur: Let's see if you're any good. Make me something. #line:0638b84 
 <<order_customer "[CocktailSystem]" Arthur>>
-Player: A [order]{Order_Cocktail_OutName(8)}[/order], then.
+Player: A [order]{Order_Cocktail_OutName(8)}[/order], then. #line:0bf9b5f 
 <<Arthur HandIn>>
-Arthur: Fine.
+Arthur: Fine. #line:01696cf 
 <<Cut_Camera CamController MainCam>>
 <<detour PT_MakeDrink>>
 
 <<if $satisfaction == Satisfaction.Perfect>>
     <<Arthur Neutral>>
-    Arthur: ...Acceptable. Don't let it go to your head.
+    Arthur: ...Acceptable. Don't let it go to your head. #line:096caac 
 <<elseif $satisfaction == Satisfaction.Acceptable>>
     <<Arthur Angry>>
-    Arthur: Barely drinkable.
+    Arthur: Barely drinkable. #line:07c500d 
 <<else>>
     <<Arthur Rage>>
-    Arthur: [shake]Is this a joke?[/shake]
+    Arthur: [shake]Is this a joke?[/shake] #line:036fd03 
 <<endif>>
 <<Reset_Variable SystemGame>>
 <<Arthur Look R>>
@@ -431,21 +431,21 @@ title: PT_D3_Isla
 // ── Customer 3: a regular comes back ──
 <<Isla Enter 3>>
 <<Isla Happy>>
-Isla: [wave]Told you I'd bring friends! ...They're running late.[/wave]
+Isla: [wave]Told you I'd bring friends! ...They're running late.[/wave] #line:03a5255 
 <<Isla KneeUp>>
-Isla: I saw Arthur storm out. Don't mind him.
+Isla: I saw Arthur storm out. Don't mind him. #line:018f60b 
 <<Isla Neutral>>
-Isla: Something new this time. Your choice.
+Isla: Something new this time. Your choice. #line:0487b2b 
 <<order_customer "[CocktailSystem]" Isla>>
-Player: Try a [order]{Order_Cocktail_OutName(5)}[/order].
+Player: Try a [order]{Order_Cocktail_OutName(5)}[/order]. #line:08fcdaa 
 <<detour PT_MakeDrink>>
 
 <<if $satisfaction == Satisfaction.Fail>>
     <<Isla Sad>>
-    Isla: Well, they can't all be winners.
+    Isla: Well, they can't all be winners. #line:0c1e462 
 <<else>>
     <<Isla Happy>>
-    Isla: [bounce]You're getting good at this.[/bounce]
+    Isla: [bounce]You're getting good at this.[/bounce] #line:0fc8788 
 <<endif>>
 <<Reset_Variable SystemGame>>
 <<Isla Exit>>
@@ -454,14 +454,14 @@ Player: Try a [order]{Order_Cocktail_OutName(5)}[/order].
 
 title: PT_D3_Close
 ---
-Player: Last call. That's the end of the week.
+Player: Last call. That's the end of the week. #line:0f899c3 
 // Shows the End Shift button (and locks the bar).
 <<Can_End_Shift SystemGame>>
 <<flow_close_bar>>
-Player: (PT) flow_phase = {flow_phase()} (expect Close)
+Player: (PT) flow_phase = {flow_phase()} (expect Close) #line:091dbf5 
 <<Switch_Camera CamController SummaryCam>>
 <<Fade_To_Summmary Panel_Transition>>
 <<Panel_FadeIn Panel_Transition>>
 <<DisplayThx>>
-Player: (PT) End of the play test. The thank-you panel should be on screen.
+Player: (PT) End of the play test. The thank-you panel should be on screen. #line:0fb8b06 
 ===

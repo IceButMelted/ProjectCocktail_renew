@@ -1,11 +1,11 @@
-title: D1_NL_00_Start
+﻿title: D1_NL_00_Start
 ---
 
 
 
-Player : This is a great day.
-Player : For first Opening day in this town.
-Player : I looking forawrd to see who will come first.
+Player : This is a great day. #line:05e939e 
+Player : For first Opening day in this town. #line:0f8a7b1 
+Player : I looking forawrd to see who will come first. #line:01afcb8 
 
 <<flow_open_bar>>
 <<jump D1_NL_01_Isla_Arrive>>
@@ -22,51 +22,51 @@ title: D1_NL_01_Isla_Arrive
 <<Switch_Camera CamController Char2Cam>>
 <<Isla Happy>>
 
-Isla: [wave]Good evening.[/wave]
+Isla: [wave]Good evening.[/wave] #line:08a0c84 
 <<Walter Look R>>
 <<Walter Happy>>
-Walter: Good evening, Isla. Didn't expect to see you out this late.
+Walter: Good evening, Isla. Didn't expect to see you out this late. #line:07177af 
 <<Isla Look L>>
-Isla: I could say the same to you, Mr. Walter.
-Walter: [wiggle]The TV can wait one night.[/wiggle]
+Isla: I could say the same to you, Mr. Walter. #line:091f3ef 
+Walter: [wiggle]The TV can wait one night.[/wiggle] #line:04b4b12 
 <<Walter Look F>>
 <<Isla Look F>>
 <<Walter Neutral>>
 
-Isla: Oh, this place is new, isn't it? I don't think I've walked by here before.
-Player: Good evening. Yeah, I just opened up a few days ago.
+Isla: Oh, this place is new, isn't it? I don't think I've walked by here before. #line:0c72231 
+Player: Good evening. Yeah, I just opened up a few days ago. #line:096a42b 
 <<Isla Neutral>>
-Isla: Well, it looks lovely. Mind if I take a seat?
-Player: Of course, make yourself comfortable.
--> Rough day?
-    Player: You look like you've had a long one.
-    Isla: [wiggle]Is it that obvious?[/wiggle] Just got off a shift.
--> First time here?
-    Player: First time in the neighborhood?
-    Isla: Something like that. I just never noticed this spot before.
--> Take your time.
-    Player: Take your time, no rush tonight.
-    Isla: [wave]Thanks, I appreciate that.[/wave]
--> Welcome in. 
-    Player: Welcome in, glad to have you.
-    Isla: [wave]Glad to be here.[/wave]
+Isla: Well, it looks lovely. Mind if I take a seat? #line:0563db4 
+Player: Of course, make yourself comfortable. #line:0aedce9 
+-> Rough day? #line:0b85232 
+    Player: You look like you've had a long one. #line:030fc29 
+    Isla: [wiggle]Is it that obvious?[/wiggle] Just got off a shift. #line:01a687f 
+-> First time here? #line:0530637 
+    Player: First time in the neighborhood? #line:0f291f0 
+    Isla: Something like that. I just never noticed this spot before. #line:0ffeea2 
+-> Take your time. #line:034b2a6 
+    Player: Take your time, no rush tonight. #line:0cce3e8 
+    Isla: [wave]Thanks, I appreciate that.[/wave] #line:060eba6 
+-> Welcome in.  #line:00c0f06 
+    Player: Welcome in, glad to have you. #line:048873e 
+    Isla: [wave]Glad to be here.[/wave] #line:0050673 
 
-Isla: I'm Isla, by the way.
-Isla: I'm a nurse over at the local clinic, just down the road.
-Player: Nice to meet you, Isla. I bet that job keeps you busy.
-Isla: [wiggle]You have no idea.[/wiggle]
-Player: Well, you're in the right place to unwind. What can I get you?
-Isla: Do you have anything to recommend?
+Isla: I'm Isla, by the way. #line:0a5fc65 
+Isla: I'm a nurse over at the local clinic, just down the road. #line:03b741d 
+Player: Nice to meet you, Isla. I bet that job keeps you busy. #line:029dcc3 
+Isla: [wiggle]You have no idea.[/wiggle] #line:08aad1b 
+Player: Well, you're in the right place to unwind. What can I get you? #line:0a11a50 
+Isla: Do you have anything to recommend? #line:03a9b11 
 <<jump D1_NL_02_Isla_Order>>
 ===
 
 title: D1_NL_02_Isla_Order
 ---
-Player: [swing]Everything is recommended here.[/swing]
-Isla: Umm...
+Player: [swing]Everything is recommended here.[/swing] #line:0ccc814 
+Isla: Umm... #line:08b55b0 
 <<order_customer "[CocktailSystem]" Isla>>
-Isla: Okay, I'll have [order] {Order_Cocktail_ByName_OutName("Cranberry Fizz")} [/order].
-Player: Got it.
+Isla: Okay, I'll have [order] {Order_Cocktail_ByName_OutName("Cranberry Fizz")} [/order]. #line:0e14474 
+Player: Got it. #line:09c73bd 
 
 <<Isla Neutral>>
 
@@ -79,18 +79,18 @@ Player: Got it.
 
 <<if $satisfaction == Satisfaction.Perfect>>
     <<Isla Happy>>
-    Isla: [bounce]Oh, wow... this is incredible.[/bounce]
-    Isla: [rainb]Seriously, you have magic hands.[/rainb]
+    Isla: [bounce]Oh, wow... this is incredible.[/bounce] #line:098cc49 
+    Isla: [rainb]Seriously, you have magic hands.[/rainb] #line:0b57f5f 
 
 <<elseif $satisfaction == Satisfaction.Acceptable>>
-    Isla: Oh, it tastes... a bit different from what I expected.
-    Isla: But it's fine.
+    Isla: Oh, it tastes... a bit different from what I expected. #line:095bf12 
+    Isla: But it's fine. #line:05bcc69 
 
 <<elseif $satisfaction == Satisfaction.Fail>>
     <<Isla Sad>>
-    Isla: [shake]Uh... Bartender?[/shake]
-    Isla: I think you might have grabbed the wrong bottle.
-    Isla: It's definitely not what I asked for.
+    Isla: [shake]Uh... Bartender?[/shake] #line:03b9d20 
+    Isla: I think you might have grabbed the wrong bottle. #line:0dcdeb1 
+    Isla: It's definitely not what I asked for. #line:058f740 
 
 <<endif>>
 
@@ -102,17 +102,17 @@ Player: Got it.
 
 title: D1_NL_03_Isla_Talk
 ---
-Isla: Did you just move here?
-Player: Yes, just a few days ago.
-Isla: It's a nice little town, once you get used to the quiet.
-Isla: Actually, I'm not from around here either.
-Isla: I was transferred here for work.
-Player: How long have you been here?
+Isla: Did you just move here? #line:08f6c19 
+Player: Yes, just a few days ago. #line:03ed3e2 
+Isla: It's a nice little town, once you get used to the quiet. #line:0debc0f 
+Isla: Actually, I'm not from around here either. #line:0d7171a 
+Isla: I was transferred here for work. #line:08c70ea 
+Player: How long have you been here? #line:0ef2fdb 
 <<Isla Happy>>
-Isla: [wiggle]Long enough to stop counting.[/wiggle]
-Isla: I just... ended up staying longer than I planned.
-Player: Sounds like this town has a way of doing that.
-Isla: [wave]Maybe it does.[/wave]
+Isla: [wiggle]Long enough to stop counting.[/wiggle] #line:034e155 
+Isla: I just... ended up staying longer than I planned. #line:015bf6b 
+Player: Sounds like this town has a way of doing that. #line:00dda3b 
+Isla: [wave]Maybe it does.[/wave] #line:07b2d83 
 <<jump D1_NL_04_Owen_Arrive>>
 ===
 
@@ -125,45 +125,45 @@ title: D1_NL_04_Owen_Arrive
 <<Switch_Camera CamController Char23Cam>>
 <<Owen Happy>>
 
-Owen: [bounce a=3]Hey! hey!! Owen here![/bounce]
+Owen: [bounce a=3]Hey! hey!! Owen here![/bounce] #line:00e2892 
 <<Isla Look R>>
-Isla: [wiggle]Ugh keep your voice down Owen.[/wiggle]
+Isla: [wiggle]Ugh keep your voice down Owen.[/wiggle] #line:0d83836 
 <<Owen Look L>>
-Owen: My bad, Isla. Nice to see you.
+Owen: My bad, Isla. Nice to see you. #line:0ea855e 
 <<Walter Look R>>
 <<Walter Happy>>
-Walter: [wiggle]Some things never change, Owen.[/wiggle]
-Owen: [bounce]Mr. Walter! Didn't see you there.[/bounce]
-Walter: Hard to miss you, son.
+Walter: [wiggle]Some things never change, Owen.[/wiggle] #line:0fb9f93 
+Owen: [bounce]Mr. Walter! Didn't see you there.[/bounce] #line:088e69f 
+Walter: Hard to miss you, son. #line:0160c60 
 <<Walter Neutral>>
-Owen: [shake]Wait, wait, wait[/shake] — new face behind the bar?
-Owen: I thought I knew everyone in town.
-Owen: Since when did this place have a bartender?
--> Hello!
-    Player: Hello. I'm a Bartender.
-    Player: I just opened a few days ago.
+Owen: [shake]Wait, wait, wait[/shake] — new face behind the bar? #line:0f3a13d 
+Owen: I thought I knew everyone in town. #line:0750053 
+Owen: Since when did this place have a bartender? #line:04e9866 
+-> Hello! #line:0479aec 
+    Player: Hello. I'm a Bartender. #line:00746d3 
+    Player: I just opened a few days ago. #line:0aa30c2 
     <<Isla Happy>>
-    Owen: Newcomer? Glad to see you.
--> Just the bartender.
-    Player: Just the bartender.
-    Owen: [swing]Just the bartender? No name, no story?[/swing]
-    Owen: Mysterious. I like it.
--> Hey! Hey!!
-    Player: hey! Hey!! Bartender here!
+    Owen: Newcomer? Glad to see you. #line:08c8720 
+-> Just the bartender. #line:0c9dc16 
+    Player: Just the bartender. #line:0cae804 
+    Owen: [swing]Just the bartender? No name, no story?[/swing] #line:0cd9875 
+    Owen: Mysterious. I like it. #line:01bde74 
+-> Hey! Hey!! #line:0982fe0 
+    Player: hey! Hey!! Bartender here! #line:064e91f 
     <<Isla Happy>>
-    Owen: [bounce]Now that's the spirit![/bounce]
--> Good evening.
-    Player: Good evening. I'm Bartender, nice to meet you.
+    Owen: [bounce]Now that's the spirit![/bounce] #line:0bd4724 
+-> Good evening. #line:096c587 
+    Player: Good evening. I'm Bartender, nice to meet you. #line:0c45181 
     <<Isla Neutral>>
-    Owen: [wiggle]Whoa, so formal. I'm speechless.[/wiggle]
-    Owen: Nice to meet you.
+    Owen: [wiggle]Whoa, so formal. I'm speechless.[/wiggle] #line:057d3f5 
+    Owen: Nice to meet you. #line:073eca7 
 
-Owen: Well, you picked the right town to open a bar.
-Owen: Looks like I've finally got a regular spot.
+Owen: Well, you picked the right town to open a bar. #line:0d17f8c 
+Owen: Looks like I've finally got a regular spot. #line:0cd3b23 
 <<Isla Look R>>
-Isla: [wiggle]You show up everywhere, Owen.[/wiggle]
+Isla: [wiggle]You show up everywhere, Owen.[/wiggle] #line:069cb2e 
 <<Owen Look L>>
-Owen: I'm easy-going. I'm fine with anywhere.
+Owen: I'm easy-going. I'm fine with anywhere. #line:02def58 
 <<jump D1_NL_05_Owen_Order>>
 ===
 
@@ -173,10 +173,10 @@ title: D1_NL_05_Owen_Order
 <<Isla Look F>>
 <<Walter Look F>>
 
-Owen: Oh right, I should probably order before the bartender kicks me out.
+Owen: Oh right, I should probably order before the bartender kicks me out. #line:0198b7a 
 <<order_customer "[CocktailSystem]" Owen>>
-Owen: I'll have [order] {Order_Cocktail_ByName_OutName("Gin Fizz")}. [/order]
-Player: One moment.
+Owen: I'll have [order] {Order_Cocktail_ByName_OutName("Gin Fizz")}. [/order] #line:04c4442 
+Player: One moment. #line:0f4fb6e 
 <<Owen Neutral>>
 
 <<flow_prepare_drinks>>
@@ -188,16 +188,16 @@ Player: One moment.
 
 <<if $satisfaction == Satisfaction.Perfect>>
     <<Owen Happy>>
-    Owen: [shake][rainb]Unbelievable![/rainb][/shake] This is amazing.
-    Owen: [bounce]I should have gone to bartender school instead.[/bounce]
+    Owen: [shake][rainb]Unbelievable![/rainb][/shake] This is amazing. #line:074edb0 
+    Owen: [bounce]I should have gone to bartender school instead.[/bounce] #line:0934015 
 
 <<elseif $satisfaction == Satisfaction.Acceptable>>
-    Owen: I'm not sure, but it feels like something's missing.
-    Owen: [wiggle]But it's better than not being able to drink.[/wiggle]
+    Owen: I'm not sure, but it feels like something's missing. #line:0bf6d8d 
+    Owen: [wiggle]But it's better than not being able to drink.[/wiggle] #line:0be9f81 
 
 <<elseif $satisfaction == Satisfaction.Fail>>
     <<Owen Sad>>
-    Owen: Hmm...[waitfor=0.2/] I hate to say it, but I think something went sideways here.
+    Owen: Hmm...[waitfor=0.2/] I hate to say it, but I think something went sideways here. #line:0b31d79 
 <<endif>>
 
 <<Reset_Variable SystemGame>>
@@ -208,43 +208,43 @@ Player: One moment.
 
 title: D1_NL_06_Owen_Talk
 ---
-Owen: Anyway.
-Owen: I didn't tell you what I do for a living, did I?
-Owen: Guess what I do for a living.
-Owen: The hint is nature.
--> Gardener
-    Owen: [wiggle]Nope. Do I look like that?[/wiggle]
--> Lumberjack
-    Owen: [shake]The opposite![/shake]
--> Wildlife conservationist
-    Owen: [bounce]Close! You're actually the first person to get that close.[/bounce]
--> You have a job?
-    Owen: [shake]Hey! What's that supposed to mean?[/shake]
+Owen: Anyway. #line:0f6bf15 
+Owen: I didn't tell you what I do for a living, did I? #line:0a0d429 
+Owen: Guess what I do for a living. #line:00fe5a9 
+Owen: The hint is nature. #line:09f72ff 
+-> Gardener #line:0a21dd5 
+    Owen: [wiggle]Nope. Do I look like that?[/wiggle] #line:0e6cc16 
+-> Lumberjack #line:0ed04b9 
+    Owen: [shake]The opposite![/shake] #line:09543c4 
+-> Wildlife conservationist #line:051b06d 
+    Owen: [bounce]Close! You're actually the first person to get that close.[/bounce] #line:0e53b57 
+-> You have a job? #line:0b24cc2 
+    Owen: [shake]Hey! What's that supposed to mean?[/shake] #line:014dff8 
 
-Owen: I'm a forest ranger.
-Owen: I take care of the forests and the wildlife.
+Owen: I'm a forest ranger. #line:00c2f16 
+Owen: I take care of the forests and the wildlife. #line:0bed875 
 <<Owen Look L>>
-Owen: You got closer than Isla ever did.
-Owen: First time we met, she thought I was homeless.
+Owen: You got closer than Isla ever did. #line:0d35166 
+Owen: First time we met, she thought I was homeless. #line:09cb174 
 <<Isla Look R>>
 
 <<Switch_Camera CamController Char23Cam>>
 
-Isla: [shake a=2]It's because you were climbing a tree behind my dorm![/shake]
-Isla: And you looked all scruffy.
-Owen: Because I climbed up to catch the raccoon.
-Isla: [shake]Then you fell off the tree. I was shocked.[/shake]
-Owen: Luckily, it wasn't anything serious.
+Isla: [shake a=2]It's because you were climbing a tree behind my dorm![/shake] #line:0b0d64b 
+Isla: And you looked all scruffy. #line:0509316 
+Owen: Because I climbed up to catch the raccoon. #line:0e467fc 
+Isla: [shake]Then you fell off the tree. I was shocked.[/shake] #line:049d711 
+Owen: Luckily, it wasn't anything serious. #line:0806441 
 <<Owen Happy>>
-Isla: Your ankle sprained.
-Owen: At least it's not broken.
-Player: And what about the raccoon?
+Isla: Your ankle sprained. #line:07698b6 
+Owen: At least it's not broken. #line:02a2006 
+Player: And what about the raccoon? #line:0bbab7b 
 <<Owen Neutral>>
-Owen: It ran away before we could catch it.
-Owen: It was rummaging through the trash at Cole's house.
+Owen: It ran away before we could catch it. #line:0ac4131 
+Owen: It was rummaging through the trash at Cole's house. #line:0c5b1e5 
 <<Isla Neutral>>
-Isla: [wiggle]That poor raccoon probably didn't know what hit him.[/wiggle]
-Owen: [wiggle]Hey, I was very gentle.[/wiggle]
+Isla: [wiggle]That poor raccoon probably didn't know what hit him.[/wiggle] #line:05b74d8 
+Owen: [wiggle]Hey, I was very gentle.[/wiggle] #line:0025424 
 <<Owen Look F>>
 <<Isla Look F>>
 <<jump D1_NL_07_Isla_Leave>>
@@ -252,18 +252,18 @@ Owen: [wiggle]Hey, I was very gentle.[/wiggle]
 
 title: D1_NL_07_Isla_Leave
 ---
-Isla: I think it's already getting late.
-Isla: I should probably head home.
+Isla: I think it's already getting late. #line:0529f7e 
+Isla: I should probably head home. #line:0925922 
 <<Owen Look R>>
-Owen: [wiggle]Come on, I was enjoying the conversation.[/wiggle]
+Owen: [wiggle]Come on, I was enjoying the conversation.[/wiggle] #line:016f0ad 
 <<Isla Look L>>
-Isla: I have an early shift tomorrow.
-Owen: [dangle]Fine...[/dangle]
-Player: Get home safe!
+Isla: I have an early shift tomorrow. #line:0cd1992 
+Owen: [dangle]Fine...[/dangle] #line:00b3c95 
+Player: Get home safe! #line:017ca8a 
 <<Isla Happy>>
-Isla: [bounce]Thanks! See you guys.[/bounce]
+Isla: [bounce]Thanks! See you guys.[/bounce] #line:0d6d95f 
 <<Owen Happy>>
-Owen: Yup, see you.
+Owen: Yup, see you. #line:07b0a4b 
 <<Switch_Camera CamController "MainCam">>
 <<Owen Look F>>
 <<Isla Exit>>
@@ -274,32 +274,32 @@ title: D1_NL_08_Owen_Outro
 ---
 //After Isla leaves
 <<Owen Neutral>>
-Owen: [fade]...[/fade]
-Owen: It's become a lot quieter.
-Player: At least you still have me.
-Owen: Yeah, you're right.
-Player: So how's the job?
-Owen: Mine? Oh, it's alright.
-Player: What do you usually do?
-Owen: Sometimes I explore on foot, or I give educational presentations to tourists.
-Player: And also chase raccoons.
-Owen: [wiggle]Ha, that too.[/wiggle]
-Owen: But I mostly stay on the observation tower.
-Owen: Keep an eye out for signs of stray animals or watch out for wildfires.
-Owen: Mostly quiet. Nothing much ever happens up there.
-Player: Sounds peaceful.
-Owen: Yeah.
-Owen: [fade]...It is.[/fade]
+Owen: [fade]...[/fade] #line:0884a36 
+Owen: It's become a lot quieter. #line:0c57620 
+Player: At least you still have me. #line:01b294f 
+Owen: Yeah, you're right. #line:0aff970 
+Player: So how's the job? #line:0d74cc7 
+Owen: Mine? Oh, it's alright. #line:0c29030 
+Player: What do you usually do? #line:0223c3a 
+Owen: Sometimes I explore on foot, or I give educational presentations to tourists. #line:0ec4435 
+Player: And also chase raccoons. #line:01aee61 
+Owen: [wiggle]Ha, that too.[/wiggle] #line:054eb36 
+Owen: But I mostly stay on the observation tower. #line:021c042 
+Owen: Keep an eye out for signs of stray animals or watch out for wildfires. #line:05ab305 
+Owen: Mostly quiet. Nothing much ever happens up there. #line:078f2db 
+Player: Sounds peaceful. #line:05849f9 
+Owen: Yeah. #line:0c41764 
+Owen: [fade]...It is.[/fade] #line:042acfe 
 <<jump D1_NL_09_Owen_SecondOrder>>
 ===
 
 title: D1_NL_09_Owen_SecondOrder
 ---
-Owen: Actually, hold on before I head out.
-Owen: One more for the road, if that's alright.
+Owen: Actually, hold on before I head out. #line:0db0591 
+Owen: One more for the road, if that's alright. #line:074c86f 
 <<order_customer "[CocktailSystem]" Owen>>
-Owen: I'll have [order] {Order_Cocktail_ByName_OutName("Greyhound")}. [/order]
-Player: Coming right up.
+Owen: I'll have [order] {Order_Cocktail_ByName_OutName("Greyhound")}. [/order] #line:032b938 
+Player: Coming right up. #line:080265e 
 <<Owen Neutral>>
 
 <<flow_prepare_drinks>>
@@ -311,16 +311,16 @@ Player: Coming right up.
 
 <<if $satisfaction == Satisfaction.Perfect>>
     <<Owen Happy>>
-    Owen: [bounce]Now THIS is how you send a guy off right.[/bounce]
-    Owen: I'll definitely be back for more.
+    Owen: [bounce]Now THIS is how you send a guy off right.[/bounce] #line:076b422 
+    Owen: I'll definitely be back for more. #line:0543a2e 
 
 <<elseif $satisfaction == Satisfaction.Acceptable>>
-    Owen: Not bad for a nightcap.
-    Owen: [wiggle]Good enough to send me home happy.[/wiggle]
+    Owen: Not bad for a nightcap. #line:0f331cd 
+    Owen: [wiggle]Good enough to send me home happy.[/wiggle] #line:0dc6bf0 
 
 <<elseif $satisfaction == Satisfaction.Fail>>
     <<Owen Sad>>
-    Owen: [shake]Hmm... maybe I should've quit while I was ahead.[/shake]
+    Owen: [shake]Hmm... maybe I should've quit while I was ahead.[/shake] #line:08b573d 
 <<endif>>
 
 <<Reset_Variable SystemGame>>
@@ -331,17 +331,17 @@ Player: Coming right up.
 
 title: D1_NL_10_Owen_Leave
 ---
-Owen: Anyway, I should head out too.
-Owen: Early morning tomorrow.
-Owen: The work never has a day off.
-Player: Good luck, see you again.
-Owen: Thanks, see you later.
-Owen: [bounce]Owen, signing out.[/bounce]
+Owen: Anyway, I should head out too. #line:0eab095 
+Owen: Early morning tomorrow. #line:042a445 
+Owen: The work never has a day off. #line:0bf574a 
+Player: Good luck, see you again. #line:0ce4aa9 
+Owen: Thanks, see you later. #line:0e53330 
+Owen: [bounce]Owen, signing out.[/bounce] #line:009a362 
 <<Owen Look L>>
 <<Owen Exit>>
 
-Player: [fade]...Another quiet night.[/fade]
-Player: Guess it's about time to close up.
+Player: [fade]...Another quiet night.[/fade] #line:0f4648b 
+Player: Guess it's about time to close up. #line:0e7ff15 
 
 <<Panel_FadeOut Panel_Transition>>
 <<wait 1.5>>
