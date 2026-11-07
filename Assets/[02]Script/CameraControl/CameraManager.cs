@@ -2,7 +2,6 @@ using System.Collections.Generic;
 using UnityEngine;
 using Unity.Cinemachine;
 using Yarn.Unity;
-using Mono.Cecil.Cil;
 
 /// <summary>
 /// The one owner of the camera: which virtual camera is live, and whether the mouse may move the view.

@@ -19,9 +19,6 @@ using static E_Cocktail;
 using UnityEditor;
 #endif
 
-/// <summary>Which way a character faces. Left and Right are the player's screen, not the character's.</summary>
-public enum Facing { Forward, Left, Right }
-
 /// <summary>Small up-and-down steps while a character fades in or out, as if walking. Default = no motion.</summary>
 [System.Serializable]
 public struct WalkBob

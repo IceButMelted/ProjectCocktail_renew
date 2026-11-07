@@ -1,47 +1,6 @@
 using System;
 using static E_Cocktail;
 
-// ── Phase ──────────────────────────────────────────────────
-
-/// <summary>
-/// The only state machine a minigame has.
-/// Runs as a straight line: Idle → Intro → Play → Outro → Idle.
-///
-/// Intro/Outro are owned by the Animator (see MinigamePanelAnimator);
-/// Play is the only phase that ticks gameplay or accepts input.
-/// </summary>
-public enum MinigamePhase
-{
-    /// <summary>Nothing on screen. Panels sit at their hidden Animator pose.</summary>
-    Idle,
-
-    /// <summary>Intro clip playing. No input, no gameplay tick.</summary>
-    Intro,
-
-    /// <summary>Active gameplay. Input is polled and OnTick(dt) runs every frame.</summary>
-    Play,
-
-    /// <summary>Outro clip playing. When it finishes the game reports its result and returns to Idle.</summary>
-    Outro
-}
-
-// ── Outcome ────────────────────────────────────────────────
-
-/// <summary>
-/// Why a run ended. Reported once, when the outro finishes.
-///
-/// Deliberately not a bool: the flow layer needs to tell "player finished the drink"
-/// apart from "player backed out", because those lead to different HSM transitions.
-/// </summary>
-public enum MinigameOutcome
-{
-    /// <summary>Win condition met — the game ran to its natural end.</summary>
-    Completed,
-
-    /// <summary>Aborted before the win condition: close button, flow backtrack, or a game switch.</summary>
-    Cancelled
-}
-
 // ── Core Minigame Contract ─────────────────────────────────
 
 /// <summary>
