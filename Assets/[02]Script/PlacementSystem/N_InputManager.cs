@@ -7,7 +7,7 @@ public class N_InputManager : MonoBehaviour
 
     [Header("Placement")]
     [Tooltip("Layer used by BOTH VolumePlacementZone and SurfacePlacementZone colliders. " +
-             "Replaces the old separate _placementLayer / _boxPlacementLayer split — " +
+             "Replaces the old separate _placementLayer / _boxPlacementLayer split â€” " +
              "the zone type is now read off the hit collider's component instead of the layer.")]
     [SerializeField] private LayerMask _zoneLayer;
 
@@ -18,7 +18,7 @@ public class N_InputManager : MonoBehaviour
 
     private Vector3 _lastPosition;
 
-    /// <summary>Drives a free-floating mouse indicator. Not clamped to any item size —
+    /// <summary>Drives a free-floating mouse indicator. Not clamped to any item size â€”
     /// use TryGetPlacementPoint for the actual dragged-object position.</summary>
     public Vector3 GetSelectedMapPosition()
     {
