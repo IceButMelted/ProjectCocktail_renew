@@ -1,3 +1,5 @@
+> **Superseded in part by [`Contracts_Final.md`](Contracts_Final.md) (2026-11-07): where they disagree, Contracts_Final wins.**
+
 # Bar410 rewrite — G4 API: Save/Load + Input
 
 Status: design contract, not compiled. Code examples only show signatures. "UNVERIFIED" items are collected in (d).

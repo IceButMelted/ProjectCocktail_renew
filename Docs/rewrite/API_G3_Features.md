@@ -1,3 +1,5 @@
+> **Superseded in part by [`Contracts_Final.md`](Contracts_Final.md) (2026-11-07): where they disagree, Contracts_Final wins.**
+
 # Bar410 rewrite: G3 API (Features + hosts)
 
 Author: G3 architect, 2026-11-07. Scope B: keep the Domain and the managers, put interfaces in front of them, and add hosts for the additive UI scenes.

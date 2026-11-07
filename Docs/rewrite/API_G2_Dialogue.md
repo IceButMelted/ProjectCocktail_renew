@@ -1,3 +1,5 @@
+> **Superseded in part by [`Contracts_Final.md`](Contracts_Final.md) (2026-11-07): where they disagree, Contracts_Final wins.**
+
 # G2 API spec: Dialogue / Yarn / Voice / Localization (Bar410 rewrite, scope B)
 
 Author: G2 architect, 2026-11-07. Basis: `Docs/Bar410_Rewrite_Options.md` §3.4/§3.5/§9/§11/§12/§16, `Bar410_LanguageSwitch_Options.md` (method C), `Bar410_O1_O4_Decisions.md`, `Bar410_CodeMap_MainScene.md`, the real code in `Assets/[06]Dialogue`, `GameFlowCommands.cs`, `CocktailSystemManager.Yarn*.cs`, `Customer/*`, `SceneLoaderBridge.cs`, and the package source of Yarn Spinner 3.2.5 + the Text Animator addon (TA v3 is active: `TextAnimatorYarnTypewriter_v3`, `YS_USE_TEXT_ANIMATOR_3`).

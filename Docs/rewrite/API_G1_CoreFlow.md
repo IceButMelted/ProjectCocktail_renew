@@ -1,3 +1,5 @@
+> **Superseded in part by [`Contracts_Final.md`](Contracts_Final.md) (2026-11-07): where they disagree, Contracts_Final wins.**
+
 # Bar410 Rewrite — G1 Core Flow: API spec + task breakdown
 
 Scope: level B, flow style ① (Async Stations on Unity `Awaitable`, plus an Inspector `Station[] steps` list), side-by-side in `Assets/Bar410/` with scene `Main_V2`, hand-wired `GameRoot`, no DI framework.
