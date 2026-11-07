@@ -44,10 +44,15 @@ namespace Bar410.Core
         /// A pre-cancelled token throws without starting the coroutine.
         /// If the runner is destroyed or inactive the coroutine stops (or never starts) and only <paramref name="ct"/>
         /// releases the waiter, so pass <c>runner.destroyCancellationToken</c> (or a token linked to it).
+        /// The runner must be an always-active object, never the NPC object. An inactive runner throws
+        /// <see cref="InvalidOperationException"/> here instead of hanging. An exception thrown by the routine
+        /// is delivered to the awaiter.
         /// </summary>
         public static Awaitable FromCoroutine(MonoBehaviour runner, IEnumerator routine, CancellationToken ct)
         {
             ct.ThrowIfCancellationRequested();
+            if (!runner.gameObject.activeInHierarchy)
+                throw new InvalidOperationException($"FromCoroutine: runner '{runner.name}' is inactive");
             var source = new AwaitableCompletionSource();
             runner.StartCoroutine(Drive(routine, source));
             return Wait(source, ct);
@@ -56,7 +61,14 @@ namespace Bar410.Core
         // Drives the routine itself so a routine with no yields completes inside StartCoroutine.
         static IEnumerator Drive(IEnumerator routine, AwaitableCompletionSource source)
         {
-            while (routine.MoveNext()) yield return routine.Current;
+            while (true)
+            {
+                bool more;
+                try { more = routine.MoveNext(); }
+                catch (Exception e) { source.TrySetException(e); yield break; }
+                if (!more) break;
+                yield return routine.Current;
+            }
             source.TrySetResult();
         }
     }

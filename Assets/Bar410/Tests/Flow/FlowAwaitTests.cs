@@ -298,6 +298,26 @@ namespace Bar410.Flow.Tests
             Assert.IsFalse(started);
         }
 
+        static IEnumerator Throws() { throw new InvalidOperationException("boom"); yield break; }
+
+        [Test]
+        public async Task FromCoroutine_ThrowingRoutine_AwaitThrowsThatException()
+        {
+            var aw = FlowAwait.FromCoroutine(NewRunner(), Throws(), CancellationToken.None);
+            var e = await Catch(async () => await aw);
+            Assert.IsInstanceOf<InvalidOperationException>(e);
+            Assert.AreEqual("boom", e.Message);
+        }
+
+        [Test]
+        public void FromCoroutine_InactiveRunner_Throws()
+        {
+            var r = NewRunner();
+            _go.SetActive(false);
+            Assert.Throws<InvalidOperationException>(() =>
+                FlowAwait.FromCoroutine(r, NoYields(() => { }), CancellationToken.None));
+        }
+
         // Not tested: a multi-frame routine. EditMode does not tick MonoBehaviour coroutines (tried: the routine never
         // advanced past its first yield in 30 editor frames). Needs a PlayMode test.
     }
