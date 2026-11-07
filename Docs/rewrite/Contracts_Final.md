@@ -5,7 +5,7 @@ Written 2026-11-07, after spikes G1-0, G4-S0 and G2-T02. Nothing has been compil
 **Phase move:** G3-T1/G4-S1 (Contracts) move from R1 to R2, after N1, because Contracts names Domain types. G1-4 and G1-5 follow them. Whatever is not mentioned here still holds as written in the group specs.
 
 Inputs: ExecutionPlan §2/§3/§5/§8, `API_G1_CoreFlow.md`, `API_G2_Dialogue.md`, `API_G3_Features.md`, `API_G4_SaveInput.md`, `Spike_G1-0_Results.md`, `Spike_G4-S0_Results.md`, `Spike_G2-T02_Results.md`.
-**G4-I0 (virtual cursor, needs the owner's pad) is NOT done.** Every decision marked **(prov. I0)** is provisional until it is.
+**G4-I0 (virtual cursor, owner's PS4 pad) is DONE (2026-11-08, see §8).** Decisions marked **(prov. I0)** are now settled by §8, except the items §8 lists as still unverified.
 
 ---
 
@@ -14,7 +14,7 @@ Inputs: ExecutionPlan §2/§3/§5/§8, `API_G1_CoreFlow.md`, `API_G2_Dialogue.md
 | Item | Status |
 |---|---|
 | G1-0, G4-S0, G2-T02 | done (results files above) |
-| G4-I0 | **not done** (needs the owner's gamepad) |
+| G4-I0 | **done** with a PS4 pad (§8); pause (timeScale 0) on a real pad and an Xbox pad are still untested |
 | G3-T0 (type splits, `Mono.Cecil` removed) | done: `b76719b`, `b91cbb9` (`HubPhase.cs`, `Facing.cs`, `MinigameOutcome.cs` now exist as their own files) |
 | N6 (`N_InputManager` → UTF-8) | done: `bcc0176` |
 | D12 (install `com.unity.localization`) | answered by action: committed in `edd03af` (Localization 1.5.14 + Addressables) |
@@ -402,7 +402,7 @@ Test notes (G1-0): use `[Test] async Task` for completion-source tests, and `[Un
 | id | change | model | depends on |
 |---|---|---|---|
 | G1-0, G4-S0, G2-T02, G3-T0, N6 | **done** | — | — |
-| G4-I0 | still open; I1, I2, I3, I8, G2-T09 and the PointerMode table stay provisional until it passes | O | owner's pad |
+| G4-I0 | **done** (§8). I1, I2, I3, I8, G2-T09, PointerMode table: unblocked, apply §8 | O | — |
 | G1-1 | skeleton per §2 (Core, Domain, Contracts, Flow, Tests; **no Data**) | H | N-RECON |
 | G1-3 | move `SO_DaySchedule` into `Domain/` (Editor move, GUID kept) | H | G1-1 |
 | G3-T1 / G4-S1 | one task: all of §3 into Contracts, + move the `IInputProvider` interface | S | **N1** (Contracts names Domain types) |
@@ -452,3 +452,25 @@ Notes for the coordinator:
 | D12 | Answered by action: the package is installed (`edd03af`). |
 | D13 | Owner play checkpoints at the end of R3, R4 and R6. |
 | D14 | Run phase by phase, with a stop and report after each phase. |
+
+---
+
+## 8. G4-I0 result (owner test with a PS4 pad on Linux, 2026-11-08) — authoritative for Input
+
+**Verdict: virtual cursor accepted.** Left stick cursor, South click on uGUI, click through RenderTexture relay, right-stick scroll, and the pad↔mouse swap all passed on the real pad (answer sheet: `Spike_G4-I0_Answers.md`).
+
+**Decisions (override anything marked prov. I0 above):**
+1. **Virtual cursor on every screen stays** (left stick, South = click). **Plus focus navigation (D-pad) with `FocusOnEnable`** on: main menu, Pause/Settings, dialogue options, Hub buttons, Garnish, ingredient selection. **Minigames use cursor/action input only** (not focus nav). Every screen keeps Back on a pad button.
+2. **Right stick = camera: both** — tap (<0.25 s, push >0.7) = next fixed view, hold = peek and return on release. The measured split works (hold released after 265 ms was classed HOLD). D8 closed accordingly; edge-hover stays off with a pad.
+3. **Button map** (owner, PlayStation names; Xbox equivalents: Square=X, Circle=B, Triangle=Y, Cross=A, L1/R1=LB/RB, Options=Menu): Back = Circle · Pause = Options · AutoPlay = Square · Log = Triangle · Skip = Square + R1 · Advance = Square + L1 **(ambiguous, see open question 1)** · cursor click stays South (Cross). Minigame shake = mash; gyro shake is an optional joke feature, **not planned** (Input System has no gyro on Linux; log it as a backlog idea only).
+4. **Glyph/device detection must not rely on `DualShockGamepad`.** On this Linux setup the PS4 pad is reported as a generic `Gamepad` (`Last device: Other`, layout `Gamepad`, interface name only in `device.description`). `InputGlyphs` classifies by `description.product/manufacturer` or name substring ("PS4", "DualShock", "DualSense", "Wireless Controller", "Xbox") with fallback to generic glyphs; the owner's Windows build is expected to expose `DualShockGamepad`, so support both.
+5. **Right-stick scroll speed was far too fast:** scroll sensitivity must be a tunable ScriptableObject/settings value, start at ≤25 % of the spike's value.
+6. **Dead zone:** spike stacked 0.15 on the control default 0.125. The pad's raw stick rest noise was 0.006, but 0.24 raw was swallowed at some moment (likely deliberate small pushes), so keep a combined dead zone ≈0.15–0.2 and make it a setting.
+
+**Still unverified:** pause (`timeScale = 0`) with a real pad (the HUD items "-- while timeScale 0" were not exercised; sim passed earlier); Xbox pad; Windows/DualShock class path; hardware-cursor hide on Windows; gamepad hot-plug.
+
+**Open questions for the owner:**
+1. The owner's map has overlapping buttons: Advance = "Square + L1", AutoPlay = "Square", Skip = "Square + R1". Candidate readings, owner to pick one:
+   - **A (recommended):** Advance = Square **or** L1 (either alone); AutoPlay = Square **held** 0.5 s; Skip = R1. No chord needed, no conflict.
+   - **B:** chords: Advance = L1 + Square, Skip = R1 + Square, AutoPlay = Square alone. Square alone would also fire on a chord's first press, so the chord needs a 0.15 s delay on AutoPlay.
+   Until answered, implementers use **A** and keep the map in one settings asset.
