@@ -13,7 +13,16 @@ namespace Bar410.Contracts
         { Selected = selected; FromDrink = fromDrink; ShowCustomer = showCustomer; }
     }
 
-    /// <summary>impl: MinigameUiHost or LegacyMinigames.</summary>
+    /// <summary>
+    /// impl: MinigameUiHost or LegacyMinigames. RunAsync timing (Contracts_Final 3.2):
+    /// 1. IsBusy -> InvalidOperationException; then wait (bounded) until the manager is Idle.
+    /// 2. Subscribe before StartMinigame.
+    /// 3. Completed -> returned after the outro. Back -> CancelMinigame and return Cancelled at once (outro continues alone).
+    /// 4. ct cancelled -> CancelMinigame and throw OperationCanceledException synchronously, without waiting for the outro.
+    /// 5. Hiding views after Back or cancel runs in a background FlowAwait.Run that waits for Idle, and is skipped
+    ///    if a newer run has started (run id).
+    /// IsBusy = a RunAsync call has not returned yet (a background outro does not count).
+    /// </summary>
     public interface IMinigameHost
     {
         bool IsBusy { get; }
