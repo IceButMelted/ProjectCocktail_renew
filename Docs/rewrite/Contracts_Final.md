@@ -56,6 +56,7 @@ Folder root: `Assets/Bar410/`. Unity asmdef references are **not transitive**: l
 
 Rules (compiler-enforced): arrows point down only; Flow never sees Dialogue/Verbs/Save/Input/Host; Dialogue never sees Flow; Save sees only Contracts/Domain; no asmdef uses DOTween module extensions; G3's `Assets/Bar410/Adapters/` is renamed `Assets/Bar410/Host/Adapters/`.
 Note (G2-T02): the Yarn source generator emits one `*-generated.ysls.json` per asmdef that references `YarnSpinner.Unity` (Dialogue, Verbs). Commit them like the existing ones.
+Note (namespace trap, R1): a namespace `Bar410.Input` makes `Input` resolve to that namespace inside any `namespace Bar410.*` block, so `Input.GetKey(...)` in old code (`Bar410.GameFlow` › `GameFlowDebugHotkeys`) stops compiling. Rule: **no namespace segment under `Bar410` may equal a type name used unqualified** (`Input`, `Time`, `Debug`, `Random`, `Object`, `Cursor`, `Screen`, `Application`, `Camera`, `Physics`, `PlayerInput`). The asmdef keeps the name `Bar410.Input`; its C# namespace is **`Bar410.Controls`** (G4 sets `rootNamespace` to it and replaces the `Bar410.InputAsm` marker). Other asmdefs keep namespace = asmdef name.
 
 ---
 
