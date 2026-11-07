@@ -469,8 +469,4 @@ Notes for the coordinator:
 
 **Still unverified:** pause (`timeScale = 0`) with a real pad (the HUD items "-- while timeScale 0" were not exercised; sim passed earlier); Xbox pad; Windows/DualShock class path; hardware-cursor hide on Windows; gamepad hot-plug.
 
-**Open questions for the owner:**
-1. The owner's map has overlapping buttons: Advance = "Square + L1", AutoPlay = "Square", Skip = "Square + R1". Candidate readings, owner to pick one:
-   - **A (recommended):** Advance = Square **or** L1 (either alone); AutoPlay = Square **held** 0.5 s; Skip = R1. No chord needed, no conflict.
-   - **B:** chords: Advance = L1 + Square, Skip = R1 + Square, AutoPlay = Square alone. Square alone would also fire on a chord's first press, so the chord needs a 0.15 s delay on AutoPlay.
-   Until answered, implementers use **A** and keep the map in one settings asset.
+**Resolved by the owner (2026-11-08): scheme A.** Advance = Square **or** L1 (either alone); AutoPlay = Square **held** 0.5 s; Skip = R1; Log = Triangle; Back = Circle; Pause = Options. Keep the map in one settings asset. Spike scene deleted in `799775e`.
