@@ -32,18 +32,3 @@ public interface IInputProvider
     /// <summary>Samples input for this frame. Call once per Update.</summary>
     void Poll();
 }
-
-// ── Default Unity Implementation ───────────────────────────
-
-/// <summary>
-/// Standard mouse / touch implementation.
-/// Injected by BaseMiniGame when no alternative is provided.
-/// </summary>
-public class UnityInputProvider : IInputProvider
-{
-    public bool IsClickedThisFrame { get; private set; }
-
-    /// <summary>Reads left-mouse or first touch. Safe to call every frame.</summary>
-    public void Poll()
-        => IsClickedThisFrame = Input.GetMouseButtonDown(0);
-}
