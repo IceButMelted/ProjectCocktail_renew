@@ -52,7 +52,9 @@ namespace Bar410.Contracts
     public readonly struct GarnishRequest
     {
         public readonly S_Drink Drink;
-        public GarnishRequest(S_Drink drink) { Drink = drink; }
+        /// <summary>Customer seat whose GarnishGlassView shows the glass (0..2). One order at a time (D6).</summary>
+        public readonly int SeatIndex;
+        public GarnishRequest(S_Drink drink, int seatIndex = 0) { Drink = drink; SeatIndex = seatIndex; }
     }
 
     /// <summary>impl: GarnishUiHost or LegacyGarnish.</summary>

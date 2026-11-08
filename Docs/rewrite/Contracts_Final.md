@@ -159,7 +159,8 @@ public interface IMinigameAnimation { void Play(); void Stop(); }
 public enum GarnishExit { Finished, Remake }
 public readonly struct GarnishResult { public readonly GarnishExit Exit; public readonly GarnishDecoration Decoration; public GarnishResult(GarnishExit exit, GarnishDecoration d); }
 public enum ServeDecision { Served, Remake }
-public readonly struct GarnishRequest { public readonly S_Drink Drink; public GarnishRequest(S_Drink drink); }
+public readonly struct GarnishRequest { public readonly S_Drink Drink; public readonly int SeatIndex;   // 0..2 (§9 D6)
+    public GarnishRequest(S_Drink drink, int seatIndex = 0); }
 public interface IGarnishHost {                 // impl: GarnishUiHost (UI scene) or LegacyGarnish (R3 fallback)
     bool IsBusy { get; }
     void ClearGlass();                          // NEW (was G1 IGarnish.ClearGlass): forwards to the bound IGarnishTable.Clear(); cancels a running pour
@@ -476,7 +477,7 @@ Notes for the coordinator:
 
 | # | Decision |
 |---|---|
-| D6 | Garnish glasses are **display views per customer seat**: `GarnishGlassView 1/2/3` (new objects in `Main_V2`, reusable, one per customer seat). **One order at a time** (no concurrent orders): the single glass is shown at the seat of the customer who ordered. Consequence: `GarnishRequest` gains `int SeatIndex` (0..2) when G3 `GarnishUiHost`/`GarnishStation` are written (R3); `IBarCounter`/`Session` stay single-order. Not yet in code. |
+| D6 | Garnish glasses are **display views per customer seat**: `GarnishGlassView 1/2/3` (new objects in `Main_V2`, reusable, one per customer seat). **One order at a time** (no concurrent orders): the single glass is shown at the seat of the customer who ordered. Consequence: `GarnishRequest` gains `int SeatIndex` (0..2) when G3 `GarnishUiHost`/`GarnishStation` are written (R3); `IBarCounter`/`Session` stay single-order. `SeatIndex` added in G1-6; `GarnishStation` passes 0 until a seat source exists (open: who maps `Order.Customer` → seat). |
 | C-1 | 26 recipes for now; owner will list more later. Tests must not hard-code a count. |
 | C-2 | No pinned type → judged against the recipe the drink matched; matches none → Fail. Same as current code (case 3 / case 5), only the comment + test note changed. Write into GDD §18. |
 | C-3 | `flow_minigame_result()` returns `""` after load (accepted). |

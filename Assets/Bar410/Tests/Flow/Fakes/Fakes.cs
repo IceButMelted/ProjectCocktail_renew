@@ -106,9 +106,11 @@ namespace Bar410.Flow.Tests.Fakes
         AwaitableCompletionSource<ServeDecision> _serve;
         public bool IsBusy => _garnish != null || _serve != null;
         public void ClearGlass() => Log("ClearGlass");
+        public GarnishRequest? LastRequest { get; private set; }
         public Awaitable<GarnishResult> RunAsync(GarnishRequest r, CancellationToken ct)
         {
             Log("RunAsync");
+            LastRequest = r;
             var src = _garnish = new AwaitableCompletionSource<GarnishResult>();
             return RunG(src, ct);
         }
@@ -127,6 +129,7 @@ namespace Bar410.Flow.Tests.Fakes
             try { return await FlowAwait.Wait(src, ct); } finally { if (_serve == src) _serve = null; }
         }
         public void CompleteGarnish(GarnishExit e) => _garnish.SetResult(new GarnishResult(e, default));
+        public void CompleteGarnish(GarnishExit e, GarnishDecoration d) => _garnish.SetResult(new GarnishResult(e, d));
         public void CompleteServe(ServeDecision d) => _serve.SetResult(d);
     }
 
