@@ -137,6 +137,10 @@ public class CameraManager : MonoBehaviour
     /// <summary>The garnish station.</summary>
     public void ShowGarnish() => SwitchCamera(_garnishShot);
 
+    /// <summary>The shaker and garnish shots with no blend (ICameraDirector.Cut).</summary>
+    public void CutToShaker() { CutToCamera(_shakerShot); IsOnShakerView = true; }
+    public void CutToGarnish() => CutToCamera(_garnishShot);
+
     /// <summary>Points the inset camera at the customer. Null hides the inset picture.</summary>
     public void ShowCustomerInset(Transform customer)
     {
