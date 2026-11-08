@@ -15,8 +15,8 @@ namespace Bar410.Host
     /// </summary>
     public sealed class LegacyMinigames : IMinigameHost
     {
-        // ponytail: fixed cap for the previous run's outro (F11); read it from the minigame config if outros get longer.
-        const float IdleWaitSeconds = 3.5f;
+        // ponytail: fixed cap for the previous run's outro (F11): outro fallback 1.5 s + 0.5 s, scaled time like the outro.
+        const float IdleWaitSeconds = 2f;
 
         readonly MinigameSystemManager _manager;
 
@@ -33,7 +33,11 @@ namespace Bar410.Host
             try
             {
                 ct.ThrowIfCancellationRequested();
-                await WaitIdleAsync(ct);
+                if (!await WaitIdleAsync(ct))
+                {
+                    Debug.LogError($"[LegacyMinigames] Previous minigame not Idle after {IdleWaitSeconds} s: completing without playing");
+                    return MinigameOutcome.Completed;   // same fallback as D5
+                }
 
                 var type = _manager.Resolve(request.Selected, request.FromDrink);
                 if (_manager.GetMinigame(type) == null)   // D5: no game for this type (e.g. Building)
@@ -72,19 +76,16 @@ namespace Bar410.Host
             finally { IsBusy = false; }
         }
 
-        // Waits (bounded) for the previous run's outro: starting over it would snap the panels.
-        async Awaitable WaitIdleAsync(CancellationToken ct)
+        // Waits (bounded, scaled time) for the previous run's outro: starting over it would snap the panels. False = timed out.
+        async Awaitable<bool> WaitIdleAsync(CancellationToken ct)
         {
-            var until = Time.unscaledTime + IdleWaitSeconds;
+            var until = Time.time + IdleWaitSeconds;
             while (_manager.ActivePhase != MinigamePhase.Idle)
             {
-                if (Time.unscaledTime >= until)
-                {
-                    Debug.LogWarning("[LegacyMinigames] Previous minigame still not Idle: starting anyway");
-                    return;
-                }
+                if (Time.time >= until) return false;
                 await Awaitable.NextFrameAsync(ct);
             }
+            return true;
         }
     }
 }

@@ -25,7 +25,7 @@ namespace Bar410.Host
         [SerializeField] GameObject _customerPanel;
         [SerializeField] WorldView _customerView;
         [SerializeField] ViewSlot[] _gameViews;
-        [Tooltip("Scaled seconds to wait for the previous run's outro (outro fallback + 0.5 s).")]
+        [Tooltip("Scaled seconds to wait for the previous run's outro (outro fallback + 0.5 s). Timeout = error + Completed without playing.")]
         [SerializeField] float _idleTimeout = 2f;
 
         bool _bound;
@@ -90,7 +90,12 @@ namespace Bar410.Host
             float until = Time.time + _idleTimeout;
             while (_manager.ActivePhase != MinigamePhase.Idle)
             {
-                if (Time.time >= until) { done.TrySetException(new TimeoutException($"[MinigameUiHost] previous minigame not Idle after {_idleTimeout} s")); return; }
+                if (Time.time >= until)
+                {
+                    Debug.LogError($"[MinigameUiHost] Previous minigame not Idle after {_idleTimeout} s: completing without playing", this);
+                    done.TrySetResult(MinigameOutcome.Completed);   // same fallback as D5
+                    return;
+                }
                 await Awaitable.NextFrameAsync(ct);
             }
             if (_run != done) return;   // cancelled meanwhile
@@ -107,8 +112,12 @@ namespace Bar410.Host
             _manager.MinigameFinished += OnFinished;
             _manager.BackRequested += OnBack;
             _started = true;
-            _manager.StartMinigame(type);
-            Started?.Invoke(type);
+            try
+            {
+                _manager.StartMinigame(type);
+                Started?.Invoke(type);
+            }
+            catch (Exception e) { done.TrySetException(e); }   // never leave RunAsync hanging with IsBusy stuck
         }
 
         void OnFinished(Enum_MiniGameType type, MinigameOutcome outcome) => _run?.TrySetResult(outcome);
@@ -116,6 +125,7 @@ namespace Bar410.Host
         // Back returns at once; the outro plays alone and the background hide waits for it.
         void OnBack()
         {
+            if (_manager.ActivePhase == MinigamePhase.Outro) return;   // a won run in its outro must stay Completed
             _manager.CancelMinigame();
             _run?.TrySetResult(MinigameOutcome.Cancelled);
         }
