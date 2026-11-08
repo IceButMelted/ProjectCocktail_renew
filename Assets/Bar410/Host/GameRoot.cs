@@ -1,0 +1,129 @@
+using System.Collections.Generic;
+using System.Threading;
+using Bar410.Contracts;
+using Bar410.Core;
+using Bar410.Flow;
+using Sirenix.OdinInspector;
+using UnityEngine;
+using UnityEngine.UI;
+
+namespace Bar410.Host
+{
+    /// <summary>
+    /// Composition root of the main scene (G1-12): builds the adapters, FlowPorts, FlowState, BartendingSession, DayRunner and
+    /// FlowCommands by hand, binds MainWiring, and boots the day. Scene-scoped singleton: a duplicate destroys itself;
+    /// no DontDestroyOnLoad. Not wired into any scene yet (G1-13 creates Main_V2).
+    /// ponytail: no UiSceneLoader / resume / autosave yet (G3 / G4). The minigame host is the legacy manager; the garnish host is
+    /// a component that implements IGarnishHost (LegacyGarnish or GarnishUiHost) and is required for a drink to be made.
+    /// </summary>
+    [DefaultExecutionOrder(-1000)]
+    public sealed class GameRoot : MonoBehaviour
+    {
+        public static GameRoot Current { get; private set; }
+
+        [Title("Flow")]
+        [Tooltip("Order matters: Prepare, Garnish, Serve.")]
+        [SerializeField, Required] Station[] _steps;
+        [SerializeField, Required] SO_DaySchedule _schedule;
+        [Tooltip("A component that implements IStory (the dialogue Director).")]
+        [SerializeField, Required] MonoBehaviour _story;
+        [Tooltip("A component that implements IGarnishHost. Empty = garnish step will fail loudly.")]
+        [SerializeField] MonoBehaviour _garnishHost;
+
+        [Title("Cocktail")]
+        [SerializeField, Required] CocktailSystemManager _cocktail;
+        [SerializeField, Required] ShakerContents _shaker;
+        [SerializeField, Required] ShakerPanelController _shakerPanels;
+        [SerializeField, Required] IngredientButtonGroup _bottles;
+        [SerializeField, Required] MethodPanel _method;
+        [SerializeField, Required] VisualizeCocktail _fillBars;
+        [SerializeField, Required] Post_It_Order _orderNote;
+        [SerializeField, Required] BookUI_V2 _book;
+        [SerializeField, Required] Button _bookButton;
+        [SerializeField] IngredientUnlocks _unlocks;   // empty = everything unlocked
+
+        [Title("Customers, camera, minigame")]
+        [SerializeField, Required] TalkToCustomerManager _customers;
+        [SerializeField, Required] CameraManager _cameras;
+        [SerializeField] Bar410.WorldViews.WorldViewSource _customerInset;
+        [SerializeField] Vector3 _customerInsetOffset;
+        [SerializeField, Required] MinigameSystemManager _minigames;
+
+        [Title("Day UI")]
+        [SerializeField] PanelTransition _transition;
+        [SerializeField] EventPopupQueue _popups;
+        [SerializeField] ChapterTitleUI _chapterTitle;
+        [SerializeField] HubManager _hub;
+
+        public CancellationToken Lifetime => destroyCancellationToken;
+        public FlowState State { get; private set; }
+        public FlowPorts Ports { get; private set; }
+        public BartendingSession Session { get; private set; }
+        public DayRunner Day { get; private set; }
+        public FlowCommands Commands { get; private set; }
+        /// <summary>Save sources built here (G4 registers them).</summary>
+        public IReadOnlyList<ISnapshotSource> Snapshots { get; private set; }
+
+        CocktailFeature _bar;
+        UnlocksAdapter _unlockPort;
+        MainWiring _wiring;
+
+        void Awake()
+        {
+            if (Current != null && Current != this)
+            {
+                Debug.LogError("[GameRoot] A second GameRoot was found: destroying it", this);
+                Destroy(this);
+                return;
+            }
+            Current = this;
+
+            if (_steps == null || _steps.Length == 0) { Debug.LogError("[GameRoot] No steps assigned", this); return; }
+            if (_story is not IStory story) { Debug.LogError("[GameRoot] 'Story' must be a component implementing IStory", this); return; }
+
+            _unlockPort = _unlocks != null ? new UnlocksAdapter(_unlocks) : null;
+            var stage = new CustomerStage(_customers);
+            var camera = new CameraDirector(_cameras, _customerInset, stage, _customerInsetOffset);
+            _bar = new CocktailFeature(_cocktail, _shaker, _shakerPanels, _bottles, _method, _fillBars, _orderNote, _book, _bookButton, _unlockPort);
+            var dayUi = new DayUiAdapter(this, _transition, _popups, _unlockPort, _chapterTitle);
+
+            if (_garnishHost != null && _garnishHost is not IGarnishHost) Debug.LogError("[GameRoot] 'Garnish Host' does not implement IGarnishHost", this);
+            Ports = new FlowPorts
+            {
+                Camera = camera, Bar = _bar, Orders = _bar, Story = story, DayUi = dayUi,
+                Minigames = new LegacyMinigames(_minigames),
+                Garnish = _garnishHost as IGarnishHost,
+            };
+
+            State = new FlowState();
+            // DayRunner needs the session and the session needs DayRunner.EnterTalkingMode: close the loop through a local.
+            DayRunner day = null;
+            Session = new BartendingSession(_steps, Ports, State, Lifetime, () => day.EnterTalkingMode());
+            Day = day = new DayRunner(Ports, _schedule, State, Session, Lifetime);
+            Commands = new FlowCommands(Day, Session, State);
+
+            var snaps = new List<ISnapshotSource> { stage, camera };
+            if (_unlockPort != null) snaps.Add(_unlockPort);
+            Snapshots = snaps;
+
+            _wiring = new MainWiring(State, _bar, _bar, _unlocks, _unlockPort, _customers, _hub);
+        }
+
+        void Start()
+        {
+            if (Current != this || Day == null) return;
+            if (Ports.Garnish == null) Debug.LogError("[GameRoot] No IGarnishHost: a drink cannot get past the Garnish step", this);
+            // ponytail: new game only; G4 resume (PendingLoad -> ResumeAsync) goes here.
+            FlowAwait.Run(Day.BootAsync, Lifetime, "GameRoot.Boot", this);
+        }
+
+        void OnDestroy()
+        {
+            if (Current != this) return;
+            Current = null;
+            _wiring?.Dispose();
+            _bar?.Dispose();
+            _unlockPort?.Dispose();
+        }
+    }
+}
