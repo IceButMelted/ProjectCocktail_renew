@@ -70,7 +70,11 @@ namespace Bar410.Host
         }
 
         /// <summary>Through the manager, so its buttons and the grids follow.</summary>
-        public void ClearGlass() => _manager.ClearGlass();
+        public void ClearGlass()
+        {
+            _manager.ClearGlass();
+            if (_glassView != null) _glassView.Hide();
+        }
 
         public async Awaitable<GarnishResult> RunAsync(GarnishRequest request, CancellationToken ct)
         {

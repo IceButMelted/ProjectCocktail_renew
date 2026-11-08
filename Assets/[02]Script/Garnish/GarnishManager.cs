@@ -145,7 +145,7 @@ public class GarnishManager : MonoBehaviour
 
     private void Awake()
     {
-        if (_table == null && _glassSpawnPoint != null && _pour != null)
+        if (_table == null && _glassSpawnPoint != null)
             UseTable(new Bar410.Host.GarnishTableCore(_glassSpawnPoint, _pour));
 
         if (_panel != null)
