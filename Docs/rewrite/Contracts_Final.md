@@ -159,8 +159,10 @@ public interface IMinigameAnimation { void Play(); void Stop(); }
 public enum GarnishExit { Finished, Remake }
 public readonly struct GarnishResult { public readonly GarnishExit Exit; public readonly GarnishDecoration Decoration; public GarnishResult(GarnishExit exit, GarnishDecoration d); }
 public enum ServeDecision { Served, Remake }
-public readonly struct GarnishRequest { public readonly S_Drink Drink; public readonly int SeatIndex;   // 0..2 (§9 D6)
-    public GarnishRequest(S_Drink drink, int seatIndex = 0); }
+public readonly struct GarnishRequest { public readonly S_Drink Drink; public readonly CharacterName Customer;   // §9 D6
+    public GarnishRequest(S_Drink drink, CharacterName customer = CharacterName.None); }
+// The host maps Customer → seat (GarnishGlassView 1/2/3) through ICustomerStage; None or not present → seat 0 + warning.
+// Flow never knows seats.
 public interface IGarnishHost {                 // impl: GarnishUiHost (UI scene) or LegacyGarnish (R3 fallback)
     bool IsBusy { get; }
     void ClearGlass();                          // NEW (was G1 IGarnish.ClearGlass): forwards to the bound IGarnishTable.Clear(); cancels a running pour
@@ -354,7 +356,7 @@ Test notes (G1-0): use `[Test] async Task` for completion-source tests, and `[Un
 2. §2.3: delete `MinigameKind`, `MinigameOutcome`, `ResumePoint`, and the `Enum.GetNames` assert. Use `E_Cocktail.Enum_MiniGameType` and the Domain `MinigameOutcome`. `DayPart` moves to Contracts. `Next`, `BarStep`, `StepCommand` and `FlowMilestone` stay.
 3. §2.4: `HubKey` (string) → `HubPhase HubPhase { get; }` (Domain enum). `SelectedMinigame` is `Enum_MiniGameType`.
 4. §2.5: the ports are replaced by the Contracts interfaces in §3.2 (`ICameraRig`→`ICameraDirector`, `IBar`→`IBarCounter`+`IOrderDesk`, `IMinigames`→`IMinigameHost`, `IGarnish`→`IGarnishHost`). `IStory` and `IDayUi` move to Contracts unchanged. `FlowPorts` per §3.6. Member mapping: `StartFreshDrink`→`BeginDrink`, `SetPicking`→`Open/CloseIngredients`, `Lock`→`LockIngredients`, `RefreshBottles`→`RefreshUnlocked`, `ResolveDrinkIdentity`→`ResolveDrink`, `SetOrderNote`→`SetOrderNoteAvailable`, `Serve`→`Orders.CommitServe`, `Filled/Emptied`→`ShakerFull/ShakerCleared`(+`ResetChosen`), `HasOrder`→`Orders.Order.HasOrder`, `EnsureOrder`→`Orders.EnsureOrder`.
-5. §2.6/2.7: label-first stands; **no F1 fallback** (remove it from the G1-6 DoD). Stations follow §4.3 (look polarity, inset, ice, `MinigameRequest` built from `State.SelectedMinigame` + `Bar.RequiredMinigame`). `GarnishStation`: `Garnish.RunAsync(new GarnishRequest(Bar.ResolveDrink()))`, `Finished`→`Continue`. `ServeStation`: `Served`→`Continue`.
+5. §2.6/2.7: label-first stands; **no F1 fallback** (remove it from the G1-6 DoD). Stations follow §4.3 (look polarity, inset, ice, `MinigameRequest` built from `State.SelectedMinigame` + `Bar.RequiredMinigame`). `GarnishStation`: `Garnish.RunAsync(new GarnishRequest(Bar.ResolveDrink(), Orders.Order.Customer))`, `Finished`→`Continue`. `ServeStation`: `Served`→`Continue`.
 6. §2.8: remake reset and `ClearGlass` happen in the session. Scoring = `Orders.CommitServe()`.
 7. §2.9: `DayRunner : IDayResume`. `BootAsync(CancellationToken ct)` (no `ResumePoint?`). `ResumeAsync(DayPart, string, ct)`. `CheckEventsAsync` calls `Bar.RefreshUnlocked()`.
 8. §2.12: `GameRoot` has no `Register/TryGet/GetAsync`. It owns `UiSceneLoader` (`UiSceneRegistry.Set/Clear`), a private `Dictionary<Type, object>` as the verb resolver, `SaveService`/`ResumeCoordinator`/`AutosaveScheduler` and `PendingLoad`.
@@ -412,6 +414,7 @@ Test notes (G1-0): use `[Test] async Task` for completion-source tests, and `[Un
 | G1-4, G1-5 | now depend on **N1** and G3-T1 (they use Domain enums / Contracts ports); G1-5 = `FlowPorts` + fakes only | S | N1, G3-T1 |
 | G1-6 | DoD: F1 fallback removed | S | — |
 | G1-11 | shrinks to `LegacyMinigames`, `LegacyGarnish`, `DayUiAdapter` | S (O reviews) | G3-T1 |
+| G1-6 (D6) | done: `GarnishRequest.Customer` (not a seat index). `GarnishStation` passes `Orders.Order.Customer`; the garnish host (G3-T9 `GarnishUiHost` / G1-11 `LegacyGarnish`) maps customer → seat via `ICustomerStage`, seat 0 + warning when None or absent | — | — |
 | G3-T4 | + `EnsureOrder`, `CloseBook`, `ISnapshotSource "order"` | S | N1, N4, G3-T1 |
 | G3-T5 | + `ISnapshotSource "camera"`, `AimCustomerInset(CharacterName)` | H | G3-T1 |
 | G3-T6 | shrinks to `UnlocksAdapter` (+ `ISnapshotSource "unlocks"`) and `HubManager` untouched | H | G3-T1 |
@@ -479,7 +482,7 @@ Notes for the coordinator:
 
 | # | Decision |
 |---|---|
-| D6 | Garnish glasses are **display views per customer seat**: `GarnishGlassView 1/2/3` (new objects in `Main_V2`, reusable, one per customer seat). **One order at a time** (no concurrent orders): the single glass is shown at the seat of the customer who ordered. Consequence: `GarnishRequest` gains `int SeatIndex` (0..2) when G3 `GarnishUiHost`/`GarnishStation` are written (R3); `IBarCounter`/`Session` stay single-order. `SeatIndex` added in G1-6; `GarnishStation` passes 0 until a seat source exists (open: who maps `Order.Customer` → seat). |
+| D6 | Garnish glasses are **display views per customer seat**: `GarnishGlassView 1/2/3` (new objects in `Main_V2`, reusable, one per customer seat). **One order at a time** (no concurrent orders): glass shown at the ordering customer's seat; `GarnishRequest` carries `Customer`. `IBarCounter`/`Session` stay single-order. |
 | C-1 | 26 recipes for now; owner will list more later. Tests must not hard-code a count. |
 | C-2 | No pinned type → judged against the recipe the drink matched; matches none → Fail. Same as current code (case 3 / case 5), only the comment + test note changed. Write into GDD §18. |
 | C-3 | `flow_minigame_result()` returns `""` after load (accepted). |

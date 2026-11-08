@@ -52,9 +52,12 @@ namespace Bar410.Contracts
     public readonly struct GarnishRequest
     {
         public readonly S_Drink Drink;
-        /// <summary>Customer seat whose GarnishGlassView shows the glass (0..2). One order at a time (D6).</summary>
-        public readonly int SeatIndex;
-        public GarnishRequest(S_Drink drink, int seatIndex = 0) { Drink = drink; SeatIndex = seatIndex; }
+        /// <summary>
+        /// The ordering customer. The host maps it to a seat (GarnishGlassView 1/2/3) through ICustomerStage;
+        /// None or not present → seat 0 + warning. Flow never knows seats (D6).
+        /// </summary>
+        public readonly CharacterName Customer;
+        public GarnishRequest(S_Drink drink, CharacterName customer = CharacterName.None) { Drink = drink; Customer = customer; }
     }
 
     /// <summary>

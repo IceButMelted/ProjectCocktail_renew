@@ -20,8 +20,8 @@ namespace Bar410.Flow
                 p.Camera.Show(CameraShot.Garnish);
                 p.Bar.LockIngredients();
                 p.Bar.SetOrderNoteAvailable(true);
-                // ponytail: seat 0 until a seat source exists (Order.Customer → seat); one order at a time (D6).
-                var r = await f.Await(p.Garnish.RunAsync(new GarnishRequest(drink), f.Token));
+                // The host maps the customer to a seat (D6); Flow never knows seats.
+                var r = await f.Await(p.Garnish.RunAsync(new GarnishRequest(drink, p.Orders.Order.Customer), f.Token));
                 if (r.Exit == GarnishExit.Remake) return Next.Remake;
                 p.Bar.SetIce(r.Decoration.ice); // a forced finish carries a default decoration (no ice); accepted
                 return Next.Continue;

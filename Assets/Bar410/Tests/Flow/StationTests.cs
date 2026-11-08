@@ -55,12 +55,13 @@ namespace Bar410.Flow.Tests
             var st = _go.AddComponent<GarnishStation>();
             var drink = ScriptableObject.CreateInstance<S_Drink>();
             Bar.Drink = drink;
+            ((FakeOrders)_p.Orders).Order.BeginOrder(E_Cocktail.CharacterName.Isla, OrderMode.FixedByName, null, E_Cocktail.TypeOfCocktail.None);
             var run = st.RunAsync(Ctx);
             Assert.AreEqual("Garnish", _state.StepString);
             CollectionAssert.AreEqual(new[] { "ResolveDrink", "LockIngredients", "SetOrderNoteAvailable(True)" }, Bar.Calls);
             CollectionAssert.AreEqual(new[] { "Show(Garnish)" }, Cam.Calls);
             Assert.AreSame(drink, Garnish.LastRequest.Value.Drink);
-            Assert.AreEqual(0, Garnish.LastRequest.Value.SeatIndex);
+            Assert.AreEqual(E_Cocktail.CharacterName.Isla, Garnish.LastRequest.Value.Customer);
 
             Garnish.CompleteGarnish(GarnishExit.Finished, new GarnishDecoration { ice = true });
             Assert.AreEqual(Next.Continue, await run);
