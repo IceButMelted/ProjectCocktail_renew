@@ -46,6 +46,26 @@ namespace Bar410.WorldViews.Tests
         }
 
         [Test]
+        public void ShowHide_SwitchesRaycastFlags()
+        {
+            var go = new GameObject("view", typeof(RectTransform), typeof(UnityEngine.UI.RawImage), typeof(CanvasGroup), typeof(WorldView));
+            var cam = new GameObject("cam").AddComponent<Camera>();
+            try
+            {
+                var view = go.GetComponent<WorldView>();
+                var img = go.GetComponent<UnityEngine.UI.RawImage>();
+                var grp = go.GetComponent<CanvasGroup>();
+                typeof(WorldView).GetField("_group", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance).SetValue(view, grp);
+                view.Bind(new WorldViewHandle("t", cam, null, ~0));
+                view.Show();
+                Assert.IsTrue(view.IsShown); Assert.IsTrue(img.raycastTarget); Assert.IsTrue(grp.blocksRaycasts);
+                view.Hide();
+                Assert.IsFalse(view.IsShown); Assert.IsFalse(img.raycastTarget); Assert.IsFalse(grp.blocksRaycasts);
+            }
+            finally { Object.DestroyImmediate(go); Object.DestroyImmediate(cam.gameObject); }
+        }
+
+        [Test]
         public void SetRendering_TogglesCamera()
         {
             var go = new GameObject("cam");
