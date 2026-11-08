@@ -104,7 +104,8 @@ namespace Bar410.Host
             Ports = new FlowPorts
             {
                 Camera = camera, Bar = _bar, Orders = _bar, Story = story, DayUi = dayUi,
-                Minigames = _useUiScenes ? null : new LegacyMinigames(_minigames),   // UI scenes: set by the preload in Start
+                // UI scenes: set by the preload in Start. Off with no legacy manager: null (error logged above).
+                Minigames = _useUiScenes || _minigames == null ? null : new LegacyMinigames(_minigames),
                 Garnish = _garnishHost as IGarnishHost,
             };
 
