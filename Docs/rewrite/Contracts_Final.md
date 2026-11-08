@@ -369,6 +369,7 @@ Test notes (G1-0): use `[Test] async Task` for completion-source tests, and `[Un
 - G1-12 `MainWiring`: push `HubManager.SetPhase(state.HubPhase)` **once at bind**. `BootAsync`'s `SetPart(None)` does not raise `Changed` (the value is already None).
 - G4-S6 autosave: the `DayStarted` milestone fires before the story's first line is presented, so the DayStart autosave must wait for the first `LinePresented` (no root/line yet at the milestone).
 - G2 `flow_open_bar` verb: pass a token that is cancelled when Skip starts, so a title wait already in progress ends at once (`waitForTitle = !IsSkipping` only covers Skip that was on before the call).
+- G1-13 checklist (`Main_V2`): remove the old `GameFlowDebugHotkeys` from `[GameLoop]` (keys would fire twice with `FlowDebugHotkeys`); assign `GameRoot._customerInset` (empty = warning, no customer picture in minigames); `GameRoot` needs a `Story` (IStory) and a garnish host (IGarnishHost) or it cannot boot.
 - G1-15 playtest item: after a forced `flow_drink_complete` + serve, check that the next drink's shaker is grabbable (the forced path no longer calls `SetShakerGrabbable(true)`; `BeginDrink` must make it grabbable again).
 
 ### G2 (`API_G2_Dialogue.md`)
@@ -499,3 +500,15 @@ Notes for the coordinator:
 | P-1 | Pad test while `timeScale 0` deferred to R6 (the Pause menu seen in the spike came from the UI Setting button, not Esc). |
 | Esc | Esc on `MainMenu_V2` opens neither Settings nor Pause (old scene, unchanged; not part of the rewrite unless asked). |
 | Docs | Update CLAUDE.md / Systems Guide at the end of R3. |
+
+---
+## 10. G4-I1 as built (`Bar410Controls.inputactions`, 2026-11-09) and follow-ups
+
+**Deviations from §8 / API_G4 §2.1:** UI/Navigate is D-pad only (left stick = virtual cursor); `CursorAlt` dropped (Square is Advance); `OpenBook` has no pad binding (Triangle = OpenLog; only `<Gamepad>/select` is free; **owner call pending**). Advance on Square is a Tap(0.5 s), AutoPlay is Hold(0.5 s) on the same button.
+
+**I2 (`InputService`) follow-ups:**
+- Keyboard AutoPlay is `A`: it collides with UI/Navigate (WASD). Change to a non-WASD key.
+- Right stick is bound to both UI/ScrollWheel and Gameplay/CameraLook: scale scroll to <= 25 % of the spike value or split into a `ScrollView` action.
+- Overlaps to arbitrate: TabPrev/TabNext (L1/R1) vs Advance/Skip; UI/Submit (South) vs cursor click (South). Mode rules in `InputService` must decide which map is live.
+- The Gamepad scheme must keep `<Pointer>`/`<Mouse>` so the VirtualMouse works (Point/Click are in group `KeyboardMouse;Gamepad`).
+- Dead zone 0.15-0.2 is not in the asset; apply it in I2 as a setting.
