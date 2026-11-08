@@ -45,7 +45,7 @@ namespace Bar410.Host
                 var done = new AwaitableCompletionSource<MinigameOutcome>();   // new source per run
                 void OnStarted(Enum_MiniGameType t) => Started?.Invoke(t);
                 void OnFinished(Enum_MiniGameType t, MinigameOutcome o) => done.TrySetResult(o);
-                void OnBack() { _manager.CancelMinigame(); done.TrySetResult(MinigameOutcome.Cancelled); }   // outro continues alone
+                void OnBack() { if (_manager.ActivePhase == MinigamePhase.Outro) return; _manager.CancelMinigame(); done.TrySetResult(MinigameOutcome.Cancelled); }   // outro continues alone; Back during the outro must not turn a won run into Cancelled
 
                 _manager.MinigameStarted += OnStarted;
                 _manager.MinigameFinished += OnFinished;
