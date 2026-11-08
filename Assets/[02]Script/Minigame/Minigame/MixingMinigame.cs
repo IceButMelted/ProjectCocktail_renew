@@ -107,7 +107,7 @@ public class MixingMinigame : BaseMiniGame
             if (inZone)
             {
                 //amc = Animation Minagame Controller
-                amc.PlayAnimation();
+                Anim?.Play();
                 OnHit();
             }
             else OnMiss();

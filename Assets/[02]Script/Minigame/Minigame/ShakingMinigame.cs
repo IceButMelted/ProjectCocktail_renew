@@ -53,7 +53,7 @@ public class ShakingMinigame : BaseMiniGame
         {
             GaugeValue = Mathf.Clamp01(GaugeValue + _cfg.GaugeIncreasePerClick * _cfg.DifficultyMultiplier);
             //Animation Minigame Controller
-            amc.PlayAnimation();
+            Anim?.Play();
         }
         // ── Decay gauge ───────────────────────────────────
         GaugeValue = Mathf.Clamp01(GaugeValue - _cfg.GaugeDecayRate * dt);

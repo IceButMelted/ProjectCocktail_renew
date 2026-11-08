@@ -23,6 +23,16 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
 
     [SerializeField] protected AnimationMinigameController amc; //<<Anim Minigame Controller
 
+    // Injected by the UI-scene host (the animator lives in the main scene); falls back to the serialized amc.
+    private Bar410.Contracts.IMinigameAnimation _anim;
+    private Bar410.Contracts.IMinigameAnimation _amcAnim;
+
+    /// <summary>Uses <paramref name="animation"/> instead of the serialized <see cref="amc"/> (null = back to amc).</summary>
+    public void UseAnimation(Bar410.Contracts.IMinigameAnimation animation) => _anim = animation;
+
+    protected Bar410.Contracts.IMinigameAnimation Anim
+        => _anim ?? (amc != null ? _amcAnim ??= new Bar410.Host.AmcAnimation(amc) : null);
+
     [field: SerializeField]
     public SO_MinigameSetting Setting { get; set; }
 
@@ -121,7 +131,7 @@ public abstract class BaseMiniGame : MonoBehaviour, IMinigame
                 break;
 
             case MinigamePhase.Outro:
-                if (amc != null) amc.StopAnimation();
+                Anim?.Stop();
                 _panels?.Hide();
                 break;
 
