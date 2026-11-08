@@ -13,8 +13,11 @@ namespace Bar410.Host
     /// Composition root of the main scene (G1-12): builds the adapters, FlowPorts, FlowState, BartendingSession, DayRunner and
     /// FlowCommands by hand, binds MainWiring, and boots the day. Scene-scoped singleton: a duplicate destroys itself;
     /// no DontDestroyOnLoad. Not wired into any scene yet (G1-13 creates Main_V2).
-    /// ponytail: no UiSceneLoader / resume / autosave yet (G3 / G4). The minigame host is the legacy manager; the garnish host is
-    /// a component that implements IGarnishHost (LegacyGarnish or GarnishUiHost) and is required for a drink to be made.
+    /// ponytail: stubs until later tasks (Main_V2 cannot boot until the garnish host exists; Awake/Start log an error):
+    /// - no IStory implementation yet (G2 Director), and no G2 verb bind (Director.Init / YarnVerbRegistry);
+    /// - no LegacyGarnish / GarnishUiHost yet (IGarnishHost);
+    /// - no "order" snapshot (CocktailFeature is not an ISnapshotSource, needs N4);
+    /// - no UiSceneLoader, resume (PendingLoad) or autosave (G3 / G4); the minigame host is the legacy manager.
     /// </summary>
     [DefaultExecutionOrder(-1000)]
     public sealed class GameRoot : MonoBehaviour
@@ -81,6 +84,7 @@ namespace Bar410.Host
             if (_steps == null || _steps.Length == 0) { Debug.LogError("[GameRoot] No steps assigned", this); return; }
             if (_story is not IStory story) { Debug.LogError("[GameRoot] 'Story' must be a component implementing IStory", this); return; }
 
+            if (_customerInset == null) Debug.LogWarning("[GameRoot] No customer inset source: the customer picture will not show in minigames (LegacyMinigames ignores ShowCustomer)", this);
             _unlockPort = _unlocks != null ? new UnlocksAdapter(_unlocks) : null;
             var stage = new CustomerStage(_customers);
             var camera = new CameraDirector(_cameras, _customerInset, stage, _customerInsetOffset);
@@ -106,7 +110,7 @@ namespace Bar410.Host
             if (_unlockPort != null) snaps.Add(_unlockPort);
             Snapshots = snaps;
 
-            _wiring = new MainWiring(State, _bar, _bar, _unlocks, _unlockPort, _customers, _hub);
+            _wiring = new MainWiring(State, _bar, _bar, _unlockPort, _customers, _hub);
         }
 
         void Start()
