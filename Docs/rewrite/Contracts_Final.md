@@ -49,7 +49,7 @@ Folder root: `Assets/Bar410/`. Unity asmdef references are **not transitive**: l
 | `Bar410.Dialogue.Editor` | `Dialogue/Editor/` | Dialogue, YarnSpinner.Unity.Editor, YarnSpinner.Compiler | validators, function declarations | G2 |
 | `Bar410.Verbs` | `Verbs/` | Core, Dialogue, Flow, Contracts, Domain, Localization, YarnSpinner.Unity | every `[YarnVerb]` + compat shims | G2 (bodies by verb owner) |
 | `Bar410.Save` | `Save/` | Contracts, Domain, Newtonsoft | save/slot/resume/autosave | G4 |
-| `Bar410.WorldView` | `Features/WorldView/` | UnityEngine.UI, Unity.Cinemachine | `WorldViewHandle`, `WorldViewSource`, `WorldView` | G3 |
+| `Bar410.WorldView` | `Features/WorldView/` | UnityEngine.UI, Unity.Cinemachine | `WorldViewHandle`, `WorldViewSource`, `WorldView` | G3 (C# namespace is `Bar410.WorldViews`, not `Bar410.WorldView`: namespace = type name trap) |
 | `Bar410.UiScenes` | `Features/UiScenes/` | UnityEngine.UI, Unity.Cinemachine | `UiSceneId`, `IUiSceneRegistry`, `UiSceneRegistry` (static), `UiSceneLoader`, `UiSceneEntry` | G3 |
 | *(no asmdef)* | `Host/` (adapters under `Host/Adapters/<Feature>/`) | everything (Assembly-CSharp) | `GameRoot`, `MainWiring`, every adapter that names an old manager, UI-scene hosts, scene entries | G1 + G3 adapters |
 | `*.Tests` | `Tests/<Asm>/` | the asm under test + Core + nunit, Editor only, `UNITY_INCLUDE_TESTS` | EditMode tests | each group |
