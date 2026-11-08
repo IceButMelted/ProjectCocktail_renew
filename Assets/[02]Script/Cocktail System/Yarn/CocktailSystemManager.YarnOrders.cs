@@ -110,7 +110,7 @@ public partial class CocktailSystemManager
     /// node calling both named one cocktail and described a different one. Now reuses a
     /// standing, unserved order for the same customer.
     /// </summary>
-    private string PlacePreferenceOrder(CharacterName customer, bool byFlavor)
+    internal string PlacePreferenceOrder(CharacterName customer, bool byFlavor)
     {
         bool reuse = Order.HasOrder && Order.Customer == customer && !Order.IsScored && Order.Target != null;
 
@@ -128,7 +128,7 @@ public partial class CocktailSystemManager
     }
 
     /// <summary>Places (or reuses) a named order and returns the requested text.</summary>
-    private string PlaceNamedOrder(string recipeName, bool byFlavor)
+    internal string PlaceNamedOrder(string recipeName, bool byFlavor)
     {
         bool reuse = Order.HasOrder && !Order.IsScored && Order.Target != null
                      && string.Equals(Order.TargetName, recipeName, System.StringComparison.OrdinalIgnoreCase);
@@ -151,7 +151,7 @@ public partial class CocktailSystemManager
     /// Bug B3: used FindFirstObjectByType on every order despite _postItOrder already
     /// being a serialized reference on this component.
     /// </summary>
-    private bool ResolvePostItText(string text)
+    internal bool ResolvePostItText(string text)
     {
         if (string.IsNullOrEmpty(text))
         {
