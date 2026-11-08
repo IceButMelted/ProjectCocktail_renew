@@ -445,6 +445,8 @@ Test notes (G1-0): use `[Test] async Task` for completion-source tests, and `[Un
 Notes for the coordinator:
 - G1-0 side effect: HEAD has `m_EnterPlayModeOptionsEnabled: 1` while the editor reported it disabled, so the next project-settings save may write a diff. Don't commit it by accident.
 - Spikes ran in the Editor only (Mono). Nothing was tested on IL2CPP/player builds or on Windows `File.Replace`.
+- **Open owner question (found in G3-T9, 2026-11-09):** the garnish slot objects `Granish_Topping_1/2` are inactive in every glass prefab and nothing activates them, so a slot can never be clicked (old scene included) and Garnish Items always land in slot 0. Pre-existing; not fixed. Activating them changes the glass prefabs (`BaseGlass.prefab` and variants) and needs the owner's approval.
+- **Open owner question (D6):** `GarnishUiHost` resolves the seat (`SeatIndex`) but nothing is shown at `GarnishGlassView1/2/3` yet (default: nothing at the seat). Undecided: when the glass appears there, same glass or a copy, how long it stays (`ClearGlass` runs right after scoring), what Remake does.
 
 ---
 
