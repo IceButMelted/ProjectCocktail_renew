@@ -34,9 +34,12 @@ public partial class TalkToCustomerManager
              "Keep it smaller and slower than Walk Bob. Height 0 = still. Editable during Play.")]
     [SerializeField] private IdleBob _idleBob = new IdleBob { Height = 0.008f, Frequency = 0.4f };
 
+    [Tooltip("Scale pulse while a character is speaking (voice playing). Scale 0 = none. Editable during Play.")]
+    [SerializeField] private SpeakPulse _speakPulse = new SpeakPulse { Scale = 0.02f, Frequency = 3f };
+
     private void ApplyIdleBob()
     {
-        foreach (var view in _byName.Values) view.Idle = _idleBob;
+        foreach (var view in _byName.Values) { view.Idle = _idleBob; view.Pulse = _speakPulse; }
     }
 
     // Lets the idle movement be tuned live in the Inspector during Play.
@@ -58,10 +61,7 @@ public partial class TalkToCustomerManager
     [SerializeField, Min(0f)] private float _exitSoundDelay = 0.6f;
 
     /// <summary>Skipping or loading finishes a fade at once, like wait_scene.</summary>
-    private float FadeSeconds => SceneLoaderBridge.IsSilentReplay || DialogueControls.IsSkipping ? 0f : _fadeSeconds;
-
-    /// <summary>Enter/exit sounds and their waits, off while skipping or loading.</summary>
-    private bool SoundsOn => !SceneLoaderBridge.IsSilentReplay && !DialogueControls.IsSkipping;
+    private static bool InstantNow => SceneLoaderBridge.IsSilentReplay || DialogueControls.IsSkipping;
 
     // ── Enter / Exit ───────────────────────────────────────
 
@@ -69,8 +69,12 @@ public partial class TalkToCustomerManager
     /// Brings a character to a spot. Not in the shop: fade in there. Already there: nothing.
     /// Standing elsewhere: fade out, move, fade in. Yarn waits for all of it.
     /// </summary>
-    public IEnumerator Enter(CharacterView view, int spot)
+    public IEnumerator Enter(CharacterView view, int spot) => Enter(view, spot, InstantNow);
+
+    /// <summary>As <see cref="Enter(CharacterView,int)"/>; <paramref name="instant"/> = no fade, no sound, no wait.</summary>
+    public IEnumerator Enter(CharacterView view, int spot, bool instant)
     {
+        float fade = instant ? 0f : _fadeSeconds;
         if (_spots == null || spot < 0 || spot >= _spots.Length || _spots[spot] == null)
         {
             Debug.LogWarning($"[TalkToCustomerManager] {view.Name}: spot {spot} does not exist.", this);
@@ -79,8 +83,8 @@ public partial class TalkToCustomerManager
 
         if (view.IsPresent && view.Spot == spot) yield break;
         // Moving between spots stays inside the shop: no enter sound.
-        if (view.IsPresent) yield return view.FadeOut(FadeSeconds, _walkBob);
-        else if (SoundsOn && !string.IsNullOrEmpty(_enterSoundId))
+        if (view.IsPresent) yield return view.FadeOut(fade, _walkBob);
+        else if (!instant && !string.IsNullOrEmpty(_enterSoundId))
         {
             SoundManager.Instance?.PlaySFX(_enterSoundId);
             if (_enterSoundLead > 0f) yield return new WaitForSeconds(_enterSoundLead);
@@ -93,15 +97,18 @@ public partial class TalkToCustomerManager
 
         view.Spot = spot;
         view.transform.position = _spots[spot].position;
-        yield return view.FadeIn(FadeSeconds, _walkBob);
+        yield return view.FadeIn(fade, _walkBob);
     }
 
     /// <summary>Fades a character out of the shop. Not in the shop: nothing.</summary>
-    public IEnumerator Exit(CharacterView view)
+    public IEnumerator Exit(CharacterView view) => Exit(view, InstantNow);
+
+    /// <summary>As <see cref="Exit(CharacterView)"/>; <paramref name="instant"/> = no fade, no sound.</summary>
+    public IEnumerator Exit(CharacterView view, bool instant)
     {
         if (!view.IsPresent) yield break;
-        yield return view.FadeOut(FadeSeconds, _walkBob);
-        if (SoundsOn && !string.IsNullOrEmpty(_exitSoundId)) StartCoroutine(PlayExitSound());
+        yield return view.FadeOut(instant ? 0f : _fadeSeconds, _walkBob);
+        if (!instant && !string.IsNullOrEmpty(_exitSoundId)) StartCoroutine(PlayExitSound());
     }
 
     private IEnumerator PlayExitSound()

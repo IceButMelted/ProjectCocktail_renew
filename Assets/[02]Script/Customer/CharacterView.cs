@@ -39,6 +39,14 @@ public struct IdleBob
     [Min(0f)] public float Frequency;
 }
 
+/// <summary>Looped scale pulse while a character speaks. Scale is the extra fraction (0.02 = 2 percent), Frequency pulses per second.</summary>
+[System.Serializable]
+public struct SpeakPulse
+{
+    [Min(0f)] public float Scale;
+    [Min(0f)] public float Frequency;
+}
+
 public class CharacterView : MonoBehaviour
 {
     [SerializeField, Required] private SO_Customer _data;
@@ -65,8 +73,15 @@ public class CharacterView : MonoBehaviour
     private Vector3 _standing;
     private float _idleSince;
 
+    /// <summary>Speaking pulse. Set by TalkToCustomerManager for every character.</summary>
+    public SpeakPulse Pulse { get; set; }
+
+    private DG.Tweening.Tween _pulse;
+    private Vector3 _authoredScale;
+
     private void Awake()
     {
+        _authoredScale = transform.localScale;
         // The scene is authored with everyone visible; at runtime they start outside the shop.
         Apply();
         SetTint(0f);
@@ -77,6 +92,29 @@ public class CharacterView : MonoBehaviour
         if (!_idling) return;
         float t = (Time.time - _idleSince) * Idle.Frequency * 2f * Mathf.PI;
         transform.position = _standing + Vector3.up * (Idle.Height * Mathf.Sin(t));
+    }
+
+    private void OnDisable() => StopPulse();
+
+    /// <summary>
+    /// Starts or stops a looped scale pulse (never position: Update and Fade write position every frame).
+    /// Pulses the root, not Body, because Face is a sibling of Body and would otherwise stay still.
+    /// Ignored while not in the shop; stopping restores the authored scale exactly.
+    /// </summary>
+    public void SetSpeaking(bool speaking)
+    {
+        if (!speaking) { StopPulse(); return; }
+        if (!IsPresent || (_pulse != null && _pulse.active) || Pulse.Scale <= 0f || Pulse.Frequency <= 0f) return;
+        _pulse = transform.DOScale(_authoredScale * (1f + Pulse.Scale), 0.5f / Pulse.Frequency)
+            .SetEase(Ease.InOutSine).SetLoops(-1, LoopType.Yoyo);
+    }
+
+    private void StopPulse()
+    {
+        if (_pulse == null) return;
+        _pulse.Kill();
+        _pulse = null;
+        transform.localScale = _authoredScale;
     }
 
     private void StartIdle()
@@ -167,6 +205,7 @@ public class CharacterView : MonoBehaviour
     public void HideInstant()
     {
         StopIdle();
+        StopPulse();
         IsPresent = false;
         SetTint(0f);
     }
@@ -189,6 +228,7 @@ public class CharacterView : MonoBehaviour
     private IEnumerator Fade(float from, float to, float duration, WalkBob bob)
     {
         StopIdle(); // back on the spot itself before the walk starts from it
+        if (to <= 0f) StopPulse();
         SetTint(from);
         Vector3 standing = transform.position;
         if (duration > 0f)
