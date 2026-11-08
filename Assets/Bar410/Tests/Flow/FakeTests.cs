@@ -56,6 +56,17 @@ namespace Bar410.Flow.Tests
         }
 
         [Test]
+        public void Garnish_RunCancel_EndsSynchronously_NotBusy()
+        {
+            var g = new FakeGarnish(); using var cts = new CancellationTokenSource();
+            var aw = g.RunAsync(new GarnishRequest(null), cts.Token);
+            Assert.IsTrue(g.IsBusy);
+            cts.Cancel();
+            Assert.IsTrue(aw.GetAwaiter().IsCompleted,"OCE is thrown synchronously (IGarnishHost timing)");
+            Assert.IsFalse(g.IsBusy);
+        }
+
+        [Test]
         public async Task DayUi_TransitionCompleteAndCancel()
         {
             var ui = new FakeDayUi();

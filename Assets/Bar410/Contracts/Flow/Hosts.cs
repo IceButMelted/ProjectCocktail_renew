@@ -57,7 +57,11 @@ namespace Bar410.Contracts
         public GarnishRequest(S_Drink drink, int seatIndex = 0) { Drink = drink; SeatIndex = seatIndex; }
     }
 
-    /// <summary>impl: GarnishUiHost or LegacyGarnish.</summary>
+    /// <summary>
+    /// impl: GarnishUiHost or LegacyGarnish. RunAsync/ServeAsync timing (Contracts_Final 3.2):
+    /// ct cancelled (load, teardown, or a Yarn force through Forcible) -> close the panel and throw
+    /// OperationCanceledException synchronously; IsBusy is false on return. Closing animations run in the background.
+    /// </summary>
     public interface IGarnishHost
     {
         bool IsBusy { get; }

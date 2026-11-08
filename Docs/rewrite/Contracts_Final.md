@@ -175,6 +175,8 @@ public interface IGarnishHost {                 // impl: GarnishUiHost (UI scene
 4. **`ct` cancelled** (load, teardown, or a Yarn force through `Forcible`) → `CancelMinigame()` and throw OCE **synchronously**. Do not wait for the outro: a forced `flow_another_ingredient`/`flow_drink_complete` must change the label before the command returns (S1).
 5. Hiding views/canvas after a Back or a cancel happens in a background `FlowAwait.Run` that waits for `Idle`, then hides. It skips the hide if a newer run has started (run id).
 
+`IGarnishHost.RunAsync`/`ServeAsync` timing: **`ct` cancelled** (load, teardown, or a Yarn force through `Forcible`: `flow_garnish_done`/`flow_serve_done`/`flow_remake_drink`) → close the panel and throw OCE **synchronously**; `IsBusy` is false when the call returns. Any closing animation runs in the background. Same reason as minigame rule 4: the forced command must change the label before it returns (S1).
+
 ### 3.3 Customers, unlocks (Verbs consume)
 
 ```csharp
@@ -376,7 +378,7 @@ Test notes (G1-0): use `[Test] async Task` for completion-source tests, and `[Un
 1. §1: `Adapters/` → `Host/Adapters/`. `SO_DaySchedule` in Domain is confirmed. `UiSceneId`/`IUiScenes`/`IUiSceneRegistry` live in `Bar410.UiScenes`, not Contracts (`IUiScenes` dropped).
 2. §2.1: `IOrderDesk` adds `EnsureOrder()` and drops `WaitScoredAsync`. `IBarCounter`: no `Func` params (the adapter holds the unlocks), adds `CloseBook()`, and `MethodChosen` carries `Enum_MiniGameType`. `CocktailFeature` also implements `ISnapshotSource "order"` (customer, mode, RecipeKey, served type, result, `IsScored`; needs N4).
 3. §2.4: timing per §3.2 (OCE synchronous on ct, Back immediate, background hide by run id, `IsBusy` definition).
-4. §2.5: `IGarnishHost.ClearGlass()` added. `ResetDrink` on Remake moves to the session.
+4. §2.5: `IGarnishHost.ClearGlass()` added. `ResetDrink` on Remake moves to the session. `GarnishUiHost`/`LegacyGarnish` checklist: on `ct` cancel, throw OCE synchronously and `IsBusy` is false on return (§3.2 `IGarnishHost` timing).
 5. §2.6: `AimCustomerInset(CharacterName)` instead of `Transform`.
 6. §2.7/2.8: `Capture/Restore` leave the interfaces; the adapters implement `ISnapshotSource` (`characters`, `unlocks`, both restored at the target only). Every mutating verb is idempotent (F13).
 7. §2.9: `IHub`, `IEventPopups`, `IChapterTitle` are not created. `HubManager` stays unchanged. Popups and title are inside G1's `DayUiAdapter`.
