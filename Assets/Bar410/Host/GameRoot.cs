@@ -15,9 +15,9 @@ namespace Bar410.Host
     /// no DontDestroyOnLoad. Not wired into any scene yet (G1-13 creates Main_V2).
     /// ponytail: stubs until later tasks (Main_V2 cannot boot until the garnish host exists; Awake/Start log an error):
     /// - no IStory implementation yet (G2 Director), and no G2 verb bind (Director.Init / YarnVerbRegistry);
-    /// - no LegacyGarnish / GarnishUiHost yet (IGarnishHost);
+    /// - no LegacyGarnish yet (IGarnishHost): with 'Use Ui Scenes' off the garnish host must be set by hand;
     /// - no "order" snapshot (CocktailFeature is not an ISnapshotSource, needs N4);
-    /// - no UiSceneLoader, resume (PendingLoad) or autosave (G3 / G4); the minigame host is the legacy manager.
+    /// - no resume (PendingLoad) or autosave (G4).
     /// </summary>
     [DefaultExecutionOrder(-1000)]
     public sealed class GameRoot : MonoBehaviour
@@ -50,7 +50,14 @@ namespace Bar410.Host
         [SerializeField, Required] CameraManager _cameras;
         [SerializeField] Bar410.WorldViews.WorldViewSource _customerInset;
         [SerializeField] Vector3 _customerInsetOffset;
-        [SerializeField, Required] MinigameSystemManager _minigames;
+        [Tooltip("Legacy minigame manager in this scene; used only when 'Use Ui Scenes' is off.")]
+        [SerializeField] MinigameSystemManager _minigames;
+
+        [Title("UI scenes (G3)")]
+        [Tooltip("On: the minigame and garnish hosts come from Minigame_UI / Garnish_UI, preloaded before the day boots. Off: legacy managers (and 'Garnish Host') in this scene.")]
+        [SerializeField] bool _useUiScenes;
+        [SerializeField] MinigameWorldSource[] _minigameWorlds;
+        [SerializeField] GarnishTable _garnishTable;
 
         [Title("Day UI")]
         [SerializeField] PanelTransition _transition;
@@ -70,6 +77,7 @@ namespace Bar410.Host
         CocktailFeature _bar;
         UnlocksAdapter _unlockPort;
         MainWiring _wiring;
+        UiSceneBindings _uiScenes;
 
         void Awake()
         {
@@ -91,11 +99,12 @@ namespace Bar410.Host
             _bar = new CocktailFeature(_cocktail, _shaker, _shakerPanels, _bottles, _method, _fillBars, _orderNote, _book, _bookButton, _unlockPort);
             var dayUi = new DayUiAdapter(this, _transition, _popups, _unlockPort, _chapterTitle);
 
+            if (!_useUiScenes && _minigames == null) Debug.LogError("[GameRoot] 'Use Ui Scenes' is off and no legacy MinigameSystemManager is set", this);
             if (_garnishHost != null && _garnishHost is not IGarnishHost) Debug.LogError("[GameRoot] 'Garnish Host' does not implement IGarnishHost", this);
             Ports = new FlowPorts
             {
                 Camera = camera, Bar = _bar, Orders = _bar, Story = story, DayUi = dayUi,
-                Minigames = new LegacyMinigames(_minigames),
+                Minigames = _useUiScenes ? null : new LegacyMinigames(_minigames),   // UI scenes: set by the preload in Start
                 Garnish = _garnishHost as IGarnishHost,
             };
 
@@ -111,14 +120,21 @@ namespace Bar410.Host
             Snapshots = snaps;
 
             _wiring = new MainWiring(State, _bar, _bar, _unlockPort, _customers, _hub);
+            if (_useUiScenes) _uiScenes = new UiSceneBindings(_minigameWorlds, _customerInset, _garnishTable, stage);
         }
 
         void Start()
         {
             if (Current != this || Day == null) return;
+            FlowAwait.Run(BootAsync, Lifetime, "GameRoot.Boot", this);
+        }
+
+        async Awaitable BootAsync(CancellationToken ct)
+        {
+            if (_uiScenes != null) await _uiScenes.PreloadAsync(Ports, ct);   // BeforeOpen: UI scenes loaded, bound and warm
             if (Ports.Garnish == null) Debug.LogError("[GameRoot] No IGarnishHost: a drink cannot get past the Garnish step", this);
             // ponytail: new game only; G4 resume (PendingLoad -> ResumeAsync) goes here.
-            FlowAwait.Run(Day.BootAsync, Lifetime, "GameRoot.Boot", this);
+            await Day.BootAsync(ct);
         }
 
         void OnDestroy()
@@ -126,6 +142,7 @@ namespace Bar410.Host
             if (Current != this) return;
             Current = null;
             _wiring?.Dispose();
+            _uiScenes?.Dispose();
             _bar?.Dispose();
             _unlockPort?.Dispose();
         }
