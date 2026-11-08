@@ -115,8 +115,9 @@ namespace Bar410.Flow
             _state.SetPart(DayPart.Event);
             LockBar();
             _ports.Bar.RefreshUnlocked(); // a new $day may have unlocked bottles
-            await _ports.DayUi.ShowDayEventsAsync(ct);
-            _state.SetPart(DayPart.Story);
+            // A cancel by any token but the lifetime (e.g. a dialogue-scoped one) must not leave the day stuck in Event.
+            try { await _ports.DayUi.ShowDayEventsAsync(ct); }
+            finally { if (!_lifetime.IsCancellationRequested) _state.SetPart(DayPart.Story); }
         }
 
         // A new day always opens on the bar, look fixed and forward. Not on flow_check_events.

@@ -134,6 +134,29 @@ namespace Bar410.Flow.Tests
         }
 
         [Test]
+        public async Task CheckEvents_CancelledByOtherToken_ReturnsToStory()
+        {
+            BootToStory();
+            using var cts = new CancellationTokenSource();
+            var aw = _day.CheckEventsAsync(cts.Token);
+            Assert.AreEqual("Event", _state.StepString);
+            cts.Cancel();
+            Assert.AreEqual("StoryBeforeOpen", _state.StepString, "no soft-lock in Event");
+            Assert.IsInstanceOf<System.OperationCanceledException>(await StationTests.Catch(async () => await aw));
+            _day.OpenBarAsync(false, _lifetime.Token);
+            Assert.AreEqual("Open", _state.PhaseString);
+        }
+
+        [Test]
+        public void CheckEvents_LifetimeCancel_LeavesPart()
+        {
+            BootToStory();
+            _day.CheckEventsAsync(_lifetime.Token);
+            _lifetime.Cancel();
+            Assert.AreEqual(DayPart.Event, _state.Part);
+        }
+
+        [Test]
         public async Task OpenBar_TalkingMode_ThenChapterTitle_Awaited()
         {
             BootToStory();
