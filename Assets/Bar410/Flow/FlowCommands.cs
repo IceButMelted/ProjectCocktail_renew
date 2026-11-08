@@ -31,11 +31,7 @@ namespace Bar410.Flow
 
         // ── Bar ──
         /// <summary>flow_prepare_drinks: Talking → step 2. The caller stops Skip first.</summary>
-        public void PrepareDrinks()
-        {
-            if (_state.Part != DayPart.Open) { Debug.LogWarning($"[Flow] flow_prepare_drinks ignored: not in Open (now {_state.Part})"); return; }
-            _session.TryBegin();
-        }
+        public void PrepareDrinks() => _session.TryBegin(); // guards and warnings live in TryBegin
 
         /// <summary>flow_ingredient_added [type]: selects the type (if given, valid any time), then presses "method chosen".</summary>
         public void IngredientAdded(string minigameType = "")

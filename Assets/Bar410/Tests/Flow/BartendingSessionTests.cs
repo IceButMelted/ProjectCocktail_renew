@@ -215,6 +215,20 @@ namespace Bar410.Flow.Tests
             Assert.AreEqual(1, Count(Bar.Calls, "BeginDrink"));
         }
 
+        [TestCase(DayPart.None)]
+        [TestCase(DayPart.Event)]
+        [TestCase(DayPart.Story)]
+        [TestCase(DayPart.Close)]
+        public void TryBegin_OutsideOpen_WarnsAndRefuses(DayPart part)
+        {
+            _state.SetPart(part);
+            LogAssert.Expect(LogType.Warning, new Regex($@"flow_prepare_drinks ignored: not in Open \(now {part}\)"));
+            Assert.IsFalse(_s.TryBegin());
+            Assert.IsFalse(_s.IsRunning);
+            Assert.IsEmpty(Bar.Calls);
+            Assert.IsEmpty(Garnish.Calls);
+        }
+
         [Test]
         public void TryBegin_NoSteps_Errors()
         {

@@ -35,9 +35,13 @@ namespace Bar410.Flow
         /// <summary>A station threw; talking mode already restored. The exception is also logged.</summary>
         public event Action<Exception> Faulted;
 
-        /// <summary>Starts a drink. Runs synchronously through the first station's entry, so the label is already set.</summary>
+        /// <summary>
+        /// Starts a drink; only while the bar is Open (flow_prepare_drinks and G2's serve_order both come here).
+        /// Runs synchronously through the first station's entry, so the label is already set.
+        /// </summary>
         public bool TryBegin()
         {
+            if (_state.Part != DayPart.Open) { Debug.LogWarning($"[Flow] flow_prepare_drinks ignored: not in Open (now {_state.Part})"); return false; }
             if (IsRunning) { Debug.LogWarning("[Flow] flow_prepare_drinks ignored: a drink is already being made"); return false; }
             if (_steps == null || _steps.Count == 0) { Debug.LogError("[Flow] BartendingSession has no steps"); return false; }
             _cts = CancellationTokenSource.CreateLinkedTokenSource(_lifetime);
