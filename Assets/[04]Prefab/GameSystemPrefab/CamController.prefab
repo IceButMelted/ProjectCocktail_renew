@@ -57,7 +57,7 @@ MonoBehaviour:
     LookAtTarget: {fileID: 0}
     CustomLookAtTarget: 0
   Lens:
-    FieldOfView: 58.715508
+    FieldOfView: 50.53402
     OrthographicSize: 5
     NearClipPlane: 0.07
     FarClipPlane: 20
@@ -117,7 +117,7 @@ Transform:
   m_GameObject: {fileID: 729612080755843433}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.574, y: 0.068, z: 0}
+  m_LocalPosition: {x: 0.484, y: 0.068, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -136,7 +136,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Unity.Cinemachine::Unity.Cinemachine.CinemachineCamera
   Priority:
-    Enabled: 1
+    Enabled: 0
     m_Value: 1000
   OutputChannel: 1
   StandbyUpdate: 2
@@ -207,7 +207,7 @@ Transform:
   m_GameObject: {fileID: 1359315490829980364}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.04, y: 0.068, z: 0.211}
+  m_LocalPosition: {x: 0.04, y: 0.068, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -237,7 +237,7 @@ MonoBehaviour:
     LookAtTarget: {fileID: 0}
     CustomLookAtTarget: 0
   Lens:
-    FieldOfView: 58.715508
+    FieldOfView: 50.53402
     OrthographicSize: 5
     NearClipPlane: 0.07
     FarClipPlane: 20
@@ -301,8 +301,8 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2379317150112739148}
   serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0.21899986, y: 1.525, z: -0.21099997}
+  m_LocalRotation: {x: 0.043619405, y: 0, z: 0, w: 0.9990483}
+  m_LocalPosition: {x: -0.30999994, y: 1.525, z: -0.8859999}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -340,8 +340,8 @@ Camera:
     width: 1
     height: 1
   near clip plane: 0.07
-  far clip plane: 20
-  field of view: 58.715508
+  far clip plane: 15
+  field of view: 58.726482
   orthographic: 0
   orthographic size: 5
   m_Depth: -1
@@ -610,7 +610,7 @@ Transform:
   m_GameObject: {fileID: 3794244149025597282}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 1.011, y: 0.068, z: 0}
+  m_LocalPosition: {x: 0.04, y: 0.068, z: -0.42}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -640,7 +640,7 @@ MonoBehaviour:
     LookAtTarget: {fileID: 0}
     CustomLookAtTarget: 0
   Lens:
-    FieldOfView: 58.715508
+    FieldOfView: 50.53402
     OrthographicSize: 5
     NearClipPlane: 0.07
     FarClipPlane: 200
@@ -700,7 +700,7 @@ Transform:
   m_GameObject: {fileID: 3857484441883621203}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -0.503, y: 0.068, z: 0}
+  m_LocalPosition: {x: -0.45, y: 0.068, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -853,7 +853,7 @@ MonoBehaviour:
     LookAtTarget: {fileID: 0}
     CustomLookAtTarget: 0
   Lens:
-    FieldOfView: 58.715508
+    FieldOfView: 50.53402
     OrthographicSize: 5
     NearClipPlane: 0.07
     FarClipPlane: 200
@@ -1250,7 +1250,11 @@ MonoBehaviour:
   _barShot: MainCam
   _shakerShot: PrepareCam
   _garnishShot: GarnishCam
+  _customerInsetCamera: {fileID: 0}
+  _customerInsetPanel: {fileID: 0}
+  _customerInsetOffset: {x: 0, y: 0.6, z: -2.2}
   logTransitions: 0
+  IsOnShakerView: 0
 --- !u!114 &6134501984845272699
 MonoBehaviour:
   m_ObjectHideFlags: 0
