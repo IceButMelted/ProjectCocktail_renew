@@ -69,12 +69,14 @@ public partial class TalkToCustomerManager
     /// Brings a character to a spot. Not in the shop: fade in there. Already there: nothing.
     /// Standing elsewhere: fade out, move, fade in. Yarn waits for all of it.
     /// </summary>
-    public IEnumerator Enter(CharacterView view, int spot) => Enter(view, spot, InstantNow);
+    public IEnumerator Enter(CharacterView view, int spot) => EnterCore(view, spot, () => InstantNow);
 
     /// <summary>As <see cref="Enter(CharacterView,int)"/>; <paramref name="instant"/> = no fade, no sound, no wait.</summary>
-    public IEnumerator Enter(CharacterView view, int spot, bool instant)
+    public IEnumerator Enter(CharacterView view, int spot, bool instant) => EnterCore(view, spot, () => instant);
+
+    // instant is re-read at each fade/sound, so Skip pressed mid-way makes the rest instant (as before).
+    private IEnumerator EnterCore(CharacterView view, int spot, System.Func<bool> instant)
     {
-        float fade = instant ? 0f : _fadeSeconds;
         if (_spots == null || spot < 0 || spot >= _spots.Length || _spots[spot] == null)
         {
             Debug.LogWarning($"[TalkToCustomerManager] {view.Name}: spot {spot} does not exist.", this);
@@ -83,8 +85,8 @@ public partial class TalkToCustomerManager
 
         if (view.IsPresent && view.Spot == spot) yield break;
         // Moving between spots stays inside the shop: no enter sound.
-        if (view.IsPresent) yield return view.FadeOut(fade, _walkBob);
-        else if (!instant && !string.IsNullOrEmpty(_enterSoundId))
+        if (view.IsPresent) yield return view.FadeOut(instant() ? 0f : _fadeSeconds, _walkBob);
+        else if (!instant() && !string.IsNullOrEmpty(_enterSoundId))
         {
             SoundManager.Instance?.PlaySFX(_enterSoundId);
             if (_enterSoundLead > 0f) yield return new WaitForSeconds(_enterSoundLead);
@@ -97,7 +99,7 @@ public partial class TalkToCustomerManager
 
         view.Spot = spot;
         view.transform.position = _spots[spot].position;
-        yield return view.FadeIn(fade, _walkBob);
+        yield return view.FadeIn(instant() ? 0f : _fadeSeconds, _walkBob);
     }
 
     /// <summary>Fades a character out of the shop. Not in the shop: nothing.</summary>
