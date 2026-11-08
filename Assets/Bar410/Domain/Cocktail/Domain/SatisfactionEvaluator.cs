@@ -22,7 +22,7 @@ public static class SatisfactionEvaluator
     /// </summary>
     /// <param name="orderedType">
     /// Type the customer asked for. <see cref="TypeOfCocktail.None"/> means no type was
-    /// pinned down; cases 3/4 then fall back to Acceptable since there's no expectation to violate.
+    /// pinned down; the drink is judged against the recipe it matched (owner decision 2026-11-09): case 3 applies, no match at all is case 5 (Fail).
     /// </param>
     public static Satisfaction Evaluate(in RecipeMatch match, TypeOfCocktail servedType, TypeOfCocktail orderedType)
     {

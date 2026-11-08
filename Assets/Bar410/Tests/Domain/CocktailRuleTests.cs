@@ -173,8 +173,8 @@ namespace Bar410.Domain.Tests
 
         [Test] public void Satisfaction_UnpinnedOrderType_FallsBackToAcceptable()
         {
-            // GDD mismatch: GDD 18 has no row for "customer ordered no type"; code treats it as Acceptable
-            // (case 3 without an expectation to violate). Asserting the CODE behaviour.
+            // Owner decision 2026-11-09: an order with no pinned type is judged against the recipe the
+            // drink matched (served == ordered); no match at all = Fail (case 5, asserted above).
             Assert.AreEqual(Satisfaction.Acceptable,
                 SatisfactionEvaluator.Evaluate(M(Make("r"), 2), TypeOfCocktail.LowAlcohol, TypeOfCocktail.None));
         }

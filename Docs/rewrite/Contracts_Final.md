@@ -470,3 +470,19 @@ Notes for the coordinator:
 **Still unverified:** pause (`timeScale = 0`) with a real pad (the HUD items "-- while timeScale 0" were not exercised; sim passed earlier); Xbox pad; Windows/DualShock class path; hardware-cursor hide on Windows; gamepad hot-plug.
 
 **Resolved by the owner (2026-11-08): scheme A.** Advance = Square **or** L1 (either alone); AutoPlay = Square **held** 0.5 s; Skip = R1; Log = Triangle; Back = Circle; Pause = Options. Keep the map in one settings asset. Spike scene deleted in `799775e`.
+
+---
+## 9. Owner answers 2026-11-09 (`R2_OwnerAnswers.md`) — authoritative
+
+| # | Decision |
+|---|---|
+| D6 | Garnish glasses are **display views per customer seat**: `GarnishGlassView 1/2/3` (new objects in `Main_V2`, reusable, one per customer seat). **One order at a time** (no concurrent orders): the single glass is shown at the seat of the customer who ordered. Consequence: `GarnishRequest` gains `int SeatIndex` (0..2) when G3 `GarnishUiHost`/`GarnishStation` are written (R3); `IBarCounter`/`Session` stay single-order. Not yet in code. |
+| C-1 | 26 recipes for now; owner will list more later. Tests must not hard-code a count. |
+| C-2 | No pinned type → judged against the recipe the drink matched; matches none → Fail. Same as current code (case 3 / case 5), only the comment + test note changed. Write into GDD §18. |
+| C-3 | `flow_minigame_result()` returns `""` after load (accepted). |
+| C-4 | Saliency = `Best` only; no random line/node groups. |
+| D1/D2 | Defaults (no seen-lines skip mode; Thai names from `character.<id>`). |
+| D3–D5, D7, D9, D10, D13 | Defaults confirmed. |
+| P-1 | Pad test while `timeScale 0` deferred to R6 (the Pause menu seen in the spike came from the UI Setting button, not Esc). |
+| Esc | Esc on `MainMenu_V2` opens neither Settings nor Pause (old scene, unchanged; not part of the rewrite unless asked). |
+| Docs | Update CLAUDE.md / Systems Guide at the end of R3. |
