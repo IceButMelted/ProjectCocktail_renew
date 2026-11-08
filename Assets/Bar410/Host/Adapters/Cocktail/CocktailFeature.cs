@@ -21,14 +21,16 @@ namespace Bar410.Host
         readonly VisualizeCocktail _bars;
         readonly Post_It_Order _note;
         readonly BookUI_V2 _book;
+        readonly UnityEngine.UI.Button _bookButton;   // member of the bottle group: Disable() locks it, so it is switched back on
         readonly IIngredientUnlocks _unlocks;   // null = everything unlocked
 
         public CocktailFeature(CocktailSystemManager manager, ShakerContents shaker, ShakerPanelController panels,
             IngredientButtonGroup bottles, MethodPanel method, VisualizeCocktail bars, Post_It_Order note,
-            BookUI_V2 book, IIngredientUnlocks unlocks)
+            BookUI_V2 book, UnityEngine.UI.Button bookButton, IIngredientUnlocks unlocks)
         {
             _manager = manager; _shaker = shaker; _panels = panels; _bottles = bottles; _method = method;
-            _bars = bars; _note = note; _book = book; _unlocks = unlocks;
+            _bars = bars; _note = note; _book = book; _bookButton = bookButton; _unlocks = unlocks;
+            if (_bookButton != null) _bookButton.onClick.AddListener(OnBookClicked);
 
             if (_shaker != null)
             {
@@ -51,6 +53,7 @@ namespace Bar410.Host
 
         public void Dispose()
         {
+            if (_bookButton != null) _bookButton.onClick.RemoveListener(OnBookClicked);
             if (_shaker != null)
             {
                 _shaker.Changed.RemoveListener(OnShakerChanged);
@@ -129,6 +132,8 @@ namespace Bar410.Host
         public void SetOrderNoteAvailable(bool on) => _note?.SetAvailable(on);
         public void CloseBook() => _book?.CloseBook();
 
+        void OnBookClicked() => _book?.SetActive(true);
+
         void OnShakerChanged() => _bars?.UpdateCocktailBars();
 
         void OnShakerCleared()
@@ -142,6 +147,7 @@ namespace Bar410.Host
         void OnShakerFull()
         {
             _bottles?.Disable();
+            if (_bookButton != null) _bookButton.interactable = true;
             _panels?.ShowMethod();
             ShakerFull?.Invoke();
         }
