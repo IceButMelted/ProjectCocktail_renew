@@ -1,7 +1,11 @@
-#if UNITY_EDITOR
+using System;
+using System.Threading;
+using Bar410.Core;
 using Bar410.Flow;
 using UnityEngine;
+#if UNITY_EDITOR
 using UnityEngine.InputSystem;
+#endif
 
 namespace Bar410.Host
 {
@@ -9,10 +13,11 @@ namespace Bar410.Host
     /// Editor-only dev tool (G1-14), the FlowCommands twin of GameFlowDebugHotkeys. Drop it on any object in a scene with a GameRoot.
     /// 1 OpenBar · 2 PrepareDrinks · 3 IngredientAdded · 4 AnotherIngredient · 5 DrinkComplete · 6 GarnishDone ·
     /// 7 ServeDone · 8 RemakeDrink · 9 CloseBar · 0 NextDay. Ignored while Shift is held (Shift+1/2 are the minigame manager's keys).
-    /// Debug keys are not input actions (Contracts_Final / API_G4 2.1).
+    /// Debug keys are not input actions (Contracts_Final / API_G4 2.1). The class exists in player builds (no missing script) but is empty there.
     /// </summary>
     public sealed class FlowDebugHotkeys : MonoBehaviour
     {
+#if UNITY_EDITOR
         [SerializeField] bool _showOverlay = true;
 
         void Update()
@@ -20,7 +25,7 @@ namespace Bar410.Host
             var k = Keyboard.current;
             if (k == null || k.shiftKey.isPressed) return;
 
-            if (k.digit1Key.wasPressedThisFrame) RunAsync("1 OpenBar", f => f.OpenBarAsync(false, destroyCancellationToken));
+            if (k.digit1Key.wasPressedThisFrame) RunAsync("1 OpenBar", (f, ct) => f.OpenBarAsync(false, ct));
             else if (k.digit2Key.wasPressedThisFrame) Run("2 PrepareDrinks", f => f.PrepareDrinks());
             else if (k.digit3Key.wasPressedThisFrame) Run("3 IngredientAdded", f => f.IngredientAdded());
             else if (k.digit4Key.wasPressedThisFrame) Run("4 AnotherIngredient", f => f.AnotherIngredient());
@@ -32,14 +37,24 @@ namespace Bar410.Host
             else if (k.digit0Key.wasPressedThisFrame) Run("0 NextDay", f => f.NextDay());
         }
 
-        // OpenBar is async: its overload returns an Awaitable, so run it through a tiny shim.
-        static void RunAsync(string label, System.Func<FlowCommands, Awaitable> command)
-            => Run(label, f => Bar410.Core.FlowAwait.Run(ct => command(f), GameRoot.Current.Lifetime, label));
-
-        static void Run(string label, System.Action<FlowCommands> command)
+        static bool TryRoot(string label, out GameRoot root)
         {
-            var root = GameRoot.Current;
-            if (root == null) { Debug.LogWarning($"[FlowDebugHotkeys] {label} ignored: no GameRoot in the scene"); return; }
+            root = GameRoot.Current;
+            if (root != null && root.Commands != null) return true;
+            Debug.LogWarning($"[FlowDebugHotkeys] {label} ignored: no booted GameRoot in the scene");
+            return false;
+        }
+
+        static void RunAsync(string label, Func<FlowCommands, CancellationToken, Awaitable> command)
+        {
+            if (!TryRoot(label, out var root)) return;
+            Debug.Log($"[FlowDebugHotkeys] {label}");
+            FlowAwait.Run(ct => command(root.Commands, ct), root.Lifetime, label);
+        }
+
+        static void Run(string label, Action<FlowCommands> command)
+        {
+            if (!TryRoot(label, out var root)) return;
             Debug.Log($"[FlowDebugHotkeys] {label}");
             command(root.Commands);
         }
@@ -59,6 +74,6 @@ namespace Bar410.Host
             GUILayout.Label("5 DrinkComplete    9 CloseBar, 0 NextDay");
             GUILayout.EndArea();
         }
+#endif
     }
 }
-#endif
