@@ -5,16 +5,17 @@
 
 ## 0. เตรียม
 - [ ] เปิดฉาก `Main_V2` กด Play (ถ้ามี Pause ซ้อนให้โหลด `PauseScene` ตามปกติ)
-- [ ] รอ preload ฉาก UI (ใน Editor ประมาณ 6-7 วินาทีหลังโหลดฉาก) จนวันเริ่ม
+- [ ] หลังกด Play ช่วงแรกประมาณ 7 วินาที (ใน Editor) จะยังไม่มีอะไรเกิดขึ้นบนจอ: เกมกำลัง preload ฉาก UI (`Minigame_UI`, `Garnish_UI`) ยังไม่ใช่บั๊ก รอจน panel `StubStory` ขึ้น part = Open
 - [ ] Console ไม่มี error สีแดง (warning ที่รู้อยู่แล้วดูหัวข้อ "ปัญหาที่รู้" ด้านล่าง)
 
 ## 1. วนหนึ่งแก้ว
 - [ ] Panel `StubStory`: กด "Customer arrives" ลูกค้าเข้าร้านและออเดอร์ขึ้น
 - [ ] Hub (ปุ่มบนจอ) โชว์เฉพาะที่ควรโชว์ใน Phase Talking
+- [ ] วันที่ 1 บนบาร์มีเฉพาะขวดที่ปลดล็อคแล้ว (ขวดที่ยังล็อคต้องไม่โผล่) และออเดอร์สุ่มเป็นสูตรที่ทำได้จากขวดที่มี
 - [ ] เข้า AddIngredient: เลือกวัตถุดิบด้วยเมาส์ได้ หมุนกล้องด้วยเมาส์ได้เฉพาะตอน shaker ยังไม่เต็ม
 - [ ] วัตถุดิบครบ 10 หน่วย เข้า Minigame (Shaking/Stirring) เล่นได้ด้วยเมาส์
-- [ ] ภาพลูกค้าข้างจอตอนมินิเกม (inset) เห็นถูกคน กรอบภาพโอเค
-- [ ] จบมินิเกม เข้า Garnish: เห็นแก้วผ่าน RenderTexture คลิกเลือก slot / วาง Garnish Item ได้
+- [ ] ภาพลูกค้าข้างจอตอนมินิเกม (inset) เห็นถูกคน กล้องอยู่ด้านหน้าลูกค้า (offset (0, 0.6, -2.2) เท่าฉากเก่า) กรอบภาพโอเค ไม่เห็นเพื่อนข้างๆ เกินไป
+- [ ] จบมินิเกม เข้า Garnish: เห็นแก้วผ่าน RenderTexture วาง Garnish Item ได้ (ลง slot 0 เสมอ: `Granish_Topping_1/2` ปิดอยู่ใน glass prefab มาตั้งแต่ฉากเก่า จึงคลิกเลือก slot บนแก้วไม่ได้)
 - [ ] Serve: เสิร์ฟแล้วได้คะแนนครั้งเดียว
 - [ ] Reaction ของลูกค้าขึ้นแล้วกลับไป Talking
 - [ ] Back: กด Back ในแต่ละ Phase ที่มีปุ่มแล้วย้อนถูกที่ ไม่ค้าง
@@ -22,6 +23,8 @@
 - [ ] Remake / Cancel มินิเกม ไม่ให้คะแนน และไม่ค้าง
 - [ ] ปุ่ม Hub ในแต่ละ Phase แสดง/ซ่อนถูกต้อง ปุ่มที่ซ่อนกดไม่ได้
 - [ ] Pause ด้วยปุ่ม Setting บนจอ (UI) เกมหยุด กลับมาเล่นต่อได้ ไม่ค้าง
+- [ ] Pause ระหว่าง Minigame และระหว่าง Garnish: หน้า Pause อยู่บนสุด ไม่ถูก Canvas ของ Minigame/Garnish บัง
+- [ ] จบแก้วแล้วกด "Close bar" แล้ว "Next day" ใน panel `StubStory`: วันถัดไปเริ่ม (Event → Story → Open) ไม่ค้าง (หมายเหตุ: วันของ StubStory ไม่ใช่ `$day` ของ Yarn ขวดที่ปลดล็อคจึงยังเหมือนวันที่ 1)
 
 ## 2. ภาพและชั้น Canvas
 - [ ] ลำดับ Canvas ถูก: Hub / Minigame / Garnish / popup ไม่บังกันผิด
@@ -35,9 +38,8 @@
 - Preload ฉาก UI ทำให้วันเริ่มช้ากว่าฉากเก่า (ราว 6 วินาทีใน Editor) ไม่ได้ซ่อนหลัง `Panel_Transition` (1.33 วินาที)
 - warning missing script บน `NPC_Walter` / `NPC_Owen` / `NPC_Isla` (สืบทอดจาก prefab เก่า)
 - warning Event System ซ้ำ 2 ตัวตอน `PauseScene` โหลด
-- มี `CinemachineBrain` 2 ตัว
 - warning ของ `SoundManager` เรื่อง `Book_Close`
-- ตัวเลข fps วัดใน Editor เท่านั้น (Talking/AddIngredient 54-56, Minigame 38-43, Garnish/Serve 28-33) ยังไม่ได้วัดใน build จึงยังตัดสินเกณฑ์ 60 fps ไม่ได้
+- ตัวเลข fps วัดใน Editor เท่านั้น: Main_V2 Talking 56-60, AddIngredient 53-58, Minigame 41-42, Garnish/Serve 32-33 (ฉากเก่าวัดแบบเดียวกัน: 33-38, 31-34, 30-31, 29-30) ยังไม่ได้วัดใน build จึงยังตัดสินเกณฑ์ 60 fps ไม่ได้ (`G3-T12_Measurements.md`)
 - slot ตกแต่ง `Granish_Topping_1/2` ปิดอยู่ใน glass prefab จึงคลิก slot ไม่ได้ Garnish Item ลง slot 0 เสมอ (มีมาตั้งแต่ฉากเก่า)
 
 ## 4. จุดตัดสิน R3 (Execution Plan §6 R3) ตอบตรงนี้
