@@ -15,6 +15,7 @@ namespace Bar410.Host
     /// </summary>
     public sealed class StubStory : MonoBehaviour, IStory
     {
+        [Tooltip("Stub day counter. NOT Yarn $day: IngredientUnlocks reads $day from the DialogueRunner, so unlocks do not advance on 'Next day' (fine for R3).")]
         [SerializeField] int _day = 1;
         [SerializeField] TalkToCustomerManager _customers;
         [SerializeField] CharacterName[] _pool = { CharacterName.Walter, CharacterName.Isla, CharacterName.Owen };
