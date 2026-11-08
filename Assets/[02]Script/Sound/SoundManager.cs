@@ -62,6 +62,7 @@ public class SoundManager : MonoBehaviour
     private float m_Duck = 1f;          // current Music/Ambient multiplier (fades to m_DuckTarget)
     private float m_DuckTarget = 1f;
     private Coroutine m_DuckRoutine;
+    private readonly List<SoundHandle> m_Handles = new();
     private int m_SfxOldest;    // ponytail: ring-buffer index, oldest = next to evict
 
     // ── Unity Lifecycle ───────────────────────────────────────────────────────
@@ -106,9 +107,18 @@ public class SoundManager : MonoBehaviour
         PlayBGM(m_BGMStart);
     }
 
+    private void Update()
+    {
+        for (int i = m_Handles.Count - 1; i >= 0; i--)
+            if (m_Handles[i].Tick(m_Paused)) m_Handles.RemoveAt(i);
+    }
+
     private void OnDestroy()
     {
-        if (Instance == this) Instance = null;
+        if (Instance != this) return;
+        Instance = null;
+        foreach (var h in m_Handles.ToArray()) h.Finish();
+        m_Handles.Clear();
     }
 
     // ── Setup ─────────────────────────────────────────────────────────────────
@@ -273,6 +283,7 @@ public class SoundManager : MonoBehaviour
             foreach (var src in m_SfxPool) SetSourcePaused(src, paused);
             foreach (var src in m_LoopingSfx.Values) SetSourcePaused(src, paused);
             SetSourcePaused(m_VoiceSrc, paused);
+            foreach (var h in m_Handles) h.Pause(paused);
         }
 
         DuckTo(paused && duckMusic ? m_PauseDuck : 1f);
@@ -467,4 +478,32 @@ public class SoundManager : MonoBehaviour
 
     /// <summary>Interrupt the current voice line.</summary>
     public void StopVoice() => m_VoiceSrc.Stop();
+
+    // ── Handles (N2): one AudioSource per call, so the caller can Stop it or wait for Ended ──
+
+    /// <summary>Voice line with a handle; null = unknown id or paused. Does not touch the shared voice source.</summary>
+    public SoundHandle PlayVoiceHandle(string id) => PlayHandle(m_Voice, SoundChannel.Voice, id, m_VoiceSrc.outputAudioMixerGroup);
+
+    /// <summary>SFX with a handle; null = unknown id or paused. Not counted against MaxSFXCount.</summary>
+    public SoundHandle PlaySFXHandle(string id) => PlayHandle(m_Sfx, SoundChannel.SFX, id, m_SfxGroup);
+
+    private SoundHandle PlayHandle(Dictionary<string, SoundEntry> dict, SoundChannel channel, string id, AudioMixerGroup group)
+    {
+        if (m_Paused) return null;
+        var e = Find(dict, channel, id);
+        if (e == null) return null;
+
+        var go = new GameObject($"[Handle]{id}");
+        go.transform.SetParent(transform, false);
+        var src = go.AddComponent<AudioSource>();
+        src.clip = e.clip;
+        src.volume = e.volume;
+        src.spatialBlend = 0f;
+        src.outputAudioMixerGroup = group;
+        src.Play();
+
+        var h = new SoundHandle(src);
+        m_Handles.Add(h);
+        return h;
+    }
 }
