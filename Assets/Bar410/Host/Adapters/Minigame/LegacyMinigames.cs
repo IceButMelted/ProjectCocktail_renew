@@ -15,8 +15,10 @@ namespace Bar410.Host
     /// </summary>
     public sealed class LegacyMinigames : IMinigameHost
     {
-        // ponytail: fixed cap for the previous run's outro (F11): outro fallback 1.5 s + 0.5 s, scaled time like the outro.
-        const float IdleWaitSeconds = 2f;
+        /// <summary>Shared by every IMinigameHost: cap on waiting for the previous run's outro (F11), outro fallback 1.5 s + 0.5 s,
+        /// scaled time like the outro. Timeout = error + Completed without playing.</summary>
+        // ponytail: fixed; read it from the minigame config if outros get longer.
+        internal const float IdleWaitSeconds = 2f;
 
         readonly MinigameSystemManager _manager;
 

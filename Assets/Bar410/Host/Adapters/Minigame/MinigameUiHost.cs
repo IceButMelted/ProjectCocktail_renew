@@ -25,8 +25,6 @@ namespace Bar410.Host
         [SerializeField] GameObject _customerPanel;
         [SerializeField] WorldView _customerView;
         [SerializeField] ViewSlot[] _gameViews;
-        [Tooltip("Scaled seconds to wait for the previous run's outro (outro fallback + 0.5 s). Timeout = error + Completed without playing.")]
-        [SerializeField] float _idleTimeout = 2f;
 
         bool _bound;
         int _runId;
@@ -87,12 +85,12 @@ namespace Bar410.Host
         async Awaitable StartWhenIdleAsync(MinigameRequest request, AwaitableCompletionSource<MinigameOutcome> done, CancellationToken ct)
         {
             // F11: a late outro would swallow StartGame, so wait for the previous run to reach Idle.
-            float until = Time.time + _idleTimeout;
+            float until = Time.time + LegacyMinigames.IdleWaitSeconds;
             while (_manager.ActivePhase != MinigamePhase.Idle)
             {
                 if (Time.time >= until)
                 {
-                    Debug.LogError($"[MinigameUiHost] Previous minigame not Idle after {_idleTimeout} s: completing without playing", this);
+                    Debug.LogError($"[MinigameUiHost] Previous minigame not Idle after {LegacyMinigames.IdleWaitSeconds} s: completing without playing", this);
                     done.TrySetResult(MinigameOutcome.Completed);   // same fallback as D5
                     return;
                 }
@@ -112,12 +110,9 @@ namespace Bar410.Host
             _manager.MinigameFinished += OnFinished;
             _manager.BackRequested += OnBack;
             _started = true;
-            try
-            {
-                _manager.StartMinigame(type);
-                Started?.Invoke(type);
-            }
-            catch (Exception e) { done.TrySetException(e); }   // never leave RunAsync hanging with IsBusy stuck
+            try { _manager.StartMinigame(type); }
+            catch (Exception e) { done.TrySetException(e); return; }   // never leave RunAsync hanging with IsBusy stuck
+            Started?.Invoke(type);   // a throwing listener is logged by FlowAwait.Run, the run goes on
         }
 
         void OnFinished(Enum_MiniGameType type, MinigameOutcome outcome) => _run?.TrySetResult(outcome);
