@@ -363,6 +363,13 @@ Test notes (G1-0): use `[Test] async Task` for completion-source tests, and `[Un
 9. §2.13 `MainWiring`: adds the PointerMode listener (prov. I0) and the voice→speaking wiring. Keeps the `CommitOrderResult`/`ResetVariables` rows.
 10. §2.14: `LegacyCameraRig` and `LegacyBar` are dropped (G3's `CameraDirector`/`CocktailFeature` replace them). Left: `LegacyMinigames : IMinigameHost`, `LegacyGarnish : IGarnishHost` (R3 fallback), `DayUiAdapter : IDayUi` (absorbs G3's `EventPopupsAdapter`, `ChapterTitleAdapter`, `UnlockPopup`).
 11. §2.1: add `FlowAwait.FromCoroutine`, the double-await rule (NRE / silent hang) and the test notes of §4.6.
+12. §2.8 (as built, G1-8): `BartendingSession.DrinkServed` and `Faulted` fire **after** cleanup: talking mode restored, `Step = Idle`, `IsRunning = false`. Listeners see settled state. `Faulted` is logged by the session itself. `TryBegin` refuses outside `Part == Open` (warns `(now X)`), so `serve_order` → `TryBegin()` cannot start a drink in Story/Event/Close.
+
+**Notes for later tasks (from the G1-6..G1-10 review):**
+- G1-12 `MainWiring`: push `HubManager.SetPhase(state.HubPhase)` **once at bind**. `BootAsync`'s `SetPart(None)` does not raise `Changed` (the value is already None).
+- G4-S6 autosave: the `DayStarted` milestone fires before the story's first line is presented, so the DayStart autosave must wait for the first `LinePresented` (no root/line yet at the milestone).
+- G2 `flow_open_bar` verb: pass a token that is cancelled when Skip starts, so a title wait already in progress ends at once (`waitForTitle = !IsSkipping` only covers Skip that was on before the call).
+- G1-15 playtest item: after a forced `flow_drink_complete` + serve, check that the next drink's shaker is grabbable (the forced path no longer calls `SetShakerGrabbable(true)`; `BeginDrink` must make it grabbable again).
 
 ### G2 (`API_G2_Dialogue.md`)
 1. §0: Dialogue refs Contracts/Domain/Input/Core; **not Flow**. Verbs refs as in §2.
