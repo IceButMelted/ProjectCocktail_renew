@@ -103,7 +103,7 @@ namespace Bar410.Flow
                 case StepCommand.AnotherIngredient:
                     return _force != null && _force.TryForce(MinigameOutcome.Cancelled);
                 case StepCommand.DrinkComplete:
-                    if (_force == null) return false;
+                    if (_force == null || _force.IsForced) return false; // never flip the flag of an already-forced run
                     _completeForced = true; // read by the inline continuation inside TryForce
                     return _force.TryForce(MinigameOutcome.Completed);
                 default:
