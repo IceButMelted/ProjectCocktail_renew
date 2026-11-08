@@ -42,7 +42,8 @@ namespace Bar410.Host
 
         public void Restore(object state)
         {
-            var s = state as UnlockState ?? new UnlockState();   // missing key = reset
+            // Missing key: leave as is. A load starts on a fresh scene, so the Awake state (day-1 rows already announced) is the reset state.
+            if (state is not UnlockState s) return;
             _unlocks.Restore(new SaveUnlockData { StoryUnlocked = new List<string>(s.storyUnlocked), Notified = new List<string>(s.notified) });
         }
     }
