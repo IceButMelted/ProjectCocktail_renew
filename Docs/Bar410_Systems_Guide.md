@@ -248,6 +248,19 @@ PauseScene (โหลดซ้อน)        หน้า Pause / Setting
   - **ย้ายร้านหรือไฟแล้วต้องกด Generate Lighting ใหม่** ไม่งั้นเงาและแสงที่ bake ไว้จะไม่ตรง
 - **HDRI เดิม:** `M_Skybox` (`HDR_WarmBar_1k`) ไม่ได้ใช้ในฉากหลักแล้ว ถ้าจะกลับไปใช้ ใส่ใน Lighting › Skybox Material แล้ว bake ใหม่
 
+## 17. Rewrite (Bar410 layer) — R3 status *2026-11-09*
+- **หลักการ:**
+  - โค้ดใหม่อยู่ `Assets/Bar410/` แยกเป็น asmdef ตามชั้น: Core / Domain / Contracts (interface + DTO) / Flow (state, Station) / Features (WorldView, UiScenes ฯลฯ) / Host (ต่อกับ Unity) ชั้นล่างไม่รู้จักชั้นบน
+  - แยก Flow / Contracts / Host: Flow เป็น C# ล้วน คุยกับโลกผ่าน port (interface ใน Contracts) ส่วน Host คือ adapter ที่ผูกกับ manager/ฉากจริง
+  - Minigame และ Garnish UI แยกเป็นฉาก additive (`Minigame_UI`, `Garnish_UI`) โหลดล่วงหน้า (preload) ก่อนเริ่มวัน ฝั่ง world อยู่ใน prefab `PF_MinigameWorld` / `PF_GarnishWorld` ภาพ world แสดงผ่าน RenderTexture ที่ `WorldView`
+  - flow state ใช้ label เป็นหลัก (label-first): `FlowState` เป็นสตริงตามตารางใน `FlowTypes`
+  - ฉากใหม่ `Main_V2` อยู่คู่ฉากเก่า `New Drag Drop System` ไม่แตะฉากเก่า (ยกเว้น marker `GarnishGlassView1/2/3`)
+- **สถานะ:** R1-R3 เสร็จ R3 (ชงหนึ่งแก้วไม่มี Yarn) **รอเจ้าของลองเล่น** fps/hitch วัดใน Editor เท่านั้น ยังไม่ได้วัดใน build (`Docs/rewrite/G3-T12_Measurements.md`) parity run (G1-15) ยังไม่ทราบสถานะ
+- **Script หลัก:** `GameRoot` + `StubStory` (`Main_V2` › `[GameRoot]`), `MainWiring` (C# ธรรมดา, `Host/`), `PrepareStation` / `GarnishStation` / `ServeStation` (`[Flow Stations]`), `DayRunner` / `BartendingSession` / `FlowCommands` (`Assets/Bar410/Flow/`), `MinigameUiHost` + `GarnishUiHost` (ฉาก UI), `GarnishTable`, `WorldView` / `WorldViewSource` / `MinigameWorldSource`, `UiSceneLoader` / `UiSceneEntry` (`Assets/Bar410/Features/`), `FlowDebugHotkeys` (`[Debug]`, Editor) ตารางเต็มดู CLAUDE.md หัวข้อ "Component ที่เพิ่มเข้ามา"
+- **แก้เองได้:** ตำแหน่ง/กล้อง/ขนาดใน prefab `PF_MinigameWorld` / `PF_GarnishWorld`, layout ของ Canvas ใน `Minigame_UI` / `Garnish_UI`, marker `GarnishGlassView1/2/3` ใน `Main_V2` ส่วน asmdef และ Contracts ไม่แนะนำให้แก้เอง
+- **ปัญหาที่รู้:** preload ทำให้วันเริ่มช้า (~6 วินาทีใน Editor), คำถามเปิดของเจ้าของ (ที่นั่งแก้ว D6, slot `Granish_Topping_1/2` ปิดอยู่, ปุ่ม OpenBook บนจอย)
+- **อ่านเพิ่ม:** `Docs/Bar410_Rewrite_ExecutionPlan.md`, `Docs/rewrite/Contracts_Final.md` (§5/§6/§10), `Docs/rewrite/G3-T12_Measurements.md`, `Docs/rewrite/R3_OwnerPlaytest.md`
+
 ## ระบบที่ยังไม่มีหรือยังไม่ครบ
 - **Close (จบวัน):** ยังไม่มี UI
 - **หน้าสูตรในหนังสือ:** มีแค่ API ของการปลดล็อค รอตัวอย่าง UI
