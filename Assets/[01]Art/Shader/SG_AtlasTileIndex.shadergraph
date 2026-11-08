@@ -23,6 +23,9 @@
         },
         {
             "m_Id": "845eba94d7ad4002beb26e5674988532"
+        },
+        {
+            "m_Id": "9bba7845e3b64cc6b533f92132db0ec7"
         }
     ],
     "m_Keywords": [],
@@ -209,6 +212,9 @@
         },
         {
             "m_Id": "55ecc19fce314b229c23d3a5f5b34e12"
+        },
+        {
+            "m_Id": "4532d292b5474a35b7754ae6910be00c"
         }
     ],
     "m_GroupDatas": [
@@ -475,6 +481,20 @@
                     "m_Id": "515166635cca4d1d963464052e1135b9"
                 },
                 "m_SlotId": 1
+            }
+        },
+        {
+            "m_OutputSlot": {
+                "m_Node": {
+                    "m_Id": "4532d292b5474a35b7754ae6910be00c"
+                },
+                "m_SlotId": 0
+            },
+            "m_InputSlot": {
+                "m_Node": {
+                    "m_Id": "b0cf1bd17ba64a6081b5ee30335128f3"
+                },
+                "m_SlotId": 0
             }
         },
         {
@@ -1916,7 +1936,7 @@
     "m_Title": "TileSize",
     "m_Position": {
         "x": -4064.0,
-        "y": 19.000038146972658
+        "y": 19.0
     }
 }
 
@@ -2696,6 +2716,42 @@
     "m_Position": {
         "x": -3141.0,
         "y": -201.0
+    }
+}
+
+{
+    "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.PropertyNode",
+    "m_ObjectId": "4532d292b5474a35b7754ae6910be00c",
+    "m_Group": {
+        "m_Id": ""
+    },
+    "m_Name": "Property",
+    "m_DrawState": {
+        "m_Expanded": true,
+        "m_Position": {
+            "serializedVersion": "2",
+            "x": 196.99996948242188,
+            "y": 371.99993896484377,
+            "width": 140.0,
+            "height": 34.000030517578128
+        }
+    },
+    "m_Slots": [
+        {
+            "m_Id": "969cdf3405744fb29a6fbd017ba4f9be"
+        }
+    ],
+    "synonyms": [],
+    "m_Precision": 0,
+    "m_PreviewExpanded": true,
+    "m_DismissedVersion": 0,
+    "m_PreviewMode": 0,
+    "m_CustomColors": {
+        "m_SerializableColors": []
+    },
+    "m_Property": {
+        "m_Id": "9bba7845e3b64cc6b533f92132db0ec7"
     }
 }
 
@@ -3989,7 +4045,7 @@
     "m_Title": "tiled",
     "m_Position": {
         "x": -5341.0,
-        "y": 254.00003051757813
+        "y": 254.0
     }
 }
 
@@ -4015,8 +4071,8 @@
     "m_ObjectId": "6edc16452107481da98c45dcc2c75a56",
     "m_Title": "mid map",
     "m_Position": {
-        "x": -730.9998168945313,
-        "y": 221.49996948242188
+        "x": -731.0,
+        "y": 222.0
     }
 }
 
@@ -5364,6 +5420,22 @@
 
 {
     "m_SGVersion": 0,
+    "m_Type": "UnityEditor.ShaderGraph.Vector1MaterialSlot",
+    "m_ObjectId": "969cdf3405744fb29a6fbd017ba4f9be",
+    "m_Id": 0,
+    "m_DisplayName": "Smoothness",
+    "m_SlotType": 1,
+    "m_Hidden": false,
+    "m_ShaderOutputName": "Out",
+    "m_StageCapability": 3,
+    "m_Value": 0.0,
+    "m_DefaultValue": 0.0,
+    "m_Labels": [],
+    "m_LiteralMode": false
+}
+
+{
+    "m_SGVersion": 0,
     "m_Type": "UnityEditor.ShaderGraph.DynamicValueMaterialSlot",
     "m_ObjectId": "97253f9c613a44359d455e36c66e847b",
     "m_Id": 0,
@@ -5481,6 +5553,50 @@
         "w": 0.0
     },
     "m_LiteralMode": false
+}
+
+{
+    "m_SGVersion": 1,
+    "m_Type": "UnityEditor.ShaderGraph.Internal.Vector1ShaderProperty",
+    "m_ObjectId": "9bba7845e3b64cc6b533f92132db0ec7",
+    "m_Guid": {
+        "m_GuidSerialized": "0320ff41-488a-4901-96d7-a47a28e38d33"
+    },
+    "promotedFromAssetID": "",
+    "promotedFromCategoryName": "",
+    "promotedOrdering": -1,
+    "m_Name": "Smoothness",
+    "m_DefaultRefNameVersion": 1,
+    "m_RefNameGeneratedByDisplayName": "Smoothness",
+    "m_DefaultReferenceName": "_Smoothness",
+    "m_OverrideReferenceName": "",
+    "m_GeneratePropertyBlock": true,
+    "m_UseCustomSlotLabel": false,
+    "m_CustomSlotLabel": "",
+    "m_DismissedVersion": 0,
+    "m_Precision": 0,
+    "overrideHLSLDeclaration": false,
+    "hlslDeclarationOverride": 0,
+    "m_Hidden": false,
+    "m_PerRendererData": false,
+    "m_customAttributes": [],
+    "m_Value": 0.5,
+    "m_FloatType": 0,
+    "m_LiteralFloatMode": false,
+    "m_RangeValues": {
+        "x": 0.0,
+        "y": 1.0
+    },
+    "m_SliderType": 0,
+    "m_SliderPower": 3.0,
+    "m_EnumType": 0,
+    "m_CSharpEnumString": "",
+    "m_EnumNames": [
+        "Default"
+    ],
+    "m_EnumValues": [
+        0
+    ]
 }
 
 {
@@ -6111,6 +6227,9 @@
         },
         {
             "m_Id": "845eba94d7ad4002beb26e5674988532"
+        },
+        {
+            "m_Id": "9bba7845e3b64cc6b533f92132db0ec7"
         }
     ]
 }
