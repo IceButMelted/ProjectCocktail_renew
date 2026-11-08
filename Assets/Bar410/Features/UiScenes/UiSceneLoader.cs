@@ -92,7 +92,7 @@ namespace Bar410.UiScenes
             try
             {
                 var active = SceneManager.GetActiveScene();
-                if (!_hosts.ContainsKey(id) && !SceneManager.GetSceneByName(sceneName).isLoaded)
+                if (!_hosts.ContainsKey(id) && !SceneManager.GetSceneByName(sceneName).IsValid())
                 {
                     var op = SceneManager.LoadSceneAsync(sceneName, LoadSceneMode.Additive);
                     if (op == null) throw new InvalidOperationException($"[UiScenes] cannot load '{sceneName}': is it in Build Settings?");

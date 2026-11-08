@@ -215,6 +215,7 @@ public interface IUiSceneRegistry { void Register(UiSceneId id, object host); vo
 - Sig.: `[SerializeField] UiSceneId _id; protected abstract object Host { get; }`.
 - Awake:
   - Scans its own scene with `scene.GetRootGameObjects()` → `GetComponentsInChildren<…>(true)` for **EventSystem, AudioListener, CinemachineBrain and Camera**. Each one found is an error and gets destroyed.
+    - **As built (G3-T3):** each one is logged as an error and **disabled** (`enabled = false`), not destroyed: components that require them (input modules on EventSystem, URP camera data on Camera) make `Destroy` fail.
   - Registers through `UiSceneRegistry.Current`. If it is null, it logs "standalone" and calls `OnStandalone()` (a virtual dev harness, editor only).
 - OnDestroy: `Unregister`.
 - Rule: **the root stays active.** Awake does not run on inactive objects, and `MinigameSystemManager.Update` ticks every frame. Hide with `Canvas.enabled=false` plus `CanvasGroup` (alpha 0, `blocksRaycasts=false`), not with `SetActive`.
